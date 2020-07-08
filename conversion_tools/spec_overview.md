@@ -68,11 +68,11 @@ The other key feature our data format must support is the ability to store and r
 
 ```
     "agcontexts": [
-        "agcontext": {
-            "crop_type": "pastoral_grassland",
-            "camera_type": "weedlogger",
-            "camera_angle": 90,
-            "camera_fov": 85,
-            "emr_channels": "na"}
+        {
+         "crop_type": "pastoral_grassland",
+         "camera_type": "weedlogger",
+         "camera_angle": 90,
+         "camera_fov": 85,
+         "emr_channels": "na"}
     ]
 ```
