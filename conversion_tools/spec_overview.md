@@ -68,8 +68,7 @@ The other key feature our data format must support is the ability to store and r
 
 ```json
 "agcontexts": [
-    {
-     "crop_type": "pastoral_grassland",
+    {"crop_type": "pastoral_grassland",
      "camera_type": "weedlogger",
      "camera_angle": 90,
      "camera_fov": 85,
