@@ -16,29 +16,29 @@ The structure of COCO annotations is designed to support computer vision researc
 
 Genrally, COCO annotation categories only contain the name and id of each category. In the agricultural context, we are aware that different plants may play different roles in different scenarios (i.e. a plant may be a crop in one dataset and a weed in another). To capture this information, we have added in a "role" for each category.
 
-```
-    "categories": [
+```json
+"categories": [
 
-        {
-            "name": "lantana",
-            "id": 1,
-            "role": "weed"
-        },
-        {
-            "name": "triticum aestivum",
-            "id": 2,
-            "role": "crop"
-        }
-  ]
+    {
+        "name": "lantana",
+        "id": 1,
+        "role": "weed"
+    },
+    {
+        "name": "triticum aestivum",
+        "id": 2,
+        "role": "crop"
+    }
+]
 ```
 
 We are still determining the amount of information to include in categories: it may be good to include reference to information like Bayer codes, common names, or other information that is typically used with biological standards such as GBIF.
 
-### The "collections" object
+### The "collections" and "collection_memberships" objects
 
 One of the key features we want to support is the ability for users to contribute their own images while also being able to assemble datasets from multiple different datasets that have previously been uploaded. To support this functionality, we have added another object which lists all of the important information about each specific collection of images. Each annotation is tied to a specific collection, and when a dataset is assembled by merging images/annotations from multiple different datasets, there will then be a seperate "collection" object for each of the different datasets. 
 
-```
+```json
 "collections": [
   {"id": 0,
    "title": "myweeds",
@@ -66,13 +66,13 @@ The original conception of COCO seems to imply that the `info` blob should store
 
 The other key feature our data format must support is the ability to store and refer to information that is essential in the agricultural context. To do this we have created an object with the agricultural context. Each annotation then contains a key linking it to its specific agricultural context object.
 
-```
-    "agcontexts": [
-        {
-         "crop_type": "pastoral_grassland",
-         "camera_type": "weedlogger",
-         "camera_angle": 90,
-         "camera_fov": 85,
-         "emr_channels": "na"}
-    ]
+```json
+"agcontexts": [
+    {
+     "crop_type": "pastoral_grassland",
+     "camera_type": "weedlogger",
+     "camera_angle": 90,
+     "camera_fov": 85,
+     "emr_channels": "na"}
+]
 ```
