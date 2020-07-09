@@ -4,7 +4,8 @@
 
 # Repository Structure
 conversion_tools/deepweeds_to_json/deepweeds_images/*.jpg
-/conversion_tools/deepweeds_to_json/*.json
+conversion_tools/deepweeds_to_json/*.json
+conversion_tools/cwfid_to_json/*.yaml
 
 # Images
 # JPEG
