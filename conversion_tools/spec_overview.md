@@ -25,6 +25,8 @@ Finally, there is an "info" section which provides some basic dataset wide infor
 
 ## Adapting COCO to our needs
 
+A diagram of the in-development schema is being developed at https://dbdiagram.io/d/5f05c0940425da461f046867
+
 ### Expanding the "categories" object
 
 Genrally, COCO annotation categories only contain the name and id of each category. 
