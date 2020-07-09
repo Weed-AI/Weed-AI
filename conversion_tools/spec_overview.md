@@ -87,13 +87,13 @@ Each annotation then contains a key linking it to its specific agricultural cont
 
 ```json
 "agcontext": [
-    {"id": 0
+    {"id": 0,
      "crop_type": "pastoral_grassland",
      "region": "region",
      "crop_growth_stage": #string,
      "weed_growth_stage": #string,
      "camera_type": "weedlogger",
-     "camera_height": 
+     "camera_height": 100,
      "camera_angle": 90,
      "camera_fov": 85,
      "emr_channels": "na"}
