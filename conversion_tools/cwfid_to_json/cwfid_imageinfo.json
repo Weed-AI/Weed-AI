@@ -17282,22 +17282,41 @@
             "id": 1
         }
     ],
-    "info": {},
+    "info": [
+        {
+            "year": 2015,
+            "version": 1,
+            "description": "YAML annotations and PNG images converted into WeedCOCO",
+            "secondary_contributor": "Converted to WeedCOCO by Henry Lydecker",
+            "contributor": "Sebastian Haug",
+            "id": 0
+        }
+    ],
     "license": [
         {
             "id": 0,
-            "license_name": "Creative Commons Attribution 4.0",
+            "license_name": "CC BY 4.0",
+            "license_fullname": "Creative Commons Attribution 4.0",
             "license_version": "4.0",
             "url": "https://creativecommons.org/licenses/by/4.0/"
         }
     ],
     "agcontext": [
         {
-            "id": 0,
+            "agcontext_id": 0,
             "agcontext_name": "cwfid",
             "crop_type": "root vegetable",
-            "upload_time": "2020-07-14 09:58:00",
-            "camera_type": "TODO"
+            "crop_stage": "leaf development",
+            "location_continent": "Europe",
+            "location_country": "Germany",
+            "location_state": "Lower Saxony",
+            "upload_time": "2020-07-15 17:03:22",
+            "camera_type": "JAI AD-130GE",
+            "camera_height": 450,
+            "camera_angle": 90,
+            "camera_fov": 25,
+            "emr_channels": "Red, NIR",
+            "url": "https://github.com/cwfid/dataset"
         }
     ],
     "collections": [
@@ -17307,6 +17326,7 @@
             "year": 2015,
             "identifier": "doi:10.1007/978-3-319-16220-1_8",
             "rights": "All data is subject to copyright and may only be used for non-commercial research. In case of use please cite our publication.",
+            "accrual_policy": "Closed",
             "id": 0
         }
     ],
