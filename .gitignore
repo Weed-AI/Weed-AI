@@ -7,6 +7,7 @@ conversion_tools/deepweeds_to_json/deepweeds_images/*.jpg
 conversion_tools/deepweeds_to_json/*.json
 conversion_tools/cwfid_to_json/*.yaml
 conversion_tools/cwfid_to_json/annotations/*.yaml
+conversion_tools/concatenation/*.json
 
 # Images
 # JPEG
