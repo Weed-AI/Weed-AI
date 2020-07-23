@@ -1,149 +1,157 @@
+type: object
+required:
+  - id
+  - crop_type
+  - crop_stage
+  - background_type
+  - weather_description
+  - location_continent
+  - location_country
+  - location_state
+  - camera_model
+  - lens_model
+  - camera_height
+  - camera_angle
+  - camera_fov
+  - photography_description
+  - cropped_to_plant
 
-agcontext_name:
-  type:
-    anyOf:
-    - type: string
-    description: |-
-      Agricultural context name
-      string. Required.
-      A string representing the name of the agricultural context.
+properties:
 
-crop_type:
-  type:
-    anyOf:
-    - type: string
-    description: |-
-      General crop type
-      string. Required.
-      A string describing the general cropping scenario (e.g. "root vegetable").
+  id:
+    type:
+      int
+      decription:
+        Integer identifying the AgContext.
 
-crop_stage:
-  type:
-    anyOf:
-    - type: string
-      enum:
-      - na
-      - 00
-      - 0
-      - 1
-      - 2
-      - 3
-      - 4
-      - 5
-      - 6
-      - 7
-      - 8
-      - 9
-      - 99
-    description: |-
-      BBCH crop development stage
-      "na", "00", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "99". Required.
-      One of eleven possible strings representing the approximate BBCH phenological development stage of the crop. If this AgContext is not in a cropping environment, use value "na".
+  crop_type:
+    type:
+      string
+      description: |-
+        General crop type
+        str. Required.
+        A string describing the general cropping scenario (e.g. "root vegetable").
 
-location_continent:
-  type:
-    anyOf:
-    - type: string
-    description: |-
-      Continent where AgContext is located
-      string. Required.
-      A string representing the continent where the AgContext is located.
+  crop_stage:
+    type:
+      string
+        enum:
+        - na
+        - 00
+        - 0
+        - 1
+        - 2
+        - 3
+        - 4
+        - 5
+        - 6
+        - 7
+        - 8
+        - 9
+        - 99
+      description: |-
+        BBCH crop development stage
+        "na", "00", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "99". Required.
+        One of eleven possible strings representing the BBCH phenological development stage of the crop.
+        If this AgContext is not in a cropping environment, use value "na".
 
-location_country:
-  type:
-    anyOf:
-    - type: string
-    description: |-
-      Country where AgContext is located
-      string. Required.
-      A string representing the country where the AgContext is located.
+  weather_description:
+    type:
+      string
+      description:
+        Description of weather when images were captured.
+        str.
 
-location_state:
-  type:
-    anyOf:
-    - type: string
-    description: |-
-      State where AgContext is located
-      string. Required.
-      A string representing the state/province where the AgContext is located.
+  location_continent:
+    type:
+       string
+      description: |-
+        Continent where AgContext is located
+        str. Required.
+        A string representing the continent where the AgContext is located.
 
-upload_time:
-  type:
-    anyOf:
-    - type: DateTime<'Y-m-d H:i:s'>
-    description: |-
-      Data and time when this AgContext was uploaded.
-      DateTime. Required.
-      System generated date time object recorded when a dataset with AgContext is uploaded.
+  location_country:
+    type:
+       string
+      description: |-
+        Country where AgContext is located
+        str. Required.
+        A string representing the country where the AgContext is located.
 
-camera_type:
-  type:
-    anyOf:
-    - type: string
-    - type: string
-      enum:
-      - variable
-    description:
-      Type of camera
-      string.
-      A string describing the model/make of camera used for this AgContext. If this is not fixed within the AgContext, use value "variable".
+  location_state:
+    type:
+       string
+      description: |-
+        State where AgContext is located
+        str. Required.
+        A string representing the state/province where the AgContext is located.
 
-camera_height:
-  type:
-    anyOf:
-    - type: integer
-    - type: string
-      enum:
-      - variable
-    description: |-
-      Height of camera
-      int or "variable". Required.
-      An integer representing the height of the camera, measured in millimeters . If this is not fixed within the AgContext, use value "variable".
+  camera_type:
+    type:
+      anyOf:
+      - type: string
+      - type: string
+        enum:
+        - variable
+      description:
+        Type of camera
+        str.
+        A string describing the model/make of camera used for this AgContext.
+        If this is not fixed within the AgContext, use value "variable".
 
-camera_angle:
-  type:
-    anyOf:
-    - type: integer
-    - type: string
-      enum:
-      - variable
-    description:
-      Angle of camera
-      int or "variable". Required
-      An integer representing the angle at which the camera is positioned, in degrees. A camera facing straight down would be 90. If this is not fixed within the AgContext, use value "variable".
+  camera_height:
+    type:
+      anyOf:
+      - type: integer
+      - type: string
+        enum:
+        - variable
+      description: |-
+        Height of camera
+        int or "variable". Required.
+        An integer representing the height of the camera, measured in millimeters .
+        If this is not fixed within the AgContext, use value "variable".
 
-camera_fov:
-  type:
-    anyOf:
-    - type: integer
-      minimum: 1
-      maximum: 180
-    - type: string
-      enum:
-      - variable
-    description: |-
-      Field of view for camera
-      int or "variable". Required.
-      An integer representing the angle captured by the camera across the diagonal of an image, measured in degrees. If this is not fixed within the AgContext, use value "variable".
+  camera_angle:
+    type:
+      anyOf:
+      - type: integer
+      - type: string
+        enum:
+        - variable
+      description:
+        Angle of camera
+        int or "variable". Required
+        An integer representing the angle at which the camera is positioned, in degrees.
+        A camera facing straight down would be 90.
+        If this is not fixed within the AgContext, use value "variable".
 
-emr_channels:
-  type:
-    anyOf:
-    - type: string
-      enum:
-      - visual
-      - NIR
-      - Red
-    description: |-
-      EMR channel recorded by camera
-      "visual", "NIR", and/or "Red".
-      A string describing the electromagnetic radiation channels recorded by the camera.
+  camera_fov:
+    type:
+      anyOf:
+      - type: integer
+        minimum: 1
+        maximum: 180
+      - type: string
+        enum:
+        - variable
+      description: |-
+        Field of view for camera
+        int or "variable". Required.
+        An integer representing the angle captured by the camera across the diagonal of an image, measured in degrees.
+        If this is not fixed within the AgContext, use value "variable".
 
-url:
-  type:
-    anyOf:
-    - type: string
-    description: |-
-      URL of AgContext
-      string.
-      A string recording the URL of the AgContext.
+  photography_description:
+    type:
+      string
+      description:
+        Description of photography.
+        str.
+
+  cropped_to_plant:
+    type:
+      boolean
+      description:
+        Has the image been cropped to the plant?
+        bool.
+        A boolean indicated if the image has been cropped to the plant.
