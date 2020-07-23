@@ -38,7 +38,7 @@ crop_stage:
     description: |-
       BBCH crop development stage
       "na", "00", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "99". Required.
-      One of eleven possible strings representing the BBCH phenological development stage of the crop. If this AgContext is not in a cropping environment, use value "na".
+      One of eleven possible strings representing the approximate BBCH phenological development stage of the crop. If this AgContext is not in a cropping environment, use value "na".
 
 location_continent:
   type:
