@@ -27,7 +27,7 @@ properties:
   crop_type:
     type:
       string
-      description: |-
+    description: |-
         General crop type
         str. Required.
         A string describing the general cropping scenario (e.g. "root vegetable").
