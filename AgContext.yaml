@@ -147,6 +147,7 @@ properties:
       description:
         Description of photography.
         str.
+Free text description of salient aspects of camera, mount and lighting.
 
   cropped_to_plant:
     type:
