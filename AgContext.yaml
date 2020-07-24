@@ -17,7 +17,7 @@ required:
   - cropped_to_plant
 
 properties:
-
+  
   id:
     type:
       number
@@ -153,6 +153,3 @@ properties:
       description:
         Has the image been cropped to the plant?
         A boolean indicating if the image has been cropped to the plant.
-
-- name: Yaml-Checker
-  uses: leon-th/yaml-checker@v1.0.0
