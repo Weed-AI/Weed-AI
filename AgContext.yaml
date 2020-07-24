@@ -154,4 +154,4 @@ properties:
       description:
         Has the image been cropped to the plant?
         bool.
-        A boolean indicated if the image has been cropped to the plant.
+        A boolean indicating if the image has been cropped to the plant.
