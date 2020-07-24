@@ -21,7 +21,7 @@ properties:
   id:
     type:
       int
-      decription:
+    description:
       Integer identifying the AgContext.
 
   crop_type:
