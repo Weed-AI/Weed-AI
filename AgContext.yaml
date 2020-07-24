@@ -22,7 +22,7 @@ properties:
     type:
       int
       decription:
-        Integer identifying the AgContext.
+      Integer identifying the AgContext.
 
   crop_type:
     type:
