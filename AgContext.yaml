@@ -122,7 +122,7 @@ properties:
         - variable
       description:
         Angle of camera.
-        An number representing the angle at which the camera is positioned, in degrees.
+        A number representing the angle at which the camera is positioned, in degrees.
         A camera facing straight down would be 90.
         If this is not fixed within the AgContext, use value "variable".
 
@@ -137,7 +137,7 @@ properties:
         - variable
       description: |-
         Field of view for camera
-        An number representing the angle captured by the camera across the diagonal of an image, measured in degrees.
+        A number representing the angle captured by the camera across the diagonal of an image, measured in degrees.
         If this is not fixed within the AgContext, use value "variable".
 
   photography_description:
