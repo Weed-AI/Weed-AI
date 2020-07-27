@@ -20,4 +20,4 @@ jobs:
         uses: docker://orrosenblatt/validate-json-action:latest
         env:
           INPUT_SCHEMA: schema_tools/validator/test_schema.json
-          INPUT_JSONS: schema_tools/validator/test_valid_schema.json,schema_tools/validator/test_invalid_schema.json
+          INPUT_JSONS: schema_tools/**.json
