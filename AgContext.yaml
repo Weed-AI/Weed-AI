@@ -17,7 +17,7 @@ required:
   - cropped_to_plant
 
 properties:
-  
+
   id:
     type:
       number
@@ -110,7 +110,7 @@ properties:
         - variable
       description: |-
         Height of camera.
-        An numbereger representing the height of the camera, measured in millimeters .
+        An number representing the height of the camera, measured in millimeters .
         If this is not fixed within the AgContext, use value "variable".
 
   camera_angle:
@@ -122,7 +122,7 @@ properties:
         - variable
       description:
         Angle of camera.
-        An numbereger representing the angle at which the camera is positioned, in degrees.
+        An number representing the angle at which the camera is positioned, in degrees.
         A camera facing straight down would be 90.
         If this is not fixed within the AgContext, use value "variable".
 
@@ -137,7 +137,7 @@ properties:
         - variable
       description: |-
         Field of view for camera
-        An numbereger representing the angle captured by the camera across the diagonal of an image, measured in degrees.
+        An number representing the angle captured by the camera across the diagonal of an image, measured in degrees.
         If this is not fixed within the AgContext, use value "variable".
 
   photography_description:
