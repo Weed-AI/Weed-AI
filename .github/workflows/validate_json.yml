@@ -1,6 +1,6 @@
 # This is built on GitHub's "basic workflow to help you get started with Actions"
 
-name: CI
+name: JSON validation CI
 
 # Controls when the action will run. Triggers the workflow on push or pull request
 on:
@@ -20,4 +20,4 @@ jobs:
         uses: docker://orrosenblatt/validate-json-action:latest
         env:
           INPUT_SCHEMA: schema_tools/validator/test_schema.json
-          INPUT_JSONS: schema_tools/**.json
+          INPUT_JSONS: schema_tools/validator/test_invalid_schema.json, schema_tools/validator/test_valid_schema.json
