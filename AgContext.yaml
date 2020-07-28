@@ -90,8 +90,7 @@ properties:
         A numeric string indicting the EPSG code for the spatial reference system used for the location of the AgContext.
 
   camera_type:
-    type:
-      anyOf:
+    anyOf:
       - type: string
       - type: string
         enum:
@@ -102,8 +101,7 @@ properties:
         If this is not fixed within the AgContext, use value "variable".
 
   camera_height:
-    type:
-      anyOf:
+    anyOf:
       - type: number
       - type: string
         enum:
@@ -114,8 +112,7 @@ properties:
         If this is not fixed within the AgContext, use value "variable".
 
   camera_angle:
-    type:
-      anyOf:
+    anyOf:
       - type: number
       - type: string
         enum:
@@ -127,8 +124,7 @@ properties:
         If this is not fixed within the AgContext, use value "variable".
 
   camera_fov:
-    type:
-      anyOf:
+    anyOf:
       - type: number
         minimum: 1
         maximum: 180
@@ -136,7 +132,7 @@ properties:
         enum:
         - variable
     description: |-
-        Field of view for camera
+        Field of view for camera.
         A number representing the angle captured by the camera across the diagonal of an image, measured in degrees.
         If this is not fixed within the AgContext, use value "variable".
 
