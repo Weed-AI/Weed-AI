@@ -70,14 +70,14 @@ properties:
 
   location_lat:
     type:
-      float
+      number
     description:
         Latitude in decimal degrees.
         Approximate latitude location of the AgContext, in decimal degrees.
 
   location_long:
     type:
-      float
+      number
     description:
         Longitude in decimal degrees.
         Approximate longitude location of the AgContext, in decimal degrees.
