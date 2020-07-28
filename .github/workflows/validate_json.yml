@@ -16,8 +16,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+      - name: Compile yaml schema to JSON
+        run: |
+          pip install yaml
+          python -c 'import json, yaml, sys; json.dump(yaml.safe_load(sys.stdin), sys.stdout, indent=2)' < AgContext.yaml > AgContext.json
+          curl -L https://json-schema.org/draft-07/schema > jsonschema07.schema.json
       - name: Validate JSON
         uses: docker://orrosenblatt/validate-json-action:latest
         env:
-          INPUT_SCHEMA: ./schema_tools/validator/test_schema.json
-          INPUT_JSONS: ./schema_tools/validator/test_invalid_schema.json,./schema_tools/validator/test_valid_schema.json
+          INPUT_SCHEMA: ./jsonschema07.schema.json
+          INPUT_JSONS: ./AgContext.json
