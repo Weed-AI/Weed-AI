@@ -21,20 +21,20 @@ properties:
   id:
     type:
       number
-      description: |-
+    description: |-
         A number identifying the AgContext.
 
   crop_type:
     type:
       string
-      description: |-
+    description: |-
           General crop type.
           A string describing the general cropping scenario (e.g. "root vegetable").
 
   crop_stage:
     type:
       string
-      enum:
+    enum:
       - na
       - 00
       - 0
@@ -48,7 +48,7 @@ properties:
       - 8
       - 9
       - 99
-      description: |-
+    description: |-
         BBCH crop development stage.
         "na", "00", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "99". Required.
         One of eleven possible strings representing approximate BBCH phenological development stage of the crop.
@@ -57,35 +57,35 @@ properties:
   background_type:
     type:
       string
-      description: |-
+    description: |-
         Background cover type.
         One of several strings describing the background cover that is behind any plants in the images.
 
   weather_description:
     type:
       string
-      description: |-
+    description: |-
         Weather conditions in images.
         Free text description of approximate weather conditions during the image capture session.
 
   location_lat:
     type:
       float
-      description:
+    description:
         Latitude in decimal degrees.
         Approximate latitude location of the AgContext, in decimal degrees.
 
   location_long:
     type:
       float
-      description:
+    description:
         Longitude in decimal degrees.
         Approximate longitude location of the AgContext, in decimal degrees.
 
   location_datum:
     type:
       string
-      description: |-
+    description: |-
         EPSG code of spatial datum.
         A numeric string indicting the EPSG code for the spatial reference system used for the location of the AgContext.
 
@@ -96,7 +96,7 @@ properties:
       - type: string
         enum:
         - variable
-      description: |-
+    description: |-
         Type of camera.
         Free text denoting the model/make of camera used for this AgContext.
         If this is not fixed within the AgContext, use value "variable".
@@ -108,7 +108,7 @@ properties:
       - type: string
         enum:
         - variable
-      description: |-
+    description: |-
         Height of camera.
         An number representing the height of the camera, measured in millimeters .
         If this is not fixed within the AgContext, use value "variable".
@@ -120,7 +120,7 @@ properties:
       - type: string
         enum:
         - variable
-      description:
+    description:
         Angle of camera.
         A number representing the angle at which the camera is positioned, in degrees.
         A camera facing straight down would be 90.
@@ -135,7 +135,7 @@ properties:
       - type: string
         enum:
         - variable
-      description: |-
+    description: |-
         Field of view for camera
         A number representing the angle captured by the camera across the diagonal of an image, measured in degrees.
         If this is not fixed within the AgContext, use value "variable".
@@ -143,13 +143,13 @@ properties:
   photography_description:
     type:
       string
-      description:
+    description:
         Description of photography.
         Free text description of salient aspects of camera, mount and lighting.
 
   cropped_to_plant:
     type:
       boolean
-      description:
+    description:
         Has the image been cropped to the plant?
         A boolean indicating if the image has been cropped to the plant.
