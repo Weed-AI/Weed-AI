@@ -16,6 +16,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+      - name: ls
+        run: |
+          ls -l /github/workspace/
+          ls -l /github/workspace/schema_tools/validator/
       - name: Validate JSON
         uses: docker://orrosenblatt/validate-json-action:latest
         env:
