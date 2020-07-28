@@ -20,9 +20,9 @@ jobs:
         run: |
           pip install pyyaml
           python -c 'import json, yaml, sys; json.dump(yaml.safe_load(sys.stdin), sys.stdout, indent=2)' < AgContext.yaml > AgContext.json
-#          curl -L https://json-schema.org/draft-07/schema > jsonschema07.schema.json
+          echo {} > test.json
       - name: Validate JSON
         uses: docker://orrosenblatt/validate-json-action:latest
         env:
-#          INPUT_SCHEMA: ./jsonschema07.schema.json
-          INPUT_JSONS: ./AgContext.json
+          INPUT_SCHEMA: ./AgContext.json
+          INPUT_JSONS: ./test.json
