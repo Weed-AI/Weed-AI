@@ -36,8 +36,8 @@ properties:
       string
     enum:
       - na
-      - 00
-      - 0
+      - "00"
+      - "0"
       - 1
       - 2
       - 3
