@@ -15,3 +15,6 @@ conversion_tools/concatenation/*.json
 *.jpeg
 # PNG
 *.png
+
+# Annotations
+*.xml
