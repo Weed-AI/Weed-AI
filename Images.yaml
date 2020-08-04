@@ -1,0 +1,56 @@
+type: object
+required:
+  - id
+  - file_name
+  - license
+  - agcontext_id
+  - width
+  - height
+  - resolution
+
+properties:
+
+  id:
+    type: number
+    description: |-
+      A number identifying the image.
+
+  file_name:
+    type: string
+    description: |-
+      A string identifying the filename of the image.
+      This string does not include the path of the image.
+
+    license:
+      type: number
+      description: |-
+        A number identifying the relevant license object.
+
+    agcontext_id:
+      type: number
+      description: |-
+        A number identifying the relevant agcontext object.
+
+    width:
+      type: number
+      minimum: 1
+      description: |-
+        Horizontal pixel count.
+
+    height:
+      type: number
+      minimum: 1
+      description: |-
+        Vertical pixel count.
+
+    resolution:
+      type: number
+      minimum: 1
+      description: |-
+        Image resolution, in pixels.
+        Calculated as the product of x_dim and y_dim.
+
+    date_captured:
+      type: datetime
+      description: |-
+        Datetime when the image was captured.
