@@ -31,32 +31,175 @@ properties:
           General crop type.
           A string describing the general cropping scenario (e.g. "root vegetable").
 
-  crop_stage:
+  grains_descriptive_text:
     type:
       string
     enum:
+      - emergence
+      - seedling
+      - tillering
+      - stem_elongation
+      - booting
+      - ear_emergence
+      - flowering
+      - milky_dough
+      - dough
+      - ripening
       - na
-      - "00"
-      - "0"
-      - "1"
-      - "2"
-      - "3"
-      - "4"
-      - "5"
-      - "6"
-      - "7"
-      - "8"
-      - "9"
-      - "99"
     description: |-
-        BBCH crop development stage.
-        "na", "00", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "99". Required.
-        One of eleven possible strings representing approximate BBCH phenological development stage of the crop.
+        Grains descriptive text.
+        One of ten possible strings describing the crop developmental stage.
         If this AgContext is not in a cropping environment, use value "na".
 
-  background_type:
+  bbch_descriptive_text:
     type:
       string
+    enum:
+      - germination
+      - sprouting
+      - bud development
+      - leaf development
+      - formation of side shoots
+      - tillering
+      - stem elongation
+      - rosette growth
+      - shoot development
+      - development of harvestable vegetative parts
+      - bolting
+      - inflorescence emergence
+      - heading
+      - flowering
+      - development of fruit
+      - ripening or maturity of fruit and seed
+      - senescence
+      - beginning of dormancy
+      - na
+    description: |-
+        BBCG descriptive text.
+        One of several possible strings describing the stage of the crop, chosen from a list of possible terms used by the BBCH.
+        If this AgContext is not in a cropping environment, use value "na".
+
+  bbch_code:
+    type:
+      string
+    enum:
+      - gs01
+      - gs02
+      - gs04
+      - gs05
+      - gs06
+      - gs07
+      - gs08
+      - gs09
+      - gs10
+      - gs11
+      - gs12
+      - gs13
+      - gs14
+      - gs15
+      - gs16
+      - gs17
+      - gs18
+      - gs19
+      - gs20
+      - gs21
+      - gs22
+      - gs23
+      - gs24
+      - gs25
+      - gs26
+      - gs27
+      - gs28
+      - gs29
+      - gs30
+      - gs31
+      - gs32
+      - gs33
+      - gs34
+      - gs35
+      - gs36
+      - gs37
+      - gs38
+      - gs39
+      - gs40
+      - gs41
+      - gs42
+      - gs43
+      - gs44
+      - gs45
+      - gs46
+      - gs47
+      - gs48
+      - gs49
+      - gs50
+      - gs51
+      - gs52
+      - gs53
+      - gs54
+      - gs55
+      - gs56
+      - gs57
+      - gs58
+      - gs59
+      - gs60
+      - gs61
+      - gs62
+      - gs63
+      - gs64
+      - gs65
+      - gs66
+      - gs67
+      - gs68
+      - gs69
+      - gs70
+      - gs71
+      - gs72
+      - gs73
+      - gs74
+      - gs75
+      - gs76
+      - gs77
+      - gs78
+      - gs79
+      - gs80
+      - gs81
+      - gs82
+      - gs83
+      - gs84
+      - gs85
+      - gs86
+      - gs87
+      - gs88
+      - gs89
+      - gs90
+      - gs91
+      - gs92
+      - gs93
+      - gs94
+      - gs95
+      - gs96
+      - gs97
+      - gs98
+      - gs99
+    description: |-
+        BBCG descriptive text.
+        One of several possible strings describing the stage of the crop, chosen from a list of codes used by the BBCH.
+        If this AgContext is not in a cropping environment, use value "na".
+
+  soil_colour:
+    type:
+      string
+    enum:
+      - not_visible
+      - black
+      - dark_brown
+      - brown
+      - red_brown
+      - dark_red
+      - yellow
+      - pale_yellow
+      - white
+      - grey
     description: |-
         Background cover type.
         One of several strings describing the background cover that is behind any plants in the images.
