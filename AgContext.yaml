@@ -3,7 +3,9 @@ required:
   - id
   - crop_type
   - crop_stage
-  - background_type
+  - soil_colour
+  - surface_cover
+  - surface_coverage
   - weather_description
   - location_lat
   - location_long
@@ -201,8 +203,33 @@ properties:
       - white
       - grey
     description: |-
-        Background cover type.
-        One of several strings describing the background cover that is behind any plants in the images.
+        Soil colour.
+        General description of the soil colour.
+
+  surface_cover:
+    type: string
+    enum:
+      - cereal
+      - oilseed
+      - legume
+      - cotton
+      - black_plastic
+      - white_plastic
+      - woodchips
+      - other
+    description: |-
+      Surface cover type.
+      One of several strings describing the background cover that is behind any plants in the images.
+
+  surface_coverage:
+    type: string
+    enum:
+      - "0-25"
+      - "25-50"
+      - "50-75"
+      - "75-100"
+    description: |-
+      Percentage of surface cover.
 
   weather_description:
     type:
