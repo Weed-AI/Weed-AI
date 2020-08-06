@@ -229,7 +229,8 @@ properties:
       - "50-75"
       - "75-100"
     description: |-
-      Percentage of surface cover.
+      Percent of coverage in image.
+      Approximate measurement of the percent of the soil in the image that is covered by the surface cover.
 
   weather_description:
     type:
