@@ -12,21 +12,21 @@ required:
 properties:
   agcontexts:
     type: array
-    contains:
+    items:
       type:
         $ref: https://weedid.sydney.edu.au/schema/AgContext.json
   collections:
     type: array
-    contains:
+    items:
       type:
         $ref: https://weedid.sydney.edu.au/schema/Collection.json
   annotations:
     type: array
-    contains:
+    items:
       type:
         $ref: https://weedid.sydney.edu.au/schema/Annotation.json
   images:
     type: array
-    contains:
+    items:
       type:
         $ref: https://weedid.sydney.edu.au/schema/Image.json
