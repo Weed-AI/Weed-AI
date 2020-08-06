@@ -1,4 +1,4 @@
-# Untitled schema Schema
+# Untitled undefined type in AgContext Schema
 
 ```txt
 https://weedid.sydney.edu.au/schema/AgContext.json#/properties/camera_height
@@ -19,5 +19,5 @@ merged type ([Details](agcontext-properties-camera_height.md))
 
 any of
 
--   [Untitled number in undefined](agcontext-properties-camera_height-anyof-0.md "check type definition")
--   [Untitled string in undefined](agcontext-properties-camera_height-anyof-1.md "check type definition")
+-   [Untitled number in AgContext](agcontext-properties-camera_height-anyof-0.md "check type definition")
+-   [Untitled string in AgContext](agcontext-properties-camera_height-anyof-1.md "check type definition")

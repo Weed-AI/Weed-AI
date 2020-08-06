@@ -1,4 +1,4 @@
-# Untitled schema Schema
+# Untitled undefined type in AgContext Schema
 
 ```txt
 https://weedid.sydney.edu.au/schema/AgContext.json#/properties

@@ -2,13 +2,11 @@
 
 ## Top-level Schemas
 
--   [Untitled object in undefined](./agcontext.md) – `https://weedid.sydney.edu.au/schema/AgContext.json`
+-   [AgContext](./agcontext.md) – `https://weedid.sydney.edu.au/schema/AgContext.json`
 -   [Untitled object in undefined](./image.md) – `https://weedid.sydney.edu.au/schema/Image.json`
--   [Untitled object in undefined](./main.md "Weed-COCO") – `-`
--   [Untitled object in undefined](./main-1.md "Weed-COCO") – `-`
--   [Untitled object in undefined](./main-2.md "Weed-COCO") – `-`
 -   [Untitled schema](./annotation.md) – `https://weedid.sydney.edu.au/schema/Annotation.json`
 -   [Untitled schema](./collection.md) – `https://weedid.sydney.edu.au/schema/Collection.json`
+-   [Weed-COCO](./main.md "An extension of MS COCO for Weed Identification in grain crops") – `-`
 
 ## Other Schemas
 
@@ -24,18 +22,10 @@
 
 ### Arrays
 
--   [Untitled array in undefined](./main-properties-agcontexts.md) – `undefined#/properties/agcontexts`
--   [Untitled array in undefined](./main-properties-collections.md) – `undefined#/properties/collections`
--   [Untitled array in undefined](./main-properties-annotations.md) – `undefined#/properties/annotations`
--   [Untitled array in undefined](./main-properties-images.md) – `undefined#/properties/images`
--   [Untitled array in undefined](./main-1-properties-agcontexts.md) – `undefined#/properties/agcontexts`
--   [Untitled array in undefined](./main-1-properties-collections.md) – `undefined#/properties/collections`
--   [Untitled array in undefined](./main-1-properties-annotations.md) – `undefined#/properties/annotations`
--   [Untitled array in undefined](./main-1-properties-images.md) – `undefined#/properties/images`
--   [Untitled array in undefined](./main-2-properties-agcontexts.md) – `undefined#/properties/agcontexts`
--   [Untitled array in undefined](./main-2-properties-collections.md) – `undefined#/properties/collections`
--   [Untitled array in undefined](./main-2-properties-annotations.md) – `undefined#/properties/annotations`
--   [Untitled array in undefined](./main-2-properties-images.md) – `undefined#/properties/images`
+-   [Untitled array in Weed-COCO](./main-properties-agcontexts.md) – `undefined#/properties/agcontexts`
+-   [Untitled array in Weed-COCO](./main-properties-collections.md) – `undefined#/properties/collections`
+-   [Untitled array in Weed-COCO](./main-properties-annotations.md) – `undefined#/properties/annotations`
+-   [Untitled array in Weed-COCO](./main-properties-images.md) – `undefined#/properties/images`
 
 ## Version Note
 

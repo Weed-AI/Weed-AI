@@ -1,4 +1,4 @@
-# Untitled boolean in undefined Schema
+# Untitled boolean in AgContext Schema
 
 ```txt
 https://weedid.sydney.edu.au/schema/AgContext.json#/properties/cropped_to_plant

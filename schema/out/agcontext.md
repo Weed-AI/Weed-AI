@@ -1,4 +1,4 @@
-# Untitled object in undefined Schema
+# AgContext Schema
 
 ```txt
 https://weedid.sydney.edu.au/schema/AgContext.json
@@ -11,32 +11,32 @@ https://weedid.sydney.edu.au/schema/AgContext.json
 | :------------------ | ---------- | -------------- | ------------ | :---------------- | --------------------- | ------------------- | --------------------------------------------------------------------- |
 | Can be instantiated | No         | Unknown status | No           | Forbidden         | Allowed               | none                | [AgContext.schema.json](AgContext.schema.json "open original schema") |
 
-## Untitled object in undefined Type
+## AgContext Type
 
-`object` ([Details](agcontext.md))
+`object` ([AgContext](agcontext.md))
 
-# undefined Properties
+# AgContext Properties
 
-| Property                                            | Type      | Required | Nullable       | Defined by                                                                                                                                                       |
-| :-------------------------------------------------- | --------- | -------- | -------------- | :--------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [id](#id)                                           | `number`  | Required | cannot be null | [Untitled schema](agcontext-properties-id.md "https&#x3A;//weedid.sydney.edu.au/schema/AgContext.json#/properties/id")                                           |
-| [crop_type](#crop_type)                             | `string`  | Required | cannot be null | [Untitled schema](agcontext-properties-crop_type.md "https&#x3A;//weedid.sydney.edu.au/schema/AgContext.json#/properties/crop_type")                             |
-| [grains_descriptive_text](#grains_descriptive_text) | `string`  | Optional | cannot be null | [Untitled schema](agcontext-properties-grains_descriptive_text.md "https&#x3A;//weedid.sydney.edu.au/schema/AgContext.json#/properties/grains_descriptive_text") |
-| [bbch_descriptive_text](#bbch_descriptive_text)     | `string`  | Optional | cannot be null | [Untitled schema](agcontext-properties-bbch_descriptive_text.md "https&#x3A;//weedid.sydney.edu.au/schema/AgContext.json#/properties/bbch_descriptive_text")     |
-| [bbch_code](#bbch_code)                             | `string`  | Optional | cannot be null | [Untitled schema](agcontext-properties-bbch_code.md "https&#x3A;//weedid.sydney.edu.au/schema/AgContext.json#/properties/bbch_code")                             |
-| [soil_colour](#soil_colour)                         | `string`  | Required | cannot be null | [Untitled schema](agcontext-properties-soil_colour.md "https&#x3A;//weedid.sydney.edu.au/schema/AgContext.json#/properties/soil_colour")                         |
-| [surface_cover](#surface_cover)                     | `string`  | Required | cannot be null | [Untitled schema](agcontext-properties-surface_cover.md "https&#x3A;//weedid.sydney.edu.au/schema/AgContext.json#/properties/surface_cover")                     |
-| [surface_coverage](#surface_coverage)               | `string`  | Required | cannot be null | [Untitled schema](agcontext-properties-surface_coverage.md "https&#x3A;//weedid.sydney.edu.au/schema/AgContext.json#/properties/surface_coverage")               |
-| [weather_description](#weather_description)         | `string`  | Required | cannot be null | [Untitled schema](agcontext-properties-weather_description.md "https&#x3A;//weedid.sydney.edu.au/schema/AgContext.json#/properties/weather_description")         |
-| [location_lat](#location_lat)                       | `number`  | Required | cannot be null | [Untitled schema](agcontext-properties-location_lat.md "https&#x3A;//weedid.sydney.edu.au/schema/AgContext.json#/properties/location_lat")                       |
-| [location_long](#location_long)                     | `number`  | Required | cannot be null | [Untitled schema](agcontext-properties-location_long.md "https&#x3A;//weedid.sydney.edu.au/schema/AgContext.json#/properties/location_long")                     |
-| [location_datum](#location_datum)                   | `string`  | Required | cannot be null | [Untitled schema](agcontext-properties-location_datum.md "https&#x3A;//weedid.sydney.edu.au/schema/AgContext.json#/properties/location_datum")                   |
-| [camera_type](#camera_type)                         | Merged    | Optional | cannot be null | [Untitled schema](agcontext-properties-camera_type.md "https&#x3A;//weedid.sydney.edu.au/schema/AgContext.json#/properties/camera_type")                         |
-| [camera_height](#camera_height)                     | Merged    | Required | cannot be null | [Untitled schema](agcontext-properties-camera_height.md "https&#x3A;//weedid.sydney.edu.au/schema/AgContext.json#/properties/camera_height")                     |
-| [camera_angle](#camera_angle)                       | Merged    | Required | cannot be null | [Untitled schema](agcontext-properties-camera_angle.md "https&#x3A;//weedid.sydney.edu.au/schema/AgContext.json#/properties/camera_angle")                       |
-| [camera_fov](#camera_fov)                           | Merged    | Required | cannot be null | [Untitled schema](agcontext-properties-camera_fov.md "https&#x3A;//weedid.sydney.edu.au/schema/AgContext.json#/properties/camera_fov")                           |
-| [photography_description](#photography_description) | `string`  | Required | cannot be null | [Untitled schema](agcontext-properties-photography_description.md "https&#x3A;//weedid.sydney.edu.au/schema/AgContext.json#/properties/photography_description") |
-| [cropped_to_plant](#cropped_to_plant)               | `boolean` | Required | cannot be null | [Untitled schema](agcontext-properties-cropped_to_plant.md "https&#x3A;//weedid.sydney.edu.au/schema/AgContext.json#/properties/cropped_to_plant")               |
+| Property                                            | Type      | Required | Nullable       | Defined by                                                                                                                                                 |
+| :-------------------------------------------------- | --------- | -------- | -------------- | :--------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [id](#id)                                           | `number`  | Required | cannot be null | [AgContext](agcontext-properties-id.md "https&#x3A;//weedid.sydney.edu.au/schema/AgContext.json#/properties/id")                                           |
+| [crop_type](#crop_type)                             | `string`  | Required | cannot be null | [AgContext](agcontext-properties-crop_type.md "https&#x3A;//weedid.sydney.edu.au/schema/AgContext.json#/properties/crop_type")                             |
+| [grains_descriptive_text](#grains_descriptive_text) | `string`  | Optional | cannot be null | [AgContext](agcontext-properties-grains_descriptive_text.md "https&#x3A;//weedid.sydney.edu.au/schema/AgContext.json#/properties/grains_descriptive_text") |
+| [bbch_descriptive_text](#bbch_descriptive_text)     | `string`  | Optional | cannot be null | [AgContext](agcontext-properties-bbch_descriptive_text.md "https&#x3A;//weedid.sydney.edu.au/schema/AgContext.json#/properties/bbch_descriptive_text")     |
+| [bbch_code](#bbch_code)                             | `string`  | Optional | cannot be null | [AgContext](agcontext-properties-bbch_code.md "https&#x3A;//weedid.sydney.edu.au/schema/AgContext.json#/properties/bbch_code")                             |
+| [soil_colour](#soil_colour)                         | `string`  | Required | cannot be null | [AgContext](agcontext-properties-soil_colour.md "https&#x3A;//weedid.sydney.edu.au/schema/AgContext.json#/properties/soil_colour")                         |
+| [surface_cover](#surface_cover)                     | `string`  | Required | cannot be null | [AgContext](agcontext-properties-surface_cover.md "https&#x3A;//weedid.sydney.edu.au/schema/AgContext.json#/properties/surface_cover")                     |
+| [surface_coverage](#surface_coverage)               | `string`  | Required | cannot be null | [AgContext](agcontext-properties-surface_coverage.md "https&#x3A;//weedid.sydney.edu.au/schema/AgContext.json#/properties/surface_coverage")               |
+| [weather_description](#weather_description)         | `string`  | Required | cannot be null | [AgContext](agcontext-properties-weather_description.md "https&#x3A;//weedid.sydney.edu.au/schema/AgContext.json#/properties/weather_description")         |
+| [location_lat](#location_lat)                       | `number`  | Required | cannot be null | [AgContext](agcontext-properties-location_lat.md "https&#x3A;//weedid.sydney.edu.au/schema/AgContext.json#/properties/location_lat")                       |
+| [location_long](#location_long)                     | `number`  | Required | cannot be null | [AgContext](agcontext-properties-location_long.md "https&#x3A;//weedid.sydney.edu.au/schema/AgContext.json#/properties/location_long")                     |
+| [location_datum](#location_datum)                   | `string`  | Required | cannot be null | [AgContext](agcontext-properties-location_datum.md "https&#x3A;//weedid.sydney.edu.au/schema/AgContext.json#/properties/location_datum")                   |
+| [camera_type](#camera_type)                         | Merged    | Optional | cannot be null | [AgContext](agcontext-properties-camera_type.md "https&#x3A;//weedid.sydney.edu.au/schema/AgContext.json#/properties/camera_type")                         |
+| [camera_height](#camera_height)                     | Merged    | Required | cannot be null | [AgContext](agcontext-properties-camera_height.md "https&#x3A;//weedid.sydney.edu.au/schema/AgContext.json#/properties/camera_height")                     |
+| [camera_angle](#camera_angle)                       | Merged    | Required | cannot be null | [AgContext](agcontext-properties-camera_angle.md "https&#x3A;//weedid.sydney.edu.au/schema/AgContext.json#/properties/camera_angle")                       |
+| [camera_fov](#camera_fov)                           | Merged    | Required | cannot be null | [AgContext](agcontext-properties-camera_fov.md "https&#x3A;//weedid.sydney.edu.au/schema/AgContext.json#/properties/camera_fov")                           |
+| [photography_description](#photography_description) | `string`  | Required | cannot be null | [AgContext](agcontext-properties-photography_description.md "https&#x3A;//weedid.sydney.edu.au/schema/AgContext.json#/properties/photography_description") |
+| [cropped_to_plant](#cropped_to_plant)               | `boolean` | Required | cannot be null | [AgContext](agcontext-properties-cropped_to_plant.md "https&#x3A;//weedid.sydney.edu.au/schema/AgContext.json#/properties/cropped_to_plant")               |
 
 ## id
 
@@ -48,7 +48,7 @@ A number identifying the AgContext.
 -   is required
 -   Type: `number`
 -   cannot be null
--   defined in: [Untitled schema](agcontext-properties-id.md "https&#x3A;//weedid.sydney.edu.au/schema/AgContext.json#/properties/id")
+-   defined in: [AgContext](agcontext-properties-id.md "https&#x3A;//weedid.sydney.edu.au/schema/AgContext.json#/properties/id")
 
 ### id Type
 
@@ -65,7 +65,7 @@ A string describing the general cropping scenario (e.g. "root vegetable").
 -   is required
 -   Type: `string`
 -   cannot be null
--   defined in: [Untitled schema](agcontext-properties-crop_type.md "https&#x3A;//weedid.sydney.edu.au/schema/AgContext.json#/properties/crop_type")
+-   defined in: [AgContext](agcontext-properties-crop_type.md "https&#x3A;//weedid.sydney.edu.au/schema/AgContext.json#/properties/crop_type")
 
 ### crop_type Type
 
@@ -83,7 +83,7 @@ If this AgContext is not in a cropping environment, use value "na".
 -   is optional
 -   Type: `string`
 -   cannot be null
--   defined in: [Untitled schema](agcontext-properties-grains_descriptive_text.md "https&#x3A;//weedid.sydney.edu.au/schema/AgContext.json#/properties/grains_descriptive_text")
+-   defined in: [AgContext](agcontext-properties-grains_descriptive_text.md "https&#x3A;//weedid.sydney.edu.au/schema/AgContext.json#/properties/grains_descriptive_text")
 
 ### grains_descriptive_text Type
 
@@ -119,7 +119,7 @@ If this AgContext is not in a cropping environment, use value "na".
 -   is optional
 -   Type: `string`
 -   cannot be null
--   defined in: [Untitled schema](agcontext-properties-bbch_descriptive_text.md "https&#x3A;//weedid.sydney.edu.au/schema/AgContext.json#/properties/bbch_descriptive_text")
+-   defined in: [AgContext](agcontext-properties-bbch_descriptive_text.md "https&#x3A;//weedid.sydney.edu.au/schema/AgContext.json#/properties/bbch_descriptive_text")
 
 ### bbch_descriptive_text Type
 
@@ -163,7 +163,7 @@ If this AgContext is not in a cropping environment, use value "na".
 -   is optional
 -   Type: `string`
 -   cannot be null
--   defined in: [Untitled schema](agcontext-properties-bbch_code.md "https&#x3A;//weedid.sydney.edu.au/schema/AgContext.json#/properties/bbch_code")
+-   defined in: [AgContext](agcontext-properties-bbch_code.md "https&#x3A;//weedid.sydney.edu.au/schema/AgContext.json#/properties/bbch_code")
 
 ### bbch_code Type
 
@@ -285,7 +285,7 @@ General description of the soil colour.
 -   is required
 -   Type: `string`
 -   cannot be null
--   defined in: [Untitled schema](agcontext-properties-soil_colour.md "https&#x3A;//weedid.sydney.edu.au/schema/AgContext.json#/properties/soil_colour")
+-   defined in: [AgContext](agcontext-properties-soil_colour.md "https&#x3A;//weedid.sydney.edu.au/schema/AgContext.json#/properties/soil_colour")
 
 ### soil_colour Type
 
@@ -319,7 +319,7 @@ One of several strings describing the background cover that is behind any plants
 -   is required
 -   Type: `string`
 -   cannot be null
--   defined in: [Untitled schema](agcontext-properties-surface_cover.md "https&#x3A;//weedid.sydney.edu.au/schema/AgContext.json#/properties/surface_cover")
+-   defined in: [AgContext](agcontext-properties-surface_cover.md "https&#x3A;//weedid.sydney.edu.au/schema/AgContext.json#/properties/surface_cover")
 
 ### surface_cover Type
 
@@ -351,7 +351,7 @@ Approximate measurement of the percent of the soil in the image that is covered 
 -   is required
 -   Type: `string`
 -   cannot be null
--   defined in: [Untitled schema](agcontext-properties-surface_coverage.md "https&#x3A;//weedid.sydney.edu.au/schema/AgContext.json#/properties/surface_coverage")
+-   defined in: [AgContext](agcontext-properties-surface_coverage.md "https&#x3A;//weedid.sydney.edu.au/schema/AgContext.json#/properties/surface_coverage")
 
 ### surface_coverage Type
 
@@ -379,7 +379,7 @@ Free text description of approximate weather conditions during the image capture
 -   is required
 -   Type: `string`
 -   cannot be null
--   defined in: [Untitled schema](agcontext-properties-weather_description.md "https&#x3A;//weedid.sydney.edu.au/schema/AgContext.json#/properties/weather_description")
+-   defined in: [AgContext](agcontext-properties-weather_description.md "https&#x3A;//weedid.sydney.edu.au/schema/AgContext.json#/properties/weather_description")
 
 ### weather_description Type
 
@@ -395,7 +395,7 @@ Latitude in decimal degrees. Approximate latitude location of the AgContext, in 
 -   is required
 -   Type: `number`
 -   cannot be null
--   defined in: [Untitled schema](agcontext-properties-location_lat.md "https&#x3A;//weedid.sydney.edu.au/schema/AgContext.json#/properties/location_lat")
+-   defined in: [AgContext](agcontext-properties-location_lat.md "https&#x3A;//weedid.sydney.edu.au/schema/AgContext.json#/properties/location_lat")
 
 ### location_lat Type
 
@@ -411,7 +411,7 @@ Longitude in decimal degrees. Approximate longitude location of the AgContext, i
 -   is required
 -   Type: `number`
 -   cannot be null
--   defined in: [Untitled schema](agcontext-properties-location_long.md "https&#x3A;//weedid.sydney.edu.au/schema/AgContext.json#/properties/location_long")
+-   defined in: [AgContext](agcontext-properties-location_long.md "https&#x3A;//weedid.sydney.edu.au/schema/AgContext.json#/properties/location_long")
 
 ### location_long Type
 
@@ -428,7 +428,7 @@ A numeric string indicting the EPSG code for the spatial reference system used f
 -   is required
 -   Type: `string`
 -   cannot be null
--   defined in: [Untitled schema](agcontext-properties-location_datum.md "https&#x3A;//weedid.sydney.edu.au/schema/AgContext.json#/properties/location_datum")
+-   defined in: [AgContext](agcontext-properties-location_datum.md "https&#x3A;//weedid.sydney.edu.au/schema/AgContext.json#/properties/location_datum")
 
 ### location_datum Type
 
@@ -446,7 +446,7 @@ If this is not fixed within the AgContext, use value "variable".
 -   is optional
 -   Type: merged type ([Details](agcontext-properties-camera_type.md))
 -   cannot be null
--   defined in: [Untitled schema](agcontext-properties-camera_type.md "https&#x3A;//weedid.sydney.edu.au/schema/AgContext.json#/properties/camera_type")
+-   defined in: [AgContext](agcontext-properties-camera_type.md "https&#x3A;//weedid.sydney.edu.au/schema/AgContext.json#/properties/camera_type")
 
 ### camera_type Type
 
@@ -454,8 +454,8 @@ merged type ([Details](agcontext-properties-camera_type.md))
 
 any of
 
--   [Untitled string in undefined](agcontext-properties-camera_type-anyof-0.md "check type definition")
--   [Untitled string in undefined](agcontext-properties-camera_type-anyof-1.md "check type definition")
+-   [Untitled string in AgContext](agcontext-properties-camera_type-anyof-0.md "check type definition")
+-   [Untitled string in AgContext](agcontext-properties-camera_type-anyof-1.md "check type definition")
 
 ## camera_height
 
@@ -469,7 +469,7 @@ If this is not fixed within the AgContext, use value "variable".
 -   is required
 -   Type: merged type ([Details](agcontext-properties-camera_height.md))
 -   cannot be null
--   defined in: [Untitled schema](agcontext-properties-camera_height.md "https&#x3A;//weedid.sydney.edu.au/schema/AgContext.json#/properties/camera_height")
+-   defined in: [AgContext](agcontext-properties-camera_height.md "https&#x3A;//weedid.sydney.edu.au/schema/AgContext.json#/properties/camera_height")
 
 ### camera_height Type
 
@@ -477,8 +477,8 @@ merged type ([Details](agcontext-properties-camera_height.md))
 
 any of
 
--   [Untitled number in undefined](agcontext-properties-camera_height-anyof-0.md "check type definition")
--   [Untitled string in undefined](agcontext-properties-camera_height-anyof-1.md "check type definition")
+-   [Untitled number in AgContext](agcontext-properties-camera_height-anyof-0.md "check type definition")
+-   [Untitled string in AgContext](agcontext-properties-camera_height-anyof-1.md "check type definition")
 
 ## camera_angle
 
@@ -490,7 +490,7 @@ Angle of camera. A number representing the angle at which the camera is position
 -   is required
 -   Type: merged type ([Details](agcontext-properties-camera_angle.md))
 -   cannot be null
--   defined in: [Untitled schema](agcontext-properties-camera_angle.md "https&#x3A;//weedid.sydney.edu.au/schema/AgContext.json#/properties/camera_angle")
+-   defined in: [AgContext](agcontext-properties-camera_angle.md "https&#x3A;//weedid.sydney.edu.au/schema/AgContext.json#/properties/camera_angle")
 
 ### camera_angle Type
 
@@ -498,8 +498,8 @@ merged type ([Details](agcontext-properties-camera_angle.md))
 
 any of
 
--   [Untitled number in undefined](agcontext-properties-camera_angle-anyof-0.md "check type definition")
--   [Untitled string in undefined](agcontext-properties-camera_angle-anyof-1.md "check type definition")
+-   [Untitled number in AgContext](agcontext-properties-camera_angle-anyof-0.md "check type definition")
+-   [Untitled string in AgContext](agcontext-properties-camera_angle-anyof-1.md "check type definition")
 
 ## camera_fov
 
@@ -513,7 +513,7 @@ If this is not fixed within the AgContext, use value "variable".
 -   is required
 -   Type: merged type ([Details](agcontext-properties-camera_fov.md))
 -   cannot be null
--   defined in: [Untitled schema](agcontext-properties-camera_fov.md "https&#x3A;//weedid.sydney.edu.au/schema/AgContext.json#/properties/camera_fov")
+-   defined in: [AgContext](agcontext-properties-camera_fov.md "https&#x3A;//weedid.sydney.edu.au/schema/AgContext.json#/properties/camera_fov")
 
 ### camera_fov Type
 
@@ -521,8 +521,8 @@ merged type ([Details](agcontext-properties-camera_fov.md))
 
 any of
 
--   [Untitled number in undefined](agcontext-properties-camera_fov-anyof-0.md "check type definition")
--   [Untitled string in undefined](agcontext-properties-camera_fov-anyof-1.md "check type definition")
+-   [Untitled number in AgContext](agcontext-properties-camera_fov-anyof-0.md "check type definition")
+-   [Untitled string in AgContext](agcontext-properties-camera_fov-anyof-1.md "check type definition")
 
 ## photography_description
 
@@ -534,7 +534,7 @@ Description of photography. Free text description of salient aspects of camera, 
 -   is required
 -   Type: `string`
 -   cannot be null
--   defined in: [Untitled schema](agcontext-properties-photography_description.md "https&#x3A;//weedid.sydney.edu.au/schema/AgContext.json#/properties/photography_description")
+-   defined in: [AgContext](agcontext-properties-photography_description.md "https&#x3A;//weedid.sydney.edu.au/schema/AgContext.json#/properties/photography_description")
 
 ### photography_description Type
 
@@ -550,7 +550,7 @@ Has the image been cropped to the plant? A boolean indicating if the image has b
 -   is required
 -   Type: `boolean`
 -   cannot be null
--   defined in: [Untitled schema](agcontext-properties-cropped_to_plant.md "https&#x3A;//weedid.sydney.edu.au/schema/AgContext.json#/properties/cropped_to_plant")
+-   defined in: [AgContext](agcontext-properties-cropped_to_plant.md "https&#x3A;//weedid.sydney.edu.au/schema/AgContext.json#/properties/cropped_to_plant")
 
 ### cropped_to_plant Type
 

@@ -1,10 +1,9 @@
-# Untitled object in undefined Schema
+# Weed-COCO Schema
 
 ```txt
 undefined
 ```
 
-Weed-COCO
 An extension of MS COCO for Weed Identification in grain crops.
 May also be applicable to related agricultural purposes.
 
@@ -13,18 +12,18 @@ May also be applicable to related agricultural purposes.
 | :------------------ | ---------- | -------------- | ------------ | :---------------- | --------------------- | ------------------- | ----------------------------------------------------------- |
 | Can be instantiated | No         | Unknown status | No           | Forbidden         | Allowed               | none                | [main.schema.json](main.schema.json "open original schema") |
 
-## Untitled object in undefined Type
+## Weed-COCO Type
 
-`object` ([Details](main.md))
+`object` ([Weed-COCO](main.md))
 
-# undefined Properties
+# Weed-COCO Properties
 
-| Property                    | Type    | Required | Nullable       | Defined by                                                                            |
-| :-------------------------- | ------- | -------- | -------------- | :------------------------------------------------------------------------------------ |
-| [agcontexts](#agcontexts)   | `array` | Required | cannot be null | [Untitled schema](main-properties-agcontexts.md "undefined#/properties/agcontexts")   |
-| [collections](#collections) | `array` | Required | cannot be null | [Untitled schema](main-properties-collections.md "undefined#/properties/collections") |
-| [annotations](#annotations) | `array` | Required | cannot be null | [Untitled schema](main-properties-annotations.md "undefined#/properties/annotations") |
-| [images](#images)           | `array` | Required | cannot be null | [Untitled schema](main-properties-images.md "undefined#/properties/images")           |
+| Property                    | Type    | Required | Nullable       | Defined by                                                                      |
+| :-------------------------- | ------- | -------- | -------------- | :------------------------------------------------------------------------------ |
+| [agcontexts](#agcontexts)   | `array` | Required | cannot be null | [Weed-COCO](main-properties-agcontexts.md "undefined#/properties/agcontexts")   |
+| [collections](#collections) | `array` | Required | cannot be null | [Weed-COCO](main-properties-collections.md "undefined#/properties/collections") |
+| [annotations](#annotations) | `array` | Required | cannot be null | [Weed-COCO](main-properties-annotations.md "undefined#/properties/annotations") |
+| [images](#images)           | `array` | Required | cannot be null | [Weed-COCO](main-properties-images.md "undefined#/properties/images")           |
 
 ## agcontexts
 
@@ -34,13 +33,13 @@ May also be applicable to related agricultural purposes.
 `agcontexts`
 
 -   is required
--   Type: unknown\[]
+-   Type: `array`
 -   cannot be null
--   defined in: [Untitled schema](main-properties-agcontexts.md "undefined#/properties/agcontexts")
+-   defined in: [Weed-COCO](main-properties-agcontexts.md "undefined#/properties/agcontexts")
 
 ### agcontexts Type
 
-unknown\[]
+`array`
 
 ## collections
 
@@ -50,13 +49,13 @@ unknown\[]
 `collections`
 
 -   is required
--   Type: unknown\[]
+-   Type: `array`
 -   cannot be null
--   defined in: [Untitled schema](main-properties-collections.md "undefined#/properties/collections")
+-   defined in: [Weed-COCO](main-properties-collections.md "undefined#/properties/collections")
 
 ### collections Type
 
-unknown\[]
+`array`
 
 ## annotations
 
@@ -66,13 +65,13 @@ unknown\[]
 `annotations`
 
 -   is required
--   Type: unknown\[]
+-   Type: `array`
 -   cannot be null
--   defined in: [Untitled schema](main-properties-annotations.md "undefined#/properties/annotations")
+-   defined in: [Weed-COCO](main-properties-annotations.md "undefined#/properties/annotations")
 
 ### annotations Type
 
-unknown\[]
+`array`
 
 ## images
 
@@ -82,10 +81,10 @@ unknown\[]
 `images`
 
 -   is required
--   Type: unknown\[]
+-   Type: `array`
 -   cannot be null
--   defined in: [Untitled schema](main-properties-images.md "undefined#/properties/images")
+-   defined in: [Weed-COCO](main-properties-images.md "undefined#/properties/images")
 
 ### images Type
 
-unknown\[]
+`array`

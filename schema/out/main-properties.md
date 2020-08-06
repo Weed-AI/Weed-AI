@@ -1,4 +1,4 @@
-# Untitled schema Schema
+# Untitled undefined type in Weed-COCO Schema
 
 ```txt
 undefined#/properties

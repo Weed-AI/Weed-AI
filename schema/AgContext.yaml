@@ -1,4 +1,5 @@
 $id: https://weedid.sydney.edu.au/schema/AgContext.json
+title: AgContext
 type: object
 required:
   - id

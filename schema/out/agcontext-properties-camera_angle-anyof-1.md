@@ -1,4 +1,4 @@
-# Untitled string in undefined Schema
+# Untitled string in AgContext Schema
 
 ```txt
 https://weedid.sydney.edu.au/schema/AgContext.json#/properties/camera_angle/anyOf/1

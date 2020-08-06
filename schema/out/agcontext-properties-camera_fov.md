@@ -1,4 +1,4 @@
-# Untitled schema Schema
+# Untitled undefined type in AgContext Schema
 
 ```txt
 https://weedid.sydney.edu.au/schema/AgContext.json#/properties/camera_fov
@@ -19,5 +19,5 @@ merged type ([Details](agcontext-properties-camera_fov.md))
 
 any of
 
--   [Untitled number in undefined](agcontext-properties-camera_fov-anyof-0.md "check type definition")
--   [Untitled string in undefined](agcontext-properties-camera_fov-anyof-1.md "check type definition")
+-   [Untitled number in AgContext](agcontext-properties-camera_fov-anyof-0.md "check type definition")
+-   [Untitled string in AgContext](agcontext-properties-camera_fov-anyof-1.md "check type definition")

@@ -1,4 +1,4 @@
-# Untitled array in undefined Schema
+# Untitled array in Weed-COCO Schema
 
 ```txt
 undefined#/properties/annotations
@@ -13,4 +13,4 @@ undefined#/properties/annotations
 
 ## annotations Type
 
-unknown\[]
+`array`
