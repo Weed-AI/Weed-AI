@@ -1,3 +1,4 @@
+$id: https://weedid.sydney.edu.au/schema/Annotation.json
 allOf:
   - type: object
     properties:

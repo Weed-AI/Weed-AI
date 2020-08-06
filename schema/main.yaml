@@ -14,19 +14,19 @@ properties:
     type: array
     contains:
       type:
-        $ref: AgContext.json#/
+        $ref: https://weedid.sydney.edu.au/schema/AgContext.json
   collections:
     type: array
     contains:
       type:
-        $ref: Collection.json#/
+        $ref: https://weedid.sydney.edu.au/schema/Collection.json
   annotations:
     type: array
     contains:
       type:
-        $ref: Annotation.json#/
+        $ref: https://weedid.sydney.edu.au/schema/Annotation.json
   images:
     type: array
     contains:
       type:
-        $ref: Image.json#/
+        $ref: https://weedid.sydney.edu.au/schema/Image.json
