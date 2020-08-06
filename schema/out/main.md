@@ -33,13 +33,13 @@ May also be applicable to related agricultural purposes.
 `agcontexts`
 
 -   is required
--   Type: `array`
+-   Type: unknown\[]
 -   cannot be null
 -   defined in: [Weed-COCO](main-properties-agcontexts.md "undefined#/properties/agcontexts")
 
 ### agcontexts Type
 
-`array`
+unknown\[]
 
 ## collections
 
@@ -49,13 +49,13 @@ May also be applicable to related agricultural purposes.
 `collections`
 
 -   is required
--   Type: `array`
+-   Type: unknown\[]
 -   cannot be null
 -   defined in: [Weed-COCO](main-properties-collections.md "undefined#/properties/collections")
 
 ### collections Type
 
-`array`
+unknown\[]
 
 ## annotations
 
@@ -65,13 +65,13 @@ May also be applicable to related agricultural purposes.
 `annotations`
 
 -   is required
--   Type: `array`
+-   Type: unknown\[]
 -   cannot be null
 -   defined in: [Weed-COCO](main-properties-annotations.md "undefined#/properties/annotations")
 
 ### annotations Type
 
-`array`
+unknown\[]
 
 ## images
 
@@ -81,10 +81,10 @@ May also be applicable to related agricultural purposes.
 `images`
 
 -   is required
--   Type: `array`
+-   Type: unknown\[]
 -   cannot be null
 -   defined in: [Weed-COCO](main-properties-images.md "undefined#/properties/images")
 
 ### images Type
 
-`array`
+unknown\[]

@@ -13,4 +13,4 @@ undefined#/properties/collections
 
 ## collections Type
 
-`array`
+unknown\[]

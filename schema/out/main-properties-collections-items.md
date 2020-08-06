@@ -1,7 +1,7 @@
-# Untitled array in Weed-COCO Schema
+# Untitled undefined type in Weed-COCO Schema
 
 ```txt
-undefined#/properties/agcontexts
+undefined#/properties/collections/items
 ```
 
 
@@ -11,6 +11,6 @@ undefined#/properties/agcontexts
 | :------------------ | ---------- | -------------- | ----------------------- | :---------------- | --------------------- | ------------------- | ------------------------------------------------------------- |
 | Can be instantiated | No         | Unknown status | Unknown identifiability | Forbidden         | Allowed               | none                | [main.schema.json\*](main.schema.json "open original schema") |
 
-## agcontexts Type
+## items Type
 
-unknown\[]
+unknown

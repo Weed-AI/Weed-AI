@@ -13,4 +13,4 @@ undefined#/properties/images
 
 ## images Type
 
-`array`
+unknown\[]

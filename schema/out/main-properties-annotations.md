@@ -13,4 +13,4 @@ undefined#/properties/annotations
 
 ## annotations Type
 
-`array`
+unknown\[]
