@@ -1,0 +1,54 @@
+allOf:
+  - type: object
+    properties:
+      id:
+        type: number
+        description: |-
+          Identifier for the collection.
+      author:
+        type: string
+        description: |-
+          Author or authors of the collection the image/annotation belongs to.
+      title:
+        type: string
+        description: |-
+          Title of the collection.
+      year:
+        type: number
+        minimum: 1900
+        maximum: 3000
+        description: |-
+          Collection publication year.
+      identifier:
+        type: string
+        description: |-
+          A DOI or other identifier used to find the collection.
+      rights:
+        type: string
+        description: |-
+          Copyright status of the collection.
+          Further detail available in the licences object.
+      accrual_policy:
+        type: string
+        enum:
+          - closed
+          - open
+        description: |-
+          A description of the accrual policy for this collection.
+          Open collections can be contributed to, and closed collections cannot be.
+
+  - type: object
+    properties:
+      image_id:
+        type: number
+        description: |-
+          A list of image_ids identifying the images belonging to the collection.
+      subset:
+        type: string
+        description: |-
+          A string decribing the collection subset.
+          i.e. "train", "test"
+      collection_id:
+        type: number
+        description: |-
+          The identity of the collection.
