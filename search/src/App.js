@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
-import { 
-	ReactiveBase, CategorySearch, SingleRange, ResultCard, ReactiveList 
+import {
+	ReactiveBase, CategorySearch, SingleRange, ResultCard, ReactiveList
 } from '@appbaseio/reactivesearch';
 import logo from './logo.svg';
 import './App.css';
@@ -32,13 +32,13 @@ class App extends Component {
 								{
 									data.map(item => (
 										<ResultCard key={item._id}>
-											<ResultCard.Image 
-												src='https://bit.do/demoimg'
+											<ResultCard.Image
+												src='https://cdn.croptrust.org/wp/wp-content/uploads/2014/12/about-us.jpg'
 											/>
-											<ResultCard.Title 
-												dangerouslySetInnerHTML={{ 
+											<ResultCard.Title
+												dangerouslySetInnerHTML={{
 													__html: item.customer_phone
-												}} 
+												}}
 											/>
 											<ResultCard.Description>
 												{item.day_of_week + " " + '*'.repeat(item.total_quantity)}
