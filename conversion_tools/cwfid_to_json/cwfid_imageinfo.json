@@ -17301,9 +17301,9 @@
             "url": "https://creativecommons.org/licenses/by/4.0/"
         }
     ],
-    "agcontext": [
+    "agcontexts": [
         {
-            "agcontext_id": 0,
+            "id": 0,
             "agcontext_name": "cwfid",
             "crop_type": "root vegetable",
             "crop_stage": "leaf development",
