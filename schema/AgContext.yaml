@@ -194,8 +194,8 @@ properties:
   camera_make:
     - type: string
     - type: string
-        enum:
-        - variable
+      enum:
+      - variable
     description: |-
         Type of camera.
         Free text denoting the model/make of camera used for this AgContext.
@@ -204,8 +204,8 @@ properties:
   camera_lens:
     - type: string
     - type: string
-        enum:
-        - variable
+      enum:
+      - variable
     description: |-
       Type of lens.
       Free text denoting the model/make of lens used for this AgContext.
