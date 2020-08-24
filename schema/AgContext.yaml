@@ -192,6 +192,7 @@ properties:
         A numeric string indicting the EPSG code for the spatial reference system used for the location of the AgContext.
 
   camera_make:
+    anyOf:
     - type: string
     - type: string
       enum:
@@ -202,6 +203,7 @@ properties:
         If this is not fixed within the AgContext, use value "variable".
 
   camera_lens:
+    anyOf:
     - type: string
     - type: string
       enum:
