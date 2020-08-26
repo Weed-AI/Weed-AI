@@ -2,7 +2,7 @@
     "images": [
         {
             "id": 46,
-            "file_name": "cwfid_images/046_image.png",
+            "file_name": "cwfid/046_image.png",
             "license": 0,
             "agcontext_id": 0,
             "width": 1296,
@@ -11,7 +11,7 @@
         },
         {
             "id": 1,
-            "file_name": "cwfid_images/001_image.png",
+            "file_name": "cwfid/001_image.png",
             "license": 0,
             "agcontext_id": 0,
             "width": 1296,
@@ -20,7 +20,7 @@
         },
         {
             "id": 18,
-            "file_name": "cwfid_images/018_image.png",
+            "file_name": "cwfid/018_image.png",
             "license": 0,
             "agcontext_id": 0,
             "width": 1296,
@@ -29,7 +29,7 @@
         },
         {
             "id": 25,
-            "file_name": "cwfid_images/025_image.png",
+            "file_name": "cwfid/025_image.png",
             "license": 0,
             "agcontext_id": 0,
             "width": 1296,
@@ -38,7 +38,7 @@
         },
         {
             "id": 17,
-            "file_name": "cwfid_images/017_image.png",
+            "file_name": "cwfid/017_image.png",
             "license": 0,
             "agcontext_id": 0,
             "width": 1296,
@@ -47,7 +47,7 @@
         },
         {
             "id": 50,
-            "file_name": "cwfid_images/050_image.png",
+            "file_name": "cwfid/050_image.png",
             "license": 0,
             "agcontext_id": 0,
             "width": 1296,
@@ -56,7 +56,7 @@
         },
         {
             "id": 49,
-            "file_name": "cwfid_images/049_image.png",
+            "file_name": "cwfid/049_image.png",
             "license": 0,
             "agcontext_id": 0,
             "width": 1296,
@@ -65,7 +65,7 @@
         },
         {
             "id": 33,
-            "file_name": "cwfid_images/033_image.png",
+            "file_name": "cwfid/033_image.png",
             "license": 0,
             "agcontext_id": 0,
             "width": 1296,
@@ -74,7 +74,7 @@
         },
         {
             "id": 9,
-            "file_name": "cwfid_images/009_image.png",
+            "file_name": "cwfid/009_image.png",
             "license": 0,
             "agcontext_id": 0,
             "width": 1296,
@@ -83,7 +83,7 @@
         },
         {
             "id": 34,
-            "file_name": "cwfid_images/034_image.png",
+            "file_name": "cwfid/034_image.png",
             "license": 0,
             "agcontext_id": 0,
             "width": 1296,
@@ -92,7 +92,7 @@
         },
         {
             "id": 57,
-            "file_name": "cwfid_images/057_image.png",
+            "file_name": "cwfid/057_image.png",
             "license": 0,
             "agcontext_id": 0,
             "width": 1296,
@@ -101,7 +101,7 @@
         },
         {
             "id": 10,
-            "file_name": "cwfid_images/010_image.png",
+            "file_name": "cwfid/010_image.png",
             "license": 0,
             "agcontext_id": 0,
             "width": 1296,
@@ -110,7 +110,7 @@
         },
         {
             "id": 58,
-            "file_name": "cwfid_images/058_image.png",
+            "file_name": "cwfid/058_image.png",
             "license": 0,
             "agcontext_id": 0,
             "width": 1296,
@@ -119,7 +119,7 @@
         },
         {
             "id": 22,
-            "file_name": "cwfid_images/022_image.png",
+            "file_name": "cwfid/022_image.png",
             "license": 0,
             "agcontext_id": 0,
             "width": 1296,
@@ -128,7 +128,7 @@
         },
         {
             "id": 6,
-            "file_name": "cwfid_images/006_image.png",
+            "file_name": "cwfid/006_image.png",
             "license": 0,
             "agcontext_id": 0,
             "width": 1296,
@@ -137,7 +137,7 @@
         },
         {
             "id": 41,
-            "file_name": "cwfid_images/041_image.png",
+            "file_name": "cwfid/041_image.png",
             "license": 0,
             "agcontext_id": 0,
             "width": 1296,
@@ -146,7 +146,7 @@
         },
         {
             "id": 8,
-            "file_name": "cwfid_images/008_image.png",
+            "file_name": "cwfid/008_image.png",
             "license": 0,
             "agcontext_id": 0,
             "width": 1296,
@@ -155,7 +155,7 @@
         },
         {
             "id": 35,
-            "file_name": "cwfid_images/035_image.png",
+            "file_name": "cwfid/035_image.png",
             "license": 0,
             "agcontext_id": 0,
             "width": 1296,
@@ -164,7 +164,7 @@
         },
         {
             "id": 11,
-            "file_name": "cwfid_images/011_image.png",
+            "file_name": "cwfid/011_image.png",
             "license": 0,
             "agcontext_id": 0,
             "width": 1296,
@@ -173,7 +173,7 @@
         },
         {
             "id": 56,
-            "file_name": "cwfid_images/056_image.png",
+            "file_name": "cwfid/056_image.png",
             "license": 0,
             "agcontext_id": 0,
             "width": 1296,
@@ -182,7 +182,7 @@
         },
         {
             "id": 23,
-            "file_name": "cwfid_images/023_image.png",
+            "file_name": "cwfid/023_image.png",
             "license": 0,
             "agcontext_id": 0,
             "width": 1296,
@@ -191,7 +191,7 @@
         },
         {
             "id": 59,
-            "file_name": "cwfid_images/059_image.png",
+            "file_name": "cwfid/059_image.png",
             "license": 0,
             "agcontext_id": 0,
             "width": 1296,
@@ -200,7 +200,7 @@
         },
         {
             "id": 40,
-            "file_name": "cwfid_images/040_image.png",
+            "file_name": "cwfid/040_image.png",
             "license": 0,
             "agcontext_id": 0,
             "width": 1296,
@@ -209,7 +209,7 @@
         },
         {
             "id": 7,
-            "file_name": "cwfid_images/007_image.png",
+            "file_name": "cwfid/007_image.png",
             "license": 0,
             "agcontext_id": 0,
             "width": 1296,
@@ -218,7 +218,7 @@
         },
         {
             "id": 47,
-            "file_name": "cwfid_images/047_image.png",
+            "file_name": "cwfid/047_image.png",
             "license": 0,
             "agcontext_id": 0,
             "width": 1296,
@@ -227,7 +227,7 @@
         },
         {
             "id": 19,
-            "file_name": "cwfid_images/019_image.png",
+            "file_name": "cwfid/019_image.png",
             "license": 0,
             "agcontext_id": 0,
             "width": 1296,
@@ -236,7 +236,7 @@
         },
         {
             "id": 24,
-            "file_name": "cwfid_images/024_image.png",
+            "file_name": "cwfid/024_image.png",
             "license": 0,
             "agcontext_id": 0,
             "width": 1296,
@@ -245,7 +245,7 @@
         },
         {
             "id": 51,
-            "file_name": "cwfid_images/051_image.png",
+            "file_name": "cwfid/051_image.png",
             "license": 0,
             "agcontext_id": 0,
             "width": 1296,
@@ -254,7 +254,7 @@
         },
         {
             "id": 16,
-            "file_name": "cwfid_images/016_image.png",
+            "file_name": "cwfid/016_image.png",
             "license": 0,
             "agcontext_id": 0,
             "width": 1296,
@@ -263,7 +263,7 @@
         },
         {
             "id": 32,
-            "file_name": "cwfid_images/032_image.png",
+            "file_name": "cwfid/032_image.png",
             "license": 0,
             "agcontext_id": 0,
             "width": 1296,
@@ -272,7 +272,7 @@
         },
         {
             "id": 48,
-            "file_name": "cwfid_images/048_image.png",
+            "file_name": "cwfid/048_image.png",
             "license": 0,
             "agcontext_id": 0,
             "width": 1296,
@@ -281,7 +281,7 @@
         },
         {
             "id": 13,
-            "file_name": "cwfid_images/013_image.png",
+            "file_name": "cwfid/013_image.png",
             "license": 0,
             "agcontext_id": 0,
             "width": 1296,
@@ -290,7 +290,7 @@
         },
         {
             "id": 54,
-            "file_name": "cwfid_images/054_image.png",
+            "file_name": "cwfid/054_image.png",
             "license": 0,
             "agcontext_id": 0,
             "width": 1296,
@@ -299,7 +299,7 @@
         },
         {
             "id": 37,
-            "file_name": "cwfid_images/037_image.png",
+            "file_name": "cwfid/037_image.png",
             "license": 0,
             "agcontext_id": 0,
             "width": 1296,
@@ -308,7 +308,7 @@
         },
         {
             "id": 42,
-            "file_name": "cwfid_images/042_image.png",
+            "file_name": "cwfid/042_image.png",
             "license": 0,
             "agcontext_id": 0,
             "width": 1296,
@@ -317,7 +317,7 @@
         },
         {
             "id": 5,
-            "file_name": "cwfid_images/005_image.png",
+            "file_name": "cwfid/005_image.png",
             "license": 0,
             "agcontext_id": 0,
             "width": 1296,
@@ -326,7 +326,7 @@
         },
         {
             "id": 38,
-            "file_name": "cwfid_images/038_image.png",
+            "file_name": "cwfid/038_image.png",
             "license": 0,
             "agcontext_id": 0,
             "width": 1296,
@@ -335,7 +335,7 @@
         },
         {
             "id": 21,
-            "file_name": "cwfid_images/021_image.png",
+            "file_name": "cwfid/021_image.png",
             "license": 0,
             "agcontext_id": 0,
             "width": 1296,
@@ -344,7 +344,7 @@
         },
         {
             "id": 26,
-            "file_name": "cwfid_images/026_image.png",
+            "file_name": "cwfid/026_image.png",
             "license": 0,
             "agcontext_id": 0,
             "width": 1296,
@@ -353,7 +353,7 @@
         },
         {
             "id": 2,
-            "file_name": "cwfid_images/002_image.png",
+            "file_name": "cwfid/002_image.png",
             "license": 0,
             "agcontext_id": 0,
             "width": 1296,
@@ -362,7 +362,7 @@
         },
         {
             "id": 45,
-            "file_name": "cwfid_images/045_image.png",
+            "file_name": "cwfid/045_image.png",
             "license": 0,
             "agcontext_id": 0,
             "width": 1296,
@@ -371,7 +371,7 @@
         },
         {
             "id": 30,
-            "file_name": "cwfid_images/030_image.png",
+            "file_name": "cwfid/030_image.png",
             "license": 0,
             "agcontext_id": 0,
             "width": 1296,
@@ -380,7 +380,7 @@
         },
         {
             "id": 53,
-            "file_name": "cwfid_images/053_image.png",
+            "file_name": "cwfid/053_image.png",
             "license": 0,
             "agcontext_id": 0,
             "width": 1296,
@@ -389,7 +389,7 @@
         },
         {
             "id": 14,
-            "file_name": "cwfid_images/014_image.png",
+            "file_name": "cwfid/014_image.png",
             "license": 0,
             "agcontext_id": 0,
             "width": 1296,
@@ -398,7 +398,7 @@
         },
         {
             "id": 29,
-            "file_name": "cwfid_images/029_image.png",
+            "file_name": "cwfid/029_image.png",
             "license": 0,
             "agcontext_id": 0,
             "width": 1296,
@@ -407,7 +407,7 @@
         },
         {
             "id": 27,
-            "file_name": "cwfid_images/027_image.png",
+            "file_name": "cwfid/027_image.png",
             "license": 0,
             "agcontext_id": 0,
             "width": 1296,
@@ -416,7 +416,7 @@
         },
         {
             "id": 60,
-            "file_name": "cwfid_images/060_image.png",
+            "file_name": "cwfid/060_image.png",
             "license": 0,
             "agcontext_id": 0,
             "width": 1296,
@@ -425,7 +425,7 @@
         },
         {
             "id": 44,
-            "file_name": "cwfid_images/044_image.png",
+            "file_name": "cwfid/044_image.png",
             "license": 0,
             "agcontext_id": 0,
             "width": 1296,
@@ -434,7 +434,7 @@
         },
         {
             "id": 3,
-            "file_name": "cwfid_images/003_image.png",
+            "file_name": "cwfid/003_image.png",
             "license": 0,
             "agcontext_id": 0,
             "width": 1296,
@@ -443,7 +443,7 @@
         },
         {
             "id": 31,
-            "file_name": "cwfid_images/031_image.png",
+            "file_name": "cwfid/031_image.png",
             "license": 0,
             "agcontext_id": 0,
             "width": 1296,
@@ -452,7 +452,7 @@
         },
         {
             "id": 15,
-            "file_name": "cwfid_images/015_image.png",
+            "file_name": "cwfid/015_image.png",
             "license": 0,
             "agcontext_id": 0,
             "width": 1296,
@@ -461,7 +461,7 @@
         },
         {
             "id": 28,
-            "file_name": "cwfid_images/028_image.png",
+            "file_name": "cwfid/028_image.png",
             "license": 0,
             "agcontext_id": 0,
             "width": 1296,
@@ -470,7 +470,7 @@
         },
         {
             "id": 52,
-            "file_name": "cwfid_images/052_image.png",
+            "file_name": "cwfid/052_image.png",
             "license": 0,
             "agcontext_id": 0,
             "width": 1296,
@@ -479,7 +479,7 @@
         },
         {
             "id": 55,
-            "file_name": "cwfid_images/055_image.png",
+            "file_name": "cwfid/055_image.png",
             "license": 0,
             "agcontext_id": 0,
             "width": 1296,
@@ -488,7 +488,7 @@
         },
         {
             "id": 12,
-            "file_name": "cwfid_images/012_image.png",
+            "file_name": "cwfid/012_image.png",
             "license": 0,
             "agcontext_id": 0,
             "width": 1296,
@@ -497,7 +497,7 @@
         },
         {
             "id": 36,
-            "file_name": "cwfid_images/036_image.png",
+            "file_name": "cwfid/036_image.png",
             "license": 0,
             "agcontext_id": 0,
             "width": 1296,
@@ -506,7 +506,7 @@
         },
         {
             "id": 4,
-            "file_name": "cwfid_images/004_image.png",
+            "file_name": "cwfid/004_image.png",
             "license": 0,
             "agcontext_id": 0,
             "width": 1296,
@@ -515,7 +515,7 @@
         },
         {
             "id": 39,
-            "file_name": "cwfid_images/039_image.png",
+            "file_name": "cwfid/039_image.png",
             "license": 0,
             "agcontext_id": 0,
             "width": 1296,
@@ -524,7 +524,7 @@
         },
         {
             "id": 43,
-            "file_name": "cwfid_images/043_image.png",
+            "file_name": "cwfid/043_image.png",
             "license": 0,
             "agcontext_id": 0,
             "width": 1296,
@@ -533,7 +533,7 @@
         },
         {
             "id": 20,
-            "file_name": "cwfid_images/020_image.png",
+            "file_name": "cwfid/020_image.png",
             "license": 0,
             "agcontext_id": 0,
             "width": 1296,

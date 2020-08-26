@@ -9,7 +9,7 @@ class App extends Component {
 	render() {
 		return (
 				<ReactiveBase
-				app="kibana_sample_data_ecommerce"
+				app="weedid"
 				url="http://localhost:9200/">
 			    <CategorySearch
 						componentId="searchbox"
@@ -33,7 +33,7 @@ class App extends Component {
 									data.map(item => (
 										<ResultCard key={item._id}>
 											<ResultCard.Image
-												src='https://cdn.croptrust.org/wp/wp-content/uploads/2014/12/about-us.jpg'
+												src={'thumbnails/' + item.file_name}
 											/>
 											<ResultCard.Title
 												dangerouslySetInnerHTML={{
