@@ -190,28 +190,17 @@ properties:
     description: |-
         EPSG code of spatial datum.
         A numeric string indicting the EPSG code for the spatial reference system used for the location of the AgContext.
-
   camera_make:
-    anyOf:
-    - type: string
-    - type: string
-      enum:
-      - variable
+    type: string
     description: |-
         Type of camera.
         Free text denoting the model/make of camera used for this AgContext.
-        If this is not fixed within the AgContext, use value "variable".
 
   camera_lens:
-    anyOf:
-    - type: string
-    - type: string
-      enum:
-      - variable
+    type: string
     description: |-
       Type of lens.
       Free text denoting the model/make of lens used for this AgContext.
-      If this is not fixed within the AgContext, use value "variable".
 
   camera_lens_focallength:
     type:
@@ -222,27 +211,17 @@ properties:
       The focal length of the lens being used in this AgContext, measured in millimeters.
 
   camera_height:
-    anyOf:
-      - type: number
-      - type: string
-        enum:
-        - variable
+    type: number
     description: |-
         Height of camera.
         An number representing the height of the camera, measured in millimeters .
-        If this is not fixed within the AgContext, use value "variable".
 
   camera_angle:
-    anyOf:
-      - type: number
-      - type: string
-        enum:
-        - variable
+    type: number
     description:
         Angle of camera.
         A number representing the angle at which the camera is positioned, in degrees.
         A camera facing straight down would be 90.
-        If this is not fixed within the AgContext, use value "variable".
 
   camera_fov:
     anyOf:
