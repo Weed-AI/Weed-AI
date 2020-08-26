@@ -1,0 +1,207 @@
+{
+    "Images":[
+        {
+            "id":"20160928-140337-0.jpg",
+            "file_name":"deepweeds_to_json/deepweeds_images_full/20160928-140337-0.jpg",
+            "width": 256,
+            "height": 256,
+            "resolution": 65536,
+            "annotations":{
+                "id": "28ffbbf4-c66a-11ea-9851-acde48001122",
+                "image_id": "20160928-140337-0.jpg",
+                "category_id": 0,
+                "agcontext_id": 0,
+                "agcontext_name": "deepweeds",
+                "category": {
+                    "common_name": "chinee apple",
+                    "id": 0,
+                    "role": "weed",
+                    "species": "ziziphus mauritiana",
+                    "eppo_taxon_code": "ZIPMA"
+                }},
+            "agcontext": {
+                "id": 0,
+                "agcontext_name": "deepweeds",
+                "crop_type": "pastoral_grassland",
+                "upload_time": "2020-07-15 17:09:49",
+                "camera_type": "weedlogger",
+                "camera_height": 100,
+                "camera_angle": 90,
+                "camera_fov": 85,
+                "emr_channels": "na",
+                "url": "https://github.com/AlexOlsen/DeepWeeds"
+            },
+            "Image":[
+                {
+                    "url":"https://keyserver.lucidcentral.org/weeds/data/media/Images/ziziphus_mauritiana/ziziphusmauritiana3.jpg"
+                }
+            ],
+            "Set":"example1"
+        },
+        {
+            "id": "20160928-140337-0.jpg",
+            "file_name": "deepweeds_to_json/deepweeds_images_full/20160928-140337-0.jpg",
+            "license": 0,
+            "width": 256,
+            "height": 256,
+            "resolution": 65536,
+            "annotations": {
+                "id": "28ffbbf4-c66a-11ea-9851-acde48001122",
+                "image_id": "20160928-140337-0.jpg",
+                "category_id": 0,
+                "agcontext_id": 0,
+                "agcontext_name": "deepweeds",
+                "category": {
+                    "common_name": "chinee apple",
+                    "id": 0,
+                    "role": "weed",
+                    "species": "ziziphus mauritiana",
+                    "eppo_taxon_code": "ZIPMA"}},
+            "agcontext": {
+                "id": 0,
+                "agcontext_name": "deepweeds",
+                "crop_type": "pastoral_grassland", "upload_time": "2020-07-15 17:09:49", "camera_type": "weedlogger", "camera_height": 100, "camera_angle": 90, "camera_fov": 85, "emr_channels": "na", "url": "https://github.com/AlexOlsen/DeepWeeds"},
+            "Image":[
+                {
+                    "url":"https://keyserver.lucidcentral.org/weeds/data/media/Images/ziziphus_mauritiana/ziziphusmauritiana3.jpg"
+                }
+            ],
+            "Collection":"example1"
+        },
+        {
+            "id": 46,
+            "file_name": "cwfid_images/046_image.png",
+            "license": 0,
+            "agdata_id": 0,
+            "width": 1296,
+            "height": 966,
+            "resolution": 1251936,
+            "annotations": [
+                {
+                    "id": 0,
+                    "image_id": 46,
+                    "category_id": 0,
+                    "segmentation": [
+                        [
+                            596,
+                            207,
+                            521,
+                            153,
+                            498,
+                            89,
+                            522,
+                            69,
+                            574,
+                            68,
+                            620,
+                            117,
+                            686,
+                            181,
+                            705,
+                            193,
+                            694,
+                            245,
+                            631,
+                            241
+                        ]
+                    ],
+                    "iscrowd": 0
+                },
+                {
+                    "id": 1,
+                    "image_id": 46,
+                    "category_id": 0,
+                    "segmentation": [
+                        [
+                            689,
+                            787,
+                            589,
+                            745,
+                            553,
+                            794,
+                            553,
+                            857,
+                            573,
+                            886,
+                            642,
+                            886,
+                            678,
+                            850,
+                            707,
+                            814
+                        ]
+                    ],
+                    "iscrowd": 0
+                },
+                {
+                    "id": 2,
+                    "image_id": 46,
+                    "category_id": 1,
+                    "segmentation": [
+                        [
+                            486,
+                            335,
+                            399,
+                            395,
+                            354,
+                            490,
+                            350,
+                            623,
+                            377,
+                            655,
+                            525,
+                            646,
+                            563,
+                            617,
+                            588,
+                            552,
+                            575,
+                            463,
+                            551,
+                            361,
+                            516,
+                            336
+                        ]
+                    ],
+                    "iscrowd": 0
+                }],
+            "categories": [
+                {
+                    "common_name": "carrot",
+                    "species": "daugus carota",
+                    "eppo_taxon_code": "DAUCS",
+                    "eppo_nontaxon_code": "3UMRC",
+                    "role": "crop",
+                    "id": 0
+                },
+                {
+                    "species": "UNSPECIFIED",
+                    "role": "weed",
+                    "id": 1
+                }
+            ],
+            "agcontext": {
+                "agcontext_id": 0,
+                "agcontext_name": "cwfid",
+                "crop_type": "root vegetable",
+                "crop_stage": "leaf development",
+                "location_continent": "Europe",
+                "location_country": "Germany",
+                "location_state": "Lower Saxony",
+                "upload_time": "2020-08-18 18:59:28",
+                "camera_type": "JAI AD-130GE",
+                "camera_height": 450,
+                "camera_angle": 90,
+                "camera_fov": 25,
+                "emr_channels": "Red, NIR",
+                "url": "https://github.com/cwfid/dataset"
+            },
+            "Image":[
+                {
+                    "url":"https://www.thompson-morgan.com/static-images/master/static-images/how-to-grow-carrots/TM-Feb19-staticarticle-how-to-grow-carrots-when-to-sow-carrots.jpg"
+                }
+            ],
+            "Collection":"example2"
+        }
+    ]
+}
