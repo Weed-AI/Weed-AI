@@ -1,0 +1,29 @@
+# This is built on GitHub's "basic workflow to help you get started with Actions"
+
+name: JSON validation CI
+
+# Controls when the action will run. Triggers the workflow on push or pull request
+on:
+  push:
+    branches: 
+      - '**'
+  pull_request:
+    branches: 
+      - '**'
+
+jobs:
+  verify-json-validation:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Compile yaml schema to JSON
+        run: |
+          pip install pyyaml
+          cd schema
+          make
+          echo {} > test.json
+      - name: Validate JSON
+        uses: docker://orrosenblatt/validate-json-action:latest
+        env:
+          INPUT_SCHEMA: ./schema/main.json
+          INPUT_JSONS: ./test.json
