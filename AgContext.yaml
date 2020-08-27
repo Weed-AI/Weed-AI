@@ -112,7 +112,7 @@ properties:
       string
     pattern: "^gs[0-9][0-9]$|^na$|^(?!.*gs00))"
     description: |-
-        BBCG descriptive text.
+        BBCH growth stage code.
         One of several possible strings describing the stage of the crop, chosen from a list of codes used by the BBCH.
         If this AgContext is not in a cropping environment, use value "na".
 
