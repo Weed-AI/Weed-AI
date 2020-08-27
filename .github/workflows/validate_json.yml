@@ -51,4 +51,4 @@ jobs:
         uses: docker://orrosenblatt/validate-json-action:latest
         env:
           INPUT_SCHEMA: ./schema/main.json
-          INPUT_JSONS: ./test.json
+          INPUT_JSONS: ./conversion_tools/cwfid_to_json/cwfid_imageinfo.json,./conversion_tools/deepweeds_to_json/deepweeds_imageinfo.json

@@ -240,7 +240,7 @@ with output_file.open('w') as fout:
                "categories": categories,
                "info": info,
                "license":license,
-               "agcontext": agcontext,
+               "agcontexts": agcontext,
                "collections": collections},
               fout, indent=4)
 
