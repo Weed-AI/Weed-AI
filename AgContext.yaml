@@ -203,7 +203,7 @@ properties:
       Type of lens.
       Free text denoting the model/make of lens used for this AgContext.
 
-  camera_lens_focallength:
+  camera_lens_focal_length:
     type:
       number
     minimum: 0
