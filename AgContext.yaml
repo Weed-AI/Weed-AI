@@ -103,7 +103,7 @@ properties:
       - beginning of dormancy
       - na
     description: |-
-        BBCG descriptive text.
+        BBCH descriptive text.
         One of several possible strings describing the stage of the crop, chosen from a list of possible terms used by the BBCH.
         If this AgContext is not in a cropping environment, use value "na".
 
