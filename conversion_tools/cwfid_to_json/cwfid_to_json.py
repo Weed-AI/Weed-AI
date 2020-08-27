@@ -153,7 +153,7 @@ for ann_path in progress:
         "id": image_id,
         "file_name": os.path.join(dir_name, ann_blob["filename"]),
         "license": 0,  # TODO
-        "agdata_id": 0,
+        "agcontext_id": 0,
     }
     dims = get_image_dimensions(image_folder / ann_blob["filename"])
 

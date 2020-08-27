@@ -84,6 +84,7 @@ for iRow,row in tqdm(input_metadata.iterrows(),total=len(input_metadata)):
         im['id'] = imageID
         im['file_name'] = str(row['Filename'])
         im['license'] = 0
+        im['agcontext_id'] = 0
         images.append(im)
         relativePathToImage[relativePath] = im
 
@@ -149,7 +150,6 @@ for iRow,row in tqdm(input_metadata.iterrows(),total=len(input_metadata)):
     ann['image_id'] = im['id']
     ann['category_id'] = categoryID
     ann['agcontext_id'] = 0
-    ann['agcontext_name'] = 'deepweeds'
 
     annotations.append(ann)
 
