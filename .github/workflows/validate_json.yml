@@ -41,7 +41,7 @@ jobs:
 
           cd ../deepweeds_to_json
           curl -L https://github.com/AlexOlsen/DeepWeeds/archive/51e3fab.tar.gz | tar xzv
-          mv DeepWeeds-513e3fab*/* .
+          mv DeepWeeds-51e3fab*/* .
           cp labels/labels.csv .
           # fake some images: make them all be a pic from cwfid
           mkdir deepweeds_images_full
