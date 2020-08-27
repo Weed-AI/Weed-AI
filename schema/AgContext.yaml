@@ -239,13 +239,31 @@ properties:
   photography_description:
     type:
       string
-    description:
+    description: |-
         Description of photography.
         Free text description of salient aspects of camera, mount and lighting.
+
+  lighting:
+    type:
+      string
+    enum:
+      - "artificial"
+      - "natural"
+    description: |-
+      Description of the lighting in  the images.
+      Two possible strings describing the lighting in the images.
 
   cropped_to_plant:
     type:
       boolean
-    description:
-        Has the image been cropped to the plant?
-        A boolean indicating if the image has been cropped to the plant.
+    description: |-
+      Has the image been cropped to the plant?
+      A boolean indicating if the image has been cropped to the plant.
+
+  emr_channels:
+    type:
+      string
+    description: |-
+      EMR channels captured in images.
+      A string describing the electromagnetic raditation channels captured.
+      In most cases, this will be "visual".
