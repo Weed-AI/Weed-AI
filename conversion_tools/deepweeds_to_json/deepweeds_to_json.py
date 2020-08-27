@@ -1,3 +1,9 @@
+#!/usr/bin/env python
+# coding: utf-8
+
+# In[17]:
+
+
 """
 deepweeds_to_json.py
 
@@ -65,33 +71,32 @@ duplicateImageIDs = set()
 
 # iRow = 0; row = input_metadata.iloc[iRow]
 for iRow,row in tqdm(input_metadata.iterrows(),total=len(input_metadata)):
-
+    
     # ImageID,Filename,FilePath,SpeciesID
     imageID = str(row['Filename'])
     fn = row['Filename']
     relativePath = os.path.join(image_folder,fn)
-
+    
     # This makes an assumption of one annotation per image, which happens to be
     # true in this data set.
     if relativePath in relativePathToImage:
 
         im = relativePathToImage[relativePath]
-        assert im['id'] == imageID
+        assert im['id'] == iRow
         duplicateImageIDs.add(imageID)
-
+            
     else:
         im = {}
-        im['id'] = imageID
+        im['id'] = iRow
         im['file_name'] = str(row['Filename'])
         im['license'] = 0
-        im['agcontext_id'] = 0
         images.append(im)
         relativePathToImage[relativePath] = im
-
+        
         if not os.path.isfile(relativePath):
-
+            
             missingFiles.append(relativePath)
-
+        
         else:
             # Retrieve image width and height
             pilImage = PIL.Image.open(relativePath)
@@ -103,10 +108,10 @@ for iRow,row in tqdm(input_metadata.iterrows(),total=len(input_metadata)):
     categoryName = row['Species'].lower()
     if categoryName in category_mappings:
         categoryName = category_mappings[categoryName]
-
+        
     categoryID = row['Label']
     assert isinstance(categoryID,int)
-
+    
     # Generate category objects
     if categoryID not in categoryIDToCategories:
         category = {}
@@ -140,24 +145,25 @@ for iRow,row in tqdm(input_metadata.iterrows(),total=len(input_metadata)):
             category['eppo_taxon_code'] = 'CVRGR'
         if category['common_name'] == 'parkinsonia':
             category['species'] = 'parkinsonia aculeata'
-            category['eppo_taxon_code'] = 'PAKAC'
+            category['eppo_taxon_code'] = 'PAKAC'        
 
     # Create an annotation
     ann = {}
-
+    
     # This creates a unique ID, however this feature may not be needed
     ann['id'] = str(uuid.uuid1())
-    ann['image_id'] = im['id']
+    ann['image_id'] = im['id']    
     ann['category_id'] = categoryID
     ann['agcontext_id'] = 0
-
+    ann['agcontext_name'] = 'deepweeds'
+    
     annotations.append(ann)
-
+    
 categories = list(categoryIDToCategories.values())
 
 elapsed = time.time() - startTime
 print('Finished verifying file loop in {}, {} images, {} missing images, {} repeat labels'.format(
-        humanfriendly.format_timespan(elapsed), len(images), len(missingFiles), len(duplicateImageIDs)))
+        humanfriendly.format_timespan(elapsed), len(images), len(missingFiles), len(duplicateImageIDs)))    
 
 """Create info array and object"""
 
@@ -245,3 +251,4 @@ with output_file.open('w') as fout:
 
 print('Finished writing .json file with {} images, {} annotations, and {} categories'.format(
         len(images),len(annotations),len(categories)))
+

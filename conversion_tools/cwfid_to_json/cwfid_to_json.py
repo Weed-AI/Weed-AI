@@ -1,3 +1,9 @@
+#!/usr/bin/env python
+# coding: utf-8
+
+# In[1]:
+
+
 """
 cwfid_to_json.py
 
@@ -140,7 +146,7 @@ info = [{
     "secondary_contributor": "Converted to WeedCOCO by Henry Lydecker",
     "contributor": "Sebastian Haug",
     "id": 0
-}]
+}]  
 annotations = []
 images = []
 progress = tqdm((cwfid_path / "annotations").glob("*_annotation.yaml"))
@@ -148,22 +154,22 @@ for ann_path in progress:
     progress.set_description(ann_path.name)
     image_id = int(ann_path.name[:3])
     ann_blob = yaml.safe_load(ann_path.open())
-
+    
     image = {
         "id": image_id,
         "file_name": os.path.join(dir_name, ann_blob["filename"]),
         "license": 0,  # TODO
-        "agcontext_id": 0,
+        "agdata_id": 0,
     }
     dims = get_image_dimensions(image_folder / ann_blob["filename"])
-
+    
     if dims is None:
         missing_files.append(image_folder / ann_blob["filename"])
     else:
         image.update(dims)
-
+        
     images.append(image)
-
+    
     annotations.extend(create_annotations(ann_blob, image_id, starting_idx=len(annotations)))
 
     collections = [
@@ -177,11 +183,11 @@ for ann_path in progress:
      "id": 0,
     }
 ]
-
+    
 subset_path = cwfid_path / "train_test_split.yaml"
 with open(subset_path) as subset_file:
     subsets = yaml.safe_load(subset_file)
-
+    
     # TODO: iterate over value key pairs and create individual collection membership per image.
     # TODO: refer to all annotations associated with an image?
     collection_memberships = []
@@ -191,13 +197,13 @@ with open(subset_path) as subset_file:
                 "image_id": value,
                 "subset": "train",
                 "collection_id": 0
-            })
+            }) 
         else:
             collection_memberships.append({
                 "image_id": value,
                 "subset": "test",
                 "collection_id": 0
-            })
+            }) 
 print(collection_memberships)
 """Write output"""
 with output_file.open('w') as fout:
@@ -211,3 +217,4 @@ with output_file.open('w') as fout:
                "collections": collections,
                "collection_memberships": collection_memberships},
               fout, indent=4)
+
