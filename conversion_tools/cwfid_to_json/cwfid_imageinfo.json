@@ -17301,7 +17301,7 @@
             "url": "https://creativecommons.org/licenses/by/4.0/"
         }
     ],
-    "agcontext": [
+    "agcontexts": [
         {
             "agcontext_id": 0,
             "agcontext_name": "cwfid",
@@ -17316,7 +17316,7 @@
             "location_lat": 53,
             "location_long": 11,
             "location_datum": 4326,
-            "upload_time": "2020-08-28 09:26:26",
+            "upload_time": "2020-08-28 09:31:22",
             "camera_make": "JAI AD-130GE",
             "camera_lens": "Fujinon TF15-DA-8",
             "camera_lens_focallength": 15,
