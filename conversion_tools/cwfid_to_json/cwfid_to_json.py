@@ -3,7 +3,11 @@ cwfid_to_json.py
 
 Ingests CWFID .yaml annotations and images to produce a WeedCOCO .JSON file.
 """
-# setup
+
+
+"""Constants and environment"""
+
+import argparse
 import yaml
 import pandas as pd
 import pathlib
@@ -20,13 +24,12 @@ import PIL
 from PIL import Image
 
 # define paths
-# TODO: Adjust this to conform to our chosen file storage structure?
-cwfid_path = pathlib.Path(os.path.realpath('../cwfid_to_json/'))
-
-input_metadata_file = cwfid_path / "labels.csv"
-output_file = cwfid_path / "cwfid_imageinfo.json"
-image_folder = cwfid_path / "cwfid_images"
-dir_name = "cwfid_images"
+ap = argparse.ArgumentParser(description=__doc__)
+ap.add_argument('--labels-dir', default='annotations', type=pathlib.Path)
+ap.add_argument('--image-dir', default='cwfid_images', type=pathlib.Path)
+ap.add_argument('-o', '--out-path', default='cwfid_imageinfo.json', type=pathlib.Path)
+ap.add_argument('--subset-dir', default='.', type=pathlib.Path)
+args = ap.parse_args()
 
 
 CATEGORY_MAP = {
@@ -143,7 +146,7 @@ info = [{
 }]
 annotations = []
 images = []
-progress = tqdm((cwfid_path / "annotations").glob("*_annotation.yaml"))
+progress = tqdm(args.labels_dir.glob("*_annotation.yaml"))
 for ann_path in progress:
     progress.set_description(ann_path.name)
     image_id = int(ann_path.name[:3])
@@ -151,14 +154,14 @@ for ann_path in progress:
 
     image = {
         "id": image_id,
-        "file_name": os.path.join(dir_name, ann_blob["filename"]),
+        "file_name": os.path.join(args.image_dir, ann_blob["filename"]),
         "license": 0,  # TODO
         "agdata_id": 0,
     }
-    dims = get_image_dimensions(image_folder / ann_blob["filename"])
+    dims = get_image_dimensions(args.image_dir / ann_blob["filename"])
 
     if dims is None:
-        missing_files.append(image_folder / ann_blob["filename"])
+        missing_files.append(args.image_dir / ann_blob["filename"])
     else:
         image.update(dims)
 
@@ -178,7 +181,7 @@ for ann_path in progress:
     }
 ]
 
-subset_path = cwfid_path / "train_test_split.yaml"
+subset_path = args.subset_dir / "train_test_split.yaml"
 with open(subset_path) as subset_file:
     subsets = yaml.safe_load(subset_file)
 
@@ -200,7 +203,7 @@ with open(subset_path) as subset_file:
             })
 print(collection_memberships)
 """Write output"""
-with output_file.open('w') as fout:
+with args.out_path.open('w') as fout:
     json.dump({
                "images": images,
                "annotations": annotations,
