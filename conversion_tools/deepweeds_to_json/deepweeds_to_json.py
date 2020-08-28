@@ -9,17 +9,13 @@ https://github.com/microsoft/CameraTraps
 
 import pandas as pd
 import pathlib
-import uuid
 import json
 import time
 import datetime
 from tqdm import tqdm
 import humanfriendly
-import exifread
-import sys
 import os
 import PIL
-from PIL import Image
 
 """Constants and environment"""
 

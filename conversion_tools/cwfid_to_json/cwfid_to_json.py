@@ -5,19 +5,12 @@ Ingests CWFID .yaml annotations and images to produce a WeedCOCO .JSON file.
 """
 # setup
 import yaml
-import pandas as pd
 import pathlib
-import uuid
 import json
-import time
 import datetime
 from tqdm import tqdm
-import humanfriendly
-import exifread
-import sys
 import os
 import PIL
-from PIL import Image
 
 # define paths
 # TODO: Adjust this to conform to our chosen file storage structure?
