@@ -1,0 +1,269 @@
+$id: https://weedid.sydney.edu.au/schema/AgContext.json
+type: object
+required:
+  - id
+  - crop_type
+  - bbch_descriptive_text
+  - bbch_code
+  - grains_descriptive_text
+  - soil_colour
+  - surface_cover
+  - surface_coverage
+  - weather_description
+  - location_lat
+  - location_long
+  - location_datum
+  - camera_make
+  - camera_lens
+  - camera_lens_focallength
+  - camera_height
+  - camera_angle
+  - camera_fov
+  - photography_description
+  - lighting
+  - emr_channels
+  - cropped_to_plant
+
+properties:
+
+  id:
+    type:
+      number
+    description: |-
+        A number identifying the AgContext.
+
+  crop_type:
+    type:
+      string
+    enum:
+      - wheat
+      - barley
+      - oats
+      - triticale
+      - sorghum
+      - rice
+      - lupins
+      - chickpeas
+      - lentils
+      - field_peas
+      - faba_beans
+      - mung_beans
+      - canola
+      - mustard
+      - flax
+      - linseed
+      - safflower
+      - cotton
+      - carrots
+      - weed_only
+      - other
+    description: |-
+          Crop type.
+          One of several strings describing the crop grown in the image.
+
+  grains_descriptive_text:
+    type:
+      string
+    enum:
+      - emergence
+      - seedling
+      - tillering
+      - stem_elongation
+      - booting
+      - ear_emergence
+      - flowering
+      - milky_dough
+      - dough
+      - ripening
+      - na
+    description: |-
+        Grains descriptive text.
+        One of ten possible strings describing the crop developmental stage.
+        If this AgContext is not in a cropping environment, use value "na".
+
+  bbch_descriptive_text:
+    type:
+      string
+    enum:
+      - germination
+      - sprouting
+      - bud development
+      - leaf development
+      - formation of side shoots
+      - tillering
+      - stem elongation
+      - rosette growth
+      - shoot development
+      - development of harvestable vegetative parts
+      - bolting
+      - inflorescence emergence
+      - heading
+      - flowering
+      - development of fruit
+      - ripening or maturity of fruit and seed
+      - senescence
+      - beginning of dormancy
+      - na
+    description: |-
+        BBCG descriptive text.
+        One of several possible strings describing the stage of the crop, chosen from a list of possible terms used by the BBCH.
+        If this AgContext is not in a cropping environment, use value "na".
+
+  bbch_code:
+    type:
+      string
+    pattern: "^gs[0-9][0-9]$|^na$|^(?!.*gs00))"
+    description: |-
+        BBCG descriptive text.
+        One of several possible strings describing the stage of the crop, chosen from a list of codes used by the BBCH.
+        If this AgContext is not in a cropping environment, use value "na".
+
+  soil_colour:
+    type:
+      string
+    enum:
+      - not_visible
+      - black
+      - dark_brown
+      - brown
+      - red_brown
+      - dark_red
+      - yellow
+      - pale_yellow
+      - white
+      - grey
+    description: |-
+        Soil colour.
+        General description of the soil colour.
+
+  surface_cover:
+    type: string
+    enum:
+      - cereal
+      - oilseed
+      - legume
+      - cotton
+      - black_plastic
+      - white_plastic
+      - woodchips
+      - other
+      - none
+    description: |-
+      Surface cover type.
+      One of several strings describing the background cover that is behind any plants in the images.
+
+  surface_coverage:
+    type: string
+    enum:
+      - "0-25"
+      - "25-50"
+      - "50-75"
+      - "75-100"
+    description: |-
+      Percent of coverage in image.
+      Approximate measurement of the percent of the soil in the image that is covered by the surface cover.
+
+  weather_description:
+    type:
+      string
+    description: |-
+        Weather conditions in images.
+        Free text description of approximate weather conditions during the image capture session.
+
+  location_lat:
+    type:
+      number
+    description:
+        Latitude in decimal degrees.
+        Approximate latitude location of the AgContext, in decimal degrees.
+
+  location_long:
+    type:
+      number
+    description:
+        Longitude in decimal degrees.
+        Approximate longitude location of the AgContext, in decimal degrees.
+
+  location_datum:
+    type:
+      string
+    description: |-
+        EPSG code of spatial datum.
+        A numeric string indicting the EPSG code for the spatial reference system used for the location of the AgContext.
+  camera_make:
+    type: string
+    description: |-
+        Type of camera.
+        Free text denoting the model/make of camera used for this AgContext.
+
+  camera_lens:
+    type: string
+    description: |-
+      Type of lens.
+      Free text denoting the model/make of lens used for this AgContext.
+
+  camera_lens_focallength:
+    type:
+      number
+    minimum: 0
+    description: |-
+      Focal length of the lens mounted to the camera.
+      The focal length of the lens being used in this AgContext, measured in millimeters.
+
+  camera_height:
+    type: number
+    description: |-
+        Height of camera.
+        An number representing the height of the camera, measured in millimeters .
+
+  camera_angle:
+    type: number
+    description:
+        Angle of camera.
+        A number representing the angle at which the camera is positioned, in degrees.
+        A camera facing straight down would be 90.
+
+  camera_fov:
+    anyOf:
+      - type: number
+        minimum: 1
+        maximum: 180
+      - type: string
+        enum:
+        - variable
+    description: |-
+        Field of view for camera.
+        A number representing the angle captured by the camera across the diagonal of an image, measured in degrees.
+        If this is not fixed within the AgContext, use value "variable".
+
+  photography_description:
+    type:
+      string
+    description: |-
+        Description of photography.
+        Free text description of salient aspects of camera, mount and lighting.
+
+  lighting:
+    type:
+      string
+    enum:
+      - "artificial"
+      - "natural"
+    description: |-
+      Description of the lighting in  the images.
+      Two possible strings describing the lighting in the images.
+
+  cropped_to_plant:
+    type:
+      boolean
+    description: |-
+      Has the image been cropped to the plant?
+      A boolean indicating if the image has been cropped to the plant.
+
+  emr_channels:
+    type:
+      string
+    description: |-
+      EMR channels captured in images.
+      A string describing the electromagnetic raditation channels captured.
+      In most cases, this will be "visual".

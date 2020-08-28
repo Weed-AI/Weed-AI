@@ -1,0 +1,27 @@
+$id: https://weedid.sydney.edu.au/schema/Annotation.json
+allOf:
+  - type: object
+    properties:
+
+  - anyOf:
+    - type: object
+      properties:
+        id:
+          type: number
+          description: |-
+            A number to identify the annotation.
+        image_id:
+          type: number
+          description: |-
+            A number identifying the number associated with the annotation.
+        category_id:
+          type: number
+          desciption: |-
+            A number identifying the category which the annotation belongs to.
+
+    - type: object
+      properties:
+    - type: object
+      properties:
+    - type: object
+      properties:

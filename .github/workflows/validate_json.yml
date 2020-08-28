@@ -1,0 +1,54 @@
+# This is built on GitHub's "basic workflow to help you get started with Actions"
+
+name: JSON validation CI
+
+# Controls when the action will run. Triggers the workflow on push or pull request
+on:
+  push:
+    branches: 
+      - '**'
+  pull_request:
+    branches: 
+      - '**'
+
+jobs:
+  verify-json-validation:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.7]
+    steps:
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+      - uses: actions/checkout@v2
+      - name: Compile yaml schema to JSON
+        run: |
+          pip install pyyaml
+          cd schema
+          make
+          echo {} > test.json
+      - name: Run import tools on test data
+        run: |
+          # TODO: use requirements file
+          pip install pyyaml pandas humanfriendly tqdm exifread pillow
+
+          cd conversion_tools/cwfid_to_json/
+          curl -L https://github.com/cwfid/dataset/archive/36290d0.tar.gz | tar xzv
+          mv dataset-36290d0*/* .
+          python cwfid_to_json.py
+
+          cd ../deepweeds_to_json
+          curl -L https://github.com/AlexOlsen/DeepWeeds/archive/51e3fab.tar.gz | tar xzv
+          mv DeepWeeds-51e3fab*/* .
+          cp labels/labels.csv .
+          # fake some images: make them all be a pic from cwfid
+          mkdir deepweeds_images_full
+          for fname in $(cut -d, -f1 < labels.csv); do ln -s ../../cwfid_to_json/images/001_image.png deepweeds_images_full/$fname; done
+          python deepweeds_to_json.py
+      - name: Validate JSON
+        uses: docker://orrosenblatt/validate-json-action:latest
+        env:
+          INPUT_SCHEMA: ./schema/main.json
+          INPUT_JSONS: ./conversion_tools/cwfid_to_json/cwfid_imageinfo.json,./conversion_tools/deepweeds_to_json/deepweeds_imageinfo.json
