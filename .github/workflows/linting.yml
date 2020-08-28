@@ -1,0 +1,17 @@
+name: Lint code style & smells
+
+# Controls when the action will run. Triggers the workflow on push or pull request
+on:
+  push:
+    branches: 
+      - '**'
+  pull_request:
+    branches: 
+      - '**'
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: cclauss/GitHub-Action-for-Flake8@v0.5.0
