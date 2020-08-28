@@ -146,7 +146,7 @@ for iRow,row in tqdm(input_metadata.iterrows(),total=len(input_metadata)):
     ann = {}
 
     # This creates a unique ID, however this feature may not be needed
-    ann['id'] = str(uuid.uuid1())
+    ann['id'] = iRow
     ann['image_id'] = im['id']
     ann['category_id'] = categoryID
     ann['agcontext_id'] = 0
