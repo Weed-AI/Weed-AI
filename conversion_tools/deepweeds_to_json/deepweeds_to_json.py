@@ -15,7 +15,7 @@ import datetime
 from tqdm import tqdm
 import humanfriendly
 import os
-import PIL
+import PIL.Image
 
 """Constants and environment"""
 

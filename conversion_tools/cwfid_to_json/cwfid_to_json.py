@@ -10,7 +10,7 @@ import json
 import datetime
 from tqdm import tqdm
 import os
-import PIL
+import PIL.Image
 
 # define paths
 # TODO: Adjust this to conform to our chosen file storage structure?
