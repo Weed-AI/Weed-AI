@@ -7,9 +7,6 @@ Modified from code from Microsoft's CameraTraps repo:
 https://github.com/microsoft/CameraTraps
 """
 
-
-"""Constants and environment"""
-
 import pandas as pd
 import pathlib
 import uuid
@@ -23,6 +20,8 @@ import sys
 import os
 import PIL
 from PIL import Image
+
+"""Constants and environment"""
 
 # from visualization import visualize_db
 # import path_utils
