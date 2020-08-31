@@ -25,10 +25,10 @@ from PIL import Image
 
 # define paths
 ap = argparse.ArgumentParser(description=__doc__)
-ap.add_argument('--labels-dir', default='annotations', type=pathlib.Path)
+ap.add_argument('--annotations-dir', default='annotations', type=pathlib.Path)
 ap.add_argument('--image-dir', default='cwfid_images', type=pathlib.Path)
 ap.add_argument('-o', '--out-path', default='cwfid_imageinfo.json', type=pathlib.Path)
-ap.add_argument('--subset-dir', default='.', type=pathlib.Path)
+ap.add_argument('--split-path', default='.', type=pathlib.Path)
 args = ap.parse_args()
 
 
@@ -146,7 +146,7 @@ info = [{
 }]
 annotations = []
 images = []
-progress = tqdm(args.labels_dir.glob("*_annotation.yaml"))
+progress = tqdm(args.annotations_dir.glob("*_annotation.yaml"))
 for ann_path in progress:
     progress.set_description(ann_path.name)
     image_id = int(ann_path.name[:3])
@@ -181,7 +181,7 @@ for ann_path in progress:
     }
 ]
 
-subset_path = args.subset_dir / "train_test_split.yaml"
+subset_path = args.split_path / "train_test_split.yaml"
 with open(subset_path) as subset_file:
     subsets = yaml.safe_load(subset_file)
 
