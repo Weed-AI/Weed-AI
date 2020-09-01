@@ -7,6 +7,7 @@ Modified from code from Microsoft's CameraTraps repo:
 https://github.com/microsoft/CameraTraps
 """
 
+import argparse
 import pandas as pd
 import pathlib
 import json
@@ -22,14 +23,21 @@ import PIL.Image
 # from visualization import visualize_db
 # import path_utils
 
+ap = 
+
+
+
+arse.ArgumentParser(description=__doc__)
+ap.add_argument("--labels-dir", default=".", type=pathlib.Path)
+ap.add_argument("--image-dir", default="deepweeds_images_full", type=pathlib.Path)
+ap.add_argument(
+    "-o", "--out-path", default="deepweeds_imageinfo.json", type=pathlib.Path
+)
+args = ap.parse_args()
+
 
 # define paths
-# TODO: Adjust this to conform to our chosen file storage structure?
-deepweeds_path = pathlib.Path(os.path.realpath("../deepweeds_to_json/"))
-
-input_metadata_file = deepweeds_path / "labels.csv"
-output_file = deepweeds_path / "deepweeds_imageinfo.json"
-image_folder = deepweeds_path / "deepweeds_images_full"
+input_metadata_file = args.labels_dir / "labels.csv"
 
 # filename_replacements = {dirName:'DeepWeeds'}
 category_mappings = {"none": "empty"}
@@ -68,7 +76,7 @@ for iRow, row in tqdm(input_metadata.iterrows(), total=len(input_metadata)):
     # ImageID,Filename,FilePath,SpeciesID
     imageID = str(row["Filename"])
     fn = row["Filename"]
-    relativePath = os.path.join(image_folder, fn)
+    relativePath = os.path.join(args.image_dir, fn)
 
     # This makes an assumption of one annotation per image, which happens to be
     # true in this data set.
@@ -245,7 +253,7 @@ agcontext = [
 ]
 
 """Write output"""
-with output_file.open("w") as fout:
+with args.out_path.open("w") as fout:
     json.dump(
         {
             "images": images,
