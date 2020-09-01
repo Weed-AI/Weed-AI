@@ -9,19 +9,12 @@ Ingests CWFID .yaml annotations and images to produce a WeedCOCO .JSON file.
 
 import argparse
 import yaml
-import pandas as pd
 import pathlib
-import uuid
 import json
-import time
 import datetime
 from tqdm import tqdm
-import humanfriendly
-import exifread
-import sys
 import os
-import PIL
-from PIL import Image
+import PIL.Image
 
 # define paths
 ap = argparse.ArgumentParser(description=__doc__)

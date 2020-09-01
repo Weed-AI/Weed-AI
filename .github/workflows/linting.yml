@@ -14,6 +14,5 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - uses: jpetrucciani/black-check@master
-        with:
-          path: '.'
+      - uses: cclauss/GitHub-Action-for-Flake8@v0.5.0
+

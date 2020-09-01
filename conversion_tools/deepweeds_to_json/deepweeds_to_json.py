@@ -7,23 +7,18 @@ Modified from code from Microsoft's CameraTraps repo:
 https://github.com/microsoft/CameraTraps
 """
 
-
-"""Constants and environment"""
-
 import argparse
 import pandas as pd
 import pathlib
-import uuid
 import json
 import time
 import datetime
 from tqdm import tqdm
 import humanfriendly
-import exifread
-import sys
 import os
-import PIL
-from PIL import Image
+import PIL.Image
+
+"""Constants and environment"""
 
 # from visualization import visualize_db
 # import path_utils
