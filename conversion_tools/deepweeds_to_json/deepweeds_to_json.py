@@ -23,11 +23,7 @@ import PIL.Image
 # from visualization import visualize_db
 # import path_utils
 
-ap = 
-
-
-
-arse.ArgumentParser(description=__doc__)
+ap = argparse.ArgumentParser(description=__doc__)
 ap.add_argument("--labels-dir", default=".", type=pathlib.Path)
 ap.add_argument("--image-dir", default="deepweeds_images_full", type=pathlib.Path)
 ap.add_argument(
