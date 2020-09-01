@@ -15,6 +15,4 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - uses: cclauss/GitHub-Action-for-Flake8@v0.5.0
-      - uses: jpetrucciani/black-check@master
-        with:
-          path: '.'
+
