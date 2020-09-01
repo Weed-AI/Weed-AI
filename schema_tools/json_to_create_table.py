@@ -44,7 +44,7 @@ def convert_json_to_create_table(json_paths):
     out = ""
     for table_name, table_types in types.items():
         table_counts = counts[table_name]
-        
+
         out += f"CREATE TABLE {table_name} (\n"
         clauses = [
             f"{k} {typ}{' NULL' if table_counts[k] < n_objects else ''}"
@@ -54,8 +54,9 @@ def convert_json_to_create_table(json_paths):
             clauses.append("PRIMARY KEY (id)")
         for k in table_types:
             if k[-3:] == "_id":
-                clauses.append(f"FOREIGN KEY ({k}) "
-                               f"REFERENCES {pluralise(k[:-3])} (id)")
+                clauses.append(
+                    f"FOREIGN KEY ({k}) " f"REFERENCES {pluralise(k[:-3])} (id)"
+                )
         out += "    " + ",\n    ".join(clauses) + "\n"
         out += f");\n"
     return out
