@@ -13,16 +13,16 @@ properties:
   images:
     type: array
     contains:
-      $ref: https://weedid.sydney.edu.au/schema/Image.json
+      $ref: https://weedid.sydney.edu.au/schema/Image.json#/
   annotations:
     type: array
     contains:
-      $ref: https://weedid.sydney.edu.au/schema/Annotation.json
+      $ref: https://weedid.sydney.edu.au/schema/Annotation.json#/
   agcontexts:
     type: array
     contains:
-      $ref: https://weedid.sydney.edu.au/schema/AgContext.json
+      $ref: https://weedid.sydney.edu.au/schema/AgContext.json#/
   collections:
     type: array
     contains:
-      $ref: https://weedid.sydney.edu.au/schema/Collection.json
+      $ref: https://weedid.sydney.edu.au/schema/Collection.json#/
