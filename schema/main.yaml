@@ -1,4 +1,5 @@
 $schema: http://json-schema.org/draft-07/schema#
+$id: https://weedid.sydney.edu.au/schema/main.json
 description: |
   Weed-COCO
   An extension of MS COCO for Weed Identification in grain crops.
@@ -12,17 +13,17 @@ required:
 properties:
   images:
     type: array
-    contains:
+    items:
       $ref: https://weedid.sydney.edu.au/schema/Image.json#/
   annotations:
     type: array
-    contains:
+    items:
       $ref: https://weedid.sydney.edu.au/schema/Annotation.json#/
   agcontexts:
     type: array
-    contains:
+    items:
       $ref: https://weedid.sydney.edu.au/schema/AgContext.json#/
   collections:
     type: array
-    contains:
+    items:
       $ref: https://weedid.sydney.edu.au/schema/Collection.json#/
