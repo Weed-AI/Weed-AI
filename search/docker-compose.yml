@@ -30,6 +30,7 @@ services:
     build: .
     volumes:
       - ./:/code   # for development
+      - /code/node_modules  # an exception from the above volume
     ports:
       - '1337:3000'
     environment:

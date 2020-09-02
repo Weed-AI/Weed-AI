@@ -2,8 +2,8 @@ FROM node:10
 RUN mkdir /code
 WORKDIR /code
 RUN mkdir /node_modules
-ENV NPM_CONFIG_PREFIX=/node_modules
 COPY package.json package-lock.json /code/
+RUN ["npm", "install"]
 
 # replace this with your application's default port
 EXPOSE 3000
