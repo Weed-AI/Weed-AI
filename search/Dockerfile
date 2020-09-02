@@ -2,7 +2,7 @@ FROM node:10
 RUN mkdir /code
 WORKDIR /code
 RUN curl -o- -L https://yarnpkg.com/install.sh | bash
-RUN yarn global react-scripts
+RUN yarn global add react-scripts
 COPY package.json yarn.lock /code/
 RUN yarn install
 
