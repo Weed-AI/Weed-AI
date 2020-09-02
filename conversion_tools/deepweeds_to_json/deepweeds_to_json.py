@@ -167,6 +167,8 @@ print(
         len(duplicateImageIDs),
     )
 )
+if missingFiles:
+    print("Example of missing file:", missingFiles[0])
 
 """Create info array and object"""
 
