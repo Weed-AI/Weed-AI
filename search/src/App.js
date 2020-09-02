@@ -53,7 +53,7 @@ class App extends Component {
 					title="Results"
 					dataField="annotations.category.common_name.keyword"
 					from={0}
-					size={10}
+					size={5}
 					pagination={true}
 					react={{
 						and: ["searchbox" /*, "ratingsfilter" */ ]
@@ -72,7 +72,7 @@ class App extends Component {
 											}}
 										/>
 										<ResultCard.Description>
-											{item.day_of_week + " " + '*'.repeat(item.total_quantity)}
+											{item._id + " " + '*'.repeat(item.total_quantity)}
 										</ResultCard.Description>
 									</ResultCard>
 								))
