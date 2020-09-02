@@ -203,7 +203,7 @@ collections = [
         "year": 2019,
         "identifier": "doi:10.1038/s41598-018-38343-3",
         "rights": "Apache License 2.0",
-        "accrual_policy": "Closed",
+        "accrual_policy": "closed",
         "id": 0,
     }
 ]

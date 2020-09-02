@@ -184,7 +184,7 @@ for ann_path in progress:
             "year": 2015,
             "identifier": "doi:10.1007/978-3-319-16220-1_8",
             "rights": "All data is subject to copyright and may only be used for non-commercial research. In case of use please cite our publication.",
-            "accrual_policy": "Closed",
+            "accrual_policy": "closed",
             "id": 0,
         }
     ]
