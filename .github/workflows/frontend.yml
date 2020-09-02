@@ -20,8 +20,8 @@ jobs:
             mkdir -p live-data
             docker-compose up -d
             sleep 1
-            while docker-compose ps | grep elasticsearch.*health:.starting > /dev/null; do sleep 1; done
-            (docker-compose ps | grep -q 'elasticseach.*Up.(healthy)') || (docker-compose ps; docker-compose logs; false)
+            while docker-compose ps | grep health:.starting > /dev/null; do sleep 1; done
+            (docker-compose ps | grep -q 'elasticsearch.*Up.(healthy)') || (docker-compose ps; docker-compose logs; false)
       - name: Index test data
         run: |
             bash search/scripts/index_test_images.sh
