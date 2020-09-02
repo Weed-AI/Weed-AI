@@ -16,9 +16,22 @@ class App extends Component {
 		return (
 			<ReactiveBase
 			app="weedid"
-			url="http://localhost:9200/">
-				<div style={{ display: "flex", flexDirection: "row" }}>
-					<div style={{ display: "flex", flexDirection: "column", width: "40%" }}>
+			url="http://localhost:9200/"
+			theme={{
+				typography: {
+				  fontFamily: 'Raleway, Helvetica, sans-serif',
+				},
+				colors: {
+				  primaryColor: '#0A0A0A',
+				  titleColor: '#E64626',
+				},
+				component: {
+				  padding: 10
+				}
+			  }}
+			>
+			<div style={{ display: "flex", flexDirection: "row" }}>
+			<div style={{ display: "flex", flexDirection: "column", width: "40%" }}>
 			    <CategorySearch
 						componentId="searchbox"
 						dataField={["annotations.category.common_name.keyword","annotations.category.role.keyword","annotations.agcontext.agcontext_name.keyword","annotations.category.species.keyword"]}
@@ -110,7 +123,7 @@ class App extends Component {
 						title="Resolution (pixels)"
 						range={{
 							"start": 0,
-							"end": 1000000
+							"end": 100000
 						}}
 						rangeLabels={{
 							"start": "Start",
@@ -119,7 +132,7 @@ class App extends Component {
 						stepValue={10000}
 						showHistogram={true}
 						showFilter={true}
-						interval={2}
+						interval={10000}
 						react={{
 							and: ["searchbox","CategoryFilter", "SearchFilter"]
 						}}
