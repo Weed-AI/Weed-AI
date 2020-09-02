@@ -35,7 +35,8 @@ jobs:
           cd conversion_tools/cwfid_to_json/
           curl -L https://github.com/cwfid/dataset/archive/36290d0.tar.gz | tar xzv
           mv dataset-36290d0*/* .
-          python cwfid_to_json.py
+          mv images cwfid_images
+          python cwfid_to_json.py --image-dir cwfid_images
           cd ../deepweeds_to_json
           curl -L https://github.com/AlexOlsen/DeepWeeds/archive/51e3fab.tar.gz | tar xzv
           mv DeepWeeds-51e3fab*/* .
