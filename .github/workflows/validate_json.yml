@@ -32,9 +32,8 @@ jobs:
       - uses: actions/setup-node@v1
         with:
           node-version: '10'
+      - run: npm install -g ajv-cli
       - name: Validate JSON
         run: |
-          npm install -g ajv-cli
-          pwd
-          ls
-          ajv -s main.json -r '*.json' -d conversion_tools/cwfid_to_json/cwfid_imageinfo.json -d conversion_tools/deepweeds_to_json/deepweeds_imageinfo.json
+          cd schema
+          ajv -s main.json -r '*.json' -d ../conversion_tools/cwfid_to_json/cwfid_imageinfo.json -d ../conversion_tools/deepweeds_to_json/deepweeds_imageinfo.json
