@@ -10,6 +10,14 @@ required:
   - images
   - annotations
 properties:
+  images:
+    type: array
+    contains:
+      $ref: https://weedid.sydney.edu.au/schema/Image.json
+  annotations:
+    type: array
+    contains:
+      $ref: https://weedid.sydney.edu.au/schema/Annotation.json
   agcontexts:
     type: array
     contains:
@@ -18,11 +26,3 @@ properties:
     type: array
     contains:
       $ref: https://weedid.sydney.edu.au/schema/Collection.json
-  annotations:
-    type: array
-    contains:
-      $ref: https://weedid.sydney.edu.au/schema/Annotation.json
-  images:
-    type: array
-    contains:
-      $ref: https://weedid.sydney.edu.au/schema/Image.json
