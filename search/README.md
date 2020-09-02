@@ -12,6 +12,8 @@ Check if you have a working install with `npm ls react-scripts`
 
 If the file isn't found, reinstall npm with `npm install`
 
+## Sources
+
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
 ## Available Scripts
