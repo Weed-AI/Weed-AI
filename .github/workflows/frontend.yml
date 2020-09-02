@@ -17,6 +17,7 @@ jobs:
         run: |
             set -ex
             cd search
+            mkdir -p live-data
             docker-compose up -d
             sleep 1
             while docker-compose ps | grep elasticsearch.*health:.starting > /dev/null; do sleep 1; done
