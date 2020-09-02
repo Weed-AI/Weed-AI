@@ -1,0 +1,25 @@
+name: Check search frontend
+
+on:
+  push:
+    branches: 
+      - master
+  pull_request:
+    branches: 
+      - '**'
+
+jobs:
+  verify-json-validation:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Bring system up
+        run: |
+            cd search
+            docker-compose up -d
+            sleep 1
+            while docker-compose ps | grep elasticsearch.*health:.starting > /dev/null; do sleep 1; done
+            docker-compose ps | grep -q elasticseach.*health:.healthy
+      - name: Index test data
+        run: |
+            bash search/scripts/index_test_images.sh
