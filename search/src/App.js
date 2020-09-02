@@ -2,8 +2,8 @@ import React, { Component } from 'react';
 import {
 	ReactiveBase,
 	CategorySearch,
-	DataSearch,
-	SingleRange,
+	RangeSlider,
+	ReactiveOpenStreetMap,
 	ResultCard,
 	MultiList,
 	ReactiveList
@@ -21,9 +21,22 @@ class App extends Component {
 					<div style={{ display: "flex", flexDirection: "column", width: "40%" }}>
 			    <CategorySearch
 						componentId="searchbox"
-						dataField="annotations.category.common_name.keyword"
-						categoryField="common_name"
-						placeholder="Search for species"
+						dataField={["annotations.category.common_name.keyword","annotations.category.role.keyword","annotations.agcontext.agcontext_name.keyword"]}
+						categoryField={["annotations.category.common_name.keyword","annotations.category.role.keyword","annotations.agcontext.agcontext_name.keyword"]}
+						placeholder="Search for species, role, or agcontext"
+						autoSuggest={true}
+						defaultSuggestions={[{label: "Weed", value: "weed"}]}
+						highlight={false}
+						highlightField={["annotations.category.common_name.keyword","annotations.category.role.keyword","annotations.agcontext.agcontext_name.keyword"]}
+						queryFormat="or"
+						fuzziness={0}
+						debounce={100}
+						react={{
+						  and: ["CategoryFilter", "SearchFilter"]
+						}}
+						showFilter={true}
+						filterLabel="Venue filter"
+						URLParams={false}
 				/>
 				<MultiList
 						componentId="rolefilter"
@@ -37,7 +50,7 @@ class App extends Component {
 						showSearch={true}
 						placeholder="Search Role"
 						react={{
-							and: ["CategoryFilter", "SearchFilter"]
+							and: ["searchbox", "SearchFilter"]
 						}}
 						showFilter={true}
 						filterLabel="Role"
@@ -47,6 +60,48 @@ class App extends Component {
 							marginTop: "10px"
 						}}
 					/>
+				<MultiList
+						componentId="agcontextfilter"
+						title="Filter by agcontext"
+						dataField="annotations.agcontext.agcontext_name.keyword"
+						sortBy="asc"
+						queryFormat="or"
+						selectAllLabel="All agcontexts"
+						showCheckbox={true}
+						showCount={true}
+						showSearch={true}
+						placeholder="Search Agcontext"
+						react={{
+							and: ["searchbox", "SearchFilter"]
+						}}
+						showFilter={true}
+						filterLabel="Agcontext"
+						URLParams={false}
+						style={{
+							padding: "5px",
+							marginTop: "10px"
+						}}
+					/>
+				<RangeSlider
+						componentId="resslider"
+						dataField="resolution"
+						title="Resolution (pixels)"
+						range={{
+							"start": 0,
+							"end": 1000000
+						}}
+						rangeLabels={{
+							"start": "Start",
+							"end": "End"
+						}}
+						stepValue={10000}
+						showHistogram={true}
+						showFilter={true}
+						interval={2}
+						react={{
+							and: ["Searchbox","CategoryFilter", "SearchFilter"]
+						}}
+				/>
 				</div>
 				<ReactiveList
 					componentId="result"
@@ -56,7 +111,7 @@ class App extends Component {
 					size={5}
 					pagination={true}
 					react={{
-						and: ["searchbox" /*, "ratingsfilter" */ ]
+						and: ["searchbox","resslider","agcontextfilter","rolefilter"]
 					}}
 					render={({ data }) => (
 						<ReactiveList.ResultCardsWrapper>
