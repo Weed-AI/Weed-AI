@@ -17316,7 +17316,7 @@
             "location_lat": 53,
             "location_long": 11,
             "location_datum": 4326,
-            "upload_time": "2020-09-02 23:07:48",
+            "upload_time": "2020-09-02 23:21:11",
             "camera_make": "JAI AD-130GE",
             "camera_lens": "Fujinon TF15-DA-8",
             "camera_lens_focallength": 15,
@@ -17336,7 +17336,7 @@
             "year": 2015,
             "identifier": "doi:10.1007/978-3-319-16220-1_8",
             "rights": "All data is subject to copyright and may only be used for non-commercial research. In case of use please cite our publication.",
-            "accrual_policy": "Closed",
+            "accrual_policy": "closed",
             "id": 0
         }
     ],
