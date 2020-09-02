@@ -6,11 +6,10 @@
 
 ## Troubleshooting:
 
-Reactive search failing to load? Might be an issue with npm.
+Reactive search failing to load? Might be an issue with react-scripts not being installed.
 
-Check if you have a working install with `npm ls react-scripts`
+Check if you have a working install with `npm ls react-scripts`. This works even with yarn as our package manager.
 
-If the file isn't found, reinstall npm with `npm install`
 
 ## Sources
 
