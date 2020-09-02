@@ -23,6 +23,7 @@ required:
   - lighting
   - emr_channels
   - cropped_to_plant
+  - afobssfg
 
 properties:
 
