@@ -15,6 +15,7 @@ jobs:
       - uses: actions/checkout@v2
       - name: Bring system up
         run: |
+            set -ex
             cd search
             docker-compose up -d
             sleep 1
