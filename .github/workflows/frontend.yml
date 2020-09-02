@@ -20,7 +20,7 @@ jobs:
             docker-compose up -d
             sleep 1
             while docker-compose ps | grep elasticsearch.*health:.starting > /dev/null; do sleep 1; done
-            docker-compose ps | grep -q elasticseach.*health:.healthy
+            (docker-compose ps | grep -q elasticseach.*health:.healthy) || (docker-compose ps; docker-compose logs; fail)
       - name: Index test data
         run: |
             bash search/scripts/index_test_images.sh
