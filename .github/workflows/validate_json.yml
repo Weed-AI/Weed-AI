@@ -28,7 +28,6 @@ jobs:
           pip install pyyaml
           cd schema
           make
-          echo {} > test.json
       - uses: actions/setup-node@v1
         with:
           node-version: '10'
