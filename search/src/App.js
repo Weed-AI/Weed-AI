@@ -21,13 +21,13 @@ class App extends Component {
 					<div style={{ display: "flex", flexDirection: "column", width: "40%" }}>
 			    <CategorySearch
 						componentId="searchbox"
-						dataField={["annotations.category.common_name.keyword","annotations.category.role.keyword","annotations.agcontext.agcontext_name.keyword"]}
-						categoryField={["annotations.category.common_name.keyword","annotations.category.role.keyword","annotations.agcontext.agcontext_name.keyword"]}
+						dataField={["annotations.category.common_name.keyword","annotations.category.role.keyword","annotations.agcontext.agcontext_name.keyword","annotations.category.species.keyword"]}
+						categoryField={["annotations.category.common_name.keyword","annotations.category.role.keyword","annotations.agcontext.agcontext_name.keyword","annotations.category.species.keyword"]}
 						placeholder="Search for species, role, or agcontext"
 						autoSuggest={true}
 						defaultSuggestions={[{label: "Weed", value: "weed"}]}
 						highlight={false}
-						highlightField={["annotations.category.common_name.keyword","annotations.category.role.keyword","annotations.agcontext.agcontext_name.keyword"]}
+						highlightField={["annotations.category.common_name.keyword","annotations.category.role.keyword","annotations.agcontext.agcontext_name.keyword","annotations.category.species.keyword"]}
 						queryFormat="or"
 						fuzziness={0}
 						debounce={100}
@@ -54,6 +54,28 @@ class App extends Component {
 						}}
 						showFilter={true}
 						filterLabel="Role"
+						URLParams={false}
+						style={{
+							padding: "5px",
+							marginTop: "10px"
+						}}
+					/>
+				<MultiList
+						componentId="speciesfilter"
+						title="Filter by species"
+						dataField="annotations.category.species.keyword"
+						sortBy="asc"
+						queryFormat="or"
+						selectAllLabel="All species"
+						showCheckbox={true}
+						showCount={true}
+						showSearch={true}
+						placeholder="Search Species"
+						react={{
+							and: ["searchbox", "SearchFilter"]
+						}}
+						showFilter={true}
+						filterLabel="Species"
 						URLParams={false}
 						style={{
 							padding: "5px",
@@ -99,7 +121,7 @@ class App extends Component {
 						showFilter={true}
 						interval={2}
 						react={{
-							and: ["Searchbox","CategoryFilter", "SearchFilter"]
+							and: ["searchbox","CategoryFilter", "SearchFilter"]
 						}}
 				/>
 				</div>
@@ -108,10 +130,10 @@ class App extends Component {
 					title="Results"
 					dataField="annotations.category.common_name.keyword"
 					from={0}
-					size={5}
+					size={20}
 					pagination={true}
 					react={{
-						and: ["searchbox","resslider","agcontextfilter","rolefilter"]
+						and: ["searchbox","resslider","agcontextfilter","rolefilter","speciesfilter"]
 					}}
 					render={({ data }) => (
 						<ReactiveList.ResultCardsWrapper>
