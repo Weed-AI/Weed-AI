@@ -9,7 +9,7 @@ on:
       - '**'
 
 jobs:
-  verify-json-validation:
+  check-search-frontend:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
