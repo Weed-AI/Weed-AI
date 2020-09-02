@@ -222,7 +222,7 @@ agcontext = [
     {
         "id": 0,
         "agcontext_name": "deepweeds",
-        "crop_type": "weed only",
+        "crop_type": "weed_only",
         "bbch_descriptive_text": "na",
         "bbch_code": "na",
         "grains_descriptive_text": "na",

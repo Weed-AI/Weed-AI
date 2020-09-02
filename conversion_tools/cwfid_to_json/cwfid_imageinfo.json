@@ -17305,7 +17305,7 @@
         {
             "id": 0,
             "agcontext_name": "cwfid",
-            "crop_type": "horticulture",
+            "crop_type": "other",
             "bbch_descriptive_text": "leaf development",
             "bbch_code": "GS10-19",
             "grains_descriptive_text": "seedling",
@@ -17316,7 +17316,7 @@
             "location_lat": 53,
             "location_long": 11,
             "location_datum": 4326,
-            "upload_time": "2020-09-02 22:56:08",
+            "upload_time": "2020-09-02 23:03:57",
             "camera_make": "JAI AD-130GE",
             "camera_lens": "Fujinon TF15-DA-8",
             "camera_lens_focallength": 15,

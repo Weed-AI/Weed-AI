@@ -105,7 +105,7 @@ agcontext = [
     {
         "id": 0,
         "agcontext_name": "cwfid",
-        "crop_type": "horticulture",
+        "crop_type": "other",
         "bbch_descriptive_text": "leaf development",
         "bbch_code": "GS10-19",
         "grains_descriptive_text": "seedling",
