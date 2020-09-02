@@ -21,7 +21,7 @@ required:
   - camera_fov
   - photography_description
   - lighting
-  - emr_channels
+#  - emr_channels
   - cropped_to_plant
 
 properties:
@@ -160,6 +160,7 @@ properties:
       - "25-50"
       - "50-75"
       - "75-100"
+      - na
     description: |-
       Percent of coverage in image.
       Approximate measurement of the percent of the soil in the image that is covered by the surface cover.
