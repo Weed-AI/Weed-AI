@@ -3,8 +3,10 @@
 # dependencies
 /live-data
 /node_modules
+/public/thumbnails
 /.pnp
 .pnp.js
+
 
 # testing
 /coverage
