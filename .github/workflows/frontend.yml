@@ -23,3 +23,8 @@ jobs:
       - name: Index test data
         run: |
             bash search/scripts/index_test_images.sh
+      # TODO: find syntax to run shutdown regardless of previous step outcomes
+      - name: Shutdown
+        run: |
+            cd search
+            docker-compose down
