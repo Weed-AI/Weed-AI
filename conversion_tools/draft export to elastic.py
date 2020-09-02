@@ -4,7 +4,12 @@
 
 import sys
 import json
+import argparse
+import os
 
+ap = argparse.ArgumentParser()
+ap.add_argument('--thumbnail-dir', help='Replace the input file_name directory with this')
+args = ap.parse_args()
 
 coco = json.load(sys.stdin)
 del coco["info"]
@@ -30,6 +35,10 @@ for annotation in coco["annotations"]:
     else:
         annotation["agcontext"] = id_lookup["agcontexts", image["agcontext_id"]]
     # todo: add collection, license
+    if hasattr(args, 'thumbnail_dir'):
+        image['thumbnail'] = args.thumbnail_dir + '/' + os.path.basename(image['file_name'])
+    else:
+        image['thumbnail'] = image['file_name']
 
 
 f = sys.stdout

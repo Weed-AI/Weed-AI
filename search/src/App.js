@@ -33,7 +33,7 @@ class App extends Component {
 									data.map(item => (
 										<ResultCard key={item._id}>
 											<ResultCard.Image
-												src={'thumbnails/' + item.file_name}
+												src={'thumbnails/' + item.thumbnail}
 											/>
 											<ResultCard.Title
 												dangerouslySetInnerHTML={{
