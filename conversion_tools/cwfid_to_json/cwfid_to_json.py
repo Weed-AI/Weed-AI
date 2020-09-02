@@ -7,6 +7,7 @@ Ingests CWFID .yaml annotations and images to produce a WeedCOCO .JSON file.
 
 """Constants and environment"""
 
+import warnings
 import argparse
 import yaml
 import pathlib
@@ -79,6 +80,7 @@ def get_image_dimensions(path):
     Function to measure image dimensions and calculate resolution.
     """
     if not os.path.isfile(path):
+        warnings.warn(f"Could not open {path}")
         return None
     # Retrieve image width and height
     image = PIL.Image.open(path)
@@ -101,7 +103,7 @@ Datasets can be concatenated to include images from multiple different agcontext
 """
 agcontext = [
     {
-        "agcontext_id": 0,
+        "id": 0,
         "agcontext_name": "cwfid",
         "crop_type": "horticulture",
         "bbch_descriptive_text": "leaf development",
@@ -159,7 +161,7 @@ for ann_path in progress:
         "id": image_id,
         "file_name": os.path.join(args.image_dir, ann_blob["filename"]),
         "license": 0,  # TODO
-        "agdata_id": 0,
+        "agcontext_id": 0,
     }
     dims = get_image_dimensions(args.image_dir / ann_blob["filename"])
 
