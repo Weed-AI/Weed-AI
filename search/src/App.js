@@ -51,9 +51,9 @@ class App extends Component {
 				<ReactiveList
 					componentId="result"
 					title="Results"
-					dataField="day_of_week"
+					dataField="annotations.category.common_name.keyword"
 					from={0}
-					size={5}
+					size={10}
 					pagination={true}
 					react={{
 						and: ["searchbox" /*, "ratingsfilter" */ ]
