@@ -1,14 +1,14 @@
 FROM node:10
 RUN mkdir /code
 WORKDIR /code
-RUN curl -o- -L https://yarnpkg.com/install.sh | bash
-RUN yarn global add react-scripts
-COPY package.json yarn.lock /code/
-RUN yarn install
+RUN mkdir /node_modules
+ENV NPM_CONFIG_PREFIX=/node_modules
+COPY package.json package-lock.json /code/
 
 # replace this with your application's default port
 EXPOSE 3000
-CMD ["yarn", "start"]
+# TODO: work out how to install in build and keep node_modules despite VOLUME...
+CMD ["npm", "start"]
 
 
 # for production:
