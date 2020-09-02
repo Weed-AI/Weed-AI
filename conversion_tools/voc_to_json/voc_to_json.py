@@ -59,8 +59,8 @@ def voc_to_coco(
 
     images = []
     annotations = []
-    for image_id, xml_path in enumerate(xml_dir.glob("*.xml")):
-        voc_annotation = etree.parse(xml_path).getroot()
+    for image_id, xml_path in enumerate(xml_dir.glob("[a-zA-Z0-9_]*.xml")):
+        voc_annotation = etree.parse(str(xml_path)).getroot()
         assert voc_annotation.tag == "annotation"
 
         coco_image = {
@@ -79,7 +79,7 @@ def voc_to_coco(
             generate_coco_annotations(
                 voc_annotation.findall("object"),
                 image_id=image_id,
-                base_annotation_id=len(annotations),
+                start_id=len(annotations),
                 category_mapping=category_mapping,
             )
         )
@@ -90,14 +90,15 @@ def voc_to_coco(
             {"id": idx, "name": name} for name, idx in category_mapping.items()
         ]
 
-    return {"images": coco_image, "annotations": annotations, "categories": categories}
+    return {"images": images, "annotations": annotations, "categories": categories}
 
 
 def _load_json_or_yaml(path):
-    if path.endswith(".yaml"):
-        obj = yaml.safe_load(path)
+    if path.suffix in (".yml", ".yaml"):
+        obj = yaml.safe_load(path.open())
     else:
-        obj = json.load(path)
+        obj = json.load(path.open())
+    return obj
 
 
 def main():
