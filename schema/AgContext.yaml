@@ -187,7 +187,7 @@ properties:
 
   location_datum:
     type:
-      int
+      number
     description: |-
         EPSG code of spatial datum.
         A number indicting the EPSG code for the spatial reference system used for the location of the AgContext.
