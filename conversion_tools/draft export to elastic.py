@@ -4,6 +4,10 @@
 
 import sys
 import json
+import logging
+
+log = logging.getLogger()
+logging.basicConfig(level=logging.INFO)
 
 
 coco = json.load(sys.stdin)
@@ -16,6 +20,7 @@ except KeyError:
 
 id_lookup = {}
 for key, objs in coco.items():
+    log.info(f"Mapping {len(objs)} {key}")
     for obj in objs:
         id_lookup[key, obj["id"]] = obj
 
