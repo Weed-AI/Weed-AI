@@ -21,7 +21,7 @@ required:
   - camera_fov
   - photography_description
   - lighting
-  - emr_channels
+#  - emr_channels
   - cropped_to_plant
 
 properties:
@@ -112,7 +112,7 @@ properties:
   bbch_code:
     type:
       string
-    pattern: "^gs[0-9][0-9]$|^na$|^(?!.*gs00))"
+    pattern: "^gs[0-9][0-9]$|^na$|^(?!.*gs00)"
     description: |-
         BBCG descriptive text.
         One of several possible strings describing the stage of the crop, chosen from a list of codes used by the BBCH.
@@ -132,6 +132,7 @@ properties:
       - pale_yellow
       - white
       - grey
+      - variable
     description: |-
         Soil colour.
         General description of the soil colour.
@@ -150,7 +151,7 @@ properties:
       - none
     description: |-
       Surface cover type.
-      One of several strings describing the background cover that is behind any plants in the images.
+      One of several strings describing the background cover (including stubble of previous crops) that is behind any plants in the images.
 
   surface_coverage:
     type: string
@@ -159,6 +160,7 @@ properties:
       - "25-50"
       - "50-75"
       - "75-100"
+      - na
     description: |-
       Percent of coverage in image.
       Approximate measurement of the percent of the soil in the image that is covered by the surface cover.
@@ -186,10 +188,10 @@ properties:
 
   location_datum:
     type:
-      string
+      number
     description: |-
         EPSG code of spatial datum.
-        A numeric string indicting the EPSG code for the spatial reference system used for the location of the AgContext.
+        A number indicting the EPSG code for the spatial reference system used for the location of the AgContext.
   camera_make:
     type: string
     description: |-
