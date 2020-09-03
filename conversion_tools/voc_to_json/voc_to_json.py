@@ -90,7 +90,7 @@ def voc_to_coco(
             {"id": idx, "name": name} for name, idx in category_mapping.items()
         ]
 
-    return {"images": images, "annotations": annotations, "categories": categories}
+    return {"images": images, "annotations": annotations, "categories": categories, "info": {}}
 
 
 def _load_json_or_yaml(path):

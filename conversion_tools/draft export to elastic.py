@@ -25,6 +25,11 @@ for key, objs in coco.items():
         id_lookup[key, obj["id"]] = obj
 
 
+for agcontext in coco["agcontexts"]:
+    # massage for ES
+    if agcontext.get("camera_fov") == "variable":
+        del agcontext["camera_fov"]
+
 for annotation in coco["annotations"]:
     image = id_lookup["images", annotation["image_id"]]
     image.setdefault("annotations", []).append(annotation)
