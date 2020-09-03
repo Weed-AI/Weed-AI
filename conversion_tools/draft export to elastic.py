@@ -4,8 +4,15 @@
 
 import sys
 import json
+<<<<<<< HEAD
 import argparse
 import os
+=======
+import logging
+
+log = logging.getLogger()
+logging.basicConfig(level=logging.INFO)
+>>>>>>> origin/master
 
 ap = argparse.ArgumentParser()
 ap.add_argument('--thumbnail-dir', help='Replace the input file_name directory with this')
@@ -21,6 +28,7 @@ except KeyError:
 
 id_lookup = {}
 for key, objs in coco.items():
+    log.info(f"Mapping {len(objs)} {key}")
     for obj in objs:
         id_lookup[key, obj["id"]] = obj
 
@@ -30,16 +38,28 @@ for agcontext in coco["agcontexts"]:
     if agcontext.get("camera_fov") == "variable":
         del agcontext["camera_fov"]
 
+
+def _flatten(src, dst, prefix):
+    for k, v in src.items():
+        dst[f"{prefix}__{k}"] = v
+
+
 for annotation in coco["annotations"]:
     image = id_lookup["images", annotation["image_id"]]
     image.setdefault("annotations", []).append(annotation)
     annotation["category"] = id_lookup["categories", annotation["category_id"]]
-    if "agcontext_id" in annotation:
-        # Handle legacy version where agcontext_id appears in annotation
-        annotation["agcontext"] = id_lookup["agcontexts", annotation["agcontext_id"]]
-    else:
-        annotation["agcontext"] = id_lookup["agcontexts", image["agcontext_id"]]
     # todo: add collection, license
+    _flatten(annotation["category"], annotation, "category")
+    # todo: add collection from collection_memberships
+
+for image in coco["images"]:
+    image["agcontext"] = id_lookup["agcontexts", image["agcontext_id"]]
+    _flatten(image["agcontext"], image, "agcontext")
+    # todo: add license
+    for annotation in image["annotations"]:
+        for k in annotation:
+            image.setdefault(f"annotation__{k}", []).append(annotation[k])
+
     if hasattr(args, 'thumbnail_dir'):
         image['thumbnail'] = args.thumbnail_dir + '/' + os.path.basename(image['file_name'])
     else:

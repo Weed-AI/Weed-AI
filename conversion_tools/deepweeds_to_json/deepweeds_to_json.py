@@ -152,7 +152,6 @@ for iRow, row in tqdm(input_metadata.iterrows(), total=len(input_metadata)):
     ann["id"] = iRow
     ann["image_id"] = im["id"]
     ann["category_id"] = categoryID
-    ann["agcontext_id"] = 0
     ann["agcontext_name"] = "deepweeds"
 
     annotations.append(ann)
@@ -168,6 +167,8 @@ print(
         len(duplicateImageIDs),
     )
 )
+if missingFiles:
+    print("Example of missing file:", missingFiles[0])
 
 """Create info array and object"""
 
@@ -204,7 +205,7 @@ collections = [
         "year": 2019,
         "identifier": "doi:10.1038/s41598-018-38343-3",
         "rights": "Apache License 2.0",
-        "accrual_policy": "Closed",
+        "accrual_policy": "closed",
         "id": 0,
     }
 ]
@@ -221,9 +222,9 @@ Datasets can be concatenated to include images from multiple different agcontext
 """
 agcontext = [
     {
-        "agcontext_id": 0,
+        "id": 0,
         "agcontext_name": "deepweeds",
-        "crop_type": "weed only",
+        "crop_type": "weed_only",
         "bbch_descriptive_text": "na",
         "bbch_code": "na",
         "grains_descriptive_text": "na",
