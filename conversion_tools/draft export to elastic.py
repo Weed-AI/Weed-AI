@@ -12,7 +12,9 @@ log = logging.getLogger()
 logging.basicConfig(level=logging.INFO)
 
 ap = argparse.ArgumentParser()
-ap.add_argument('--thumbnail-dir', help='Replace the input file_name directory with this')
+ap.add_argument(
+    "--thumbnail-dir", help="Replace the input file_name directory with this"
+)
 args = ap.parse_args()
 
 coco = json.load(sys.stdin)
@@ -21,7 +23,6 @@ try:
     del coco["collection_memberships"]
 except KeyError:
     pass
-
 
 id_lookup = {}
 for key, objs in coco.items():
@@ -41,10 +42,12 @@ for annotation in coco["annotations"]:
     annotation["category"] = id_lookup["categories", annotation["category_id"]]
     _flatten(annotation["category"], annotation, "category")
     # todo: add collection from collection_memberships
-    if hasattr(args, 'thumbnail_dir'):
-        image['thumbnail'] = args.thumbnail_dir + '/' + os.path.basename(image['file_name'])
+    if hasattr(args, "thumbnail_dir"):
+        image["thumbnail"] = (
+            args.thumbnail_dir + "/" + os.path.basename(image["file_name"])
+        )
     else:
-        image['thumbnail'] = image['file_name']
+        image["thumbnail"] = image["file_name"]
 
 for image in coco["images"]:
     image["agcontext"] = id_lookup["agcontexts", image["agcontext_id"]]
@@ -53,7 +56,6 @@ for image in coco["images"]:
     for annotation in image["annotations"]:
         for k in annotation:
             image.setdefault(f"annotation__{k}", []).append(annotation[k])
-
 
 f = sys.stdout
 f.write("\n")
