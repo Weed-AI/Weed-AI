@@ -4,18 +4,17 @@
 
 import sys
 import json
-<<<<<<< HEAD
 import argparse
 import os
-=======
 import logging
 
 log = logging.getLogger()
 logging.basicConfig(level=logging.INFO)
->>>>>>> origin/master
 
 ap = argparse.ArgumentParser()
-ap.add_argument('--thumbnail-dir', help='Replace the input file_name directory with this')
+ap.add_argument(
+    "--thumbnail-dir", help="Replace the input file_name directory with this"
+)
 args = ap.parse_args()
 
 coco = json.load(sys.stdin)
@@ -60,10 +59,12 @@ for image in coco["images"]:
         for k in annotation:
             image.setdefault(f"annotation__{k}", []).append(annotation[k])
 
-    if hasattr(args, 'thumbnail_dir'):
-        image['thumbnail'] = args.thumbnail_dir + '/' + os.path.basename(image['file_name'])
+    if hasattr(args, "thumbnail_dir"):
+        image["thumbnail"] = (
+            args.thumbnail_dir + "/" + os.path.basename(image["file_name"])
+        )
     else:
-        image['thumbnail'] = image['file_name']
+        image["thumbnail"] = image["file_name"]
 
 
 f = sys.stdout
