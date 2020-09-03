@@ -4,10 +4,16 @@
 
 import sys
 import json
+import argparse
+import os
 import logging
 
 log = logging.getLogger()
 logging.basicConfig(level=logging.INFO)
+
+ap = argparse.ArgumentParser()
+ap.add_argument('--thumbnail-dir', help='Replace the input file_name directory with this')
+args = ap.parse_args()
 
 coco = json.load(sys.stdin)
 del coco["info"]
@@ -34,6 +40,10 @@ for annotation in coco["annotations"]:
     annotation["category"] = id_lookup["categories", annotation["category_id"]]
     _flatten(annotation["category"], annotation, "category")
     # todo: add collection from collection_memberships
+    if hasattr(args, 'thumbnail_dir'):
+        image['thumbnail'] = args.thumbnail_dir + '/' + os.path.basename(image['file_name'])
+    else:
+        image['thumbnail'] = image['file_name']
 
 for image in coco["images"]:
     image["agcontext"] = id_lookup["agcontexts", image["agcontext_id"]]
