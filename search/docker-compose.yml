@@ -14,17 +14,23 @@ services:
       - bootstrap.memory_lock=true
       - 'ES_JAVA_OPTS=-Xms512m -Xmx512m'
     volumes:
-      - ./live-data:/usr/share/elasticsearch/data
+      - esdata1:/usr/share/elasticsearch/data
     ports:
       - '9200:9200'
       - '9300:9300'
     networks:
       - elastic
+    healthcheck:
+      test: ["CMD-SHELL", "curl --silent --fail localhost:9200/_cluster/health || exit 1"]
+      interval: 30s
+      timeout: 30s
+      retries: 3
   reactivesearch:
     image: my-reactivesearch
     build: .
     volumes:
       - ./:/code   # for development
+      - /code/node_modules  # an exception from the above volume
     ports:
       - '1337:3000'
     environment:
@@ -56,3 +62,7 @@ services:
 networks:
   elastic:
     driver: bridge
+
+volumes:
+  esdata1:
+    driver: local
