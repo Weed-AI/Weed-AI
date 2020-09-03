@@ -151,7 +151,7 @@ properties:
       - none
     description: |-
       Surface cover type.
-      One of several strings describing the background cover that is behind any plants in the images.
+      One of several strings describing the background cover (including stubble of previous crops) that is behind any plants in the images.
 
   surface_coverage:
     type: string
