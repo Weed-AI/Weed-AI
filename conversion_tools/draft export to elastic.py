@@ -9,14 +9,12 @@ import logging
 log = logging.getLogger()
 logging.basicConfig(level=logging.INFO)
 
-
 coco = json.load(sys.stdin)
 del coco["info"]
 try:
     del coco["collection_memberships"]
 except KeyError:
     pass
-
 
 id_lookup = {}
 for key, objs in coco.items():
@@ -44,7 +42,6 @@ for image in coco["images"]:
     for annotation in image["annotations"]:
         for k in annotation:
             image.setdefault(f"annotation__{k}", []).append(annotation[k])
-
 
 f = sys.stdout
 f.write("\n")
