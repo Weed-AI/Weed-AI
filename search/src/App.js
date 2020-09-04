@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
 import {
 	ReactiveBase,
+	DataSearch,
 	CategorySearch,
 	RangeSlider,
-	ReactiveOpenStreetMap,
 	ResultCard,
 	MultiList,
 	ReactiveList
@@ -34,13 +34,13 @@ class App extends Component {
 			<div style={{ display: "flex", flexDirection: "column", width: "40%" }}>
 			    <CategorySearch
 						componentId="searchbox"
-						dataField={["annotations.category.common_name.keyword","annotations.category.role.keyword","annotations.agcontext.agcontext_name.keyword","annotations.category.species.keyword"]}
-						categoryField={["annotations.category.common_name.keyword","annotations.category.role.keyword","annotations.agcontext.agcontext_name.keyword","annotations.category.species.keyword"]}
+						categoryField={["annotations__category__common_name","annotation__category__role.keyword","agcontext__agcontext_name.keyword","annotation__category__species.keyword"]}
+						dataField={["annotations__category__common_name","annotation__category__role.keyword","agcontext__agcontext_name.keyword","annotation__category__species.keyword"]}
 						placeholder="Search for species, role, or agcontext"
 						autoSuggest={true}
 						defaultSuggestions={[{label: "Weed", value: "weed"}]}
 						highlight={false}
-						highlightField={["annotations.category.common_name.keyword","annotations.category.role.keyword","annotations.agcontext.agcontext_name.keyword","annotations.category.species.keyword"]}
+						highlightField={["annotations__category__common_name","annotation__category__role.keyword","agcontext__agcontext_name.keyword","annotation__category__species.keyword"]}
 						queryFormat="and"
 						fuzziness={0}
 						debounce={100}
@@ -49,12 +49,12 @@ class App extends Component {
 						}}
 						showFilter={true}
 						filterLabel="Venue filter"
-						URLParams={false}
+						URLParams={true}
 				/>
 				<MultiList
 						componentId="rolefilter"
 						title="Filter by role"
-						dataField="annotations.category.role.keyword"
+						dataField="annotation__category__role.keyword"
 						sortBy="asc"
 						queryFormat="and"
 						selectAllLabel="All roles"
@@ -67,7 +67,7 @@ class App extends Component {
 						}}
 						showFilter={true}
 						filterLabel="Role"
-						URLParams={false}
+						URLParams={true}
 						style={{
 							padding: "5px",
 							marginTop: "10px"
@@ -76,7 +76,7 @@ class App extends Component {
 				<MultiList
 						componentId="speciesfilter"
 						title="Filter by species"
-						dataField="annotations.category.species.keyword"
+						dataField="annotation__category__species.keyword"
 						sortBy="asc"
 						queryFormat="and"
 						selectAllLabel="All species"
@@ -89,7 +89,7 @@ class App extends Component {
 						}}
 						showFilter={true}
 						filterLabel="Species"
-						URLParams={false}
+						URLParams={true}
 						style={{
 							padding: "5px",
 							marginTop: "10px"
@@ -97,21 +97,21 @@ class App extends Component {
 					/>
 				<MultiList
 						componentId="agcontextfilter"
-						title="Filter by agcontext"
-						dataField="annotations.agcontext.agcontext_name.keyword"
+						title="Filter by Collection"
+						dataField="agcontext__agcontext_name.keyword"
 						sortBy="asc"
 						queryFormat="and"
-						selectAllLabel="All agcontexts"
+						selectAllLabel="All collections"
 						showCheckbox={true}
 						showCount={true}
 						showSearch={true}
-						placeholder="Search Agcontext"
+						placeholder="Search collection"
 						react={{
 							and: ["searchbox", "SearchFilter"]
 						}}
 						showFilter={true}
 						filterLabel="Agcontext"
-						URLParams={false}
+						URLParams={true}
 						style={{
 							padding: "5px",
 							marginTop: "10px"
@@ -123,7 +123,7 @@ class App extends Component {
 						title="Resolution (pixels)"
 						range={{
 							"start": 0,
-							"end": 100000
+							"end": 1500000
 						}}
 						rangeLabels={{
 							"start": "Start",
@@ -134,14 +134,14 @@ class App extends Component {
 						showFilter={true}
 						interval={10000}
 						react={{
-							and: ["searchbox","CategoryFilter", "SearchFilter"]
+							and: ["searchbox","resslider","agcontextfilter","rolefilter","speciesfilter"]
 						}}
 				/>
 				</div>
 				<ReactiveList
 					componentId="result"
 					title="Results"
-					dataField="annotations.category.common_name.keyword"
+					dataField="annotations__category__common_name"
 					from={0}
 					size={20}
 					pagination={true}
