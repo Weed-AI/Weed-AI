@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import {
 	ReactiveBase,
 	DataSearch,
-	CategorySearch,
 	RangeSlider,
 	ResultCard,
 	MultiList,
@@ -32,23 +31,25 @@ class App extends Component {
 			>
 			<div style={{ display: "flex", flexDirection: "row" }}>
 			<div style={{ display: "flex", flexDirection: "column", width: "40%" }}>
-			    <CategorySearch
+			    <DataSearch
 						componentId="searchbox"
-						categoryField={["annotations__category__common_name","annotation__category__role.keyword","agcontext__agcontext_name.keyword","annotation__category__species.keyword"]}
 						dataField={["annotations__category__common_name","annotation__category__role.keyword","agcontext__agcontext_name.keyword","annotation__category__species.keyword"]}
 						placeholder="Search for species, role, or agcontext"
 						autoSuggest={true}
-						defaultSuggestions={[{label: "Weed", value: "weed"}]}
-						highlight={false}
+						defaultSuggestions={[
+							{label: "Weed", value: "weed"},
+							{label: "Carrot", value: "carrot"}
+						]}
+						highlight={true}
 						highlightField={["annotations__category__common_name","annotation__category__role.keyword","agcontext__agcontext_name.keyword","annotation__category__species.keyword"]}
-						queryFormat="and"
+						queryFormat="or"
 						fuzziness={0}
 						debounce={100}
 						react={{
-						  and: ["CategoryFilter", "SearchFilter"]
+						  and: ["searchbox","resslider","agcontextfilter","rolefilter","speciesfilter","grainstextfilter"]
 						}}
 						showFilter={true}
-						filterLabel="Venue filter"
+						filterLabel="General filter"
 						URLParams={true}
 				/>
 				<MultiList
@@ -63,7 +64,7 @@ class App extends Component {
 						showSearch={true}
 						placeholder="Search Role"
 						react={{
-							and: ["searchbox", "SearchFilter"]
+							and: ["searchbox","resslider","agcontextfilter","rolefilter","speciesfilter","grainstextfilter"]
 						}}
 						showFilter={true}
 						filterLabel="Role"
@@ -85,7 +86,7 @@ class App extends Component {
 						showSearch={true}
 						placeholder="Search Species"
 						react={{
-							and: ["searchbox", "SearchFilter"]
+							and: ["searchbox","resslider","agcontextfilter","rolefilter","speciesfilter","grainstextfilter"]
 						}}
 						showFilter={true}
 						filterLabel="Species"
@@ -107,10 +108,32 @@ class App extends Component {
 						showSearch={true}
 						placeholder="Search collection"
 						react={{
-							and: ["searchbox", "SearchFilter"]
+							and: ["searchbox","resslider","agcontextfilter","rolefilter","speciesfilter","grainstextfilter"]
 						}}
 						showFilter={true}
 						filterLabel="Agcontext"
+						URLParams={true}
+						style={{
+							padding: "5px",
+							marginTop: "10px"
+						}}
+					/>
+					<MultiList
+						componentId="grainstextfilter"
+						title="Filter by Growth Stage"
+						dataField="agcontext__grains_descriptive_text.keyword"
+						sortBy="asc"
+						queryFormat="and"
+						selectAllLabel="All growth stages"
+						showCheckbox={true}
+						showCount={true}
+						showSearch={true}
+						placeholder="Search growth stage"
+						react={{
+							and: ["searchbox","resslider","agcontextfilter","rolefilter","speciesfilter","grainstextfilter"]
+						}}
+						showFilter={true}
+						filterLabel="Growth stage"
 						URLParams={true}
 						style={{
 							padding: "5px",
@@ -134,7 +157,7 @@ class App extends Component {
 						showFilter={true}
 						interval={10000}
 						react={{
-							and: ["searchbox","resslider","agcontextfilter","rolefilter","speciesfilter"]
+							and: ["searchbox","resslider","agcontextfilter","rolefilter","speciesfilter","grainstextfilter"]
 						}}
 				/>
 				</div>
@@ -146,7 +169,7 @@ class App extends Component {
 					size={20}
 					pagination={true}
 					react={{
-						and: ["searchbox","resslider","agcontextfilter","rolefilter","speciesfilter"]
+						and: ["searchbox","resslider","agcontextfilter","rolefilter","speciesfilter","grainstextfilter"]
 					}}
 					render={({ data }) => (
 						<ReactiveList.ResultCardsWrapper>
