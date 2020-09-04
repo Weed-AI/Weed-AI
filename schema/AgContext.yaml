@@ -182,8 +182,7 @@ properties:
         Approximate latitude location of the AgContext, in decimal degrees.
 
   location_long:
-    type:
-      number
+    type: number
     minimum: 0
     maximum: 180
     description:
@@ -191,10 +190,8 @@ properties:
         Approximate longitude location of the AgContext, in decimal degrees.
 
   location_datum:
-    type:
-      number
-    enum:
-      4326
+    type: number
+    enum: 4326
     description: |-
         EPSG code of spatial datum.
         A number indicting the EPSG code for the spatial reference system used for the location of the AgContext.
