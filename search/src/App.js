@@ -41,7 +41,7 @@ class App extends Component {
 						defaultSuggestions={[{label: "Weed", value: "weed"}]}
 						highlight={false}
 						highlightField={["annotations.category.common_name.keyword","annotations.category.role.keyword","annotations.agcontext.agcontext_name.keyword","annotations.category.species.keyword"]}
-						queryFormat="or"
+						queryFormat="and"
 						fuzziness={0}
 						debounce={100}
 						react={{
@@ -56,7 +56,7 @@ class App extends Component {
 						title="Filter by role"
 						dataField="annotations.category.role.keyword"
 						sortBy="asc"
-						queryFormat="or"
+						queryFormat="and"
 						selectAllLabel="All roles"
 						showCheckbox={true}
 						showCount={true}
@@ -78,7 +78,7 @@ class App extends Component {
 						title="Filter by species"
 						dataField="annotations.category.species.keyword"
 						sortBy="asc"
-						queryFormat="or"
+						queryFormat="and"
 						selectAllLabel="All species"
 						showCheckbox={true}
 						showCount={true}
@@ -100,7 +100,7 @@ class App extends Component {
 						title="Filter by agcontext"
 						dataField="annotations.agcontext.agcontext_name.keyword"
 						sortBy="asc"
-						queryFormat="or"
+						queryFormat="and"
 						selectAllLabel="All agcontexts"
 						showCheckbox={true}
 						showCount={true}
