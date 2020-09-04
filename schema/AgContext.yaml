@@ -112,7 +112,7 @@ properties:
   bbch_code:
     type:
       string
-    pattern: "^gs[0-9][0-9]$|^na$|^(?!.*gs00)"
+    pattern: "^gs(?!00)[0-9][0-9]$|^na$"
     description: |-
         BBCG descriptive text.
         One of several possible strings describing the stage of the crop, chosen from a list of codes used by the BBCH.
@@ -175,6 +175,8 @@ properties:
   location_lat:
     type:
       number
+    minimum: -90
+    maximum: 90
     description:
         Latitude in decimal degrees.
         Approximate latitude location of the AgContext, in decimal degrees.
@@ -182,6 +184,8 @@ properties:
   location_long:
     type:
       number
+    minimum: 0
+    maximum: 180
     description:
         Longitude in decimal degrees.
         Approximate longitude location of the AgContext, in decimal degrees.
@@ -189,9 +193,13 @@ properties:
   location_datum:
     type:
       number
+    enum:
+      4326
     description: |-
         EPSG code of spatial datum.
         A number indicting the EPSG code for the spatial reference system used for the location of the AgContext.
+        For now, this is fixed at EPSG 4326, aka WGS 84.
+
   camera_make:
     type: string
     description: |-
@@ -214,6 +222,7 @@ properties:
 
   camera_height:
     type: number
+    minimum: 0
     description: |-
         Height of camera.
         An number representing the height of the camera, measured in millimeters .
@@ -223,7 +232,7 @@ properties:
     description:
         Angle of camera.
         A number representing the angle at which the camera is positioned, in degrees.
-        A camera facing straight down would be 90.
+        A camera facing straight down would be 90. A camera facing forward would be 0.
 
   camera_fov:
     anyOf:
@@ -267,5 +276,5 @@ properties:
       string
     description: |-
       EMR channels captured in images.
-      A string describing the electromagnetic raditation channels captured.
+      A string describing the electromagnetic radiation channels captured.
       In most cases, this will be "visual".
