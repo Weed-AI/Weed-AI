@@ -190,11 +190,11 @@ properties:
         Approximate longitude location of the AgContext, in decimal degrees.
 
   location_datum:
-    type:
-      number
+    type: number
+    enum: 4326
     description: |-
-        EPSG code of spatial datum.
-        A number indicting the EPSG code for the spatial reference system used for the location of the AgContext.
+        EPSG code of spatial coordinates.
+        European Petroleum Survey Group code that identifies the projection used for the spatial coordinates.
 
   camera_make:
     type: string
