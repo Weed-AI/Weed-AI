@@ -115,7 +115,7 @@ agcontext = [
         "weather_description": "sunny",
         "location_lat": 53,
         "location_long": 11,
-        "location_datum": 4326,
+        "location_datum": "4326",
         "upload_time": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
         "camera_make": "JAI AD-130GE",
         "camera_lens": "Fujinon TF15-DA-8",
