@@ -191,7 +191,6 @@ properties:
 
   location_datum:
     type: number
-    enum: 4326
     description: |-
         EPSG code of spatial coordinates.
         European Petroleum Survey Group code that identifies the projection used for the spatial coordinates.
