@@ -24,7 +24,6 @@ try:
 except KeyError:
     pass
 
-
 id_lookup = {}
 for key, objs in coco.items():
     log.info(f"Mapping {len(objs)} {key}")
@@ -50,6 +49,12 @@ for annotation in coco["annotations"]:
     # todo: add collection, license
     _flatten(annotation["category"], annotation, "category")
     # todo: add collection from collection_memberships
+    if hasattr(args, "thumbnail_dir"):
+        image["thumbnail"] = (
+            args.thumbnail_dir + "/" + os.path.basename(image["file_name"])
+        )
+    else:
+        image["thumbnail"] = image["file_name"]
 
 for image in coco["images"]:
     image["agcontext"] = id_lookup["agcontexts", image["agcontext_id"]]
@@ -58,14 +63,6 @@ for image in coco["images"]:
     for annotation in image["annotations"]:
         for k in annotation:
             image.setdefault(f"annotation__{k}", []).append(annotation[k])
-
-    if hasattr(args, "thumbnail_dir"):
-        image["thumbnail"] = (
-            args.thumbnail_dir + "/" + os.path.basename(image["file_name"])
-        )
-    else:
-        image["thumbnail"] = image["file_name"]
-
 
 f = sys.stdout
 f.write("\n")

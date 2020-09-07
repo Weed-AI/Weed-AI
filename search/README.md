@@ -1,3 +1,18 @@
+# Starter Guide
+
+1. `docker-compose up`
+2. localhost:1337 for the reactive search UI
+3. localhost:5601 for kibana and elastic stach
+
+## Troubleshooting:
+
+Reactive search failing to load? Might be an issue with react-scripts not being installed.
+
+Check if you have a working install with `npm ls react-scripts`. This works even with yarn as our package manager.
+
+
+## Sources
+
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
 ## Available Scripts

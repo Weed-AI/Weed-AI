@@ -18,3 +18,7 @@ conversion_tools/concatenation/*.json
 
 # Annotations
 *.xml
+
+
+# Dev Tools
+.vscode/settings.json

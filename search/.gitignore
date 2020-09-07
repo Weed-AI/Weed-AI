@@ -1,9 +1,12 @@
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
 # dependencies
+/live-data
 /node_modules
+/public/thumbnails
 /.pnp
 .pnp.js
+
 
 # testing
 /coverage
