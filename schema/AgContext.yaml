@@ -190,7 +190,7 @@ properties:
         Approximate longitude location of the AgContext, in decimal degrees.
 
   location_datum:
-    type: integer
+    type: number
     enum: - 4326
     description: |-
         EPSG code of spatial coordinates.
