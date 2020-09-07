@@ -113,10 +113,7 @@ agcontext = [
         "surface_cover": "none",
         "surface_coverage": "0-25",
         "weather_description": "sunny",
-        "location": {
-            "lat": 53,
-            "lon": 11
-        },
+        "location": {"lat": 53, "lon": 11},
         "location_datum": 4326,
         "upload_time": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
         "camera_make": "JAI AD-130GE",
