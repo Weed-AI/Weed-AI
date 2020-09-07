@@ -29,8 +29,7 @@ class App extends Component {
 				}
 			  }}
 			>
-			<div style={{ display: "flex", flexDirection: "row" }}>
-			<div style={{ display: "flex", flexDirection: "column", width: "40%" }}>
+			<div style={{ position: "fixed", width: "20rem", overflow: "scroll", height: "100%" }}>
 			    <DataSearch
 						componentId="searchbox"
 						dataField={["annotations__category__common_name","annotation__category__role.keyword","agcontext__agcontext_name.keyword","annotation__category__species.keyword"]}
@@ -161,6 +160,7 @@ class App extends Component {
 						}}
 				/>
 				</div>
+			<div style={{ position: "absolute", left: "20rem" }}>
 				<ReactiveList
 					componentId="result"
 					title="Results"
@@ -177,7 +177,7 @@ class App extends Component {
 								data.map(item => (
 									<ResultCard key={item._id}>
 										<ResultCard.Image
-											src={'thumbnails/' + item.file_name}
+											src={'thumbnails/' + item.thumbnail}
 										/>
 										<ResultCard.Title
 											dangerouslySetInnerHTML={{
