@@ -5,7 +5,8 @@ import {
 	RangeSlider,
 	ResultCard,
 	MultiList,
-	ReactiveList
+	ReactiveList,
+	SelectedFilters
 } from '@appbaseio/reactivesearch';
 import logo from './logo.svg';
 import './App.css';
@@ -14,23 +15,23 @@ class App extends Component {
 	render() {
 		return (
 			<ReactiveBase
-			app="weedid"
-			url="http://localhost:9200/"
-			theme={{
-				typography: {
-				  fontFamily: 'Raleway, Helvetica, sans-serif',
-				},
-				colors: {
-				  primaryColor: '#0A0A0A',
-				  titleColor: '#E64626',
-				},
-				component: {
-				  padding: 10
-				}
-			  }}
+				app="weedid"
+				url="http://localhost:9200/"
+				theme={{
+					typography: {
+						fontFamily: 'Raleway, Helvetica, sans-serif',
+					},
+					colors: {
+						primaryColor: '#0A0A0A',
+						titleColor: '#E64626',
+					},
+					component: {
+						padding: 10
+					}
+				}}
 			>
-			<div style={{ position: "fixed", width: "20rem", overflow: "scroll", height: "100%" }}>
-			    <DataSearch
+				<div style={{ position: "fixed", width: "20rem", overflow: "scroll", height: "100%" }}>
+					{/* <DataSearch
 						componentId="searchbox"
 						dataField={["annotations__category__common_name","annotation__category__role.keyword","agcontext__agcontext_name.keyword","annotation__category__species.keyword"]}
 						placeholder="Search for species, role, or agcontext"
@@ -50,8 +51,8 @@ class App extends Component {
 						showFilter={true}
 						filterLabel="General filter"
 						URLParams={true}
-				/>
-				<MultiList
+				/> */}
+					<MultiList
 						componentId="rolefilter"
 						title="Filter by role"
 						dataField="annotation__category__role.keyword"
@@ -63,7 +64,7 @@ class App extends Component {
 						showSearch={true}
 						placeholder="Search Role"
 						react={{
-							and: ["searchbox","resslider","agcontextfilter","rolefilter","speciesfilter","grainstextfilter"]
+							and: ["searchbox", "resslider", "agcontextfilter", "rolefilter", "speciesfilter", "grainstextfilter"]
 						}}
 						showFilter={true}
 						filterLabel="Role"
@@ -73,7 +74,7 @@ class App extends Component {
 							marginTop: "10px"
 						}}
 					/>
-				<MultiList
+					<MultiList
 						componentId="speciesfilter"
 						title="Filter by species"
 						dataField="annotation__category__species.keyword"
@@ -85,7 +86,7 @@ class App extends Component {
 						showSearch={true}
 						placeholder="Search Species"
 						react={{
-							and: ["searchbox","resslider","agcontextfilter","rolefilter","speciesfilter","grainstextfilter"]
+							and: ["searchbox", "resslider", "agcontextfilter", "rolefilter", "speciesfilter", "grainstextfilter"]
 						}}
 						showFilter={true}
 						filterLabel="Species"
@@ -95,7 +96,7 @@ class App extends Component {
 							marginTop: "10px"
 						}}
 					/>
-				<MultiList
+					<MultiList
 						componentId="agcontextfilter"
 						title="Filter by Collection"
 						dataField="agcontext__agcontext_name.keyword"
@@ -107,7 +108,7 @@ class App extends Component {
 						showSearch={true}
 						placeholder="Search collection"
 						react={{
-							and: ["searchbox","resslider","agcontextfilter","rolefilter","speciesfilter","grainstextfilter"]
+							and: ["searchbox", "resslider", "agcontextfilter", "rolefilter", "speciesfilter", "grainstextfilter"]
 						}}
 						showFilter={true}
 						filterLabel="Agcontext"
@@ -129,7 +130,7 @@ class App extends Component {
 						showSearch={true}
 						placeholder="Search growth stage"
 						react={{
-							and: ["searchbox","resslider","agcontextfilter","rolefilter","speciesfilter","grainstextfilter"]
+							and: ["searchbox", "resslider", "agcontextfilter", "rolefilter", "speciesfilter", "grainstextfilter"]
 						}}
 						showFilter={true}
 						filterLabel="Growth stage"
@@ -139,7 +140,7 @@ class App extends Component {
 							marginTop: "10px"
 						}}
 					/>
-				<RangeSlider
+					<RangeSlider
 						componentId="resslider"
 						dataField="resolution"
 						title="Resolution (pixels)"
@@ -156,43 +157,44 @@ class App extends Component {
 						showFilter={true}
 						interval={10000}
 						react={{
-							and: ["searchbox","resslider","agcontextfilter","rolefilter","speciesfilter","grainstextfilter"]
+							and: ["searchbox", "resslider", "agcontextfilter", "rolefilter", "speciesfilter", "grainstextfilter"]
 						}}
-				/>
+					/>
 				</div>
-			<div style={{ position: "absolute", left: "20rem" }}>
-				<ReactiveList
-					componentId="result"
-					title="Results"
-					dataField="annotations__category__common_name"
-					from={0}
-					size={20}
-					pagination={true}
-					react={{
-						and: ["searchbox","resslider","agcontextfilter","rolefilter","speciesfilter","grainstextfilter"]
-					}}
-					render={({ data }) => (
-						<ReactiveList.ResultCardsWrapper>
-							{
-								data.map(item => (
-									<ResultCard key={item._id}>
-										<ResultCard.Image
-											src={'thumbnails/' + item.thumbnail}
-										/>
-										<ResultCard.Title
-											dangerouslySetInnerHTML={{
-												__html: item.customer_phone
-											}}
-										/>
-										<ResultCard.Description>
-											{item._id + " " + '*'.repeat(item.total_quantity)}
-										</ResultCard.Description>
-									</ResultCard>
-								))
-							}
-						</ReactiveList.ResultCardsWrapper>
-					)}
-				/>
+				<div style={{ position: "absolute", left: "20rem" }}>
+					<SelectedFilters />
+					<ReactiveList
+						componentId="result"
+						title="Results"
+						dataField="annotations__category__common_name"
+						from={0}
+						size={20}
+						pagination={true}
+						react={{
+							and: ["searchbox", "resslider", "agcontextfilter", "rolefilter", "speciesfilter", "grainstextfilter"]
+						}}
+						render={({ data }) => (
+							<ReactiveList.ResultCardsWrapper>
+								{
+									data.map(item => (
+										<ResultCard key={item._id}>
+											<ResultCard.Image
+												src={'thumbnails/' + item.thumbnail}
+											/>
+											<ResultCard.Title
+												dangerouslySetInnerHTML={{
+													__html: item.customer_phone
+												}}
+											/>
+											<ResultCard.Description>
+												{item._id + " " + '*'.repeat(item.total_quantity)}
+											</ResultCard.Description>
+										</ResultCard>
+									))
+								}
+							</ReactiveList.ResultCardsWrapper>
+						)}
+					/>
 				</div>
 			</ReactiveBase>
 		);
