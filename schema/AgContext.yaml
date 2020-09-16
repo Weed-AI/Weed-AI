@@ -192,7 +192,8 @@ properties:
   location_datum:
     type:
       number
-    enum: 4326
+    enum:
+      - 4326
     description: |-
         EPSG code of spatial datum.
         A number indicting the EPSG code for the spatial reference system used for the location of the AgContext.
