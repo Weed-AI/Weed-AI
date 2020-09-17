@@ -118,8 +118,11 @@ class App extends Component {
 						dataField="annotations__category__common_name"
 						from={0}
 						size={20}
-						pagination={true}
 						{...facetProps}
+						infiniteScroll={true}
+						react={{
+							and: ["searchbox", "resslider", "agcontextfilter", "rolefilter", "speciesfilter", "grainstextfilter"]
+						}}
 						render={({ data }) => (
 							<ReactiveList.ResultCardsWrapper>
 								{
