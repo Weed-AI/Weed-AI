@@ -17,6 +17,60 @@ ap.add_argument(
 )
 args = ap.parse_args()
 
+# Code derived from Olivier Melançon's answer https://stackoverflow.com/questions/55892600/python-triplet-dictionary
+# class GroupMap:
+#     def __init__(self):
+#         self.data = {}
+
+#     def add(self, group):
+#         for item in group:
+#             self.data[item] = group
+
+#     def __getitem__(self, item):
+#         return self.data[item]
+
+
+class trictionary:
+    def __init__(self):
+        self.data = []
+
+    def add(self, group):
+        self.data.append(group)
+
+    def __getitem__(self, key):
+        for group in data:  # Find the set the key belongs to.
+            if key in group:
+                return tuple(group)
+
+
+# A dictionary of value triplets
+growth = {
+    ("emergence", "germination", "^gs0[0-9]$"),
+    ("emergence", "sprouting", "^gs0[0-9]$"),
+    ("emergence", "bud development", "^gs0[0-9]$"),
+    ("seedling", "leaf development", "^gs1[0-9]$"),
+    ("tillering", "formation of side roots", "^gs2[0-9]$"),
+    ("tillering", "tillering", "^gs2[0-9]$"),
+    ("stem elongation", "stem elongation", "^gs3[0-9]$"),
+    ("stem elongation", "rosette growth", "^gs3[0-9]$"),
+    ("stem elongation", "shoot development", "^gs3[0-9]$"),
+    ("booting", "development of harvestable vegetable parts", "^gs4[0-9]$"),
+    ("booting", "bolting", "^gs4[0-9]$"),
+    ("ear emergence", "inflorescence", "^gs5[0-9]$"),
+    ("ear emergence", "emergence", "^gs5[0-9]$"),
+    ("ear emergence", "heading", "^gs5[0-9]$"),
+    ("flowering", "flowering", "^gs6[0-9]$"),
+    ("milky dough", "development of fruit", "^gs7[0-9]$"),
+    ("dough", "ripening or maturity of fruit and seed", "^gs8[0-9]$"),
+    ("ripening", "senescence", "^gs9[0-9]$"),
+    ("ripening", "beginning of dormancy", "^gs9[0-9]$"),
+}
+
+growth_map = trictionary()
+growth_map.add(growth)
+
+print(growth_map[5])
+
 coco = json.load(sys.stdin)
 del coco["info"]
 try:
@@ -57,46 +111,6 @@ for image in coco["images"]:
         for k in annotation:
             image.setdefault(f"annotation__{k}", []).append(annotation[k])
 
-# Code derived from Olivier Melançon's answer https://stackoverflow.com/questions/55892600/python-triplet-dictionary
-class GroupMap:
-    def __init__(self):
-        self.data = {}
-
-    def add(self, group):
-        for item in group:
-            self.data[item] = group
-
-    def __getitem__(self, item):
-        return self.data[item]
-
-
-# A dictionary of value triplets
-growth = {
-    ("emergence", "germination", "^gs0[0-9]$"),
-    ("emergence", "sprouting", "^gs0[0-9]$"),
-    ("emergence", "bud development", "^gs0[0-9]$"),
-    ("seedling", "leaf development", "^gs1[0-9]$"),
-    ("tillering", "formation of side roots", "^gs2[0-9]$"),
-    ("tillering", "tillering", "^gs2[0-9]$"),
-    ("stem elongation", "stem elongation", "^gs3[0-9]$"),
-    ("stem elongation", "rosette growth", "^gs3[0-9]$"),
-    ("stem elongation", "shoot development", "^gs3[0-9]$"),
-    ("booting", "development of harvestable vegetable parts", "^gs4[0-9]$"),
-    ("booting", "bolting", "^gs4[0-9]$"),
-    ("ear emergence", "inflorescence", "^gs5[0-9]$"),
-    ("ear emergence", "emergence", "^gs5[0-9]$"),
-    ("ear emergence", "heading", "^gs5[0-9]$"),
-    ("flowering", "flowering", "^gs6[0-9]$"),
-    ("milky dough", "development of fruit", "^gs7[0-9]$"),
-    ("dough", "ripening or maturity of fruit and seed", "^gs8[0-9]$"),
-    ("ripening", "senescence", "^gs9[0-9]$"),
-    ("ripening", "beginning of dormancy", "^gs9[0-9]$"),
-}
-
-group_map = GroupMap()
-group_map.add(growth)
-
-print(group_map[1])
 
 f = sys.stdout
 f.write("\n")
