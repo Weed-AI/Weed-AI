@@ -3,10 +3,11 @@
 name: JSON validation CI
 
 # Controls when the action will run. Triggers the workflow on push or pull request
+
 on:
-#  push:
-#    branches: 
-#      - '**'
+  push:
+    branches: 
+      - master
   pull_request:
     branches: 
       - '**'
