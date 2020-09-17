@@ -107,7 +107,7 @@ agcontext = [
         "agcontext_name": "cwfid",
         "crop_type": "other",
         "bbch_descriptive_text": "leaf development",
-        "bbch_code": "GS10-19",
+        "bbch_code": "gs10",
         "grains_descriptive_text": "seedling",
         "soil_colour": "grey",
         "surface_cover": "none",
