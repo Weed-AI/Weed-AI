@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import {
 	ReactiveBase,
-	DataSearch,
 	RangeSlider,
 	ResultCard,
 	MultiList,
@@ -135,7 +134,7 @@ class App extends Component {
 												}}
 											/>
 											<ResultCard.Description>
-												{item._id + " " + '*'.repeat(item.total_quantity)}
+												{"Crop: " + item.agcontext__crop_type}
 											</ResultCard.Description>
 										</ResultCard>
 									))
