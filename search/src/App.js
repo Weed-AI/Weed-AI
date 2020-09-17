@@ -48,27 +48,6 @@ class App extends Component {
 				}}
 			>
 				<div style={{ position: "fixed", width: "20rem", overflow: "scroll", height: "100%" }}>
-					{/* <DataSearch
-						componentId="searchbox"
-						dataField={["annotations__category__common_name","annotation__category__role.keyword","agcontext__agcontext_name.keyword","annotation__category__species.keyword"]}
-						placeholder="Search for species, role, or agcontext"
-						autoSuggest={true}
-						defaultSuggestions={[
-							{label: "Weed", value: "weed"},
-							{label: "Carrot", value: "carrot"}
-						]}
-						highlight={true}
-						highlightField={["annotations__category__common_name","annotation__category__role.keyword","agcontext__agcontext_name.keyword","annotation__category__species.keyword"]}
-						queryFormat="or"
-						fuzziness={0}
-						debounce={100}
-						react={{
-						  and: ["searchbox","resslider","agcontextfilter","rolefilter","speciesfilter","grainstextfilter"]
-						}}
-						showFilter={true}
-						filterLabel="General filter"
-						URLParams={true}
-				/> */}
 					<MultiList
 						componentId="rolefilter"
 						title="Filter by role"
@@ -107,22 +86,11 @@ class App extends Component {
 						title="Filter by Growth Stage"
 						dataField="agcontext__grains_descriptive_text.keyword"
 						sortBy="asc"
-						queryFormat="and"
 						selectAllLabel="All growth stages"
-						showCheckbox={true}
-						showCount={true}
-						showSearch={true}
 						placeholder="Search growth stage"
-						react={{
-							and: ["searchbox", "resslider", "agcontextfilter", "rolefilter", "speciesfilter", "grainstextfilter"]
-						}}
-						showFilter={true}
 						filterLabel="Growth stage"
-						URLParams={true}
-						style={{
-							padding: "5px",
-							marginTop: "10px"
-						}}
+						{...facetProps}
+						{...multilistFacetProps}
 					/>
 					<RangeSlider
 						componentId="resslider"
@@ -138,11 +106,9 @@ class App extends Component {
 						}}
 						stepValue={10000}
 						showHistogram={true}
-						showFilter={true}
 						interval={10000}
-						react={{
-							and: ["searchbox", "resslider", "agcontextfilter", "rolefilter", "speciesfilter", "grainstextfilter"]
-						}}
+						{...facetProps}
+						{...multilistFacetProps}
 					/>
 				</div>
 				<div style={{ position: "absolute", left: "20rem" }}>
@@ -154,9 +120,7 @@ class App extends Component {
 						from={0}
 						size={20}
 						pagination={true}
-						react={{
-							and: ["searchbox", "resslider", "agcontextfilter", "rolefilter", "speciesfilter", "grainstextfilter"]
-						}}
+						{...facetProps}
 						render={({ data }) => (
 							<ReactiveList.ResultCardsWrapper>
 								{
