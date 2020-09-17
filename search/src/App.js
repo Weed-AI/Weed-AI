@@ -13,6 +13,23 @@ import './App.css';
 
 class App extends Component {
 	render() {
+		let facetProps = {
+			queryFormat: "and",
+			URLParams: true,
+			react: {
+				and: ["searchbox", "resslider", "agcontextfilter", "rolefilter", "speciesfilter", "grainstextfilter"]
+			}
+		}
+		let multilistFacetProps = {
+			showCheckbox: true,
+			showCount: true,
+			showSearch: true,
+			showFilter: true,
+			style: {
+				padding: "5px",
+				marginTop: "10px"
+			},
+		}
 		return (
 			<ReactiveBase
 				app="weedid"
@@ -57,66 +74,33 @@ class App extends Component {
 						title="Filter by role"
 						dataField="annotation__category__role.keyword"
 						sortBy="asc"
-						queryFormat="and"
 						selectAllLabel="All roles"
-						showCheckbox={true}
-						showCount={true}
-						showSearch={true}
 						placeholder="Search Role"
-						react={{
-							and: ["searchbox", "resslider", "agcontextfilter", "rolefilter", "speciesfilter", "grainstextfilter"]
-						}}
-						showFilter={true}
 						filterLabel="Role"
-						URLParams={true}
-						style={{
-							padding: "5px",
-							marginTop: "10px"
-						}}
+						{...facetProps}
+						{...multilistFacetProps}
 					/>
 					<MultiList
 						componentId="speciesfilter"
 						title="Filter by species"
 						dataField="annotation__category__species.keyword"
 						sortBy="asc"
-						queryFormat="and"
 						selectAllLabel="All species"
-						showCheckbox={true}
-						showCount={true}
-						showSearch={true}
 						placeholder="Search Species"
-						react={{
-							and: ["searchbox", "resslider", "agcontextfilter", "rolefilter", "speciesfilter", "grainstextfilter"]
-						}}
-						showFilter={true}
 						filterLabel="Species"
-						URLParams={true}
-						style={{
-							padding: "5px",
-							marginTop: "10px"
-						}}
+						{...facetProps}
+						{...multilistFacetProps}
 					/>
 					<MultiList
 						componentId="agcontextfilter"
 						title="Filter by Collection"
 						dataField="agcontext__agcontext_name.keyword"
 						sortBy="asc"
-						queryFormat="and"
 						selectAllLabel="All collections"
-						showCheckbox={true}
-						showCount={true}
-						showSearch={true}
 						placeholder="Search collection"
-						react={{
-							and: ["searchbox", "resslider", "agcontextfilter", "rolefilter", "speciesfilter", "grainstextfilter"]
-						}}
-						showFilter={true}
 						filterLabel="Agcontext"
-						URLParams={true}
-						style={{
-							padding: "5px",
-							marginTop: "10px"
-						}}
+						{...facetProps}
+						{...multilistFacetProps}
 					/>
 					<MultiList
 						componentId="grainstextfilter"
