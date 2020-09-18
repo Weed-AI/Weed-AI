@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 
 
-with open('README.md') as readme_file:
+with open("README.md") as readme_file:
     readme = readme_file.read()
     # FIXME: Convert to ReST
 
@@ -15,7 +15,7 @@ setup(
     author="Henry Lydecker, Joel Nothman, Sydney Informatics Hub",
     long_description=readme,
     include_package_data=True,
-    packages=find_packages(include=['weedcoco', 'weedcoco.*']),
+    packages=find_packages(include=["weedcoco", "weedcoco.*"]),
     license="BSD",
     author_email="henry.lydecker@sydney.edu.au",
     keywords=[""],
