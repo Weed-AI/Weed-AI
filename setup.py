@@ -1,13 +1,21 @@
-from distutils.core import setup
+from setuptools import setup, find_packages
+
+
+with open('README.md') as readme_file:
+    readme = readme_file.read()
+    # FIXME: Convert to ReST
+
 
 requirements = "pyyaml pandas humanfriendly tqdm exifread pillow".split()
 
 setup(
     name="weedcoco",
-    packages=[],
     version="0.1.0",
     description="Tools for WeedCOCO agricultural image annotation interchange",
     author="Henry Lydecker, Joel Nothman, Sydney Informatics Hub",
+    long_description=readme,
+    include_package_data=True,
+    packages=find_packages(include=['weedcoco', 'weedcoco.*']),
     license="BSD",
     author_email="henry.lydecker@sydney.edu.au",
     keywords=[""],
