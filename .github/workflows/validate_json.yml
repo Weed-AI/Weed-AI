@@ -51,4 +51,4 @@ jobs:
       - name: Validate JSON
         run: |
           cd weedcoco/schema
-          ajv -s main.json -r '*.json' -d ../weedcoco/cwfid_to_json/cwfid_imageinfo.json -d ../weedcoco/deepweeds_to_json/deepweeds_imageinfo.json
+          ajv -s main.json -r '*.json' -d ../cwfid_to_json/cwfid_imageinfo.json -d ../deepweeds_to_json/deepweeds_imageinfo.json
