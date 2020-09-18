@@ -1,5 +1,4 @@
-"""
-deepweeds_to_json.py
+"""weedcoco.importers.deepweeds
 
 Ingests DeepWeeds .csv annotations and images to produce a WeedCOCO .JSON file.
 
@@ -16,7 +15,8 @@ import datetime
 from tqdm import tqdm
 import humanfriendly
 import os
-import PIL.Image
+
+from weedcoco.utils import get_image_dimensions
 
 """Constants and environment"""
 
@@ -97,11 +97,7 @@ for iRow, row in tqdm(input_metadata.iterrows(), total=len(input_metadata)):
 
         else:
             # Retrieve image width and height
-            pilImage = PIL.Image.open(relativePath)
-            width, height = pilImage.size
-            im["width"] = width
-            im["height"] = height
-            im["resolution"] = width * height
+            im.update(get_image_dimensions(relativePath))
 
     categoryName = row["Species"].lower()
     if categoryName in category_mappings:
