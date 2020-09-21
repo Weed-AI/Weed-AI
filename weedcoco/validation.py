@@ -18,9 +18,15 @@ class ValidationError(Exception):
 
 def validate_json(weedcoco, schema_dir=SCHEMA_DIR):
     """Check that the weedcoco matches its JSON schema"""
-    # TODO: cache
-    schema_objects = [yaml.safe_load(path.open()) for path in SCHEMA_DIR.glob("*.yaml")]
-    ref_store = {obj["$id"]: obj for obj in schema_objects}
+    try:
+        # memoise the schema
+        ref_store = validate_json.ref_store
+    except AttributeError:
+        schema_objects = [
+            yaml.safe_load(path.open()) for path in SCHEMA_DIR.glob("*.yaml")
+        ]
+        validate_json.ref_store = {obj["$id"]: obj for obj in schema_objects}
+        ref_store = validate_json.ref_store
     main_schema = ref_store[MAIN_SCHEMA_URI]
     jsonschema.validate(
         weedcoco,
@@ -29,9 +35,10 @@ def validate_json(weedcoco, schema_dir=SCHEMA_DIR):
     )
 
 
-def validate_references(weedcoco, schema_dir=SCHEMA_DIR):
+def validate_references(weedcoco, schema_dir=SCHEMA_DIR, require_reference=True):
     """Check that all IDs are unique and references valid"""
     known_ids = set()
+    referenced_ids = set()
 
     # ensure IDs are unique per section
     for section_name, section in weedcoco.items():
@@ -61,6 +68,13 @@ def validate_references(weedcoco, schema_dir=SCHEMA_DIR):
                                 f"Reference to unknown ID: {id_key}. "
                                 f"Found in {section_name} id {obj.get('id')}"
                             )
+                        referenced_ids.add(id_key)
+
+    if require_reference and referenced_ids != known_ids:
+        raise ValidationError(
+            f"Not all objects are referenced. Unreferenced are: {sorted(known_ids - referenced_ids)}"
+        )
+    # TODO: consider warning if not require_reference
 
 
 def validate_coordinates(weedcoco):
