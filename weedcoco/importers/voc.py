@@ -7,6 +7,8 @@ import yaml
 
 from lxml import etree
 
+from weedcoco.validation import validate
+
 
 def generate_coco_annotations(
     voc_objects: list, image_id: int, start_id: int, category_mapping: Mapping[str, int]
@@ -65,7 +67,6 @@ def voc_to_coco(
 
         coco_image = {
             "id": image_id,
-            # TODO: handle folder
             "file_name": voc_annotation.find("filename").text,
             "width": int(voc_annotation.find("size/width").text),
             "height": int(voc_annotation.find("size/height").text),
@@ -134,7 +135,7 @@ def main():
             for annotation in coco["annotations"]
         ]
 
-    # TODO: validate
+    validate(coco)
 
     with args.out_path.open("w") as out:
         json.dump(coco, out, indent=4)
