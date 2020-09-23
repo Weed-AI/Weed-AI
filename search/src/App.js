@@ -115,7 +115,6 @@ class App extends Component {
 					<ReactiveList
 						componentId="result"
 						title="Results"
-						dataField="annotations__category__common_name"
 						from={0}
 						size={20}
 						{...facetProps}
