@@ -44,7 +44,6 @@ jobs:
           mkdir deepweeds_images_full
           for fname in $(cut -d, -f1 < labels.csv); do ln -s ../../cwfid_to_json/cwfid_images/001_image.png deepweeds_images_full/$fname; done
           python -m weedcoco.importers.deepweeds --labels-dir labels --image-dir deepweeds_images_full -o deepweeds_imageinfo.json
-          cat deepweeds_imageinfo.json
       - uses: actions/setup-node@v1
         with:
           node-version: '10'

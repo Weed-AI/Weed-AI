@@ -7,9 +7,10 @@ description: |
 type: object
 required:
   - agcontexts
+  - annotations
+  - categories
   - collections
   - images
-  - annotations
 properties:
   images:
     type: array
