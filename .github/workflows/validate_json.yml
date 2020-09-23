@@ -52,6 +52,9 @@ jobs:
           pip install pyyaml
           cd weedcoco/schema
           make
+      - uses: actions/setup-node@v1
+        with:
+          node-version: '10'
       - run: npm install -g ajv-cli
       - name: Validate JSON with ajv until we are confident with Python's jsonschema
         run: |
