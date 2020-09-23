@@ -109,7 +109,6 @@ for iRow, row in tqdm(input_metadata.iterrows(), total=len(input_metadata)):
     # Generate category objects
     if categoryID not in categoryIDToCategories:
         category = {}
-        category["name"] = row["Species"].lower()
         category["common_name"] = row["Species"].lower()
         category["id"] = row["Label"]
         categoryIDToCategories[categoryID] = category
