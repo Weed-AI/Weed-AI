@@ -24,14 +24,10 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
       - uses: actions/checkout@v2
-      - name: Compile yaml schema to JSON
-        run: |
-          pip install pyyaml
-          cd weedcoco/schema
-          make
+      - name: Install weedcoco
+        run: pip install .
       - name: Run import tools on test data
         run: |
-          pip install .
           cd weedcoco/cwfid_to_json/
           curl -L https://github.com/cwfid/dataset/archive/36290d0.tar.gz | tar xzv
           mv dataset-36290d0*/* .
@@ -44,11 +40,19 @@ jobs:
           mkdir deepweeds_images_full
           for fname in $(cut -d, -f1 < labels.csv); do ln -s ../../cwfid_to_json/cwfid_images/001_image.png deepweeds_images_full/$fname; done
           python -m weedcoco.importers.deepweeds --labels-dir labels --image-dir deepweeds_images_full -o deepweeds_imageinfo.json
-      - uses: actions/setup-node@v1
-        with:
-          node-version: '10'
+      - name: Validate WeedCOCO
+        run: |
+          # TODO: include --images-root
+          python -m weedcoco.validation weedcoco/cwfid_to_json/cwfid_imageinfo.json
+          python -m weedcoco.validation weedcoco/deepweeds_to_json/deepweeds_imageinfo.json
+      # Backup validation with ajv
+      - name: Compile yaml schema to JSON
+        run: |
+          pip install pyyaml
+          cd weedcoco/schema
+          make
       - run: npm install -g ajv-cli
-      - name: Validate JSON
+      - name: Validate JSON with ajv until we are confident with Python's jsonschema
         run: |
           cd weedcoco/schema
           ajv -s main.json -r '*.json' -d ../cwfid_to_json/cwfid_imageinfo.json -d ../deepweeds_to_json/deepweeds_imageinfo.json
