@@ -206,7 +206,10 @@ collections = [
     }
 ]
 
-# TODO: Create collection memberships from multiple csv files...
+# TODO: Create subset memberships from multiple csv files...
+collection_memberships = [
+    {"annotation_id": ann["id"], "collection_id": 0} for ann in annotations
+]
 
 """
 Create agcontext object.
