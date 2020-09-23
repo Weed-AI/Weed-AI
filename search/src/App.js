@@ -13,16 +13,15 @@ import './App.css';
 class App extends Component {
 	render() {
 		let facetProps = {
-			queryFormat: "and",
+			queryFormat: "or",
 			URLParams: true,
 			react: {
-				and: ["searchbox", "resslider", "agcontextfilter", "rolefilter", "speciesfilter", "grainstextfilter"]
+				or: ["searchbox", "resslider", "agcontextfilter", "rolefilter", "speciesfilter", "grainstextfilter"]
 			}
 		}
 		let multilistFacetProps = {
 			showCheckbox: true,
 			showCount: true,
-			showSearch: true,
 			showFilter: true,
 			style: {
 				padding: "5px",
