@@ -12,7 +12,7 @@ properties:
 
   name:
     type: string
-    pattern: "^((crop|weed): ([a-z]+|UNSPECIFIED)|crop|weed|none)$"
+    pattern: "^((crop|weed): ([a-z ]+|UNSPECIFIED)|crop|weed|none)$"
     description: |-
       A category for an annotation, consisting of an agricultural role and
       optionally a biological name, separated by ": ". Currently allowed
