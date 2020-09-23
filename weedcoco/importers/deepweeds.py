@@ -109,10 +109,12 @@ for iRow, row in tqdm(input_metadata.iterrows(), total=len(input_metadata)):
     # Generate category objects
     if categoryID not in categoryIDToCategories:
         category = {}
+        category["name"] = row["Species"].lower()
         category["common_name"] = row["Species"].lower()
         category["id"] = row["Label"]
         categoryIDToCategories[categoryID] = category
         if category["common_name"] == "negative":
+            category["name"] = "none"
             category["role"] = "na"
         else:
             category["role"] = "weed"
@@ -140,6 +142,8 @@ for iRow, row in tqdm(input_metadata.iterrows(), total=len(input_metadata)):
         if category["common_name"] == "parkinsonia":
             category["species"] = "parkinsonia aculeata"
             category["eppo_taxon_code"] = "PAKAC"
+        if "name" not in category:
+            category["name"] = f"{category['role']}: {category['species']}"
 
     # Create an annotation
     ann = {}

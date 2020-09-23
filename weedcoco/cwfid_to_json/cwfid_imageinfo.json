@@ -17269,6 +17269,7 @@
     ],
     "categories": [
         {
+            "name": "crop: daugus carota",
             "common_name": "carrot",
             "species": "daugus carota",
             "eppo_taxon_code": "DAUCS",
@@ -17277,6 +17278,7 @@
             "id": 0
         },
         {
+            "name": "weed: UNSPECIFIED",
             "species": "UNSPECIFIED",
             "role": "weed",
             "id": 1
@@ -17316,7 +17318,7 @@
             "location_lat": 53,
             "location_long": 11,
             "location_datum": 4326,
-            "upload_time": "2020-09-02 23:21:11",
+            "upload_time": "2020-09-23 17:21:34",
             "camera_make": "JAI AD-130GE",
             "camera_lens": "Fujinon TF15-DA-8",
             "camera_lens_focallength": 15,
