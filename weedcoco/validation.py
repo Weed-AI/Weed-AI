@@ -64,6 +64,8 @@ def validate_references(
                     known_ids.add(id_key)
 
     # ensure referenced IDs are known
+    # FIXME: this should be more precise, checking the relationship between
+    # the referring and referent sections.
     for section_name, section in weedcoco.items():
         if isinstance(section, list):
             for obj in section:
