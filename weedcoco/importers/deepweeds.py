@@ -259,6 +259,7 @@ with args.out_path.open("w") as fout:
             "license": license,
             "agcontexts": agcontext,
             "collections": collections,
+            "collection_memberships": collection_memberships,
         },
         fout,
         indent=4,
