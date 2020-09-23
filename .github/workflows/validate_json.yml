@@ -32,7 +32,8 @@ jobs:
           curl -L https://github.com/cwfid/dataset/archive/36290d0.tar.gz | tar xzv
           mv dataset-36290d0*/* .
           mv images cwfid_images
-          python -m weedcoco.importers.cwfid --image-dir cwfid_images
+          python -m weedcoco.importers.cwfid --image-dir cwfid_images -o cwfid_imageinfo.json
+          cat cwfid_imageinfo.json
           cd ../deepweeds_to_json
           curl -L https://github.com/AlexOlsen/DeepWeeds/archive/51e3fab.tar.gz | tar xzv
           mv DeepWeeds-51e3fab*/* .
