@@ -1,13 +1,8 @@
-"""
-cwfid_to_json.py
+"""weedcoco.importers.cwfid
 
 Ingests CWFID .yaml annotations and images to produce a WeedCOCO .JSON file.
 """
 
-
-"""Constants and environment"""
-
-import warnings
 import argparse
 import yaml
 import pathlib
@@ -15,7 +10,10 @@ import json
 import datetime
 from tqdm import tqdm
 import os
-import PIL.Image
+
+from weedcoco.utils import get_image_dimensions
+
+"""Constants and environment"""
 
 # define paths
 ap = argparse.ArgumentParser(description=__doc__)
@@ -73,21 +71,6 @@ def create_annotations(ann_blob, image_id, starting_idx):
             }
         )
     return annotations
-
-
-def get_image_dimensions(path):
-    """
-    Function to measure image dimensions and calculate resolution.
-    """
-    if not os.path.isfile(path):
-        warnings.warn(f"Could not open {path}")
-        return None
-    # Retrieve image width and height
-    image = PIL.Image.open(path)
-    width, height = image.size
-    # Calculate resolution in pixels
-    resolution = width * height
-    return {"width": width, "height": height, "resolution": resolution}
 
 
 missing_files = []

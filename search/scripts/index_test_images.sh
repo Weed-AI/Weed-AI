@@ -1,7 +1,7 @@
 #! zsh
 
 mypath=$0:A
-conversion_root=$(dirname "$mypath")/../../conversion_tools
+conversion_root=$(dirname "$mypath")/../../weedcoco
 
 conv() {
     python "$conversion_root"'/draft export to elastic.py' "$@"
