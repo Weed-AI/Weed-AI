@@ -155,8 +155,9 @@ for ann_path in progress:
 
     images.append(image)
 
+    starting_idx = 0 if not annotations else annotations[-1]["id"] + 1
     annotations.extend(
-        create_annotations(ann_blob, image_id, starting_idx=annotations[-1]["id"] + 1)
+        create_annotations(ann_blob, image_id, starting_idx=starting_idx)
     )
 
     collections = [
