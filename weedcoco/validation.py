@@ -35,7 +35,11 @@ def validate_json(weedcoco, schema_dir=SCHEMA_DIR):
     )
 
 
-def validate_references(weedcoco, schema_dir=SCHEMA_DIR, require_reference=True):
+def validate_references(
+    weedcoco,
+    schema_dir=SCHEMA_DIR,
+    require_reference=("collection", "image", "agcontext"),
+):
     """Check that all IDs are unique and references valid"""
     known_ids = set()
     referenced_ids = set()
@@ -50,9 +54,12 @@ def validate_references(weedcoco, schema_dir=SCHEMA_DIR, require_reference=True)
             section_name_singular = section_name
         if isinstance(section, list):
             for obj in section:
+                if "id" not in obj:
+                    # collection_memberships objects do not require 'id'
+                    continue
                 id_key = (section_name_singular, obj["id"])
                 if id_key in known_ids:
-                    raise ValueError(f"Duplicate ID: {id_key}")
+                    raise ValidationError(f"Duplicate ID: {id_key}")
                 else:
                     known_ids.add(id_key)
 
@@ -70,10 +77,10 @@ def validate_references(weedcoco, schema_dir=SCHEMA_DIR, require_reference=True)
                             )
                         referenced_ids.add(id_key)
 
-    if require_reference and referenced_ids != known_ids:
-        raise ValidationError(
-            f"Not all objects are referenced. Unreferenced are: {sorted(known_ids - referenced_ids)}"
-        )
+    for known_id in known_ids:
+        section_name = known_id[0]
+        if section_name in require_reference and known_id not in referenced_ids:
+            raise ValidationError(f"{section_name} ID {known_id[1]} is unreferenced")
     # TODO: consider warning if not require_reference
 
 
