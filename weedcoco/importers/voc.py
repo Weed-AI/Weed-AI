@@ -3,11 +3,13 @@ from pathlib import Path
 from typing import Optional, Mapping
 import argparse
 import json
-import yaml
 
 from lxml import etree
 
 from weedcoco.validation import validate
+from weedcoco.utils import load_json_or_yaml
+from weedcoco.utils import add_agcontext_from_file
+from weedcoco.utils import add_collection_from_file
 
 
 def generate_coco_annotations(
@@ -61,7 +63,7 @@ def voc_to_coco(
 
     images = []
     annotations = []
-    for image_id, xml_path in enumerate(xml_dir.glob("[a-zA-Z0-9_]*.xml")):
+    for image_id, xml_path in enumerate(sorted(xml_dir.glob("[a-zA-Z0-9_]*.xml"))):
         voc_annotation = etree.parse(str(xml_path)).getroot()
         assert voc_annotation.tag == "annotation"
 
@@ -97,15 +99,7 @@ def voc_to_coco(
     return out
 
 
-def _load_json_or_yaml(path):
-    if path.suffix in (".yml", ".yaml"):
-        obj = yaml.safe_load(path.open())
-    else:
-        obj = json.load(path.open())
-    return obj
-
-
-def main():
+def main(args=None):
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--voc-dir", required=True, default=".", type=Path)
     ap.add_argument("--image-dir", required=True, type=Path)
@@ -118,37 +112,28 @@ def main():
     ap.add_argument("--collection-path", type=Path)
     ap.add_argument("--validate", action="store_true", default=False)
     ap.add_argument("-o", "--out-path", default="coco_from_voc.json", type=Path)
-    args = ap.parse_args()
+    args = ap.parse_args(args)
 
     if args.category_name_map:
-        category_name_map = _load_json_or_yaml(args.category_name_map)
+        category_name_map = load_json_or_yaml(args.category_name_map)
         keys, values = zip(*category_name_map.items())
         categories = [{"id": i, "name": value} for i, value in enumerate(values)]
         category_mapping = {key: i for i, key in enumerate(keys)}
     else:
         categories = None
         category_mapping = None
+
     coco = voc_to_coco(args.voc_dir, args.image_dir, category_mapping=category_mapping)
+
+    if not coco["images"]:
+        ap.error(f"Found no .xml files in {args.voc_dir}")
+
     if categories is not None:
         coco["categories"] = categories
-
     if args.agcontext_path:
-        agcontext = _load_json_or_yaml(args.agcontext_path)
-        if "id" not in agcontext:
-            agcontext["id"] = 0
-        coco["agcontexts"] = [agcontext]
-        for image in coco["images"]:
-            image["agcontext_id"] = agcontext["id"]
-
+        add_agcontext_from_file(coco, args.agcontext_path)
     if args.collection_path:
-        collection = _load_json_or_yaml(args.collection_path)
-        if "id" not in collection:
-            collection["id"] = 0
-        coco["collections"] = [collection]
-        coco["collection_memberships"] = [
-            {"annotation_id": annotation["id"], "collection_id": collection["id"]}
-            for annotation in coco["annotations"]
-        ]
+        add_collection_from_file(coco, args.collection_path)
 
     if args.validate:
         validate(coco)
