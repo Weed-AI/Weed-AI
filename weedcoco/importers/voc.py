@@ -113,6 +113,7 @@ def main():
     ap.add_argument("--image-dir", required=True, type=Path)
     ap.add_argument("--agcontext-path", type=Path)
     ap.add_argument("--collection-path", type=Path)
+    ap.add_argument("--validate", action="store_true", default=False)
     ap.add_argument("-o", "--out-path", default="coco_from_voc.json", type=Path)
     args = ap.parse_args()
 
@@ -135,7 +136,8 @@ def main():
             for annotation in coco["annotations"]
         ]
 
-    validate(coco)
+    if args.validate:
+        validate(coco)
 
     with args.out_path.open("w") as out:
         json.dump(coco, out, indent=4)
