@@ -90,6 +90,7 @@ SMALL_WEEDCOCO = {
     ],
     "categories": [
         {
+            "name": "crop: daugus carota",
             "common_name": "carrot",
             "species": "daugus carota",
             "eppo_taxon_code": "DAUCS",
@@ -97,7 +98,12 @@ SMALL_WEEDCOCO = {
             "role": "crop",
             "id": 0,
         },
-        {"species": "UNSPECIFIED", "role": "weed", "id": 1},
+        {
+            "name": "weed: unspecified",
+            "species": "UNSPECIFIED",
+            "role": "weed",
+            "id": 1,
+        },
     ],
     "info": {
         "version": 1,
