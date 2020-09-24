@@ -12,22 +12,35 @@ import './App.css';
 
 class App extends Component {
 	render() {
-		let facetProps = {
-			queryFormat: "or",
-			URLParams: true,
-			react: {
-				or: ["searchbox", "resslider", "agcontextfilter", "rolefilter", "speciesfilter", "grainstextfilter"]
+		let makeProps = function (id, ismultilist) {
+			let multilistFacetProps = {
+				showCheckbox: true,
+				showCount: true,
+				showFilter: true,
+				style: {
+					padding: "5px",
+					marginTop: "10px"
+				},
 			}
+			if (!ismultilist) {
+				multilistFacetProps = {}
+			}
+			let facetProps = {
+				queryFormat: "or",
+				URLParams: true,
+				react: {
+					and: ["searchbox", "resslider", "agcontextfilter", "rolefilter", "speciesfilter", "grainstextfilter"]
+				},
+				...multilistFacetProps
+			}
+			var idx
+			//remove id from query
+			if ((idx = facetProps.react.and.indexOf(id)) !== -1) {
+				facetProps.react.and.splice(idx, 1);
+			}
+			return (facetProps)
 		}
-		let multilistFacetProps = {
-			showCheckbox: true,
-			showCount: true,
-			showFilter: true,
-			style: {
-				padding: "5px",
-				marginTop: "10px"
-			},
-		}
+
 		return (
 			<ReactiveBase
 				app="weedid"
@@ -54,8 +67,7 @@ class App extends Component {
 						selectAllLabel="All roles"
 						placeholder="Search Role"
 						filterLabel="Role"
-						{...facetProps}
-						{...multilistFacetProps}
+						{...makeProps("rolefilter", true)}
 					/>
 					<MultiList
 						componentId="speciesfilter"
@@ -65,8 +77,7 @@ class App extends Component {
 						selectAllLabel="All species"
 						placeholder="Search Species"
 						filterLabel="Species"
-						{...facetProps}
-						{...multilistFacetProps}
+						{...makeProps("speciesfilter", true)}
 					/>
 					<MultiList
 						componentId="agcontextfilter"
@@ -76,8 +87,7 @@ class App extends Component {
 						selectAllLabel="All collections"
 						placeholder="Search collection"
 						filterLabel="Agcontext"
-						{...facetProps}
-						{...multilistFacetProps}
+						{...makeProps("agcontextfilter", true)}
 					/>
 					<MultiList
 						componentId="grainstextfilter"
@@ -87,8 +97,7 @@ class App extends Component {
 						selectAllLabel="All growth stages"
 						placeholder="Search growth stage"
 						filterLabel="Growth stage"
-						{...facetProps}
-						{...multilistFacetProps}
+						{...makeProps("grainstextfilter", true)}
 					/>
 					<RangeSlider
 						componentId="resslider"
@@ -105,8 +114,7 @@ class App extends Component {
 						stepValue={10000}
 						showHistogram={true}
 						interval={10000}
-						{...facetProps}
-						{...multilistFacetProps}
+						{...makeProps("resslider", false)}
 					/>
 				</div>
 				<div style={{ position: "absolute", left: "20rem" }}>
@@ -116,11 +124,8 @@ class App extends Component {
 						title="Results"
 						from={0}
 						size={20}
-						{...facetProps}
+						{...makeProps("result", false)}
 						infiniteScroll={true}
-						react={{
-							and: ["searchbox", "resslider", "agcontextfilter", "rolefilter", "speciesfilter", "grainstextfilter"]
-						}}
 						render={({ data }) => (
 							<ReactiveList.ResultCardsWrapper>
 								{
