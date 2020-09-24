@@ -29,7 +29,7 @@ class App extends Component {
 				queryFormat: "or",
 				URLParams: true,
 				react: {
-					and: ["searchbox", "resslider", "agcontextfilter", "rolefilter", "speciesfilter", "grainstextfilter"]
+					and: ["searchbox", "resslider", "agcontextfilter", "categoryfilter", "grainstextfilter"]
 				},
 				...multilistFacetProps
 			}
@@ -60,24 +60,14 @@ class App extends Component {
 			>
 				<div style={{ position: "fixed", width: "20rem", overflow: "scroll", height: "100%" }}>
 					<MultiList
-						componentId="rolefilter"
-						title="Filter by role"
-						dataField="annotation__category__role.keyword"
-						sortBy="asc"
-						selectAllLabel="All roles"
-						placeholder="Search Role"
-						filterLabel="Role"
-						{...makeProps("rolefilter", true)}
-					/>
-					<MultiList
-						componentId="speciesfilter"
+						componentId="categoryfilter"
 						title="Filter by species"
-						dataField="annotation__category__species.keyword"
+						dataField="annotation__category__name.keyword"
 						sortBy="asc"
 						selectAllLabel="All species"
 						placeholder="Search Species"
 						filterLabel="Species"
-						{...makeProps("speciesfilter", true)}
+						{...makeProps("categoryfilter", true)}
 					/>
 					<MultiList
 						componentId="agcontextfilter"

@@ -7,9 +7,10 @@ description: |
 type: object
 required:
   - agcontexts
+  - annotations
+  - categories
   - collections
   - images
-  - annotations
 properties:
   images:
     type: array
@@ -19,6 +20,10 @@ properties:
     type: array
     items:
       $ref: https://weedid.sydney.edu.au/schema/Annotation.json#/
+  categories:
+    type: array
+    items:
+      $ref: https://weedid.sydney.edu.au/schema/Category.json#/
   agcontexts:
     type: array
     items:
