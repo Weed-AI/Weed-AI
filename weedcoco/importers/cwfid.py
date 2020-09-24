@@ -27,6 +27,7 @@ args = ap.parse_args()
 CATEGORY_MAP = {
     # TODO: we need a spec for species unspecified, and we need a spec for species specified
     "crop": {
+        "name": "crop: daugus carota",
         "common_name": "carrot",
         "species": "daugus carota",
         "eppo_taxon_code": "DAUCS",
@@ -34,7 +35,12 @@ CATEGORY_MAP = {
         "role": "crop",
         "id": 0,
     },
-    "weed": {"species": "UNSPECIFIED", "role": "weed", "id": 1},
+    "weed": {
+        "name": "weed: UNSPECIFIED",
+        "species": "UNSPECIFIED",
+        "role": "weed",
+        "id": 1,
+    },
 }
 
 

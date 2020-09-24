@@ -17269,6 +17269,7 @@
     ],
     "categories": [
         {
+            "name": "crop: daugus carota",
             "common_name": "carrot",
             "species": "daugus carota",
             "eppo_taxon_code": "DAUCS",
@@ -17277,6 +17278,7 @@
             "id": 0
         },
         {
+            "name": "weed: UNSPECIFIED",
             "species": "UNSPECIFIED",
             "role": "weed",
             "id": 1
