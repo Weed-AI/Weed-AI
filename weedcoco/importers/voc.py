@@ -53,7 +53,7 @@ def voc_to_coco(
         'categories' if category_mapping was not provided.
         Other COCO components should be added as a post-process.
     """
-    use_default_category_mapping = True
+    use_default_category_mapping = category_mapping is None
     if use_default_category_mapping:
         category_mapping = defaultdict(None)
         # ordinal numbering
@@ -85,18 +85,17 @@ def voc_to_coco(
             )
         )
 
+    out = {
+        "images": images,
+        "annotations": annotations,
+        "info": {},
+    }
     if use_default_category_mapping:
-        # TODO: define role somehow??
-        categories = [
+        out["categories"] = [
             {"id": idx, "name": name} for name, idx in category_mapping.items()
         ]
 
-    return {
-        "images": images,
-        "annotations": annotations,
-        "categories": categories,
-        "info": {},
-    }
+    return out
 
 
 def _load_json_or_yaml(path):
@@ -111,13 +110,29 @@ def main():
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--voc-dir", required=True, default=".", type=Path)
     ap.add_argument("--image-dir", required=True, type=Path)
+    ap.add_argument(
+        "--category-name-map",
+        type=Path,
+        help="JSON or YAML mapping of VOC names to WeedCOCO category names",
+    )
     ap.add_argument("--agcontext-path", type=Path)
     ap.add_argument("--collection-path", type=Path)
     ap.add_argument("--validate", action="store_true", default=False)
     ap.add_argument("-o", "--out-path", default="coco_from_voc.json", type=Path)
     args = ap.parse_args()
 
-    coco = voc_to_coco(args.voc_dir, args.image_dir)
+    if args.category_name_map:
+        category_name_map = _load_json_or_yaml(args.category_name_map)
+        keys, values = zip(*category_name_map.items())
+        categories = [{"id": i, "name": value} for i, value in enumerate(values)]
+        category_mapping = {key: i for i, key in enumerate(keys)}
+    else:
+        categories = None
+        category_mapping = None
+    coco = voc_to_coco(args.voc_dir, args.image_dir, category_mapping=category_mapping)
+    if categories is not None:
+        coco["categories"] = categories
+
     if args.agcontext_path:
         agcontext = _load_json_or_yaml(args.agcontext_path)
         if "id" not in agcontext:
