@@ -31,10 +31,15 @@ for key, objs in coco.items():
         id_lookup[key, obj["id"]] = obj
 
 
+# where a field may be 'variable' we want it to be removed, so that it does not
+# disagree with inferred schema.
+variable_to_null_fields = ["camera_fov", "camera_lens_focallength"]
+
 for agcontext in coco["agcontexts"]:
     # massage for ES
-    if agcontext.get("camera_fov") == "variable":
-        del agcontext["camera_fov"]
+    for field in variable_to_null_fields:
+        if agcontext.get(field) == "variable":
+            del agcontext[field]
 
 
 def _flatten(src, dst, prefix):
