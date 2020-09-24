@@ -30,8 +30,7 @@ def load_json_or_yaml(path):
 
 
 def add_agcontext_from_file(coco, agcontext_path):
-    """Make all images have the same AgContext loaded from YAML or JSON
-    """
+    """Make all images have the same AgContext loaded from YAML or JSON"""
     agcontext = load_json_or_yaml(agcontext_path)
     if "id" not in agcontext:
         agcontext["id"] = 0
@@ -42,8 +41,7 @@ def add_agcontext_from_file(coco, agcontext_path):
 
 
 def add_collection_from_file(coco, collection_path):
-    """Make all annotations members of one collection loaded from YAML or JSON
-    """
+    """Make all annotations members of one collection loaded from YAML or JSON"""
     collection = load_json_or_yaml(collection_path)
     if "id" not in collection:
         collection["id"] = 0
