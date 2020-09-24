@@ -14,12 +14,12 @@ def generate_coco_annotations(
     voc_objects: list, image_id: int, start_id: int, category_mapping: Mapping[str, int]
 ):
     for annotation_id, voc_object in enumerate(voc_objects, start_id):
-        # TODO: handle segmented
+        # TODO: do we need to handle "segmented"?
         annotation = {
             "id": annotation_id,
             "image_id": image_id,
             "category_id": category_mapping[voc_object.find("name").text],
-            # TODO: handle truncated, difficult?
+            # TODO: do we need to handle "truncated", "difficult"?
         }
         voc_bndbox = voc_object.find("bndbox")
         if voc_bndbox is not None:
@@ -70,8 +70,7 @@ def voc_to_coco(
             "file_name": voc_annotation.find("filename").text,
             "width": int(voc_annotation.find("size/width").text),
             "height": int(voc_annotation.find("size/height").text),
-            # TODO: handle absent size
-            # TODO: handle depth?
+            # XXX: should we calculate height and width if absent?
             # TODO: handle folder and path??
         }
         images.append(coco_image)
