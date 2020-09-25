@@ -31,6 +31,17 @@ for key, objs in coco.items():
         id_lookup[key, obj["id"]] = obj
 
 
+# where a field may be 'variable' we want it to be removed, so that it does not
+# disagree with inferred schema.
+variable_to_null_fields = ["camera_fov", "camera_lens_focallength"]
+
+for agcontext in coco["agcontexts"]:
+    # massage for ES
+    for field in variable_to_null_fields:
+        if agcontext.get(field) == "variable":
+            del agcontext[field]
+
+
 def _flatten(src, dst, prefix):
     for k, v in src.items():
         dst[f"{prefix}__{k}"] = v
@@ -40,6 +51,7 @@ for annotation in coco["annotations"]:
     image = id_lookup["images", annotation["image_id"]]
     image.setdefault("annotations", []).append(annotation)
     annotation["category"] = id_lookup["categories", annotation["category_id"]]
+    # todo: add collection, license
     _flatten(annotation["category"], annotation, "category")
     # todo: add collection from collection_memberships
     if hasattr(args, "thumbnail_dir"):
