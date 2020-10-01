@@ -209,7 +209,10 @@ collections = [
     }
 ]
 
-# TODO: Create collection memberships from multiple csv files...
+# TODO: Create subset memberships from multiple csv files...
+collection_memberships = [
+    {"annotation_id": ann["id"], "collection_id": 0} for ann in annotations
+]
 
 """
 Create agcontext object.
@@ -259,6 +262,7 @@ with args.out_path.open("w") as fout:
             "license": license,
             "agcontexts": agcontext,
             "collections": collections,
+            "collection_memberships": collection_memberships,
         },
         fout,
         indent=4,

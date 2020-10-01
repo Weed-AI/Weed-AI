@@ -54,7 +54,7 @@ def create_annotations(ann_blob, image_id, starting_idx):
         # a COCO polygon is just a sequence [[x1, y1, x2, y2, ...]]
         if not isinstance(obj["points"]["x"], list):
             print(
-                f"Found invalid polygon for annotation of {ann_blob['filename']} with points {obj['points']}"
+                f"Skipping invalid polygon for annotation of {ann_blob['filename']} with points {obj['points']}. Expected a list."
             )
             continue
         polygon = zip(obj["points"]["x"], obj["points"]["y"])
@@ -161,8 +161,9 @@ for ann_path in progress:
 
     images.append(image)
 
+    starting_idx = 0 if not annotations else annotations[-1]["id"] + 1
     annotations.extend(
-        create_annotations(ann_blob, image_id, starting_idx=len(annotations))
+        create_annotations(ann_blob, image_id, starting_idx=starting_idx)
     )
 
     collections = [
@@ -185,16 +186,11 @@ with open(subset_path) as subset_file:
     # TODO: iterate over value key pairs and create individual collection membership per image.
     # TODO: refer to all annotations associated with an image?
     collection_memberships = []
-    for key, value in subsets.items():
-        if key == "train":
+    for train_or_test, image_ids in subsets.items():
+        for image_id in image_ids:
             collection_memberships.append(
-                {"image_id": value, "subset": "train", "collection_id": 0}
+                {"image_id": image_id, "subset": train_or_test, "collection_id": 0}
             )
-        else:
-            collection_memberships.append(
-                {"image_id": value, "subset": "test", "collection_id": 0}
-            )
-print(collection_memberships)
 """Write output"""
 with args.out_path.open("w") as fout:
     json.dump(

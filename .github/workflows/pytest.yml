@@ -1,0 +1,35 @@
+
+
+name: weedcoco python package tests
+
+# Controls when the action will run. Triggers the workflow on push or pull request
+
+on:
+  push:
+    branches: 
+      - master
+  pull_request:
+    branches: 
+      - '**'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.7]
+    steps:
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+      - uses: actions/checkout@v2
+      - name: Install
+        run: |
+          pip install . pytest pytest-cov
+      - name: Test
+        run: pytest --cov=weedcoco/ --cov-report=xml
+      - uses: codecov/codecov-action@v1
+        with:
+          flags: weedcoco
+          fail_ci_if_error: false

@@ -10,6 +10,7 @@ required:
   - annotations
   - categories
   - collections
+  - collection_memberships
   - images
 properties:
   images:
