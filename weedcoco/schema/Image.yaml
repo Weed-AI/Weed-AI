@@ -3,7 +3,7 @@ type: object
 required:
   - id
   - file_name
-  - license
+  # - license  - See #104
   - agcontext_id
   - width
   - height
