@@ -7,7 +7,6 @@ required:
   - agcontext_id
   - width
   - height
-  - resolution
 
 properties:
 
@@ -43,13 +42,6 @@ properties:
       minimum: 1
       description: |-
         Vertical pixel count.
-
-    resolution:
-      type: number
-      minimum: 1
-      description: |-
-        Image resolution, in pixels.
-        Calculated as the product of x_dim and y_dim.
 
     date_captured:
       type: datetime
