@@ -13,6 +13,4 @@ def get_image_dimensions(path):
     # Retrieve image width and height
     image = PIL.Image.open(path)
     width, height = image.size
-    # Calculate resolution in pixels
-    resolution = width * height
-    return {"width": width, "height": height, "resolution": resolution}
+    return {"width": width, "height": height}
