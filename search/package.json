@@ -4,12 +4,17 @@
   "private": true,
   "dependencies": {
     "@appbaseio/reactivesearch": "^3.12.2",
+    "@testing-library/dom": "^5",
     "@testing-library/jest-dom": "^4.2.4",
     "@testing-library/react": "^9.3.2",
     "@testing-library/user-event": "^7.1.2",
+    "node-fetch": "^2.6.1",
+    "node-forge": "^0.10.0",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
-    "react-scripts": "3.4.3"
+    "react-scripts": "3.4.3",
+    "redux": "^2.0.0",
+    "typescript": "^2.8.0"
   },
   "scripts": {
     "start": "react-scripts start",

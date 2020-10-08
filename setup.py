@@ -5,8 +5,7 @@ with open("README.md") as readme_file:
     readme = readme_file.read()
     # FIXME: Convert to ReST
 
-
-requirements = "pyyaml pandas humanfriendly tqdm exifread pillow lxml".split()
+requirements = "pyyaml pandas humanfriendly tqdm exifread pillow lxml jsonschema".split()
 
 setup(
     name="weedcoco",

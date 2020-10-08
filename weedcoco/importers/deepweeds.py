@@ -113,6 +113,7 @@ for iRow, row in tqdm(input_metadata.iterrows(), total=len(input_metadata)):
         category["id"] = row["Label"]
         categoryIDToCategories[categoryID] = category
         if category["common_name"] == "negative":
+            category["name"] = "none"
             category["role"] = "na"
         else:
             category["role"] = "weed"
@@ -140,6 +141,8 @@ for iRow, row in tqdm(input_metadata.iterrows(), total=len(input_metadata)):
         if category["common_name"] == "parkinsonia":
             category["species"] = "parkinsonia aculeata"
             category["eppo_taxon_code"] = "PAKAC"
+        if "name" not in category:
+            category["name"] = f"{category['role']}: {category['species']}"
 
     # Create an annotation
     ann = {}
@@ -206,7 +209,10 @@ collections = [
     }
 ]
 
-# TODO: Create collection memberships from multiple csv files...
+# TODO: Create subset memberships from multiple csv files...
+collection_memberships = [
+    {"annotation_id": ann["id"], "collection_id": 0} for ann in annotations
+]
 
 """
 Create agcontext object.
@@ -256,6 +262,7 @@ with args.out_path.open("w") as fout:
             "license": license,
             "agcontexts": agcontext,
             "collections": collections,
+            "collection_memberships": collection_memberships,
         },
         fout,
         indent=4,
