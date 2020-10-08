@@ -17,7 +17,7 @@ def get_image_dimensions(path):
     image = PIL.Image.open(path)
     width, height = image.size
     return {"width": width, "height": height}
-  
+
 
 def load_json_or_yaml(path):
     """Streamlined function for open both JSON and YAML"""
