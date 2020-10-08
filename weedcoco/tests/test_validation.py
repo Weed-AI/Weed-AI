@@ -39,7 +39,6 @@ SMALL_WEEDCOCO = {
             "agcontext_id": 0,
             "width": 1296,
             "height": 966,
-            "resolution": 1251936,
         },
         {
             "id": 1,
@@ -48,7 +47,6 @@ SMALL_WEEDCOCO = {
             "agcontext_id": 0,
             "width": 1296,
             "height": 966,
-            "resolution": 1251936,
         },
     ],
     "annotations": [
