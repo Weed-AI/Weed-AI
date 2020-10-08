@@ -21,6 +21,7 @@ AGCONTEXT = {
     "cropped_to_plant": False,
     "grains_descriptive_text": "na",
     "id": 0,
+    "lighting": "artificial",
     "location_datum": 4236,
     "location_lat": 5555,
     "location_long": 555,
