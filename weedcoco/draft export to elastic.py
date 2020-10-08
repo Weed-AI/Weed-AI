@@ -62,6 +62,7 @@ for annotation in coco["annotations"]:
         image["thumbnail"] = image["file_name"]
 
 for image in coco["images"]:
+    image["resolution"] = image["width"] * image["height"]
     image["agcontext"] = id_lookup["agcontexts", image["agcontext_id"]]
     _flatten(image["agcontext"], image, "agcontext")
     # todo: add license
