@@ -1,6 +1,3 @@
-# Weed-ID-Interchange
-A repository to support the development of a schema for weed identification annotation
-
 # Welcome to the Weeds Imaging Database (WeedID). 
 
 WeedID Is an open source, searchable, weeds image platform designed to facilitate the research and development of machine learning algorithms for weed recognition in cropping systems.
@@ -38,7 +35,9 @@ Annotation data is stored in the Weed-COCO format, an extension of MS COCO for w
 
 The format may also be applicable to related agricultural purposes.
 As with MS COCO, the format supports classification, bounding box and segmentation labels.
-Reporting these details will help ensure consistency in published datasets for ease of comparison and use in further research and development. 
+Reporting these details will help ensure consistency in published datasets for ease of comparison and use in further research and development.
+
+![WeedID Data Flow](weedID-data-flow-diagram.png)
 
 # Acknowledgements 
 
