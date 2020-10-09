@@ -14,6 +14,8 @@ requirements = [
     "pillow",
     "pyyaml",
     "tqdm",
+    "opencv-python",
+    "numpy"
 ]
 
 setup(
