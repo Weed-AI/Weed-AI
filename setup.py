@@ -15,7 +15,7 @@ requirements = [
     "pyyaml",
     "tqdm",
     "opencv-python",
-    "numpy"
+    "numpy",
 ]
 
 setup(
