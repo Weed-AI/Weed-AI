@@ -3,11 +3,18 @@ A repository to support the development of a schema for weed identification anno
 
 # Welcome to the Weeds Imaging Database (WeedID). 
 
-WeedID Is an open source, searchable, weeds image platform designed to facilitate the research and development of machine learning algorithms for weed recognition in cropping systems. It brings together existing datasets, enables users to contribute their own data and pulls together custom datasets for straightforward download. 
+WeedID Is an open source, searchable, weeds image platform designed to facilitate the research and development of machine learning algorithms for weed recognition in cropping systems.
+It brings together existing datasets, enables users to contribute their own data and pulls together custom datasets for straightforward download. 
 
 # Background 
 
-Large numbers of high quality, annotated weed images are essential for the development of weed recognition algorithms that are accurate and reliable in complex biological systems. Accurate weed recognition enables the use of site-specific weed control (SSWC) in agricultural systems eliminating the need for wasteful whole field treatments. This approach substantially reduces weed control inputs and creates opportunities for the introduction of alternative weed control technologies that were not previously feasible for use as indiscriminate whole field treatments. SSWC relies on accurate detection (is a weed present) and identification (what is the species/further information on morphology) of weeds in agricultural and environmental systems (crop, pastures, rangelands and non-crop areas, etc.). Camera-based weed recognition using deep learning algorithms has emerged as a frontrunner for in-crop site-specific control with an improved ability to handle variation. Training and development of algorithms require significant quantities of high-quality, annotated image data. WeedID is addressing this challenge by enabling the easy access and contribution of weed image data on an open source platform with search, dynamic filter and preview functions for custom dataset download capability. 
+Large numbers of high quality, annotated weed images are essential for the development of weed recognition algorithms that are accurate and reliable in complex biological systems.
+Accurate weed recognition enables the use of site-specific weed control (SSWC) in agricultural systems eliminating the need for wasteful whole field treatments.
+This approach substantially reduces weed control inputs and creates opportunities for the introduction of alternative weed control technologies that were not previously feasible for use as indiscriminate whole field treatments.
+SSWC relies on accurate detection (is a weed present) and identification (what is the species/further information on morphology) of weeds in agricultural and environmental systems (crop, pastures, rangelands and non-crop areas, etc.).
+Camera-based weed recognition using deep learning algorithms has emerged as a frontrunner for in-crop site-specific control with an improved ability to handle variation.
+Training and development of algorithms require significant quantities of high-quality, annotated image data.
+WeedID is addressing this challenge by enabling the easy access and contribution of weed image data on an open source platform with search, dynamic filter and preview functions for custom dataset download capability. 
 
 # Data supported 
 
@@ -29,11 +36,14 @@ Annotation data is stored in the Weed-COCO format, an extension of MS COCO for w
 
 - Lighting  
 
-The format may also be applicable to related agricultural purposes. As with MS COCO, the format supports classification, bounding box and segmentation labels. Reporting these details will help ensure consistency in published datasets for ease of comparison and use in further research and development. 
+The format may also be applicable to related agricultural purposes.
+As with MS COCO, the format supports classification, bounding box and segmentation labels.
+Reporting these details will help ensure consistency in published datasets for ease of comparison and use in further research and development. 
 
 # Acknowledgements 
 
-This project has been funded by the Grains Research and Development Corporation. The platform was developed in a collaborative effort between University of Sydney research groups, the Sydney Informatics Hub, Australian Centre for Field Robotics and the Precision Weed Control Group. 
+This project has been funded by the Grains Research and Development Corporation.
+The platform was developed in a collaborative effort between University of Sydney research groups, the Sydney Informatics Hub, Australian Centre for Field Robotics and the Precision Weed Control Group. 
 
 # Citation Guidelines 
 
