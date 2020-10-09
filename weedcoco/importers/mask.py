@@ -21,7 +21,38 @@ categories = [
 ]
 
 
+def generate_masks_contours(mask_path):
+
+    """
+    Return contours' matrix of mask or image using opencv
+    """
+
+    def np_tolist(np_array):
+        return np_array.tolist()
+
+    im = cv.imread(mask_path)
+    imgray = cv.cvtColor(im, cv.COLOR_BGR2GRAY)
+    ret, thresh = cv.threshold(imgray, 127, 255, 0)
+    contours, hierarchy = cv.findContours(thresh, cv.RETR_TREE, cv.CHAIN_APPROX_SIMPLE)
+    return json.dumps(list(map(np_tolist, contours)))
+
+
 def mask_to_coco(image_dir: Path, mask_dir: Path):
+
+    """Converts images and masks to MS COCO images and annotations
+
+    Parameters
+    ----------
+    image_dir: pathlib.Path
+    mask_dir: pathlib.Path
+
+    Returns
+    -------
+    dict
+        Keys present should be 'images', 'annotations', and
+        'categories'.
+        Other COCO components should be added as a post-process.
+    """
 
     images = []
     annotations = []
@@ -37,8 +68,10 @@ def mask_to_coco(image_dir: Path, mask_dir: Path):
 
             annotation = {
                 "id": image_id,
+                "image_id": image_id,
                 "category_id": 0,
-                "contours": generate_masks_contours(str(mask_dir / filename)),
+                "segmentation": generate_masks_contours(str(mask_dir / filename)),
+                "is_crowd": 0,
             }
             annotations.append(annotation)
             image_id += 1
@@ -53,20 +86,8 @@ def mask_to_coco(image_dir: Path, mask_dir: Path):
     return out
 
 
-def generate_masks_contours(mask_path):
-
-    """
-    Return contours' matrix of mask or image using opencv
-    """
-
-    def np_tolist(np_array):
-        return np_array.tolist()
-
-    im = cv.imread(mask_path)
-    imgray = cv.cvtColor(im, cv.COLOR_BGR2GRAY)
-    ret, thresh = cv.threshold(imgray, 127, 255, 0)
-    contours, hierarchy = cv.findContours(thresh, cv.RETR_TREE, cv.CHAIN_APPROX_SIMPLE)
-    return json.dumps(list(map(np_tolist, contours)))
+# TODO: Add licenses
+# TODO: add collections
 
 
 def main(args=None):
