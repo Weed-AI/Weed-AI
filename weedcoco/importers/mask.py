@@ -63,7 +63,7 @@ def mask_to_coco(image_dir: Path, mask_dir: Path):
             coco_image = {
                 "id": image_id,
                 "file_name": filename,
-            }
+            }  # TODO: use get_image_dimensions
             images.append(coco_image)
 
             annotation = {
@@ -87,7 +87,6 @@ def mask_to_coco(image_dir: Path, mask_dir: Path):
 
 
 # TODO: Add licenses
-# TODO: add collections
 
 
 def main(args=None):
