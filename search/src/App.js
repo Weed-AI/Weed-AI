@@ -61,7 +61,7 @@ class App extends Component {
 				<div style={{ position: "fixed", width: "20rem", overflow: "scroll", height: "100%" }}>
 					<MultiList
 						componentId="categoryfilter"
-						title="Filter by species"
+						title="Annotated Species"
 						dataField="annotation__category__name.keyword"
 						sortBy="asc"
 						selectAllLabel="All species"
@@ -71,7 +71,7 @@ class App extends Component {
 					/>
 					<MultiList
 						componentId="agcontextfilter"
-						title="Filter by Collection"
+						title="Collection"
 						dataField="agcontext__agcontext_name.keyword"
 						sortBy="asc"
 						selectAllLabel="All collections"
@@ -81,7 +81,7 @@ class App extends Component {
 					/>
 					<MultiList
 						componentId="grainstextfilter"
-						title="Filter by Growth Stage"
+						title="Crop Growth Stage"
 						dataField="agcontext__grains_descriptive_text.keyword"
 						sortBy="asc"
 						selectAllLabel="All growth stages"
@@ -92,7 +92,7 @@ class App extends Component {
 					<RangeSlider
 						componentId="resslider"
 						dataField="resolution"
-						title="Resolution (pixels)"
+						title="Image Resolution (pixels)"
 						range={{
 							"start": 0,
 							"end": 1500000
