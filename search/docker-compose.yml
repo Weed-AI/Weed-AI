@@ -1,4 +1,4 @@
-version: '3'
+version: "3"
 services:
   # search engine
   elasticsearch:
@@ -12,16 +12,20 @@ services:
       - http.cors.allow-headers=X-Requested-With,X-Auth-Token,Content-Type,Content-Length,Authorization
       - http.cors.allow-credentials=true
       - bootstrap.memory_lock=true
-      - 'ES_JAVA_OPTS=-Xms512m -Xmx512m'
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
     volumes:
       - esdata1:/usr/share/elasticsearch/data
     ports:
-      - '9200:9200'
-      - '9300:9300'
+      - "9200:9200"
+      - "9300:9300"
     networks:
       - elastic
     healthcheck:
-      test: ["CMD-SHELL", "curl --silent --fail localhost:9200/_cluster/health || exit 1"]
+      test:
+        [
+          "CMD-SHELL",
+          "curl --silent --fail localhost:9200/_cluster/health || exit 1",
+        ]
       interval: 30s
       timeout: 30s
       retries: 3
@@ -29,25 +33,16 @@ services:
     image: my-reactivesearch
     build: .
     volumes:
-      - ./:/code   # for development
-      - /code/node_modules  # an exception from the above volume
+      - ./:/code # for development
+      - /code/node_modules # an exception from the above volume
     ports:
-      - '1337:3000'
+      - "1337:3000"
     environment:
       - NODE_ENV=production
     networks:
       - elastic
     stdin_open: true
-  # elasticsearch browser
-  dejavu:
-    image: appbaseio/dejavu:3.2.3
-    container_name: dejavu
-    ports:
-      - '1358:1358'
-    links:
-      - elasticsearch
-    networks:
-      - elastic
+
   # kibana as another elastic search UI
   kibana:
     image: docker.elastic.co/kibana/kibana-oss:7.8.1
