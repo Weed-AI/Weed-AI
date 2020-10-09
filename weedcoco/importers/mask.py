@@ -15,12 +15,11 @@ from weedcoco.utils import load_json_or_yaml
 from weedcoco.utils import add_agcontext_from_file
 from weedcoco.utils import add_collection_from_file
 
+# TODO: extend functionality to read categories from a file
 categories = [
-        {
-            "id": 0,
-            "name": "crop: zingiber officnale"
-        },
-    ]
+    {"id": 0, "name": "crop: zingiber officnale"},
+]
+
 
 def mask_to_coco(image_dir: Path, mask_dir: Path):
 
@@ -29,7 +28,7 @@ def mask_to_coco(image_dir: Path, mask_dir: Path):
 
     image_id = 0
     for filename in os.listdir(image_dir):
-        if filename.endswith(".png") or filename.endswith(".jpg"): 
+        if filename.endswith(".png") or filename.endswith(".jpg"):
             coco_image = {
                 "id": image_id,
                 "file_name": filename,
@@ -48,16 +47,18 @@ def mask_to_coco(image_dir: Path, mask_dir: Path):
         "images": images,
         "annotations": annotations,
         "info": {},
-        "categories": categories
+        "categories": categories,
     }
 
     return out
+
 
 def generate_masks_contours(mask_path):
 
     """
     Return contours' matrix of mask or image using opencv
     """
+
     def np_tolist(np_array):
         return np_array.tolist()
 
@@ -80,9 +81,6 @@ def main(args=None):
 
     coco = mask_to_coco(args.image_dir, args.mask_dir)
 
-    if not coco["images"]:
-        ap.error(f"Found no .xml files in {args.voc_dir}")
-
     if args.agcontext_path:
         add_agcontext_from_file(coco, args.agcontext_path)
     if args.collection_path:
@@ -93,6 +91,7 @@ def main(args=None):
 
     with args.out_path.open("w") as out:
         json.dump(coco, out, indent=4)
+
 
 if __name__ == "__main__":
     main()
