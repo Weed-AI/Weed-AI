@@ -64,6 +64,7 @@ for annotation in coco["annotations"]:
 for image in coco["images"]:
     image["resolution"] = image["width"] * image["height"]
     image["agcontext"] = id_lookup["agcontexts", image["agcontext_id"]]
+    image["sortKey"] = hash(image["file_name"])  # for deterministic random order
     _flatten(image["agcontext"], image, "agcontext")
     # todo: add license
     for annotation in image["annotations"]:

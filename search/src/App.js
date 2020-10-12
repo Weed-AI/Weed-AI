@@ -112,6 +112,7 @@ class App extends Component {
 					<ReactiveList
 						componentId="result"
 						title="Results"
+						sortOptions={[{"label": "random order", "dataField": "sortKey", "sortBy": "asc"}]}
 						from={0}
 						size={20}
 						{...makeProps("result", false)}
