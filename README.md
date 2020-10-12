@@ -50,7 +50,7 @@ The platform was developed by the Sydney Informatics Hub, a core research facili
 
 If you found WeedID useful in your research, please cite the database as: 
 
-INSERT_CITATION 
+CITATION TBA by mid 2021
 
 ## Specific Datasets 
 
