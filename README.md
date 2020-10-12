@@ -34,7 +34,7 @@ Annotation data is stored in the Weed-COCO format, an extension of MS COCO for w
 - Lighting  
 
 The format may also be applicable to related agricultural purposes.
-As with MS COCO, the format supports classification, bounding box and segmentation labels.
+As with MS COCO, the format supports classification, bounding box and segmentation labels indicating the presence of a specific or unknown species of weed.
 Reporting these details will help ensure consistency in published datasets for ease of comparison and use in further research and development.
 
 ![WeedID Data Flow](weedID-data-flow-diagram.png)
