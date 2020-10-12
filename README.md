@@ -42,7 +42,7 @@ Reporting these details will help ensure consistency in published datasets for e
 # Acknowledgements 
 
 This project has been funded by the Grains Research and Development Corporation.
-The platform was developed in a collaborative effort between University of Sydney research groups, the Sydney Informatics Hub, Australian Centre for Field Robotics and the Precision Weed Control Group. 
+The platform was developed by the Sydney Informatics Hub, a core research facility of the University of Sydney, as part of a research collaboration with the Australian Centre for Field Robotics and the Precision Weed Control Group at the University of Sydney.
 
 # Citation Guidelines 
 
