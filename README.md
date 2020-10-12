@@ -1,6 +1,6 @@
 # Welcome to the Weeds Imaging Database (WeedID). 
 
-WeedID Is an open source, searchable, weeds image platform designed to facilitate the research and development of machine learning algorithms for weed recognition in cropping systems.
+WeedID is an open source, searchable, weeds image platform designed to facilitate the research and development of machine learning algorithms for weed recognition in cropping systems.
 It brings together existing datasets, enables users to contribute their own data and pulls together custom datasets for straightforward download. 
 
 # Background 
