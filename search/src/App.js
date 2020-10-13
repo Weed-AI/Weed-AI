@@ -31,13 +31,13 @@ class App extends Component {
 				URLParams: true,
 				react: {
 					and: [
-					    "searchbox",
-					    "crop_type_filter",
-					    "category_filter",
-					    "grains_text_filter",
-					    "task_type_filter",
-					    "lighting_filter",
-					    "resslider",
+						"searchbox",
+						"crop_type_filter",
+						"category_filter",
+						"grains_text_filter",
+						"task_type_filter",
+						"lighting_filter",
+						"resslider",
 					]
 				},
 				...multilistFacetProps
