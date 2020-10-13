@@ -7,7 +7,6 @@ import {
 	ReactiveList,
 	SelectedFilters
 } from '@appbaseio/reactivesearch';
-import logo from '../logo.svg';
 import '../App.css';
 
 class ReactiveSearchComponent extends Component {
@@ -43,7 +42,7 @@ class ReactiveSearchComponent extends Component {
 		}
 
 		return (
-			
+
 			<ReactiveBase
 				app="weedid"
 				url="http://localhost:9200/"

@@ -9,7 +9,7 @@ const Navbar = ({ sticky }) => (
             <h1> WeedID Explorer</h1>
         </div>
         <ul className="navbar--link">
-            <li className="navbar--link-item">Home</li>
+            <li className="navbar--link-item">Welcome</li>
             <li className="navbar--link-item">About</li>
             <li className="navbar--link-item">Search</li>
         </ul>
