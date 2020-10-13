@@ -26,6 +26,10 @@ class App extends Component {
 				multilistFacetProps = {}
 			}
 			let facetProps = {
+				innerClass: {
+					title: "filter-title",
+					checkbox: "filter-checkbox"
+				},
 				queryFormat: "or",
 				URLParams: true,
 				react: {

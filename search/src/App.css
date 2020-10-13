@@ -36,3 +36,12 @@
     transform: rotate(360deg);
   }
 }
+
+/* TODO: use innerClass to get unpacked class name */
+.filter-checkbox + label::before {
+  border-color: white !important;
+}
+
+.filter-checkbox + label:hover::before {
+  border-color: #424242 !important;
+}
