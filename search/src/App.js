@@ -124,13 +124,16 @@ class App extends Component {
 											<ResultCard.Image
 												src={'thumbnails/' + item.thumbnail}
 											/>
-											<ResultCard.Title
-												dangerouslySetInnerHTML={{
-													__html: item.customer_phone
-												}}
-											/>
 											<ResultCard.Description>
-												{"Crop: " + item.agcontext__crop_type}
+												<ul class="annotations">
+												{
+													// TODO: make this more idiomatically React
+													Array.from(new Set(item.annotation__category__name)).map((annotName) => (
+														<li class={annotName.match(/^[^:]*/)[0]}>{annotName.match(/(?<=: ).*/)[0]}</li>
+													))
+												}
+												</ul>
+												{" in " + item.agcontext__grains_descriptive_text + " " + item.agcontext__crop_type}
 											</ResultCard.Description>
 										</ResultCard>
 									))

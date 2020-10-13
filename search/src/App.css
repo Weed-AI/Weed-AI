@@ -7,6 +7,27 @@
   pointer-events: none;
 }
 
+.annotations {
+	display: inline;
+	list-style-type: none;
+	padding: 0;
+}
+.annotations li {
+	display: inline-block;
+	font-weight: 700;
+	padding: .25em .4em;
+	border-radius: .25em;
+	margin: .1em;
+}
+.annotations li.weed {
+	color: white;
+	background: #dc3545;
+}
+.annotations li.crop {
+	color: white;
+	background: #28a745;
+}
+
 @media (prefers-reduced-motion: no-preference) {
   .App-logo {
     animation: App-logo-spin infinite 20s linear;
