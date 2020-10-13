@@ -6,16 +6,20 @@ It brings together existing datasets, enables users to contribute their own data
 # Background 
 
 Large numbers of high quality, annotated weed images are essential for the development of weed recognition algorithms that are accurate and reliable in complex biological systems.
-Accurate weed recognition enables the use of site-specific weed control (SSWC) in agricultural systems eliminating the need for wasteful whole field treatments.
+Accurate weed recognition enables the use of site-specific weed control (SSWC) in agricultural systems, eliminating the need for wasteful whole field treatments.
 This approach substantially reduces weed control inputs and creates opportunities for the introduction of alternative weed control technologies that were not previously feasible for use as indiscriminate whole field treatments.
 SSWC relies on accurate detection (is a weed present) and identification (what is the species/further information on morphology) of weeds in agricultural and environmental systems (crop, pastures, rangelands and non-crop areas, etc.).
 Camera-based weed recognition using deep learning algorithms has emerged as a frontrunner for in-crop site-specific control with an improved ability to handle variation.
-Training and development of algorithms require significant quantities of high-quality, annotated image data.
+
+Training and development of algorithms require significant quantities of high-quality, annotated images.
 WeedID is addressing this challenge by enabling the easy access and contribution of weed image data on an open source platform with search, dynamic filter and preview functions for custom dataset download capability. 
 
 # Data supported 
 
-Annotation data is stored in the Weed-COCO format, an extension of MS COCO for weed recognition in grain crops. Weed-COCO incorporates additional whole-dataset contextual information on: 
+To support the largest number of use cases and the unique demands of SSWC technology development, we have developed a standard for storing weed images and their anotations. 
+Our standard - WeedCOCO - is an extension on Microsoft's Common Objects in Context format (MS COCO). 
+WeedCOCO incorporates additional whole-dataset contextual information that provides descriptions of the agricultural context as well as details of how the images were capture.
+This "AgContext" includes:
 
 - Crop type 
 
@@ -36,6 +40,7 @@ Annotation data is stored in the Weed-COCO format, an extension of MS COCO for w
 The format may also be applicable to related agricultural purposes.
 As with MS COCO, the format supports classification, bounding box and segmentation labels indicating the presence of a specific or unknown species of weed.
 Reporting these details will help ensure consistency in published datasets for ease of comparison and use in further research and development.
+
 
 ![WeedID Data Flow](weedID-data-flow-diagram.png)
 
