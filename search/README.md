@@ -10,10 +10,16 @@ Reactive search failing to load? Might be an issue with react-scripts not being 
 
 Check if you have a working install with `npm ls react-scripts`. This works even with yarn as our package manager.
 
+### Rebuilding the index
+
+When changes are made to the schema, you will need to remove data that follows the old schema from the index.
+You can delete an index using `curl -XDELETE localhost:9200/weedid`
+
 
 ## Sources
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+
 
 ## Available Scripts
 
