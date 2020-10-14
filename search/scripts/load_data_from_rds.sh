@@ -1,4 +1,4 @@
-#! zsh
+#!/usr/bin/env zsh
 # Clean refresh of ES data and thumbnails given path to RDS
 # For use by the project team at the University of Sydney
 
