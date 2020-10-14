@@ -1,10 +1,9 @@
 # Starter Guide
 
-1. `docker-compose up`
-2. localhost:1337 for the reactive search UI
-3. localhost:5601 for kibana and elastic stack
-5. Run the python script for prepping data for elastic indexing
-6. Use elastic search bulk api via curl to post data to the front end
+1. `docker-compose up --build --force-recreate`
+2. Mount RDS and run `scripts/load_data_from_rds.sh` to load all prepared data
+3. Open http://localhost:1337 for the reactive search UI
+4. localhost:5601 for kibana and elastic stack
 
 ## Troubleshooting:
 
