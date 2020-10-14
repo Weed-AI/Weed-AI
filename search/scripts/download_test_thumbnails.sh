@@ -5,11 +5,13 @@ mkdir -p "$thumbnails_root"
 tmpd=$(mktemp -d)
 trap 'rm -rf "$tmpd"; rm -rf "$thumbnails_root"/Makefile' EXIT
 
+rds_cp='scp research-data-int.sydney.edu.au:/rds/PRJ-iweeds'
+
 cat > "$thumbnails_root"/Makefile <<EOF
 all: deepweeds cwfid digifarm-mungbeans artificial natural ginger
 
 deepweeds:
-	wget -O $tmpd/deepweeds.zip https://nextcloud.qriscloud.org.au/index.php/s/a3KxPawpqkiorST/download
+	wget -O $tmpd/deepweeds.zip https://drive.google.com/u/0/uc?export=download&confirm=C_v5&id=1xnK3B6K6KekDI55vwJ0vnc2IGoDga9cj
 	mkdir $tmpd/deepweeds
 	unzip -d $tmpd/deepweeds $tmpd/deepweeds.zip
 	rm -r $tmpd/deepweeds.zip

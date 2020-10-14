@@ -44,11 +44,14 @@ while [[ "$#" -gt 0 ]]; do
     shift
 done
 
-if [ $get_thumbs == 1 ]
+if [ "$get_thumbs" = 1 ]
 then
-	rm -r $repo_root/search/public/thumbnails/*
+	rm -rf $repo_root/search/public/thumbnails
+	mkdir $repo_root/search/public/thumbnails
 	$repo_root/search/scripts/download_test_thumbnails.sh
 fi
+
+curl -X DELETE $elastic_host"/weedid?pretty"
 
 scripts/index_test_images.sh
 
