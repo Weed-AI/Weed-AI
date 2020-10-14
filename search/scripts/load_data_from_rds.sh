@@ -116,7 +116,7 @@ python -m weedcoco.importers.voc \
 	--collection $dir/collection.yaml \
 	--agcontext $dir/agcontext.yaml \
 	-o $tmpd/coco_from_voc-test.weedcoco
-cat $tmpd/coco_from_voc-test.weedcoco | index_bulk --thumbnail-dir artificial
+cat $tmpd/coco_from_voc-test.weedcoco | index_bulk --thumbnail-dir natural
 
 dir=$rds_root/data/raw/SOLES/narrabri/2019-winter/20190803
 python -m weedcoco.importers.voc \
@@ -136,7 +136,7 @@ python -m weedcoco.importers.voc \
 	--collection $dir/collection.yaml \
 	--agcontext $dir/agcontext-mungbeans.yaml \
 	-o $tmpd/coco_from_voc-test.weedcoco
-cat $tmpd/coco_from_voc-test.weedcoco | index_bulk --thumbnail-dir artificial
+cat $tmpd/coco_from_voc-test.weedcoco | index_bulk --thumbnail-dir digifarm-mungbeans
 
 dir=$rds_root/data/raw/SOLES/cobbity/2020-winter/20201006/20201006-ld_wht_tos4_tw_19345061
 python -m weedcoco.importers.voc \
@@ -146,7 +146,7 @@ python -m weedcoco.importers.voc \
 	--collection $dir/collection.yaml \
 	--agcontext $dir/agcontext.yaml \
 	-o $tmpd/coco_from_voc-test.weedcoco
-cat $tmpd/coco_from_voc-test.weedcoco | index_bulk --thumbnail-dir artificial
+cat $tmpd/coco_from_voc-test.weedcoco | index_bulk --thumbnail-dir overcast
 
 dir=$rds_root/data/raw/SOLES/cobbity/2020-winter/20201006/20201006-ld_wht_tos4_tw_19110130
 python -m weedcoco.importers.voc \
@@ -156,7 +156,7 @@ python -m weedcoco.importers.voc \
 	--collection $dir/collection.yaml \
 	--agcontext $dir/agcontext.yaml \
 	-o $tmpd/coco_from_voc-test.weedcoco
-cat $tmpd/coco_from_voc-test.weedcoco | index_bulk --thumbnail-dir artificial
+cat $tmpd/coco_from_voc-test.weedcoco | index_bulk --thumbnail-dir overcast
 
 dir=$rds_root/data/raw/SOLES/cobbity/2020-winter/20200923/20200923-ld_why_tos4_tw_19345061
 python -m weedcoco.importers.voc \
@@ -166,7 +166,7 @@ python -m weedcoco.importers.voc \
 	--collection $dir/collection.yaml \
 	--agcontext $dir/agcontext.yaml \
 	-o $tmpd/coco_from_voc-test.weedcoco
-cat $tmpd/coco_from_voc-test.weedcoco | index_bulk --thumbnail-dir artificial
+cat $tmpd/coco_from_voc-test.weedcoco | index_bulk --thumbnail-dir natural
 
 dir=$rds_root/data/raw/SOLES/cobbity/2020-winter/20200923/20200923-ld_wht_tos4_tw_19110130
 python -m weedcoco.importers.voc \
@@ -176,4 +176,4 @@ python -m weedcoco.importers.voc \
 	--collection $dir/collection.yaml \
 	--agcontext $dir/agcontext.yaml \
 	-o $tmpd/coco_from_voc-test.weedcoco
-cat $tmpd/coco_from_voc-test.weedcoco | index_bulk --thumbnail-dir artificial
+cat $tmpd/coco_from_voc-test.weedcoco | index_bulk --thumbnail-dir natural

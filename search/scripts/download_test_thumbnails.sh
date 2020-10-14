@@ -65,8 +65,23 @@ artificial:
 natural:
 	mkdir $tmpd/natural
 	$rds_cp/data/raw/SOLES/narrabri/2019-winter/20190729/img/*.jpg $tmpd/natural
+	$rds_cp/data/raw/SOLES/cobbity/2020-winter/20200923/20200923-ld_wht_tos4_tw_19110130/img/*.jpg $tmpd/natural
+	$rds_cp/data/raw/SOLES/cobbity/2020-winter/20200923/20200923-ld_why_tos4_tw_19345061/img/*.jpg $tmpd/natural
 	find $tmpd/natural/ -name "*.jpg" -exec magick "{}" -resize 300x300 '{}' ';'
 	mv $tmpd/natural .
+
+natural2:
+	mkdir $tmpd/natural2
+	$rds_cp/data/raw/SOLES/narrabri/2019-winter/20190803/img/*.jpg $tmpd/natural2
+	find $tmpd/natural2/ -name "*.jpg" -exec magick "{}" -resize 300x300 '{}' ';'
+	mv $tmpd/natural2 .
+
+overcast:
+	mkdir $tmpd/overcast
+	$rds_cp/data/raw/SOLES/cobbity/2020-winter/20201006/20201006-ld_wht_tos4_tw_19345061/img/*.jpg $tmpd/overcast
+	$rds_cp/data/raw/SOLES/cobbity/2020-winter/20201006/20201006-ld_wht_tos4_tw_19110130/img/*.jpg $tmpd/overcast
+	find $tmpd/overcast/ -name "*.jpg" -exec magick "{}" -resize 300x300 '{}' ';'
+	mv $tmpd/overcast .
 
 ginger:
 	mkdir $tmpd/ginger
