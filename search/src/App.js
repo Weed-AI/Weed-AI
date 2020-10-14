@@ -147,6 +147,7 @@ class App extends Component {
 						componentId="result"
 						dataField="results"
 						title="Results"
+						sortOptions={[{"label": "random order", "dataField": "sortKey", "sortBy": "asc"}]}
 						from={0}
 						size={20}
 						{...makeProps("result", false)}
