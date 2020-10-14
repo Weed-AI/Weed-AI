@@ -7,17 +7,17 @@ import {
 	ReactiveList,
 	SelectedFilters
 } from '@appbaseio/reactivesearch';
-import logo from './logo.svg';
-import './App.css';
+import logo from '../logo.svg';
+import '../App.css';
 
-class App extends Component {
+class ReactiveSearchComponent extends Component {
+
 	render() {
 		let makeProps = function (id, ismultilist) {
 			let multilistFacetProps = {
 				showCheckbox: true,
 				showCount: true,
 				showFilter: true,
-				showSearch: false,
 				style: {
 					padding: "5px",
 					marginTop: "10px"
@@ -27,22 +27,10 @@ class App extends Component {
 				multilistFacetProps = {}
 			}
 			let facetProps = {
-				innerClass: {
-					title: "filter-title",
-					checkbox: "filter-checkbox"
-				},
 				queryFormat: "or",
 				URLParams: true,
 				react: {
-					and: [
-						"searchbox",
-						"crop_type_filter",
-						"category_filter",
-						"grains_text_filter",
-						"task_type_filter",
-						"lighting_filter",
-						"resslider",
-					]
+					and: ["searchbox", "resslider", "agcontextfilter", "categoryfilter", "grainstextfilter"]
 				},
 				...multilistFacetProps
 			}
@@ -55,6 +43,7 @@ class App extends Component {
 		}
 
 		return (
+			
 			<ReactiveBase
 				app="weedid"
 				url="http://localhost:9200/"
@@ -73,29 +62,28 @@ class App extends Component {
 			>
 				<div style={{ position: "fixed", width: "20rem", overflow: "scroll", height: "100%" }}>
 					<MultiList
-						componentId="crop_type_filter"
-						title="Crop Type"
-						dataField="agcontext__crop_type.keyword"
-						sortBy="asc"
-						selectAllLabel="All types"
-						placeholder="Search types"
-						filterLabel="Types"
-						{...makeProps("crop_type_filter", true)}
-					/>
-					<MultiList
-						componentId="category_filter"
-						title="Annotated Species"
+						componentId="categoryfilter"
+						title="Filter by species"
 						dataField="annotation__category__name.keyword"
 						sortBy="asc"
 						selectAllLabel="All species"
 						placeholder="Search Species"
 						filterLabel="Species"
 						{...makeProps("categoryfilter", true)}
-                        showSearch={true}
 					/>
 					<MultiList
-						componentId="grains_text_filter"
-						title="Crop Growth Stage"
+						componentId="agcontextfilter"
+						title="Filter by Collection"
+						dataField="agcontext__agcontext_name.keyword"
+						sortBy="asc"
+						selectAllLabel="All collections"
+						placeholder="Search collection"
+						filterLabel="Agcontext"
+						{...makeProps("agcontextfilter", true)}
+					/>
+					<MultiList
+						componentId="grainstextfilter"
+						title="Filter by Growth Stage"
 						dataField="agcontext__grains_descriptive_text.keyword"
 						sortBy="asc"
 						selectAllLabel="All growth stages"
@@ -103,30 +91,10 @@ class App extends Component {
 						filterLabel="Growth stage"
 						{...makeProps("grainstextfilter", true)}
 					/>
-					<MultiList
-						componentId="task_type_filter"
-						title="Computer Vision Task"
-						dataField="task_type.keyword"
-						sortBy="asc"
-						selectAllLabel="All tasks"
-						placeholder="Search Tasks"
-						filterLabel="Tasks"
-						{...makeProps("task_type_filter", true)}
-					/>
-					<MultiList
-						componentId="lighting_filter"
-						title="Lighting Mode"
-						dataField="agcontext__lighting.keyword"
-						sortBy="asc"
-						selectAllLabel="All lighting"
-						placeholder="Search Lighting"
-						filterLabel="Lighting"
-						{...makeProps("lighting_filter", true)}
-					/>
 					<RangeSlider
 						componentId="resslider"
 						dataField="resolution"
-						title="Image Resolution (pixels)"
+						title="Resolution (pixels)"
 						range={{
 							"start": 0,
 							"end": 1500000
@@ -145,7 +113,6 @@ class App extends Component {
 					<SelectedFilters />
 					<ReactiveList
 						componentId="result"
-						dataField="results"
 						title="Results"
 						from={0}
 						size={20}
@@ -159,16 +126,13 @@ class App extends Component {
 											<ResultCard.Image
 												src={'thumbnails/' + item.thumbnail}
 											/>
+											<ResultCard.Title
+												dangerouslySetInnerHTML={{
+													__html: item.customer_phone
+												}}
+											/>
 											<ResultCard.Description>
-												<ul class="annotations">
-												{
-													// TODO: make this more idiomatically React
-													Array.from(new Set(item.annotation__category__name)).map((annotName) => (
-														<li class={annotName.match(/^[^:]*/)[0]}>{annotName.match(/(?<=: ).*/)[0]}</li>
-													))
-												}
-												</ul>
-												{" in " + item.agcontext__grains_descriptive_text + " " + item.agcontext__crop_type}
+												{"Crop: " + item.agcontext__crop_type}
 											</ResultCard.Description>
 										</ResultCard>
 									))
@@ -182,4 +146,4 @@ class App extends Component {
 	}
 }
 
-export default App;
+export default ReactiveSearchComponent;

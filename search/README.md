@@ -2,13 +2,16 @@
 
 1. `docker-compose up`
 2. localhost:1337 for the reactive search UI
-3. localhost:5601 for kibana and elastic stach
+3. localhost:5601 for kibana and elastic stack
+5. Run the python script for prepping data for elastic indexing
+6. Use elastic search bulk api via curl to post data to the front end
 
 ## Troubleshooting:
 
 Reactive search failing to load? Might be an issue with react-scripts not being installed.
 
 Check if you have a working install with `npm ls react-scripts`. This works even with yarn as our package manager.
+
 
 ### Rebuilding the index
 

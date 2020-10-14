@@ -66,9 +66,19 @@ for image in coco["images"]:
     image["agcontext"] = id_lookup["agcontexts", image["agcontext_id"]]
     _flatten(image["agcontext"], image, "agcontext")
     # todo: add license
+    image["task_type"] = set()
     for annotation in image["annotations"]:
         for k in annotation:
             image.setdefault(f"annotation__{k}", []).append(annotation[k])
+
+        # determine available task types
+        image["task_type"].add("classification")
+        if "segmentation" in annotation:
+            image["task_type"].add("segmentation")
+            image["task_type"].add("bounding box")
+        if "bbox" in annotation:
+            image["task_type"].add("bounding box")
+    image["task_type"] = sorted(image["task_type"])
 
 f = sys.stdout
 f.write("\n")
