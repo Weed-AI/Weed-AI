@@ -1,11 +1,33 @@
 #! zsh
 mypath=$0:A
+
+usage() {
+	echo $0 "[OPTIONS]" >&2
+	echo Options: >&2
+	echo " -r|--rds      Set the path to the iweeds RDS" >&2
+	exit 1
+}
+
+while [[ "$#" -gt 0 ]]; do
+    case $1 in
+        -h|--help) usage ;;
+        -r|--rds) rds_root="$2"; shift ;;
+        *) echo "Unknown parameter passed: $1"; usage ;;
+    esac
+    shift
+done
+
 thumbnails_root=$(dirname "$mypath")/../public/thumbnails
 mkdir -p "$thumbnails_root"
 tmpd=$(mktemp -d)
 trap 'rm -rf "$tmpd"; rm -rf "$thumbnails_root"/Makefile' EXIT
 
-rds_cp='$rds_cp'
+if [ -n "$rds_root" ]
+then
+	rds_cp='cp -r "'$rds_root'"'
+else
+	rds_cp='scp -r research-data-int.sydney.edu.au:/rds/PRJ-iweeds'
+fi
 
 cat > "$thumbnails_root"/Makefile <<EOF
 all: deepweeds cwfid digifarm-mungbeans artificial natural ginger
@@ -19,7 +41,8 @@ deepweeds:
 	mv $tmpd/deepweeds .
 	
 cwfid:
-	cd $tmpd && git clone https://github.com/cwfid/dataset && cd -
+	mkdir $tmpd/dataset
+	$rds_cp/external_datasets/raw/cwfid/dataset $tmpd/
 	mkdir cwfid
 	find $tmpd/dataset/images -name "*.png" -exec magick "{}" -resize 300x300 '{}' ';'
 	mv $tmpd/dataset/images/*.png cwfid/

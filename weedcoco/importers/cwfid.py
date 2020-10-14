@@ -20,7 +20,7 @@ ap = argparse.ArgumentParser(description=__doc__)
 ap.add_argument("--annotations-dir", default="annotations", type=pathlib.Path)
 ap.add_argument("--image-dir", default="cwfid_images", type=pathlib.Path)
 ap.add_argument("-o", "--out-path", default="cwfid_imageinfo.json", type=pathlib.Path)
-ap.add_argument("--split-path", default=".", type=pathlib.Path)
+ap.add_argument("--split-path", default="train_test_split.yaml", type=pathlib.Path)
 args = ap.parse_args()
 
 
@@ -179,8 +179,7 @@ for ann_path in progress:
         }
     ]
 
-subset_path = args.split_path / "train_test_split.yaml"
-with open(subset_path) as subset_file:
+with args.split_path.open() as subset_file:
     subsets = yaml.safe_load(subset_file)
 
     # TODO: iterate over value key pairs and create individual collection membership per image.
