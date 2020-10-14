@@ -26,26 +26,26 @@ cwfid:
 
 digifarm-mungbeans:
 	mkdir $tmpd/digifarm-mungbeans
-	scp research-data-int.sydney.edu.au:/rds/PRJ-iweeds/Narrabri/digifarm/mungbeans/*/images/*.jpg $tmpd/digifarm-mungbeans
+	scp research-data-int.sydney.edu.au:/rds/PRJ-iweeds/data/raw/SOLES/narrabri/2020-summer/20200402/img/*.jpg $tmpd/digifarm-mungbeans
 	find $tmpd/digifarm-mungbeans/ -name "*.jpg" -exec magick "{}" -resize 300x300 '{}' ';'
 	mv $tmpd/digifarm-mungbeans .
 
 
 artificial:
 	mkdir $tmpd/artificial
-	scp research-data-int.sydney.edu.au:/rds/PRJ-iweeds/Narrabri/artificial_illumination/20190728_Z16/images/*.jpg $tmpd/artificial
+	scp research-data-int.sydney.edu.au:/rds/PRJ-iweeds/data/raw/SOLES/narrabri/2019-winter/20190728/img/*.jpg $tmpd/artificial
 	find $tmpd/artificial/ -name "*.jpg" -exec magick "{}" -resize 300x300 '{}' ';'
 	mv $tmpd/artificial .
 
 natural:
 	mkdir $tmpd/natural
-	scp research-data-int.sydney.edu.au:/rds/PRJ-iweeds/Narrabri/natural_illumination/*/images/*.jpg $tmpd/natural
+	scp research-data-int.sydney.edu.au:/rds/PRJ-iweeds/data/raw/SOLES/narrabri/2019-winter/20190729/img/*.jpg $tmpd/natural
 	find $tmpd/natural/ -name "*.jpg" -exec magick "{}" -resize 300x300 '{}' ';'
 	mv $tmpd/natural .
 
 ginger:
 	mkdir $tmpd/ginger
-	scp research-data-int.sydney.edu.au:/rds/PRJ-iweeds/Ginger/artificial/img/*.png $tmpd/ginger
+	scp research-data-int.sydney.edu.au:/rds/PRJ-iweeds/data/raw/SOLES/chromakey/2020-spring/20200804/20200804-ginger-shed/img/*.png $tmpd/ginger
 	find $tmpd/ginger/ -name "*.png" -exec magick "{}" -resize 300x300 '{}' ';'
 	mv $tmpd/ginger .
 EOF
