@@ -4,7 +4,7 @@ mypath=$0:A
 repo_root=$(dirname "$mypath")/../../
 
 conv() {
-    python "$repo_root"'/search/scripts/weedcoco-to-elastic-index-bulk.py' "$@"
+    python "$repo_root"'/search/scripts/weedcoco_to_elastic_index_bulk.py' "$@"
 }
 
 (
