@@ -81,7 +81,7 @@ then
 fi
 
 index_bulk() {
-    python "$repo_root"'/search/scripts/weedcoco-to-elastic-index-bulk.py' "$@" |
+    python "$repo_root"'/search/scripts/weedcoco_to_elastic_index_bulk.py' "$@" |
 		curl -X POST $elastic_host/_bulk -H 'Content-Type: application/json' --data-binary @-
 }
 
