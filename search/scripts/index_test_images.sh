@@ -6,6 +6,8 @@ repo_root=$(dirname "$mypath")/../../
 if [ -n "$1" ]
 then
 	elastic_host="$1"
+else
+	elastic_host=http://localhost:9200
 fi
 
 conv() {
