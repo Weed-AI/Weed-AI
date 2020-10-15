@@ -126,7 +126,7 @@ python -m weedcoco.importers.voc \
 	--collection $dir/collection.yaml \
 	--agcontext $dir/agcontext.yaml \
 	-o $tmpd/coco_from_voc-test.weedcoco
-cat $tmpd/coco_from_voc-test.weedcoco | index_bulk --thumbnail-dir artificial
+cat $tmpd/coco_from_voc-test.weedcoco | index_bulk --thumbnail-dir natural2
 
 dir=$rds_root/data/raw/SOLES/narrabri/2020-summer/20200402
 python -m weedcoco.importers.voc \
