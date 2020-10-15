@@ -11,4 +11,4 @@ CMD ["yarn", "start"]
 
 
 # for production:
-# COPY . /code
+COPY . /code
