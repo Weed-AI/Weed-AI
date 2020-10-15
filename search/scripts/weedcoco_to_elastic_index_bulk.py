@@ -62,7 +62,10 @@ for annotation in coco["annotations"]:
         image["thumbnail"] = image["file_name"]
 
 for image in coco["images"]:
-    image["resolution"] = image["width"] * image["height"]
+    try:
+        image["resolution"] = image["width"] * image["height"]
+    except KeyError:
+        pass
     image["agcontext"] = id_lookup["agcontexts", image["agcontext_id"]]
     image["sortKey"] = hash(image["file_name"])  # for deterministic random order
     _flatten(image["agcontext"], image, "agcontext")

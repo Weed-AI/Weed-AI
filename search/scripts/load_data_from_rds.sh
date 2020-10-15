@@ -96,7 +96,7 @@ python -m weedcoco.importers.cwfid \
 	--image-dir "$rds_root"/external_datasets/raw/cwfid/dataset/images \
 	--split-path "$rds_root"/external_datasets/raw/cwfid/dataset/train_test_split.yaml \
 	-o $tmpd/cwfid.weedcoco
-cat $tmpd/cwfid.weedcoco | index_bulk --thumbnail-dir deepweeds
+cat $tmpd/cwfid.weedcoco | index_bulk --thumbnail-dir cwfid
 
 dir=$rds_root/data/raw/SOLES/narrabri/2019-winter/20190728
 python -m weedcoco.importers.voc \
