@@ -1,13 +1,15 @@
 FROM node:10
 RUN mkdir /code
 WORKDIR /code
-COPY . /code/
+COPY package.json yarn.lock /code/
 RUN ["yarn", "install"]
+RUN apt-get update && \
+      apt-get -y install sudo
 
 # replace this with your application's default port
-EXPOSE 80
+EXPOSE 3000
 # TODO: work out how to install in build and keep node_modules despite VOLUME...
-CMD ["yarn", "start"]
+CMD ["sudo", "yarn", "start"]
 
 
 # for production:
