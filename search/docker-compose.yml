@@ -45,6 +45,13 @@ services:
       timeout: 30s
       retries: 3
 
+  reactbuild:
+    image: reactbuild
+    container_name: reactbuild
+    build:
+      context: .
+      dockerfile: Dockerfile.build
+
   reactivesearch:
     image: my-reactivesearch
     container_name: reactivesearch
