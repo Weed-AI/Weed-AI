@@ -57,7 +57,7 @@ class App extends Component {
 		return (
 			<ReactiveBase
 				app="weedid"
-				url="http://localhost:9200/"
+				url="/elasticsearch/"
 				theme={{
 					typography: {
 						fontFamily: 'Raleway, Helvetica, sans-serif',
