@@ -1,5 +1,51 @@
 version: "3"
 services:
+  # nginx reverse proxy
+  reverse-proxy:
+    image: reverse-proxy
+    container_name: reverse_proxy
+    depends_on:
+        - controller
+        - reactivesearch
+        - kibana
+    build:
+        context: ./nginx/nginx
+    ports:
+      - "80:80"
+    networks:
+      - elastic
+
+  # django controller
+  controller:
+    image: controller
+    container_name: controller
+    depends_on:
+      - elasticsearch
+      - db
+    build:
+        context: ./controller
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - ./controller/:/code
+    ports:
+      - "8000:8000"
+    networks:
+      - elastic
+
+  db:
+    image: postgres:12.0-alpine
+    container_name: db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=reactivesearch
+    ports:
+      - "5432:5432"
+    networks:
+      - elastic
+
   # search engine
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch-oss:7.8.1
@@ -8,7 +54,8 @@ services:
       - discovery.type=single-node
       - http.port=9200
       - http.cors.enabled=true
-      - http.cors.allow-origin=http://localhost:1358,http://127.0.0.1:1358,http://localhost:1337,http://127.0.0.1:1337
+      # - http.cors.allow-origin=http://localhost:1358,http://127.0.0.1:1358,http://localhost:1337,http://127.0.0.1:1337,http://localhost:8000
+      - http.cors.allow-origin=*
       - http.cors.allow-headers=X-Requested-With,X-Auth-Token,Content-Type,Content-Length,Authorization
       - http.cors.allow-credentials=true
       - bootstrap.memory_lock=true
@@ -29,14 +76,16 @@ services:
       interval: 30s
       timeout: 30s
       retries: 3
+
   reactivesearch:
     image: my-reactivesearch
+    container_name: reactivesearch
     build: .
-    volumes:
-      - ./:/code # for development
-      - /code/node_modules # an exception from the above volume
+    # volumes:
+    #   - ./:/code # for development
+    #   - /code/node_modules # an exception from the above volume
     ports:
-      - "1337:3000"
+      - "8080:80"
     environment:
       - NODE_ENV=production
     networks:
@@ -51,6 +100,7 @@ services:
     environment:
       ELASTICSEARCH_URL: http://elasticsearch:9200
       ELASTICSEARCH_HOSTS: http://elasticsearch:9200
+      SERVER_BASEPATH: /dashboard
     networks:
       - elastic
 
@@ -61,3 +111,4 @@ networks:
 volumes:
   esdata1:
     driver: local
+  postgres_data:
