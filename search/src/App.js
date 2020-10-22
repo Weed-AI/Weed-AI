@@ -54,10 +54,12 @@ class App extends Component {
 			return (facetProps)
 		}
 
+		const esURL = new URL(window.location);
+
 		return (
 			<ReactiveBase
 				app="weedid"
-				url="http://wdidpa00000.srv.sydney.edu.au/elasticsearch/"
+				url={esURL + "controller/elasticsearch/"}
 				theme={{
 					typography: {
 						fontFamily: 'Raleway, Helvetica, sans-serif',
