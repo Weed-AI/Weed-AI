@@ -54,7 +54,7 @@ class App extends Component {
 			return (facetProps)
 		}
 
-		const esURL = new URL(window.location);
+		const esURL = new URL(window.location.origin);
 
 		return (
 			<ReactiveBase
