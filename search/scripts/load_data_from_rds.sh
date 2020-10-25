@@ -30,9 +30,9 @@ if [ -d /Volumes/research-data/PRJ-iweeds ]
 then
 	rds_root=/Volumes/research-data/PRJ-iweeds 
 else
-	rds_root=/rds/PRJ-iweeds
+	rds_root=Volumes/PRJ-iweeds
 fi
-elastic_host=http://localhost:9200
+elastic_host=http://wdidpa00000.srv.sydney.edu.au/elasticsearch/
 get_thumbs=1
 wipe_thumbs=0
 demo_mode=0
