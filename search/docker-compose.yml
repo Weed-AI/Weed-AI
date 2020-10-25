@@ -23,7 +23,9 @@ services:
       - elasticsearch
       - db
     build:
-        context: ./controller
+      context: ./controller
+    environment:
+      SECRET_DJANGO_FILE: /run/secrets/secret_django
     command: python manage.py runserver 0.0.0.0:8000
     # volumes:
     #   - ./controller/:/code
@@ -31,6 +33,8 @@ services:
       - "8000:8000"
     networks:
       - elastic
+    secrets:
+      - secret_django
 
   db:
     image: postgres:12.0-alpine
@@ -107,6 +111,10 @@ services:
 networks:
   elastic:
     driver: bridge
+
+secrets:
+  secret_django:
+    file: ./docker-secrets/secret_django.txt
 
 volumes:
   esdata1:

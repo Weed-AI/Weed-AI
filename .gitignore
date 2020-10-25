@@ -24,3 +24,6 @@ weedcoco/concatenation/*.json
 
 # Dev Tools
 .vscode/settings.json
+
+# Docker Secrets
+search/docker-secrets
