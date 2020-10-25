@@ -30,9 +30,9 @@ if [ -d /Volumes/research-data/PRJ-iweeds ]
 then
 	rds_root=/Volumes/research-data/PRJ-iweeds 
 else
-	rds_root=/rds/PRJ-iweeds
+	rds_root=Volumes/PRJ-iweeds
 fi
-elastic_host=http://localhost:9200
+elastic_host=http://wdidpa00000.srv.sydney.edu.au/elasticsearch/
 get_thumbs=1
 wipe_thumbs=0
 demo_mode=0
@@ -96,7 +96,7 @@ python -m weedcoco.importers.cwfid \
 	--image-dir "$rds_root"/external_datasets/raw/cwfid/dataset/images \
 	--split-path "$rds_root"/external_datasets/raw/cwfid/dataset/train_test_split.yaml \
 	-o $tmpd/cwfid.weedcoco
-cat $tmpd/cwfid.weedcoco | index_bulk --thumbnail-dir deepweeds
+cat $tmpd/cwfid.weedcoco | index_bulk --thumbnail-dir cwfid
 
 dir=$rds_root/data/raw/SOLES/narrabri/2019-winter/20190728
 python -m weedcoco.importers.voc \
@@ -107,3 +107,73 @@ python -m weedcoco.importers.voc \
 	--agcontext $dir/agcontext.yaml \
 	-o $tmpd/coco_from_voc-test.weedcoco
 cat $tmpd/coco_from_voc-test.weedcoco | index_bulk --thumbnail-dir artificial
+
+dir=$rds_root/data/raw/SOLES/narrabri/2019-winter/20190729
+python -m weedcoco.importers.voc \
+	--voc-dir $dir/voc \
+	--image-dir $dir/img \
+	--category-name-map $dir/category-name-map.yaml \
+	--collection $dir/collection.yaml \
+	--agcontext $dir/agcontext.yaml \
+	-o $tmpd/coco_from_voc-test.weedcoco
+cat $tmpd/coco_from_voc-test.weedcoco | index_bulk --thumbnail-dir natural
+
+dir=$rds_root/data/raw/SOLES/narrabri/2019-winter/20190803
+python -m weedcoco.importers.voc \
+	--voc-dir $dir/voc \
+	--image-dir $dir/img \
+	--category-name-map $dir/category-name-map.yaml \
+	--collection $dir/collection.yaml \
+	--agcontext $dir/agcontext.yaml \
+	-o $tmpd/coco_from_voc-test.weedcoco
+cat $tmpd/coco_from_voc-test.weedcoco | index_bulk --thumbnail-dir natural2
+
+dir=$rds_root/data/raw/SOLES/narrabri/2020-summer/20200402
+python -m weedcoco.importers.voc \
+	--voc-dir $dir/voc \
+	--image-dir $dir/img \
+	--category-name-map $dir/category-name-map.yaml \
+	--collection $dir/collection.yaml \
+	--agcontext $dir/agcontext-mungbeans.yaml \
+	-o $tmpd/coco_from_voc-test.weedcoco
+cat $tmpd/coco_from_voc-test.weedcoco | index_bulk --thumbnail-dir digifarm-mungbeans
+
+dir=$rds_root/data/raw/SOLES/cobbity/2020-winter/20201006/20201006-ld_wht_tos4_tw_19345061
+python -m weedcoco.importers.voc \
+	--voc-dir $dir/voc \
+	--image-dir $dir/img \
+	--category-name-map $dir/category-name-map.yaml \
+	--collection $dir/collection.yaml \
+	--agcontext $dir/agcontext.yaml \
+	-o $tmpd/coco_from_voc-test.weedcoco
+cat $tmpd/coco_from_voc-test.weedcoco | index_bulk --thumbnail-dir overcast
+
+dir=$rds_root/data/raw/SOLES/cobbity/2020-winter/20201006/20201006-ld_wht_tos4_tw_19110130
+python -m weedcoco.importers.voc \
+	--voc-dir $dir/voc \
+	--image-dir $dir/img \
+	--category-name-map $dir/category-name-map.yaml \
+	--collection $dir/collection.yaml \
+	--agcontext $dir/agcontext.yaml \
+	-o $tmpd/coco_from_voc-test.weedcoco
+cat $tmpd/coco_from_voc-test.weedcoco | index_bulk --thumbnail-dir overcast
+
+dir=$rds_root/data/raw/SOLES/cobbity/2020-winter/20200923/20200923-ld_why_tos4_tw_19345061
+python -m weedcoco.importers.voc \
+	--voc-dir $dir/voc \
+	--image-dir $dir/img \
+	--category-name-map $dir/category-name-map.yaml \
+	--collection $dir/collection.yaml \
+	--agcontext $dir/agcontext.yaml \
+	-o $tmpd/coco_from_voc-test.weedcoco
+cat $tmpd/coco_from_voc-test.weedcoco | index_bulk --thumbnail-dir natural
+
+dir=$rds_root/data/raw/SOLES/cobbity/2020-winter/20200923/20200923-ld_wht_tos4_tw_19110130
+python -m weedcoco.importers.voc \
+	--voc-dir $dir/voc \
+	--image-dir $dir/img \
+	--category-name-map $dir/category-name-map.yaml \
+	--collection $dir/collection.yaml \
+	--agcontext $dir/agcontext.yaml \
+	-o $tmpd/coco_from_voc-test.weedcoco
+cat $tmpd/coco_from_voc-test.weedcoco | index_bulk --thumbnail-dir natural
