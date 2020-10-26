@@ -25,7 +25,7 @@ services:
     build:
       context: ./controller
     environment:
-      SECRET_DJANGO_FILE: /run/secrets/secret_django
+      - DJANGO_SECRET_KEY=${DJANGO_SECRET_KEY}
     command: python manage.py runserver 0.0.0.0:8000
     # volumes:
     #   - ./controller/:/code
@@ -33,8 +33,6 @@ services:
       - "8000:8000"
     networks:
       - elastic
-    secrets:
-      - secret_django
 
   db:
     image: postgres:12.0-alpine
@@ -42,9 +40,9 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data/
     environment:
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
-      - POSTGRES_DB=reactivesearch
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
     ports:
       - "5432:5432"
     networks:
@@ -111,10 +109,6 @@ services:
 networks:
   elastic:
     driver: bridge
-
-secrets:
-  secret_django:
-    file: ./docker-secrets/secret_django.txt
 
 volumes:
   esdata1:
