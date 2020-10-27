@@ -14,6 +14,7 @@ requirements = [
     "pillow",
     "pyyaml",
     "tqdm",
+    "imagehash",
 ]
 
 setup(

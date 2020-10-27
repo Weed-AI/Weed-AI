@@ -4,6 +4,7 @@ import warnings
 
 import PIL.Image
 import yaml
+import imagehash
 
 
 def get_image_dimensions(path):
@@ -50,3 +51,8 @@ def add_collection_from_file(coco, collection_path):
         for annotation in coco["annotations"]
     ]
     return coco
+
+
+def get_image_average_hash(path):
+    """Return an average hash of an image"""
+    return str(imagehash.average_hash(PIL.Image.open(path)))
