@@ -55,4 +55,4 @@ def add_collection_from_file(coco, collection_path):
 
 def get_image_average_hash(path):
     """Return an average hash of an image"""
-    return str(imagehash.average_hash(PIL.Image.open(path)))
+    return str(imagehash.average_hash(PIL.Image.open(path), hash_size=16))
