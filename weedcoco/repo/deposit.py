@@ -57,7 +57,7 @@ def setup_dataset_dir(repository_dir):
 
 def create_image_hash(image_dir):
     return {
-        image_name: f"{get_image_average_hash(image_dir / image_name)}{os.path.splitext(image_name)[-1]}"
+        image_name: f"{get_image_average_hash(image_dir / image_name, 16)}{os.path.splitext(image_name)[-1]}"
         for image_name in os.listdir(image_dir)
         if image_name.lower().endswith((".png", ".jpg", ".jpeg", ".tiff"))
     }
