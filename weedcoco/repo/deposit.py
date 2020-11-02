@@ -40,7 +40,7 @@ def get_all_existing_hash(repository_dir):
 def setup_dataset_dir(repository_dir):
     if not os.path.isdir(repository_dir):
         os.mkdir(repository_dir)
-        dataset_dir = repository_dir / "dataset_0"
+        dataset_dir = repository_dir / "dataset_1"
     else:
         latest_dataset_dir_index = max(
             [
@@ -69,9 +69,10 @@ def migrate_images(dataset_dir, raw_dir, image_hash):
         os.mkdir(image_dir)
 
     for image_origin in os.listdir(raw_dir):
-        image_path = dataset_dir / "images" / image_hash[image_origin]
-        if not os.path.isfile(image_path):
-            copyfile(raw_dir / image_origin, image_path)
+        if image_origin.lower().endswith((".png", ".jpg", ".jpeg", ".tiff")):
+            image_path = dataset_dir / "images" / image_hash[image_origin]
+            if not os.path.isfile(image_path):
+                copyfile(raw_dir / image_origin, image_path)
 
 
 def deposit_weedcoco(weedcoco_path, dataset_dir, image_dir, image_hash):
@@ -87,14 +88,14 @@ def deposit_weedcoco(weedcoco_path, dataset_dir, image_dir, image_hash):
         json.dump(weedcoco, out, indent=4)
 
 
-def main():
+def main(args=None):
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument(
         "--weedcoco-path", default="cwfid_imageinfo.json", type=pathlib.Path
     )
     ap.add_argument("--image-dir", default="cwfid_images", type=pathlib.Path)
     ap.add_argument("--repository-dir", default="repository", type=pathlib.Path)
-    args = ap.parse_args()
+    args = ap.parse_args(args)
 
     image_hash = create_image_hash(args.image_dir)
     validate_duplicate_images(image_hash)
