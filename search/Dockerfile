@@ -28,6 +28,5 @@ RUN cd /code && find . && yarn install && yarn run build
 
 RUN mkdir /app
 RUN cp -R /code/build/* /app/
-RUN cp /tmp/code/ /app
 
 COPY ./nginx/react/nginx.conf /etc/nginx/nginx.conf
