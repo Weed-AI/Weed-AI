@@ -82,10 +82,12 @@ services:
   reactivesearch:
     image: my-reactivesearch
     container_name: reactivesearch
-    build: .
-    # volumes:
-    #   - ./:/code # for development
-    #   - /code/node_modules # an exception from the above volume
+    build:
+      context: .
+      dockerfile:  ${reactivesearch_dockerfile:-Dockerfile}
+    volumes:
+       - ./:/code # for development, unused in production
+       - /code/node_modules # an exception from the above volume
     ports:
       - "8080:80"
     environment:
@@ -93,6 +95,8 @@ services:
     networks:
       - elastic
     stdin_open: true
+    depends_on:
+      - elasticsearch
 
   # kibana as another elastic search UI
   kibana:
