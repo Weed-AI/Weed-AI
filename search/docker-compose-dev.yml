@@ -24,10 +24,12 @@ services:
       - db
     build:
       context: ./controller
-      dockerfile:  Dockerfile
+      dockerfile:  Dockerfile-dev
     environment:
       - DJANGO_SECRET_KEY=${DJANGO_SECRET_KEY}
     command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - ./controller/:/code
     ports:
       - "8000:8000"
     networks:
@@ -83,7 +85,10 @@ services:
     container_name: reactivesearch
     build:
       context: .
-      dockerfile:  Dockerfile
+      dockerfile:  Dockerfile-dev
+    volumes:
+       - ./:/code # for development, unused in production
+       - /code/node_modules # an exception from the above volume
     ports:
       - "8080:80"
     environment:
