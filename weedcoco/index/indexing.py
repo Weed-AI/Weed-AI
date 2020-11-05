@@ -28,6 +28,7 @@ class ElasticSearchIndex:
             or not os.path.isdir(self.temp_index_dir)
             and "temp" not in os.listdir()
         ):
+            self.temp_index_dir = "temp"
             os.mkdir(self.temp_index_dir)
 
     def modify_coco(self):
