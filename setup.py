@@ -15,6 +15,7 @@ requirements = [
     "pyyaml",
     "tqdm",
     "imagehash",
+    "requests",
 ]
 
 setup(
