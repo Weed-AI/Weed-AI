@@ -54,22 +54,11 @@ def assert_files_equal(dir1, dir2):
 
 
 def assert_weedcoco_equal(dir1, dir2):
-    def ordered_json(obj):
-        if isinstance(obj, dict):
-            return sorted((k, ordered_json(v)) for k, v in obj.items())
-        if isinstance(obj, list):
-            return sorted(ordered_json(x) for x in obj)
-        else:
-            return obj
-
-    return all(
-        [
-            ordered_json(json.load(open(dir1 / dir / "weedcoco.json")))
-            == ordered_json(json.load(open(dir2 / dir / "weedcoco.json")))
-            for dir in os.listdir(dir2)
-            if re.fullmatch(r"^dataset_\d+$", dir)
-        ]
-    )
+    for dir in os.listdir(dir2):
+        if re.fullmatch(r"^dataset_\d+$", dir):
+            assert json.load(open(dir1 / dir / "weedcoco.json")) == json.load(
+                open(dir2 / dir / "weedcoco.json")
+            )
 
 
 def test_basic(executor):
@@ -77,7 +66,7 @@ def test_basic(executor):
         TEST_BASIC_DIR_1 / "weedcoco.json", TEST_BASIC_DIR_1 / "images"
     )
     assert_files_equal(test_repo_dir, TEST_DATA_SAMPLE_DIR / "basic")
-    assert assert_weedcoco_equal(test_repo_dir, TEST_DATA_SAMPLE_DIR / "basic")
+    assert_weedcoco_equal(test_repo_dir, TEST_DATA_SAMPLE_DIR / "basic")
 
 
 def test_duplicate_images(executor):
@@ -103,4 +92,4 @@ def test_multiple_collections(executor):
         TEST_BASIC_DIR_2 / "weedcoco.json", TEST_BASIC_DIR_2 / "images"
     )
     assert_files_equal(test_repo_dir, TEST_DATA_SAMPLE_DIR / "multiple")
-    assert assert_weedcoco_equal(test_repo_dir, TEST_DATA_SAMPLE_DIR / "multiple")
+    assert_weedcoco_equal(test_repo_dir, TEST_DATA_SAMPLE_DIR / "multiple")
