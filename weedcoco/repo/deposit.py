@@ -23,9 +23,7 @@ def validate_existing_images(repository_dir, image_hash):
 
 
 def get_hashset_from_image_name(image_hash):
-    return set(
-        map(lambda image_name: os.path.splitext(image_name)[0], image_hash.values())
-    )
+    return {os.path.splitext(image_name)[0] for image_name in image_hash.values()}
 
 
 def get_all_existing_hash(repository_dir):
@@ -88,6 +86,15 @@ def deposit_weedcoco(weedcoco_path, dataset_dir, image_dir, image_hash):
         json.dump(weedcoco, out, indent=4)
 
 
+def deposit(weedcoco_path, image_dir, repository_dir):
+    image_hash = create_image_hash(image_dir)
+    validate_duplicate_images(image_hash)
+    validate_existing_images(repository_dir, image_hash)
+    dataset_dir = setup_dataset_dir(repository_dir)
+    deposit_weedcoco(weedcoco_path, dataset_dir, image_dir, image_hash)
+    migrate_images(dataset_dir, image_dir, image_hash)
+
+
 def main(args=None):
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument(
@@ -96,14 +103,7 @@ def main(args=None):
     ap.add_argument("--image-dir", default="cwfid_images", type=pathlib.Path)
     ap.add_argument("--repository-dir", default="repository", type=pathlib.Path)
     args = ap.parse_args(args)
-
-    image_hash = create_image_hash(args.image_dir)
-    validate_duplicate_images(image_hash)
-    validate_existing_images(args.repository_dir, image_hash)
-
-    dataset_dir = setup_dataset_dir(args.repository_dir)
-    deposit_weedcoco(args.weedcoco_path, dataset_dir, args.image_dir, image_hash)
-    migrate_images(dataset_dir, args.image_dir, image_hash)
+    deposit(args.weedcoco_path, args.image_dir, args.repository_dir)
 
 
 if __name__ == "__main__":
