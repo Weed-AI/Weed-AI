@@ -12,6 +12,7 @@
     "node-forge": "^0.10.0",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
+    "react-reactive-form": "^1.0.32",
     "react-scripts": "3.4.3",
     "redux": "^2.0.0",
     "typescript": "^2.8.0"
