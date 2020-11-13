@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import React, { Component, useState } from 'react'
 import { render } from "react-dom";
 import Form from "react-jsonschema-form";
 // TODO: load schema from file
@@ -253,11 +253,21 @@ const log = type => console.log.bind(console, type);
 
 const onSubmit = ({formData}, e) => console.log("Data submitted", formData);
 
+const handleSaveToPC = (formData,filename) => {
+  const fileData = JSON.stringify(formData);
+  const blob = new Blob([fileData], {type: "text/plain"});
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.download = `${filename}.json`;
+  link.href = url;
+  link.click();
+}
+
 const App = () => (
   <Form
     schema={schema}
     uiSchema={uiSchema}
-    onSubmit={onSubmit}
+    onSubmit={handleSaveToPC}
   />
 );
 
