@@ -1,5 +1,9 @@
+import React, { Component } from 'react'
 import { render } from "react-dom";
 import Form from "react-jsonschema-form";
+// TODO: load schema from file
+// For some reason loading the schema from file throw "unsupported field schema for field" errors 
+// import { agcontextSchema } from './schemas'
 import './App.css';
 
 const schema = {
@@ -100,7 +104,7 @@ const schema = {
         "beginning of dormancy",
         "na"
       ],
-      "description": "BBCG descriptive text.\nOne of several possible strings describing the stage of the crop, chosen from a list of possible terms used by the BBCH.\nIf this AgContext is not in a cropping environment, use value \"na\"."
+      "description": "BBCH descriptive text.\nOne of several possible strings describing the stage of the crop, chosen from a list of possible terms used by the BBCH.\nIf this AgContext is not in a cropping environment, use value \"na\"."
     },
     "bbch_code": {
       "type": "string",
@@ -234,6 +238,7 @@ const schema = {
   }
 };
 
+
 const uiSchema = {
   title: {
     "ui:help": (
@@ -246,10 +251,13 @@ const uiSchema = {
 
 const log = type => console.log.bind(console, type);
 
+const onSubmit = ({formData}, e) => console.log("Data submitted", formData);
+
 const App = () => (
   <Form
     schema={schema}
     uiSchema={uiSchema}
+    onSubmit={onSubmit}
   />
 );
 
