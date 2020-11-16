@@ -1,0 +1,4 @@
+django==2.2
+psycopg2
+requests
+django-cors-headers
