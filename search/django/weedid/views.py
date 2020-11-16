@@ -8,7 +8,7 @@ def test(request):
 
 
 @csrf_exempt
-def elasticsearchQuery(request):
+def elasticsearch_query(request):
     elasticsearch_url = "/".join(request.path.split("/")[3:])
     elasticsearch_response = requests.post(
         url=f"http://elasticsearch:9200/{elasticsearch_url}",

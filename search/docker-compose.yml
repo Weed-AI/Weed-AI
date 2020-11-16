@@ -5,9 +5,8 @@ services:
     image: reverse-proxy
     container_name: reverse_proxy
     depends_on:
-        - controller
+        - django
         - reactivesearch
-        - kibana
     build:
         context: ./nginx/nginx
     ports:
@@ -15,15 +14,14 @@ services:
     networks:
       - elastic
 
-  # django controller
-  controller:
-    image: controller
-    container_name: controller
+  django:
+    image: django
+    container_name: django
     depends_on:
       - elasticsearch
       - db
     build:
-      context: ./controller
+      context: ./django
       dockerfile:  Dockerfile
     environment:
       - DJANGO_SECRET_KEY=${DJANGO_SECRET_KEY}
@@ -93,18 +91,6 @@ services:
     stdin_open: true
     depends_on:
       - elasticsearch
-
-  # kibana as another elastic search UI
-  kibana:
-    image: docker.elastic.co/kibana/kibana-oss:7.8.1
-    ports:
-      - 5601:5601
-    environment:
-      ELASTICSEARCH_URL: http://elasticsearch:9200
-      ELASTICSEARCH_HOSTS: http://elasticsearch:9200
-      SERVER_BASEPATH: /dashboard
-    networks:
-      - elastic
 
 networks:
   elastic:

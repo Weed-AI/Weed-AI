@@ -3,5 +3,5 @@ from weedid import views
 
 urlpatterns = [
     path("api/", views.test, name="test"),
-    re_path(r"^elasticsearch", views.elasticsearchQuery, name="elasticsearchQuery"),
+    re_path(r"^elasticsearch", views.elasticsearch_query, name="elasticsearch_query"),
 ]
