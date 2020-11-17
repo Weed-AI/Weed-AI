@@ -249,16 +249,17 @@ const uiSchema = {
   }
 };
 
+
 const log = type => console.log.bind(console, type);
 
 const onSubmit = ({formData}, e) => console.log("Data submitted", formData);
 
-const handleSaveToPC = (formData,filename) => {
-  const fileData = JSON.stringify(formData);
+const handleSaveToPC = (payload) => {
+  const fileData = JSON.stringify(payload.formData);
   const blob = new Blob([fileData], {type: "text/plain"});
   const url = URL.createObjectURL(blob);
   const link = document.createElement('a');
-  link.download = `${filename}.json`;
+  link.download = `AgContext.json`;
   link.href = url;
   link.click();
 }

@@ -1,5 +1,8 @@
 version: "3"
 services:
+  app:
+    tty: true
+    stdin_open: true # without this node doesn't start
   frontend:
     build: ./App
     command: ["yarn", "start"]
