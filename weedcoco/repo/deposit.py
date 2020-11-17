@@ -82,8 +82,10 @@ def deposit_weedcoco(weedcoco_path, dataset_dir, image_dir, image_hash):
             image_reference["file_name"] = "images/" + image_hash[file_name]
 
     validate(weedcoco, image_dir)
-    with (dataset_dir / "weedcoco.json").open("w") as out:
+    new_dataset_dir = dataset_dir / "weedcoco.json"
+    with (new_dataset_dir).open("w") as out:
         json.dump(weedcoco, out, indent=4)
+    return new_dataset_dir
 
 
 def deposit(weedcoco_path, image_dir, repository_dir):
@@ -91,8 +93,11 @@ def deposit(weedcoco_path, image_dir, repository_dir):
     validate_duplicate_images(image_hash)
     validate_existing_images(repository_dir, image_hash)
     dataset_dir = setup_dataset_dir(repository_dir)
-    deposit_weedcoco(weedcoco_path, dataset_dir, image_dir, image_hash)
+    new_dataset_dir = deposit_weedcoco(
+        weedcoco_path, dataset_dir, image_dir, image_hash
+    )
     migrate_images(dataset_dir, image_dir, image_hash)
+    return str(new_dataset_dir)
 
 
 def main(args=None):
