@@ -65,7 +65,9 @@ class ElasticSearchIndex:
             _flatten(annotation["category"], annotation, "category")
             # todo: add collection from collection_memberships
             image["thumbnail"] = str(
-                self.thumbnail_dir / os.path.basename(image["file_name"])
+                self.thumbnail_dir
+                / os.path.basename(image["file_name"])[:2]
+                / os.path.basename(image["file_name"])
             )
 
         for image in coco["images"]:
