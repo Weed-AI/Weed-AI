@@ -23,13 +23,10 @@ class ElasticSearchIndex:
         self.es_url = es_url
         self.coco = coco
 
-        if (
-            self.temp_index_dir == "temp"
-            or not os.path.isdir(self.temp_index_dir)
-            and "temp" not in os.listdir()
-        ):
+        if self.temp_index_dir == "temp" or not os.path.isdir(self.temp_index_dir):
             self.temp_index_dir = "temp"
-            os.mkdir(self.temp_index_dir)
+            if "temp" not in os.listdir():
+                os.mkdir(self.temp_index_dir)
 
     def modify_coco(self):
         def _flatten(src, dst, prefix):
