@@ -14,22 +14,56 @@ services:
     networks:
       - elastic
 
+  # django backend
   django:
     image: django
     container_name: django
     depends_on:
       - elasticsearch
       - db
+      - redis
     build:
       context: ./django
       dockerfile:  Dockerfile-dev
     environment:
       - DJANGO_SECRET_KEY=${DJANGO_SECRET_KEY}
+      - CELERY_BROKER=redis://redis:6379/0
+      - CELERY_BACKEND=redis://redis:6379/0
     command: python manage.py runserver 0.0.0.0:8000
     volumes:
       - ./django/:/code
+      - thumbnails_dir:/code/thumbnails
+      - repository_dir:/code/repository
+      - upload_dir:/code/upload
     ports:
       - "8000:8000"
+    networks:
+      - elastic
+
+  celery:
+    image: celery
+    container_name: celery
+    build:
+      context: ./django
+      dockerfile:  Dockerfile-dev
+    command: celery -A core worker -l INFO
+    environment:
+      - DJANGO_SECRET_KEY=${DJANGO_SECRET_KEY}
+      - CELERY_BROKER=redis://redis:6379/0
+      - CELERY_BACKEND=redis://redis:6379/0
+    volumes:
+      - ./django/:/code
+      - thumbnails_dir:/code/thumbnails
+      - repository_dir:/code/repository
+      - upload_dir:/code/upload
+    depends_on:
+      - django
+      - redis
+    networks:
+      - elastic
+
+  redis:
+    image: redis:alpine
     networks:
       - elastic
 
@@ -97,6 +131,19 @@ services:
     depends_on:
       - elasticsearch
 
+  thumbnails:
+    image: thumbnails
+    container_name: thumbnails
+    build:
+      context: ./nginx/thumbnails
+    volumes:
+      - thumbnails_dir:/tmp/thumbnails
+    ports:
+      - "8081:80"
+    networks:
+      - elastic
+    stdin_open: true
+
 networks:
   elastic:
     driver: bridge
@@ -105,3 +152,10 @@ volumes:
   esdata1:
     driver: local
   postgres_data:
+    driver: local
+  repository_dir:
+    driver: local
+  thumbnails_dir:
+    driver: local
+  upload_dir:
+    driver: local
