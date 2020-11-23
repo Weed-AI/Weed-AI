@@ -9,6 +9,7 @@ import {
 } from '@appbaseio/reactivesearch';
 import logo from './logo.svg';
 import './App.css';
+import UploadDialog from './Components/upload/upload_dialog'
 
 class App extends Component {
 	render() {
@@ -57,6 +58,8 @@ class App extends Component {
 		const esURL = new URL(window.location.origin);
 
 		return (
+			<div>
+			<UploadDialog />
 			<ReactiveBase
 				app="weedid"
 				url={esURL + "elasticsearch/"}
@@ -160,7 +163,7 @@ class App extends Component {
 									data.map(item => (
 										<ResultCard key={item._id}>
 											<ResultCard.Image
-												src={'thumbnails/' + item.thumbnail}
+												src={item.thumbnail}
 											/>
 											<ResultCard.Description>
 												<ul class="annotations">
@@ -181,6 +184,7 @@ class App extends Component {
 					/>
 				</div>
 			</ReactiveBase>
+			</div>
 		);
 	}
 }
