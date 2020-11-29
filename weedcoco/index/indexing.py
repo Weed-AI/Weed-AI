@@ -3,43 +3,52 @@ import os
 import pathlib
 import json
 import requests
-from math import ceil
+import urllib
 
 
 class ElasticSearchIndex:
+
+    """
+    Parameters:
+        weedcoco_path (pathlib.PosixPath): weedcoco local path for indexing
+        thumbnail_dir (pathlib.PosixPath): thumbnail folder local path to be integrated into the json file for indexing
+        index_name (string): index name for ElasticSearch
+        batch_size (int): split json file for indexing into batches to reduce the payload of each request
+        es_url (string): ElasticSearch server root to send request
+        indexes (dict): base file to build index json file
+    """
+
     def __init__(
         self,
         weedcoco_path,
         thumbnail_dir,
-        temp_index_dir="temp",
-        index_batch=30,
+        index_name="weedid",
+        batch_size=30,
         es_url="http://localhost:9200/",
-        coco={},
+        indexes=None,
     ):
         self.weedcoco_path = weedcoco_path
         self.thumbnail_dir = thumbnail_dir
-        self.temp_index_dir = temp_index_dir
-        self.index_batch = index_batch
+        self.index_name = index_name
+        self.batch_size = batch_size
         self.es_url = es_url
-        self.coco = coco
-
-        if self.temp_index_dir == "temp" or not os.path.isdir(self.temp_index_dir):
-            self.temp_index_dir = "temp"
-            if "temp" not in os.listdir():
-                os.mkdir(self.temp_index_dir)
+        self.indexes = indexes if indexes is not None else {}
 
     def modify_coco(self):
+        """
+        Create index entries for request to ElasticSearch
+        """
+
         def _flatten(src, dst, prefix):
             for k, v in src.items():
                 dst[f"{prefix}__{k}"] = v
 
         with open(self.weedcoco_path) as f:
             coco = json.load(f)
-        try:
+        if "info" in coco:
             del coco["info"]
+        if "collection_memberships" in coco:
             del coco["collection_memberships"]
-        except KeyError:
-            pass
 
         id_lookup = {}
         for key, objs in coco.items():
@@ -92,36 +101,39 @@ class ElasticSearchIndex:
                     image["task_type"].add("bounding box")
             image["task_type"] = sorted(image["task_type"])
 
-        self.coco = coco
+        self.indexes = coco
 
     def generate_batches(self):
+        """
+        Split indexes into batches to reduce payload size of each request to ElasticSearch
+        """
+        indexes = self.indexes
+        if "images" in indexes and len(indexes["images"]) > 0:
+            images = indexes["images"]
+            for start in range(0, len(images), self.batch_size):
+                blobs = []
+                batch = images[start : start + self.batch_size]
+                for image in batch:
+                    blobs.append(
+                        '{"index": {"_index": "'
+                        + self.index_name
+                        + '", "_type": "image"}}'
+                    )
+                    blobs.append(json.dumps(image))
+                blobs.append("")
+                yield "\n".join(blobs)
 
-        coco = self.coco
-        if "images" in coco and len(coco["images"]) > 0:
-            for i in range(ceil(len(coco["images"]) / self.index_batch)):
-                with open(f"{self.temp_index_dir}/index{str(i+1)}.json", "w") as f:
-                    for image in coco["images"][
-                        i
-                        * self.index_batch : min(
-                            len(coco["images"]), (i + 1) * self.index_batch
-                        )
-                    ]:
-                        json.dump({"index": {"_index": "weedid", "_type": "image"}}, f)
-                        f.write("\n")
-                        json.dump(image, f)
-                        f.write("\n")
-
-    def post_index(self):
-
-        files = [
-            file for file in os.listdir(self.temp_index_dir) if file.endswith(".json")
-        ]
-        for item in files:
-            requests.post(
-                f"{self.es_url}_bulk",
-                data=open(f"{self.temp_index_dir}/{item}", "rb").read(),
+    def post_to_index(self):
+        """
+        Send post request to ElasticSearch
+        """
+        for index_batch in self.generate_batches():
+            res = requests.post(
+                urllib.parse.urljoin(self.es_url, "_bulk"),
+                data=index_batch,
                 headers={"content-type": "application/json"},
             )
+            print(res.headers, res.status_code, res.content)
 
 
 def main(args=None):
@@ -135,5 +147,4 @@ def main(args=None):
 if __name__ == "__main__":
     es_index = main()
     es_index.modify_coco()
-    es_index.generate_batches()
-    es_index.post_index()
+    es_index.post_to_index()

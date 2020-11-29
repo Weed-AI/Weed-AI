@@ -2,17 +2,20 @@ import argparse
 import os
 import pathlib
 from PIL import Image
+from weedcoco.utils import check_if_approved_image_format
 
 
 def thumbnailing(thumbnails_dir, repository_dir, THUMBNAIL_SIZE=(300, 300)):
     for dirpath, dirnames, filenames in os.walk(repository_dir):
         for filename in filenames:
-            if filename.lower().endswith((".png", ".jpg", ".jpeg", ".tiff")):
-                image = Image.open(f"{dirpath}/{filename}")
-                image.thumbnail(THUMBNAIL_SIZE)
-                if filename[:2] not in os.listdir(thumbnails_dir):
-                    os.mkdir(thumbnails_dir / filename[:2])
-                image.save(thumbnails_dir / filename[:2] / filename)
+            if check_if_approved_image_format(filename):
+                image_path = thumbnails_dir / filename[:2] / filename
+                if not image_path.is_file():
+                    image = Image.open(f"{dirpath}/{filename}")
+                    image.thumbnail(THUMBNAIL_SIZE)
+                    if filename[:2] not in os.listdir(thumbnails_dir):
+                        os.mkdir(thumbnails_dir / filename[:2])
+                    image.save(image_path)
 
 
 def main(args=None):

@@ -56,3 +56,7 @@ def add_collection_from_file(coco, collection_path):
 def get_image_average_hash(path, hash_size=8):
     """Return an average hash of an image"""
     return str(imagehash.average_hash(PIL.Image.open(path), hash_size=hash_size))
+
+
+def check_if_approved_image_format(image_name):
+    return image_name.lower().endswith((".png", ".jpg", ".jpeg", ".tiff"))
