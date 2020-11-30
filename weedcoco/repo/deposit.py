@@ -4,7 +4,7 @@ import json
 import os
 import re
 from shutil import copyfile
-from weedcoco.utils import get_image_average_hash, check_if_approved_image_format
+from weedcoco.utils import get_image_average_hash, check_if_approved_image_extension
 from weedcoco.validation import ValidationError, validate
 
 
@@ -57,7 +57,7 @@ def create_image_hash(image_dir):
     return {
         image_name: f"{get_image_average_hash(image_dir / image_name, 10)}{os.path.splitext(image_name)[-1]}"
         for image_name in os.listdir(image_dir)
-        if check_if_approved_image_format(image_name)
+        if check_if_approved_image_extension(image_name)
     }
 
 
@@ -67,7 +67,7 @@ def migrate_images(dataset_dir, raw_dir, image_hash):
         os.mkdir(image_dir)
 
     for image_origin in os.listdir(raw_dir):
-        if check_if_approved_image_format(image_origin):
+        if check_if_approved_image_extension(image_origin):
             image_path = dataset_dir / "images" / image_hash[image_origin]
             if not os.path.isfile(image_path):
                 copyfile(raw_dir / image_origin, image_path)

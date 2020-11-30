@@ -16,6 +16,7 @@ requirements = [
     "tqdm",
     "imagehash",
     "requests",
+    "elasticsearch",
 ]
 
 setup(

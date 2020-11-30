@@ -2,19 +2,20 @@ import argparse
 import os
 import pathlib
 import json
-import requests
-import urllib
+from elasticsearch import Elasticsearch, helpers
 
 
 class ElasticSearchIndex:
 
     """
-    Parameters:
+    Args:
         weedcoco_path (pathlib.PosixPath): weedcoco local path for indexing
         thumbnail_dir (pathlib.PosixPath): thumbnail folder local path to be integrated into the json file for indexing
-        index_name (string): index name for ElasticSearch
+        es_index_name (string): index name for ElasticSearch
+        es_type_name (string): type name for ElasticSearch
         batch_size (int): split json file for indexing into batches to reduce the payload of each request
-        es_url (string): ElasticSearch server root to send request
+        es_host (string): ElasticSearch server host to send request
+        es_port (int): ElasticSearch server port to send request
         indexes (dict): base file to build index json file
     """
 
@@ -22,16 +23,19 @@ class ElasticSearchIndex:
         self,
         weedcoco_path,
         thumbnail_dir,
-        index_name="weedid",
+        es_index_name="weedid",
+        es_type_name="image",
         batch_size=30,
-        es_url="http://localhost:9200/",
+        es_host="http://localhost",
+        es_port=9200,
         indexes=None,
     ):
         self.weedcoco_path = weedcoco_path
         self.thumbnail_dir = thumbnail_dir
-        self.index_name = index_name
+        self.es_index_name = es_index_name
+        self.es_type_name = es_type_name
         self.batch_size = batch_size
-        self.es_url = es_url
+        self.es_client = Elasticsearch(HOST=es_host, PORT=es_port)
         self.indexes = indexes if indexes is not None else {}
 
     def modify_coco(self):
@@ -115,25 +119,20 @@ class ElasticSearchIndex:
                 batch = images[start : start + self.batch_size]
                 for image in batch:
                     blobs.append(
-                        '{"index": {"_index": "'
-                        + self.index_name
-                        + '", "_type": "image"}}'
+                        {
+                            "_index": self.es_index_name,
+                            "_type": self.es_type_name,
+                            "_source": image,
+                        }
                     )
-                    blobs.append(json.dumps(image))
-                blobs.append("")
-                yield "\n".join(blobs)
+                yield blobs
 
     def post_to_index(self):
         """
         Send post request to ElasticSearch
         """
         for index_batch in self.generate_batches():
-            res = requests.post(
-                urllib.parse.urljoin(self.es_url, "_bulk"),
-                data=index_batch,
-                headers={"content-type": "application/json"},
-            )
-            print(res.headers, res.status_code, res.content)
+            helpers.bulk(self.es_client, index_batch)
 
 
 def main(args=None):

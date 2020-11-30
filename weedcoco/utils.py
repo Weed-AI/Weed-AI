@@ -58,5 +58,9 @@ def get_image_average_hash(path, hash_size=8):
     return str(imagehash.average_hash(PIL.Image.open(path), hash_size=hash_size))
 
 
-def check_if_approved_image_format(image_name):
+def check_if_approved_image_extension(image_name):
     return image_name.lower().endswith((".png", ".jpg", ".jpeg", ".tiff"))
+
+
+def check_if_approved_image_format(image_ext):
+    return image_ext in ("PNG", "JPG", "JPEG", "TIFF")

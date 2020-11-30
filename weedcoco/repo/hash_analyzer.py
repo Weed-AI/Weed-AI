@@ -7,7 +7,7 @@ import scipy.spatial
 import PIL.Image
 import seaborn as sns
 import matplotlib.pyplot as plt
-from weedcoco.utils import check_if_approved_image_format
+from weedcoco.utils import check_if_approved_image_extension
 
 
 sns.set_theme(color_codes=True)
@@ -24,7 +24,7 @@ X = np.asarray(
         for dirpath, dirnames, filenames in os.walk(args.dataset_dir)
         if os.path.basename(dirpath) == "img"
         for filename in filenames
-        if check_if_approved_image_format(filename)
+        if check_if_approved_image_extension(filename)
     ]
 )
 distances = scipy.spatial.distance.pdist(X, metric="hamming")
