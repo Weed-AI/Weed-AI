@@ -1,6 +1,8 @@
 import React, { Component, useState } from 'react'
 import { render } from "react-dom";
-import Form from "react-jsonschema-form";
+import { Form, withTheme } from "react-jsonschema-form";
+import { Theme as MuiTheme } from 'rjsf-material-ui';
+import MaterialJsonSchemaForm from 'react-jsonschema-form-material-ui'
 // TODO: load schema from file
 // For some reason loading the schema from file throw "unsupported field schema for field" errors 
 // import { agcontextSchema } from './schemas'
@@ -239,14 +241,10 @@ const schema = {
 };
 
 
+
+
 const uiSchema = {
-  title: {
-    "ui:help": (
-      <div>
-        <a href="#">test</a>
-      </div>
-    )
-  }
+  title: "AgContext Entry Form"
 };
 
 
@@ -265,10 +263,13 @@ const handleSaveToPC = (payload) => {
 }
 
 const App = () => (
+  //const [formData, setFormData] = React.useState(null);
   <Form
     schema={schema}
     uiSchema={uiSchema}
     onSubmit={handleSaveToPC}
+    //formData={formData}
+    //onChange={e => setFormData(e.formData)}
   />
 );
 

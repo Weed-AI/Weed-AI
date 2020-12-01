@@ -10,6 +10,7 @@
     "react-dom": "^17.0.1",
     "react-jsonschema-form": "^1.8.1",
     "react-jsonschema-form-manager": "^0.4.7",
+    "react-jsonschema-form-material-ui": "^2.2.1",
     "react-scripts": "4.0.0",
     "web-vitals": "^0.2.4"
   },
