@@ -1,15 +1,16 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import {BrowserRouter as Router, Route, Link} from 'react-router-dom';
+import { BrowserRouter as Router, Route } from 'react-router-dom';
 import './index.css';
 import App from './App';
+import AgContextForm from './AgContextForm';
 import * as serviceWorker from './serviceWorker';
 
 //import RouterMapping from './RouterMapping';
 const RouterMapping = () => (
   <Router>
     <Route exact path='/' component={App} />
-
+    <Route exact path='/agcontext/editor' component={AgContextForm} />
   </Router>
 );
 

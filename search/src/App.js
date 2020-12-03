@@ -7,6 +7,7 @@ import {
 	ReactiveList,
 	SelectedFilters
 } from '@appbaseio/reactivesearch';
+import { withRouter } from 'react-router-dom';
 import logo from './logo.svg';
 import './App.css';
 
@@ -54,7 +55,7 @@ class App extends Component {
 			return (facetProps)
 		}
 
-		return (
+		const out = (
 			<ReactiveBase
 				app="weedid"
 				url="http://localhost:9200/"
@@ -180,7 +181,8 @@ class App extends Component {
 				</div>
 			</ReactiveBase>
 		);
+		return out;
 	}
 }
 
-export default App;
+export default withRouter(App);
