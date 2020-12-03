@@ -4,8 +4,6 @@ import Form, { withTheme } from "react-jsonschema-form";
 import { Theme as MuiTheme } from 'rjsf-material-ui';
 import { withRouter } from 'react-router-dom';
 import MaterialJsonSchemaForm from 'react-jsonschema-form-material-ui'
-// TODO: load schema from file
-// For some reason loading the schema from file throw "unsupported field schema for field" errors 
 import { agcontextSchema } from './schemas'
 import './AgContextForm.css';
 
