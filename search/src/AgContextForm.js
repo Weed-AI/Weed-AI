@@ -263,7 +263,7 @@ class AgContextForm extends Component {
             link.click();
         }
 
-        const out = (
+        return (
             <Form
               schema={schema}
               uiSchema={uiSchema}
@@ -272,8 +272,6 @@ class AgContextForm extends Component {
               //onChange={e => setFormData(e.formData)}
             />
         );
-        console.log(out);
-        return out;
     }
 }
 

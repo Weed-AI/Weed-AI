@@ -55,10 +55,12 @@ class App extends Component {
 			return (facetProps)
 		}
 
-		const out = (
+		const esURL = new URL(window.location.origin);
+
+		return (
 			<ReactiveBase
 				app="weedid"
-				url="http://localhost:9200/"
+				url={esURL + "elasticsearch/"}
 				theme={{
 					typography: {
 						fontFamily: 'Raleway, Helvetica, sans-serif',
@@ -181,7 +183,6 @@ class App extends Component {
 				</div>
 			</ReactiveBase>
 		);
-		return out;
 	}
 }
 
