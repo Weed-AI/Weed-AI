@@ -1,11 +1,16 @@
 import React, { Component, useState } from 'react'
 import { render } from "react-dom";
-import Form, { withTheme } from "react-jsonschema-form";
+import { withTheme } from "react-jsonschema-form";
 import { Theme as MuiTheme } from 'rjsf-material-ui';
 import { withRouter } from 'react-router-dom';
-import MaterialJsonSchemaForm from 'react-jsonschema-form-material-ui'
 import { agcontextSchema } from './schemas'
 import './AgContextForm.css';
+import Container from '@material-ui/core/Container';
+import Box from '@material-ui/core/Box';
+import { shadows } from '@material-ui/system';
+
+
+const Form = withTheme(MuiTheme);
 
 class AgContextForm extends Component {
     render() {
@@ -41,4 +46,21 @@ class AgContextForm extends Component {
     }
 }
 
-export default withRouter(AgContextForm);
+
+class StandaloneEditor extends Component {
+    render() {
+        return (
+///            <div style={{maxWidth: "600px", margin: "2em auto", border: "thin" }}>
+            <Container maxWidth="sm">
+                <Box boxShadow={3} px={2}>
+                    <AgContextForm />
+                </Box>
+            </Container>
+///            </div>
+        );
+    }
+}
+
+
+export default AgContextForm;
+export const Standalone = withRouter(StandaloneEditor);
