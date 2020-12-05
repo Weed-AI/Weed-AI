@@ -27,3 +27,6 @@ weedcoco/concatenation/*.json
 
 # Dev Tools
 .vscode/settings.json
+
+# .env
+.env

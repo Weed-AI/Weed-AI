@@ -1,14 +1,19 @@
-FROM node:10
-RUN mkdir /code
-WORKDIR /code
+# For Production
+FROM nginx:latest
+
+# build node package
+RUN apt update
+RUN apt install -y npm
+RUN npm install -g yarn
+RUN mkdir /code /code/public /code/src
+COPY public /code/public
+COPY src /code/src
 COPY package.json yarn.lock /code/
-RUN ["yarn", "install"]
+RUN cd /code && find . && yarn install && yarn run build
 
-# replace this with your application's default port
-EXPOSE 3000
-# TODO: work out how to install in build and keep node_modules despite VOLUME...
-CMD ["yarn", "start"]
+# TODO: uninstall node
 
+RUN mkdir /app
+RUN cp -R /code/build/* /app/
 
-# for production:
-# COPY . /code
+COPY ./nginx/react/nginx.conf /etc/nginx/nginx.conf
