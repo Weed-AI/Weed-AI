@@ -14,6 +14,9 @@ requirements = [
     "pillow",
     "pyyaml",
     "tqdm",
+    "imagehash",
+    "requests",
+    "elasticsearch",
 ]
 
 setup(
