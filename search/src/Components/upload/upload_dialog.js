@@ -20,6 +20,12 @@ const styles = (theme) => ({
     top: theme.spacing(1),
     color: theme.palette.grey[500],
   },
+  uploadButton: {
+    height: '3em',
+    fontWeight: 600,
+    backgroundColor: '#4490db',
+    color: 'white'
+  }
 });
 
 const DialogTitle = withStyles(styles)((props) => {
@@ -42,7 +48,8 @@ const DialogContent = withStyles((theme) => ({
   },
 }))(MuiDialogContent);
 
-export default function UploadDialog() {
+export default function UploadDialog(props) {
+  const classes = styles;
   const [open, setOpen] = React.useState(false);
 
   const handleClickOpen = () => {
@@ -50,20 +57,21 @@ export default function UploadDialog() {
   };
   const handleClose = () => {
     setOpen(false);
+    props.handleUploadStatus();
   };
 
   return (
-    <div>
-      <Button variant="outlined" color="primary" onClick={handleClickOpen}>
-        Upload
+    <React.Fragment>
+      <Button disabled={!props.uploadType} className={classes.uploadButton} variant="contained" onClick={handleClickOpen}>
+        Begin upload
       </Button>
       <Dialog onClose={handleClose} aria-labelledby="upload-dialog-title" open={open}>
         <DialogTitle id="upload-dialog-title" onClose={handleClose}>
         </DialogTitle>
         <DialogContent>
-            <UploadSteper />
+            <UploadSteper handleClose={handleClose}/>
         </DialogContent>
       </Dialog>
-    </div>
+    </React.Fragment>
   );
 }

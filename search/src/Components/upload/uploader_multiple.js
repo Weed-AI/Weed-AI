@@ -4,8 +4,16 @@ import Dropzone from 'react-dropzone-uploader';
 import axios from 'axios';
 
 
+const Preview = ({ meta }) => {
+    const { name, percent, status } = meta
+    return (
+      <span style={{ alignSelf: 'flex-start', margin: '10px 3%', fontFamily: 'Helvetica' }}>
+        {name}, {Math.round(percent)}%, {status}
+      </span>
+    )
+}
+
 const UploaderMultiple = (props) => {
-    const esURL = new URL(window.location.origin);
     const baseURL = new URL(window.location.origin);
     const getUploadParams = ({ file, meta }) => {
         const body = new FormData()
@@ -15,7 +23,6 @@ const UploaderMultiple = (props) => {
     }
   
     const handleChangeStatus = ({ meta }, status) => {
-        console.log(status, meta)
     }
   
     const handleSubmit = (files, allFiles) => {
@@ -23,12 +30,9 @@ const UploaderMultiple = (props) => {
         body.append('upload_id', props.upload_id)
         axios({
             method: 'post',
-            url: esURL + "api/submit_deposit/",
+            url: baseURL + "api/submit_deposit/",
             data: body,
             headers: {'Content-Type': 'multipart/form-data' }
-        })
-        .then(res => {
-            console.log(res);
         })
     }
     
@@ -42,6 +46,7 @@ const UploaderMultiple = (props) => {
         onChangeStatus={handleChangeStatus}
         onSubmit={handleSubmit}
         validate={handleValidate}
+        PreviewComponent={Preview}
         styles={{ dropzone: { minHeight: 200, maxHeight: 250 } }}
       />
     )

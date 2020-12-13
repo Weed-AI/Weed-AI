@@ -7,8 +7,7 @@ import {
 	ReactiveList,
 	SelectedFilters
 } from '@appbaseio/reactivesearch';
-import logo from '../logo.svg';
-import '../App.css';
+
 
 class ReactiveSearchComponent extends Component {
 
@@ -18,6 +17,7 @@ class ReactiveSearchComponent extends Component {
 				showCheckbox: true,
 				showCount: true,
 				showFilter: true,
+				showSearch: false,
 				style: {
 					padding: "5px",
 					marginTop: "10px"
@@ -27,10 +27,22 @@ class ReactiveSearchComponent extends Component {
 				multilistFacetProps = {}
 			}
 			let facetProps = {
+				innerClass: {
+					title: "filter-title",
+					checkbox: "filter-checkbox"
+				},
 				queryFormat: "or",
 				URLParams: true,
 				react: {
-					and: ["searchbox", "resslider", "agcontextfilter", "categoryfilter", "grainstextfilter"]
+					and: [
+						"searchbox",
+						"crop_type_filter",
+						"category_filter",
+						"grains_text_filter",
+						"task_type_filter",
+						"lighting_filter",
+						"resslider",
+					]
 				},
 				...multilistFacetProps
 			}
@@ -42,11 +54,12 @@ class ReactiveSearchComponent extends Component {
 			return (facetProps)
 		}
 
+		const esURL = new URL(window.location.origin);
+
 		return (
-			
 			<ReactiveBase
 				app="weedid"
-				url="http://localhost:9200/"
+				url={esURL + "elasticsearch/"}
 				theme={{
 					typography: {
 						fontFamily: 'Raleway, Helvetica, sans-serif',
@@ -60,30 +73,31 @@ class ReactiveSearchComponent extends Component {
 					}
 				}}
 			>
-				<div style={{ position: "fixed", width: "20rem", overflow: "scroll", height: "100%" }}>
+				<div style={{ position: "fixed", width: "20rem", overflow: "scroll", height: "90%", left: 0, padding: '0 1rem' }}>
 					<MultiList
-						componentId="categoryfilter"
-						title="Filter by species"
+						componentId="crop_type_filter"
+						title="Crop Type"
+						dataField="agcontext__crop_type.keyword"
+						sortBy="asc"
+						selectAllLabel="All types"
+						placeholder="Search types"
+						filterLabel="Types"
+						{...makeProps("crop_type_filter", true)}
+					/>
+					<MultiList
+						componentId="category_filter"
+						title="Annotated Species"
 						dataField="annotation__category__name.keyword"
 						sortBy="asc"
 						selectAllLabel="All species"
 						placeholder="Search Species"
 						filterLabel="Species"
 						{...makeProps("categoryfilter", true)}
+                        showSearch={true}
 					/>
 					<MultiList
-						componentId="agcontextfilter"
-						title="Filter by Collection"
-						dataField="agcontext__agcontext_name.keyword"
-						sortBy="asc"
-						selectAllLabel="All collections"
-						placeholder="Search collection"
-						filterLabel="Agcontext"
-						{...makeProps("agcontextfilter", true)}
-					/>
-					<MultiList
-						componentId="grainstextfilter"
-						title="Filter by Growth Stage"
+						componentId="grains_text_filter"
+						title="Crop Growth Stage"
 						dataField="agcontext__grains_descriptive_text.keyword"
 						sortBy="asc"
 						selectAllLabel="All growth stages"
@@ -91,10 +105,30 @@ class ReactiveSearchComponent extends Component {
 						filterLabel="Growth stage"
 						{...makeProps("grainstextfilter", true)}
 					/>
+					<MultiList
+						componentId="task_type_filter"
+						title="Computer Vision Task"
+						dataField="task_type.keyword"
+						sortBy="asc"
+						selectAllLabel="All tasks"
+						placeholder="Search Tasks"
+						filterLabel="Tasks"
+						{...makeProps("task_type_filter", true)}
+					/>
+					<MultiList
+						componentId="lighting_filter"
+						title="Lighting Mode"
+						dataField="agcontext__lighting.keyword"
+						sortBy="asc"
+						selectAllLabel="All lighting"
+						placeholder="Search Lighting"
+						filterLabel="Lighting"
+						{...makeProps("lighting_filter", true)}
+					/>
 					<RangeSlider
 						componentId="resslider"
 						dataField="resolution"
-						title="Resolution (pixels)"
+						title="Image Resolution (pixels)"
 						range={{
 							"start": 0,
 							"end": 1500000
@@ -109,11 +143,13 @@ class ReactiveSearchComponent extends Component {
 						{...makeProps("resslider", false)}
 					/>
 				</div>
-				<div style={{ position: "absolute", left: "20rem" }}>
+				<div style={{ position: "absolute", left: "20rem", paddingRight: "1rem" }}>
 					<SelectedFilters />
 					<ReactiveList
 						componentId="result"
+						dataField="results"
 						title="Results"
+						sortOptions={[{"label": "random order", "dataField": "sortKey", "sortBy": "asc"}]}
 						from={0}
 						size={20}
 						{...makeProps("result", false)}
@@ -124,15 +160,19 @@ class ReactiveSearchComponent extends Component {
 									data.map(item => (
 										<ResultCard key={item._id}>
 											<ResultCard.Image
-												src={'thumbnails/' + item.thumbnail}
-											/>
-											<ResultCard.Title
-												dangerouslySetInnerHTML={{
-													__html: item.customer_phone
-												}}
+												src={item.thumbnail}
 											/>
 											<ResultCard.Description>
-												{"Crop: " + item.agcontext__crop_type}
+												<ul class="annotations">
+												{
+													// TODO: make this more idiomatically React
+													Array.from(new Set(item.annotation__category__name)).map((annotName) => {
+														const annot = annotName.match(/^[^:]*/)
+														return annot.length > 0 ? (<li class={annot[0]}>{annot[0]}</li>) : ""
+													})
+												}
+												</ul>
+												{" in " + item.agcontext__grains_descriptive_text + " " + item.agcontext__crop_type}
 											</ResultCard.Description>
 										</ResultCard>
 									))
