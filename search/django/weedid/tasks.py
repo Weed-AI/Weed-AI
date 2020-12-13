@@ -3,26 +3,52 @@ from celery import shared_task
 from weedcoco.repo.deposit import deposit
 from weedcoco.index.indexing import ElasticSearchIndex
 from weedcoco.index.thumbnailing import thumbnailing
+from weedid.models import Dataset
 from core.settings import THUMBNAILS_DIR, REPOSITORY_DIR
 from pathlib import Path
 
 
 @shared_task
-def upload_task(weedcoco_path, image_dir):
-    new_weedcoco_path = deposit(
-        Path(weedcoco_path), Path(image_dir), Path(REPOSITORY_DIR)
-    )
-    update_index_and_thumbnails.delay(new_weedcoco_path)
+def upload_task(weedcoco_path, image_dir, upload_id):
+    upload_entity = Dataset.objects.get(upload_id=upload_id)
+    upload_entity.upload_status = "P"
+    upload_entity.upload_status_details = ""
+    upload_entity.save()
+    try:
+        new_weedcoco_path = deposit(
+            Path(weedcoco_path), Path(image_dir), Path(REPOSITORY_DIR)
+        )
+    except Exception as e:
+        upload_entity.upload_status = "F"
+        upload_entity.upload_status_details = str(e)
+        upload_entity.save()
+    else:
+        update_index_and_thumbnails.delay(new_weedcoco_path, upload_id)
 
 
 @shared_task
 def update_index_and_thumbnails(
-    weedcoco_path, thumbnails_dir=THUMBNAILS_DIR, repository_dir=REPOSITORY_DIR
+    weedcoco_path,
+    upload_id,
+    thumbnails_dir=THUMBNAILS_DIR,
+    repository_dir=REPOSITORY_DIR,
 ):
-    es_index = ElasticSearchIndex(
-        Path(weedcoco_path), Path(thumbnails_dir), es_url="http://elasticsearch:9200/"
-    )
-    es_index.modify_coco()
-    es_index.generate_batches()
-    es_index.post_index()
-    thumbnailing(Path(thumbnails_dir), Path(repository_dir))
+    upload_entity = Dataset.objects.get(upload_id=upload_id)
+    try:
+        es_index = ElasticSearchIndex(
+            Path(weedcoco_path),
+            Path(thumbnails_dir),
+            es_host="elasticsearch",
+            es_port=9200,
+        )
+        es_index.modify_coco()
+        es_index.post_to_index()
+        thumbnailing(Path(thumbnails_dir), Path(repository_dir))
+    except Exception as e:
+        upload_entity.upload_status = "F"
+        upload_entity.upload_status_details = str(e)
+    else:
+        upload_entity.upload_status = "C"
+        upload_entity.upload_status_details = "It has been successfully uploaded."
+    finally:
+        upload_entity.save()
