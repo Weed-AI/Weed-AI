@@ -5,7 +5,7 @@ import ReactImageUploadComponent from './react-images-upload/index'
 const UploaderImages = props => {
   const [pictures, setPictures] = useState([]);
 
-  const onDrop = picture => 
+  const onDrop = picture => {
     setPictures(picture);
   };
 

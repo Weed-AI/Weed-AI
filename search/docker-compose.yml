@@ -13,6 +13,7 @@ services:
       - "80:80"
     networks:
       - elastic
+    restart: always
 
   # django backend
   django:
@@ -31,6 +32,7 @@ services:
       - "8000:8000"
     networks:
       - elastic
+    restart: always
 
   celery:
     image: celery
@@ -52,11 +54,13 @@ services:
       - redis
     networks:
       - elastic
+    restart: always
 
   redis:
     image: redis:alpine
     networks:
       - elastic
+    restart: always
 
   db:
     image: postgres:12.0-alpine
@@ -71,6 +75,7 @@ services:
       - "5432:5432"
     networks:
       - elastic
+    restart: always
 
   # search engine
   elasticsearch:
@@ -102,6 +107,7 @@ services:
       interval: 30s
       timeout: 30s
       retries: 3
+    restart: always
 
   reactivesearch:
     image: my-reactivesearch
@@ -118,6 +124,7 @@ services:
     stdin_open: true
     depends_on:
       - elasticsearch
+    restart: always
 
   thumbnails:
     image: thumbnails
@@ -131,6 +138,7 @@ services:
     networks:
       - elastic
     stdin_open: true
+    restart: always
 
 networks:
   elastic:
