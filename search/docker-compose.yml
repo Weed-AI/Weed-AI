@@ -22,11 +22,18 @@ services:
     depends_on:
       - elasticsearch
       - db
+      - redis
     build:
       context: ./django
       dockerfile:  Dockerfile
     environment:
       - DJANGO_SECRET_KEY=${DJANGO_SECRET_KEY}
+      - CELERY_BROKER=redis://redis:6379/0
+      - CELERY_BACKEND=redis://redis:6379/0
+    volumes:
+      - thumbnails_dir:/code/thumbnails
+      - repository_dir:/code/repository
+      - upload_dir:/code/upload
     command: python manage.py runserver 0.0.0.0:8000
     ports:
       - "8000:8000"
