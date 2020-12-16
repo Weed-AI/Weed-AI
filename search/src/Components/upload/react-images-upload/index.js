@@ -106,6 +106,10 @@ class ReactImageUploadComponent extends React.Component {
     });
   }
 
+  /*
+     Customised function modified on original codebase
+     Copyright (c) 2020 Zheng Li
+   */
   uploadFileToServer(dataURLs, files, newFileData) {
     const filesName = files.map(file => file.name);
     if (filesName.includes(newFileData.file.name)){
