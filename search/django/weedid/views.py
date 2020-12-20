@@ -12,6 +12,9 @@ from weedid.utils import (
     create_upload_entity,
 )
 from weedid.models import Dataset, WeedidUser
+from django.contrib.auth import login, logout
+from django.contrib.auth.hashers import check_password
+from django.http import HttpResponseForbidden
 import time
 
 
@@ -76,7 +79,7 @@ def submit_deposit(request):
 
 
 def upload_status(request):
-    user_id = 2
+    user_id = request.user.id
     upload_entity = WeedidUser.objects.get(id=user_id).latest_upload
     return HttpResponse(
         json.dumps(
@@ -118,3 +121,50 @@ def upload_list(request):
         Dataset.objects.filter(upload_status="C"),
     )
     return HttpResponse(json.dumps(list(upload_list)))
+
+
+@csrf_exempt
+def user_register(request):
+    if request.method == "GET":
+        return HttpResponse("Only support POST request")
+    elif request.method == "POST":
+        username = request.POST["username"]
+        email = request.POST["email"]
+        password = request.POST["password"]
+        try:
+            user = WeedidUser.objects.create_user(username, email, password)
+            user.save()
+            return HttpResponse("The account has been created")
+        except Exception:
+            return HttpResponseForbidden()
+
+
+@csrf_exempt
+def user_login(request):
+    if request.method == "GET":
+        return HttpResponse("Only support POST request")
+    elif request.method == "POST":
+        username = request.POST["username"]
+        password = request.POST["password"]
+        user = WeedidUser.objects.get(username=username)
+        print(check_password(user.password, password))
+
+        if user is not None and (
+            user.password == password or check_password(password, user.password)
+        ):
+            login(request, user)
+            return HttpResponse("You have been logged in")
+        else:
+            return HttpResponseForbidden()
+
+
+def user_logout(request):
+    logout(request)
+    return HttpResponse("You have been logged out")
+
+
+def user_login_status(request):
+    if request.user.is_authenticated:
+        return HttpResponse("You have been logged in")
+    else:
+        return HttpResponseForbidden("You havent been logged in")

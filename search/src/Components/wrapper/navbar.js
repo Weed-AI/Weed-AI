@@ -6,9 +6,9 @@ import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
 import Typography from '@material-ui/core/Typography';
 import Box from '@material-ui/core/Box';
-import ReactiveSearchComponent from './reactive_search'
-import UploadComponent from './upload'
-import DatasetComponent from './datasets'
+import ReactiveSearchComponent from './reactive_search';
+import UploadComponent from './upload';
+import DatasetComponent from './datasets';
 
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -89,6 +89,7 @@ const StyledTab = withStyles((theme) => ({
 }))((props) => <Tab disableRipple {...props} />);
 
 export default function NavbarComponent() {
+
   const classes = useStyles();
   const [value, setValue] = React.useState(0);
 

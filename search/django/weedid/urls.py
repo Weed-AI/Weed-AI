@@ -9,5 +9,9 @@ urlpatterns = [
     path("api/upload_status/", views.upload_status, name="upload_status"),
     path("api/upload_info/", views.upload_info, name="upload_info"),
     path("api/upload_list/", views.upload_list, name="upload_list"),
+    path("api/register/", views.user_register, name="user_register"),
+    path("api/login/", views.user_login, name="user_login"),
+    path("api/logout/", views.user_logout, name="user_logout"),
+    path("api/login_status/", views.user_login_status, name="user_login_status"),
     re_path(r"^elasticsearch", views.elasticsearch_query, name="elasticsearch_query"),
 ]
