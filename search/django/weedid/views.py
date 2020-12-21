@@ -15,7 +15,6 @@ from weedid.models import Dataset, WeedidUser
 from django.contrib.auth import login, logout
 from django.contrib.auth.hashers import check_password
 from django.http import HttpResponseForbidden
-import time
 
 
 def test(request):
@@ -38,7 +37,7 @@ def upload(request):
     if request.method == "GET":
         return HttpResponse("Only support POST request")
     elif request.method == "POST":
-        user_id = 2
+        user_id = request.user.id
         images = []
         file_weedcoco = request.FILES["weedcoco"]
         for image_reference in json.load(file_weedcoco)["images"]:
@@ -54,8 +53,7 @@ def upload_image(request):
     if request.method == "GET":
         return HttpResponse("Only support POST request")
     elif request.method == "POST":
-        time.sleep(3)
-        user_id = 2
+        user_id = request.user.id
         upload_id = request.POST["upload_id"]
         upload_image = request.FILES["upload_image"]
         upload_dir = os.path.join(UPLOAD_DIR, str(user_id), upload_id, "images")
@@ -68,7 +66,7 @@ def submit_deposit(request):
     if request.method == "GET":
         return HttpResponse("Only support POST request")
     elif request.method == "POST":
-        user_id = 2
+        user_id = request.user.id
         upload_id = request.POST["upload_id"]
         weedcoco_path = os.path.join(
             UPLOAD_DIR, str(user_id), str(upload_id), "weedcoco.json"
