@@ -16,7 +16,7 @@ def upload_task(weedcoco_path, image_dir, upload_id):
     upload_entity.save()
     try:
         new_weedcoco_path = deposit(
-            Path(weedcoco_path), Path(image_dir), Path(REPOSITORY_DIR)
+            Path(weedcoco_path), Path(image_dir), Path(REPOSITORY_DIR), upload_id
         )
     except Exception as e:
         upload_entity.upload_status = "F"
