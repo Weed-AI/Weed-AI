@@ -35,20 +35,23 @@ def get_all_existing_hash(repository_dir):
     }
 
 
-def setup_dataset_dir(repository_dir):
-    if not os.path.isdir(repository_dir):
-        os.mkdir(repository_dir)
-        dataset_dir = repository_dir / "dataset_1"
+def setup_dataset_dir(repository_dir, upload_id=None):
+    if upload_id is None:
+        if not os.path.isdir(repository_dir):
+            os.mkdir(repository_dir)
+            dataset_dir = repository_dir / "dataset_1"
+        else:
+            latest_dataset_dir_index = max(
+                [
+                    int(dir.split("_")[-1])
+                    for dir in os.listdir(repository_dir)
+                    if re.fullmatch(r"^dataset_\d+$", dir)
+                ],
+                default=0,
+            )
+            dataset_dir = repository_dir / f"dataset_{latest_dataset_dir_index + 1}"
     else:
-        latest_dataset_dir_index = max(
-            [
-                int(dir.split("_")[-1])
-                for dir in os.listdir(repository_dir)
-                if re.fullmatch(r"^dataset_\d+$", dir)
-            ],
-            default=0,
-        )
-        dataset_dir = repository_dir / f"dataset_{latest_dataset_dir_index + 1}"
+        dataset_dir = repository_dir / upload_id
     os.mkdir(dataset_dir)
     return dataset_dir
 
@@ -88,11 +91,11 @@ def deposit_weedcoco(weedcoco_path, dataset_dir, image_dir, image_hash):
     return new_dataset_dir
 
 
-def deposit(weedcoco_path, image_dir, repository_dir):
+def deposit(weedcoco_path, image_dir, repository_dir, upload_id=None):
     image_hash = create_image_hash(image_dir)
     validate_duplicate_images(image_hash)
     validate_existing_images(repository_dir, image_hash)
-    dataset_dir = setup_dataset_dir(repository_dir)
+    dataset_dir = setup_dataset_dir(repository_dir, upload_id)
     new_dataset_dir = deposit_weedcoco(
         weedcoco_path, dataset_dir, image_dir, image_hash
     )
