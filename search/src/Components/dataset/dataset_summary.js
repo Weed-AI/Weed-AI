@@ -76,6 +76,7 @@ class DatasetSummary extends Component {
     const {classes} = this.props
     const capitalFirstLetter = (string) => string.charAt(0).toUpperCase() + string.slice(1)
     const converter = (snakeName) => snakeName.split("_").map(string => capitalFirstLetter(string)).join(" ")
+    const getAttribute = (collection, key) => collection.length > 0 && key in collection[0] ? collection[0][key] : ""
     return (
       <div className={classes.root}>
         <Grid container spacing={3}>
@@ -85,22 +86,22 @@ class DatasetSummary extends Component {
                 <IconButton aria-label="back to list" color="secondary" onClick={() => this.props.handleUploadid("*")}>
                   <ListIcon />
                 </IconButton>
-                <Typography variant='h4' style={{fontWeight: 600}}>{this.state.metadata.info.length > 0 && "name" in this.state.metadata.info[0] ? this.state.metadata.info[0].name : ""}</Typography>
+                <Typography variant='h4' style={{fontWeight: 600}}>{getAttribute(this.state.metadata.info, "name")}</Typography>
               </div>
               <p>
-                {this.state.metadata.collections.length > 0 && "title" in this.state.metadata.collections[0] ? this.state.metadata.collections[0].title : ""}
+                {getAttribute(this.state.metadata.collections, "title")}
               </p>
               <p>
                 Author:
                 &nbsp;
-                {this.state.metadata.collections.length > 0 && "author" in this.state.metadata.collections[0] ? this.state.metadata.collections[0].author : ""}
+                {getAttribute(this.state.metadata.collections, "author")}
               </p>
               <p>
                 Licence:
                 &nbsp;
-                {this.state.metadata.license.length > 0 && "license_name" in this.state.metadata.license[0] ? this.state.metadata.license[0].license_name : ""}
+                {getAttribute(this.state.metadata.license, "license_name")}
                 &nbsp;
-                {this.state.metadata.license.length > 0 && "url" in this.state.metadata.license[0] ? this.state.metadata.license[0].url : ""}
+                {getAttribute(this.state.metadata.license, "url")}
               </p>
             </div>
           </Grid>
