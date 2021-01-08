@@ -21,10 +21,11 @@ def get_image_dimensions(path):
 
 def load_json_or_yaml(path):
     """Streamlined function for open both JSON and YAML"""
-    if path.suffix in (".yml", ".yaml"):
-        obj = yaml.safe_load(open(path))
-    else:
-        obj = json.load(open(path))
+    with open(path) as f:
+        if path.suffix in (".yml", ".yaml"):
+            obj = yaml.safe_load(f)
+        else:
+            obj = json.load(f)
     return obj
 
 
