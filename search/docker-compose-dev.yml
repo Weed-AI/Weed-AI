@@ -30,6 +30,7 @@ services:
       - CELERY_BROKER=redis://redis:6379/0
       - CELERY_BACKEND=redis://redis:6379/0
     command: python manage.py runserver 0.0.0.0:8000
+    entrypoint: /entrypoint.sh
     volumes:
       - ./django/:/code
       - thumbnails_dir:/code/thumbnails
