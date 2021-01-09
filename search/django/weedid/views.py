@@ -17,10 +17,6 @@ from django.contrib.auth.hashers import check_password
 from django.http import HttpResponseForbidden
 
 
-def test(request):
-    return HttpResponse("TESTING VIEW")
-
-
 @csrf_exempt
 def elasticsearch_query(request):
     elasticsearch_url = "/".join(request.path.split("/")[3:])
@@ -34,9 +30,7 @@ def elasticsearch_query(request):
 
 @csrf_exempt
 def upload(request):
-    if request.method == "GET":
-        return HttpResponse("Only support POST request")
-    elif request.method == "POST":
+    if request.method == "POST":
         user_id = request.user.id
         images = []
         file_weedcoco = request.FILES["weedcoco"]
@@ -46,26 +40,26 @@ def upload(request):
         weedcoco_path = store_tmp_weedcoco(file_weedcoco, upload_dir)
         create_upload_entity(weedcoco_path, upload_id, user_id)
         return HttpResponse(json.dumps({"upload_id": upload_id, "images": images}))
+    else:
+        return HttpResponse("Only support POST request")
 
 
 @csrf_exempt
 def upload_image(request):
-    if request.method == "GET":
-        return HttpResponse("Only support POST request")
-    elif request.method == "POST":
+    if request.method == "POST":
         user_id = request.user.id
         upload_id = request.POST["upload_id"]
         upload_image = request.FILES["upload_image"]
         upload_dir = os.path.join(UPLOAD_DIR, str(user_id), upload_id, "images")
         store_tmp_image(upload_image, upload_dir)
         return HttpResponse(f"Uploaded {upload_image.name} to {upload_dir}")
+    else:
+        return HttpResponse("Only support POST request")
 
 
 @csrf_exempt
 def submit_deposit(request):
-    if request.method == "GET":
-        return HttpResponse("Only support POST request")
-    elif request.method == "POST":
+    if request.method == "POST":
         user_id = request.user.id
         upload_id = request.POST["upload_id"]
         weedcoco_path = os.path.join(
@@ -74,6 +68,8 @@ def submit_deposit(request):
         images_dir = os.path.join(UPLOAD_DIR, str(user_id), str(upload_id), "images")
         upload_task.delay(weedcoco_path, images_dir, upload_id)
         return HttpResponse(f"Work on user {user_id}'s upload{upload_id}")
+    else:
+        return HttpResponse("Only support POST request")
 
 
 def upload_status(request):
@@ -91,9 +87,7 @@ def upload_status(request):
 
 @csrf_exempt
 def upload_info(request):
-    if request.method == "GET":
-        return HttpResponse("Only support POST request")
-    elif request.method == "POST":
+    if request.method == "POST":
         upload_id = request.POST["upload_id"]
         upload_entity = Dataset.objects.get(upload_id=upload_id)
         return HttpResponse(
@@ -104,6 +98,8 @@ def upload_info(request):
                 }
             )
         )
+    else:
+        return HttpResponse("Only support POST request")
 
 
 def upload_list(request):
@@ -123,9 +119,7 @@ def upload_list(request):
 
 @csrf_exempt
 def user_register(request):
-    if request.method == "GET":
-        return HttpResponse("Only support POST request")
-    elif request.method == "POST":
+    if request.method == "POST":
         username = request.POST["username"]
         email = request.POST["email"]
         password = request.POST["password"]
@@ -135,13 +129,13 @@ def user_register(request):
             return HttpResponse("The account has been created")
         except Exception:
             return HttpResponseForbidden()
+    else:
+        return HttpResponse("Only support POST request")
 
 
 @csrf_exempt
 def user_login(request):
-    if request.method == "GET":
-        return HttpResponse("Only support POST request")
-    elif request.method == "POST":
+    if request.method == "POST":
         username = request.POST["username"]
         password = request.POST["password"]
         user = WeedidUser.objects.get(username=username)
@@ -154,6 +148,8 @@ def user_login(request):
             return HttpResponse("You have been logged in")
         else:
             return HttpResponseForbidden()
+    else:
+        return HttpResponse("Only support POST request")
 
 
 def user_logout(request):
