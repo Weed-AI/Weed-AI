@@ -6,6 +6,10 @@ import Typography from '@material-ui/core/Typography';
 import { withStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
 import axios from 'axios';
+import Cookies from 'js-cookie'
+
+
+const csrftoken = Cookies.get('csrftoken');
 
 const useStyles = (theme) => ({
     paper: {
@@ -45,7 +49,7 @@ class LoginComponent extends React.Component {
             method: 'post',
             url: baseURL + 'api/login/',
             data: bodyFormData,
-            headers: {'Content-Type': 'multipart/form-data' }
+            headers: {'Content-Type': 'multipart/form-data', 'X-CSRFToken': csrftoken }
         })
         .then((response) => {
             console.log(response);

@@ -1,5 +1,4 @@
 from django.http import HttpResponse
-from django.views.decorators.csrf import csrf_exempt
 import requests
 import os
 import json
@@ -17,7 +16,6 @@ from django.contrib.auth.hashers import check_password
 from django.http import HttpResponseForbidden
 
 
-@csrf_exempt
 def elasticsearch_query(request):
     elasticsearch_url = "/".join(request.path.split("/")[3:])
     elasticsearch_response = requests.post(
@@ -28,7 +26,6 @@ def elasticsearch_query(request):
     return HttpResponse(elasticsearch_response)
 
 
-@csrf_exempt
 def upload(request):
     if request.method == "POST":
         user_id = request.user.id
@@ -44,7 +41,6 @@ def upload(request):
         return HttpResponse("Only support POST request")
 
 
-@csrf_exempt
 def upload_image(request):
     if request.method == "POST":
         user_id = request.user.id
@@ -57,7 +53,6 @@ def upload_image(request):
         return HttpResponse("Only support POST request")
 
 
-@csrf_exempt
 def submit_deposit(request):
     if request.method == "POST":
         user_id = request.user.id
@@ -73,19 +68,21 @@ def submit_deposit(request):
 
 
 def upload_status(request):
-    user_id = request.user.id
-    upload_entity = WeedidUser.objects.get(id=user_id).latest_upload
-    return HttpResponse(
-        json.dumps(
-            {
-                "upload_status": upload_entity.upload_status,
-                "upload_status_details": upload_entity.upload_status_details,
-            }
+    if request.user.is_authenticated:
+        user_id = request.user.id
+        upload_entity = WeedidUser.objects.get(id=user_id).latest_upload
+        return HttpResponse(
+            json.dumps(
+                {
+                    "upload_status": upload_entity.upload_status,
+                    "upload_status_details": upload_entity.upload_status_details,
+                }
+            )
         )
-    )
+    else:
+        return HttpResponse("You havent been logged in")
 
 
-@csrf_exempt
 def upload_info(request):
     if request.method == "POST":
         upload_id = request.POST["upload_id"]
@@ -117,7 +114,6 @@ def upload_list(request):
     return HttpResponse(json.dumps(list(upload_list)))
 
 
-@csrf_exempt
 def user_register(request):
     if request.method == "POST":
         username = request.POST["username"]
@@ -133,13 +129,11 @@ def user_register(request):
         return HttpResponse("Only support POST request")
 
 
-@csrf_exempt
 def user_login(request):
     if request.method == "POST":
         username = request.POST["username"]
         password = request.POST["password"]
         user = WeedidUser.objects.get(username=username)
-        print(check_password(user.password, password))
 
         if user is not None and (
             user.password == password or check_password(password, user.password)

@@ -3,7 +3,10 @@ import PropTypes from 'prop-types';
 import './index.css';
 import FlipMove from 'react-flip-move';
 import axios from 'axios';
+import Cookies from 'js-cookie'
 
+
+const csrftoken = Cookies.get('csrftoken');
 
 const styles = {
   display: "flex",
@@ -122,7 +125,7 @@ class ReactImageUploadComponent extends React.Component {
             method: 'post',
             url: this.props.uploadURL,
             data: body,
-            headers: {'Content-Type': 'multipart/form-data' }
+            headers: {'Content-Type': 'multipart/form-data', 'X-CSRFToken': csrftoken }
         }).then(res => {
             if(res.status === 200){
                 dataURLs.push(newFileData.dataURL);

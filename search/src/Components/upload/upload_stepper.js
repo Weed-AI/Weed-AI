@@ -187,8 +187,11 @@ import Button from '@material-ui/core/Button';
 import Typography from '@material-ui/core/Typography';
 import UploaderSingle from './uploader_single';
 import UploaderImages from './uploader_images';
-import axios from 'axios'
+import axios from 'axios';
+import Cookies from 'js-cookie'
 
+
+const csrftoken = Cookies.get('csrftoken');
 
 const useStyles = (theme) => ({
   root: {
@@ -306,7 +309,7 @@ class UploadStepper extends React.Component {
             method: 'post',
             url: baseURL + "api/submit_deposit/",
             data: body,
-            headers: {'Content-Type': 'multipart/form-data' }
+            headers: {'Content-Type': 'multipart/form-data', 'X-CSRFToken': csrftoken }
         })
     }
 

@@ -7,7 +7,10 @@ import {
 	ReactiveList,
 	SelectedFilters
 } from '@appbaseio/reactivesearch';
+import Cookies from 'js-cookie'
 
+
+const csrftoken = Cookies.get('csrftoken');
 
 class ReactiveSearchComponent extends Component {
 
@@ -72,6 +75,7 @@ class ReactiveSearchComponent extends Component {
 						padding: 10
 					}
 				}}
+				headers={{'X-CSRFToken': csrftoken}}
 			>
 				<div style={{ position: "fixed", width: "20rem", overflow: "scroll", height: "90%", left: 0, padding: '0 1rem' }}>
 					<MultiList

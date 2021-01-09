@@ -10,7 +10,10 @@ import Grid from '@material-ui/core/Grid';
 import axios from 'axios';
 import ListIcon from '@material-ui/icons/List';
 import IconButton from '@material-ui/core/IconButton';
+import Cookies from 'js-cookie'
 
+
+const csrftoken = Cookies.get('csrftoken');
 
 const useStyles = (theme) => ({
   root: {
@@ -61,7 +64,7 @@ class DatasetSummary extends Component {
         method: 'post',
         url: baseURL + "api/upload_info/",
         data: body,
-        headers: {'Content-Type': 'multipart/form-data' }
+        headers: {'Content-Type': 'multipart/form-data', 'X-CSRFToken': csrftoken }
     })
     .then(res => res.data)
     .then(json => {
