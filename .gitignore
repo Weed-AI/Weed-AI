@@ -21,6 +21,12 @@ weedcoco/concatenation/*.json
 # Annotations
 *.xml
 
+# test images for repo
+!weedcoco/tests/repo/**/*.jpg
+!weedcoco/tests/repo/**/*.png
 
 # Dev Tools
 .vscode/settings.json
+
+# .env
+.env

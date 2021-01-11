@@ -15,6 +15,9 @@ requirements = [
     "pyyaml",
     "tqdm",
     "numpy",
+    "imagehash",
+    "requests",
+    "elasticsearch",
 ]
 
 setup(

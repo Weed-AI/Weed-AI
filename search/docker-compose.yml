@@ -1,5 +1,50 @@
-version: '3'
+version: "3"
 services:
+  # nginx reverse proxy
+  reverse-proxy:
+    image: reverse-proxy
+    container_name: reverse_proxy
+    depends_on:
+        - django
+        - reactivesearch
+    build:
+        context: ./nginx/nginx
+    ports:
+      - "80:80"
+    networks:
+      - elastic
+
+  django:
+    image: django
+    container_name: django
+    depends_on:
+      - elasticsearch
+      - db
+    build:
+      context: ./django
+      dockerfile:  Dockerfile
+    environment:
+      - DJANGO_SECRET_KEY=${DJANGO_SECRET_KEY}
+    command: python manage.py runserver 0.0.0.0:8000
+    ports:
+      - "8000:8000"
+    networks:
+      - elastic
+
+  db:
+    image: postgres:12.0-alpine
+    container_name: db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
+    ports:
+      - "5432:5432"
+    networks:
+      - elastic
+
   # search engine
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch-oss:7.8.1
@@ -8,56 +53,44 @@ services:
       - discovery.type=single-node
       - http.port=9200
       - http.cors.enabled=true
-      - http.cors.allow-origin=http://localhost:1358,http://127.0.0.1:1358,http://localhost:1337,http://127.0.0.1:1337
+      # - http.cors.allow-origin=http://localhost:1358,http://127.0.0.1:1358,http://localhost:1337,http://127.0.0.1:1337,http://localhost:8000
+      - http.cors.allow-origin=*
       - http.cors.allow-headers=X-Requested-With,X-Auth-Token,Content-Type,Content-Length,Authorization
       - http.cors.allow-credentials=true
       - bootstrap.memory_lock=true
-      - 'ES_JAVA_OPTS=-Xms512m -Xmx512m'
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
     volumes:
       - esdata1:/usr/share/elasticsearch/data
     ports:
-      - '9200:9200'
-      - '9300:9300'
+      - "9200:9200"
+      - "9300:9300"
     networks:
       - elastic
     healthcheck:
-      test: ["CMD-SHELL", "curl --silent --fail localhost:9200/_cluster/health || exit 1"]
+      test:
+        [
+          "CMD-SHELL",
+          "curl --silent --fail localhost:9200/_cluster/health || exit 1",
+        ]
       interval: 30s
       timeout: 30s
       retries: 3
+
   reactivesearch:
     image: my-reactivesearch
-    build: .
-    volumes:
-      - ./:/code   # for development
-      - /code/node_modules  # an exception from the above volume
+    container_name: reactivesearch
+    build:
+      context: .
+      dockerfile:  Dockerfile
     ports:
-      - '1337:3000'
+      - "8080:80"
     environment:
       - NODE_ENV=production
     networks:
       - elastic
     stdin_open: true
-  # elasticsearch browser
-  dejavu:
-    image: appbaseio/dejavu:3.2.3
-    container_name: dejavu
-    ports:
-      - '1358:1358'
-    links:
+    depends_on:
       - elasticsearch
-    networks:
-      - elastic
-  # kibana as another elastic search UI
-  kibana:
-    image: docker.elastic.co/kibana/kibana-oss:7.8.1
-    ports:
-      - 5601:5601
-    environment:
-      ELASTICSEARCH_URL: http://elasticsearch:9200
-      ELASTICSEARCH_HOSTS: http://elasticsearch:9200
-    networks:
-      - elastic
 
 networks:
   elastic:
@@ -66,3 +99,4 @@ networks:
 volumes:
   esdata1:
     driver: local
+  postgres_data:
