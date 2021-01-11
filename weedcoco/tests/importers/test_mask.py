@@ -50,13 +50,13 @@ def test_basic(converter):
             },
             {
                 "id": 1,
-                "file_name": "0054_20200306T012123.728442.png",
+                "file_name": "0042_20200306T012119.728345.png",
                 "width": 1024,
                 "height": 768,
             },
             {
                 "id": 2,
-                "file_name": "0042_20200306T012119.728345.png",
+                "file_name": "0054_20200306T012123.728442.png",
                 "width": 1024,
                 "height": 768,
             },
@@ -84,7 +84,7 @@ def test_basic(converter):
             },
             {
                 "id": 2,
-                "image_id": 2,
+                "image_id": 1,
                 "category_id": 1,
                 "segmentation": {
                     "size": [768, 1024],

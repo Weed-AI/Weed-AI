@@ -109,6 +109,9 @@ def masks_to_coco(
     colors_not_found = set()
     categories_found = set()
     for path in sorted(image_dir.glob("*.*")):
+        if path.name.startswith("."):
+            # real glob excludes these
+            continue
         mask_path = mask_dir / (_image_name_to_mask(path.name))
         if not mask_path.exists():
             raise FileNotFoundError(
