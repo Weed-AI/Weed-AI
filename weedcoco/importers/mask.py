@@ -82,8 +82,13 @@ def masks_to_coco(
         'categories'.
         Other COCO components should be added as a post-process.
     """
+    if not image_dir.is_dir():
+        raise NotADirectoryError(f"Not a directory: {image_dir}")
+    if not mask_dir.is_dir():
+        raise NotADirectoryError(f"Not a directory: {mask_dir}")
     if image_to_mask_pattern is None:
         image_to_mask_pattern = r"$.*\.(?=[^.]+$)"
+
     categories = []
     color_to_idx_map = {}
     for i, (color, name) in enumerate(color_to_category_map.items()):
@@ -133,6 +138,9 @@ def masks_to_coco(
             annotations.append(annotation)
 
         images.append({"id": len(images), "file_name": path.name, **dims})
+
+    if not images:
+        raise ValueError(f"No images found in {image_dir}")
 
     if len(colors_not_found) > 1:
         raise ValueError(
