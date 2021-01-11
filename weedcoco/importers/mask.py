@@ -108,7 +108,7 @@ def masks_to_coco(
     annotations = []
     colors_not_found = set()
     categories_found = set()
-    for path in image_dir.glob("*.*"):
+    for path in sorted(image_dir.glob("*.*")):
         mask_path = mask_dir / (_image_name_to_mask(path.name))
         if not mask_path.exists():
             raise FileNotFoundError(
