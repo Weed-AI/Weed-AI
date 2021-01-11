@@ -15,6 +15,7 @@ requirements = [
     "pyyaml",
     "tqdm",
     "numpy",
+    "pycocotools",
     "imagehash",
     "requests",
     "elasticsearch",

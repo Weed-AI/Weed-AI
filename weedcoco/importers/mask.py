@@ -55,7 +55,10 @@ def generate_segmentations(mask_path, color_map, colors_not_found):
 
 
 def masks_to_coco(
-    image_dir: Path, mask_dir: Path, color_to_category_map: Mapping[str, str], image_to_mask_pattern=None
+    image_dir: Path,
+    mask_dir: Path,
+    color_to_category_map: Mapping[str, str],
+    image_to_mask_pattern=None,
 ):
     """Converts images and masks to MS COCO images and annotations
 
@@ -91,8 +94,10 @@ def masks_to_coco(
         try:
             return re.search(image_to_mask_pattern, name).group() + ".png"
         except AttributeError:
-            raise ValueError(f"Could not extract mask filename from {name} "
-                             f"using pattern {repr(image_to_mask_pattern)}")
+            raise ValueError(
+                f"Could not extract mask filename from {name} "
+                f"using pattern {repr(image_to_mask_pattern)}"
+            )
 
     images = []
     annotations = []
@@ -135,14 +140,20 @@ def masks_to_coco(
             f"Got {len(colors_not_found)}: {', '.join(f'#{x}' for x in sorted(colors_not_found))}."
         )
     if len(categories_found) != len(categories):
-        missing_category_names = {cat["name"] for cat in categories
-                                  if cat["id"] not in categories_found}
-        missing_category_colors = {color: name for color, name in color_to_category_map.items()
-                                   if name in missing_category_names}
+        missing_category_names = {
+            cat["name"] for cat in categories if cat["id"] not in categories_found
+        }
+        missing_category_colors = {
+            color: name
+            for color, name in color_to_category_map.items()
+            if name in missing_category_names
+        }
 
-        warnings.warn(f"{len(categories)} categories defined, but only "
-                      f"{len(categories_found)} of these are present in masks. "
-                      f"Missing are {missing_category_colors}")
+        warnings.warn(
+            f"{len(categories)} categories defined, but only "
+            f"{len(categories_found)} of these are present in masks. "
+            f"Missing are {missing_category_colors}"
+        )
 
     out = {
         "images": images,
@@ -169,8 +180,10 @@ def main(args=None):
         "--category-map",
         required=True,
         type=Path,
-        help=("JSON or YAML mapping of colors (RRGGBB) to WeedCOCO category names. "
-              "The background color should not be mapped."),
+        help=(
+            "JSON or YAML mapping of colors (RRGGBB) to WeedCOCO category names. "
+            "The background color should not be mapped."
+        ),
     )
     ap.add_argument("--agcontext-path", type=Path)
     ap.add_argument("--collection-path", type=Path)
@@ -179,7 +192,12 @@ def main(args=None):
     args = ap.parse_args(args)
 
     color_to_category_map = load_json_or_yaml(args.category_map)
-    coco = masks_to_coco(args.image_dir, args.mask_dir, color_to_category_map, image_to_mask_pattern=args.path_to_mask_pattern)
+    coco = masks_to_coco(
+        args.image_dir,
+        args.mask_dir,
+        color_to_category_map,
+        image_to_mask_pattern=args.path_to_mask_pattern,
+    )
 
     if args.agcontext_path:
         add_agcontext_from_file(coco, args.agcontext_path)
