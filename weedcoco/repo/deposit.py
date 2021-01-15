@@ -93,6 +93,12 @@ def deposit_weedcoco(weedcoco_path, dataset_dir, image_dir, image_hash):
     return new_dataset_dir
 
 
+def retrieve_image_paths(images_path):
+    for root, directories, files in os.walk(images_path):
+        for filename in files:
+            yield (os.path.join(root, filename), filename)
+
+
 def compress_to_download(dataset_dir, deposit_id, download_dir):
     if not os.path.isdir(download_dir):
         os.mkdir(download_dir)
@@ -101,7 +107,8 @@ def compress_to_download(dataset_dir, deposit_id, download_dir):
         os.remove(download_path)
     with ZipFile(download_path, "w") as zip:
         zip.write(dataset_dir / "weedcoco.json", "weedcoco.json")
-        zip.write(dataset_dir / "images", "images")
+        for image, image_name in retrieve_image_paths(dataset_dir / "images"):
+            zip.write(image, "images/" + image_name)
 
 
 def deposit(weedcoco_path, image_dir, repository_dir, download_dir, upload_id=None):
