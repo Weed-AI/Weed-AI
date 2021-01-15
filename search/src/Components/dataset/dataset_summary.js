@@ -80,6 +80,7 @@ class DatasetSummary extends Component {
     const capitalFirstLetter = (string) => string.charAt(0).toUpperCase() + string.slice(1)
     const converter = (snakeName) => snakeName.split("_").map(string => capitalFirstLetter(string)).join(" ")
     const getAttribute = (collection, key) => collection.length > 0 && key in collection[0] ? collection[0][key] : ""
+    const esURL = new URL(window.location.origin)
     return (
       <div className={classes.root}>
         <Grid container spacing={3}>
@@ -110,7 +111,7 @@ class DatasetSummary extends Component {
           </Grid>
           <Grid item xs={2}>
             <div className={classes.summary}>
-                <Button className={classes.download}>Download in WeedCOCO format</Button>
+                <Button className={classes.download} onClick={() => window.open(`${esURL}code/download/${this.props.upload_id}.zip`)}>Download in WeedCOCO format</Button>
             </div>
           </Grid>
         </Grid>

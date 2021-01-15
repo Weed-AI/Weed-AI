@@ -36,6 +36,7 @@ services:
       - thumbnails_dir:/code/thumbnails
       - repository_dir:/code/repository
       - upload_dir:/code/upload
+      - download_dir:/code/download
     ports:
       - "8000:8000"
     networks:
@@ -57,6 +58,7 @@ services:
       - thumbnails_dir:/code/thumbnails
       - repository_dir:/code/repository
       - upload_dir:/code/upload
+      - download_dir:/code/download
     depends_on:
       - django
       - redis
@@ -145,6 +147,19 @@ services:
       - elastic
     stdin_open: true
 
+  download:
+    image: download
+    container_name: download
+    build:
+      context: ./nginx/download
+    volumes:
+      - download_dir:/tmp/download
+    ports:
+      - "8082:80"
+    networks:
+      - elastic
+    stdin_open: true
+
 networks:
   elastic:
     driver: bridge
@@ -157,6 +172,8 @@ volumes:
   repository_dir:
     driver: local
   thumbnails_dir:
+    driver: local
+  download_dir:
     driver: local
   upload_dir:
     driver: local

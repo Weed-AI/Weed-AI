@@ -4,7 +4,7 @@ from weedcoco.repo.deposit import deposit
 from weedcoco.index.indexing import ElasticSearchIndex
 from weedcoco.index.thumbnailing import thumbnailing
 from weedid.models import Dataset
-from core.settings import THUMBNAILS_DIR, REPOSITORY_DIR
+from core.settings import THUMBNAILS_DIR, REPOSITORY_DIR, DOWNLOAD_DIR
 from pathlib import Path
 
 
@@ -16,7 +16,11 @@ def upload_task(weedcoco_path, image_dir, upload_id):
     upload_entity.save()
     try:
         new_weedcoco_path = deposit(
-            Path(weedcoco_path), Path(image_dir), Path(REPOSITORY_DIR), upload_id
+            Path(weedcoco_path),
+            Path(image_dir),
+            Path(REPOSITORY_DIR),
+            Path(DOWNLOAD_DIR),
+            upload_id,
         )
     except Exception as e:
         upload_entity.upload_status = "F"
