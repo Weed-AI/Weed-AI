@@ -51,6 +51,8 @@ def setup_dataset_dir(repository_dir, upload_id=None):
                 default=0,
             )
             deposit_id = f"dataset_{latest_dataset_dir_index + 1}"
+    else:
+        deposit_id = upload_id
     dataset_dir = repository_dir / deposit_id
     os.mkdir(dataset_dir)
     return dataset_dir, deposit_id
