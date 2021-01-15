@@ -4,6 +4,7 @@ import json
 import os
 import re
 from shutil import copyfile
+from zipfile import ZipFile
 from weedcoco.utils import get_image_average_hash, check_if_approved_image_extension
 from weedcoco.validation import ValidationError, validate
 
@@ -39,7 +40,7 @@ def setup_dataset_dir(repository_dir, upload_id=None):
     if upload_id is None:
         if not os.path.isdir(repository_dir):
             os.mkdir(repository_dir)
-            dataset_dir = repository_dir / "dataset_1"
+            deposit_id = "dataset_1"
         else:
             latest_dataset_dir_index = max(
                 [
@@ -49,11 +50,10 @@ def setup_dataset_dir(repository_dir, upload_id=None):
                 ],
                 default=0,
             )
-            dataset_dir = repository_dir / f"dataset_{latest_dataset_dir_index + 1}"
-    else:
-        dataset_dir = repository_dir / upload_id
+            deposit_id = f"dataset_{latest_dataset_dir_index + 1}"
+    dataset_dir = repository_dir / deposit_id
     os.mkdir(dataset_dir)
-    return dataset_dir
+    return dataset_dir, deposit_id
 
 
 def create_image_hash(image_dir):
@@ -91,15 +91,27 @@ def deposit_weedcoco(weedcoco_path, dataset_dir, image_dir, image_hash):
     return new_dataset_dir
 
 
-def deposit(weedcoco_path, image_dir, repository_dir, upload_id=None):
+def compress_to_download(dataset_dir, deposit_id, download_dir):
+    if not os.path.isdir(download_dir):
+        os.mkdir(download_dir)
+    download_path = str(download_dir / deposit_id) + ".zip"
+    if os.path.exists(download_path):
+        os.remove(download_path)
+    with ZipFile(download_path, "w") as zip:
+        zip.write(dataset_dir / "weedcoco.json", "weedcoco.json")
+        zip.write(dataset_dir / "images", "images")
+
+
+def deposit(weedcoco_path, image_dir, repository_dir, download_dir, upload_id=None):
     image_hash = create_image_hash(image_dir)
     validate_duplicate_images(image_hash)
     validate_existing_images(repository_dir, image_hash)
-    dataset_dir = setup_dataset_dir(repository_dir, upload_id)
+    dataset_dir, deposit_id = setup_dataset_dir(repository_dir, upload_id)
     new_dataset_dir = deposit_weedcoco(
         weedcoco_path, dataset_dir, image_dir, image_hash
     )
     migrate_images(dataset_dir, image_dir, image_hash)
+    compress_to_download(dataset_dir, deposit_id, download_dir)
     return str(new_dataset_dir)
 
 
@@ -110,8 +122,9 @@ def main(args=None):
     )
     ap.add_argument("--image-dir", default="cwfid_images", type=pathlib.Path)
     ap.add_argument("--repository-dir", default="repository", type=pathlib.Path)
+    ap.add_argument("--download-dir", default="download", type=pathlib.Path)
     args = ap.parse_args(args)
-    deposit(args.weedcoco_path, args.image_dir, args.repository_dir)
+    deposit(args.weedcoco_path, args.image_dir, args.repository_dir, args.download_dir)
 
 
 if __name__ == "__main__":
