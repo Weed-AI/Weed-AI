@@ -88,46 +88,73 @@ const StyledTab = withStyles((theme) => ({
   selected: {}
 }))((props) => <Tab disableRipple {...props} />);
 
-export default function NavbarComponent() {
+export default function NavbarComponent(props) {
 
   const classes = useStyles();
-  const [value, setValue] = React.useState(0);
+  const { match, history } = props;
+  const { params } = match;
+  const { page } = params;
+
+  const tabNameToIndex = {
+    0: "explore",
+    1: "datasets",
+    2: "upload",
+    3: "about"
+  };
+
+  const indexToTabName = {
+    explore: 0,
+    datasets: 1,
+    upload: 2,
+    about: 3
+  };
+
+  const [selectedTab, setSelectedTab] = React.useState(indexToTabName[page]);
 
   const handleChange = (event, newValue) => {
-    setValue(newValue);
+    history.push(`/${tabNameToIndex[newValue]}`);
+    setSelectedTab(newValue);
   };
 
   return (
     <div className={classes.root}>
       <AppBar position="fixed">
-        <StyledTabs onChange={handleChange} value={value}>
-          <StyledTab label="Explore" {...a11yProps(0)}/>
-          <StyledTab label="Datasets" {...a11yProps(1)} />
-          <StyledTab label="Upload" {...a11yProps(2)} />
-          <StyledTab label="About" disabled {...a11yProps(3)} />
+        <StyledTabs onChange={handleChange} value={selectedTab}>
+          <StyledTab label="Explore" />
+          <StyledTab label="Datasets" />
+          <StyledTab label="Upload" />
+          <StyledTab label="About" disabled />
           <Typography variant='p' className={classes.logo}><span style={{color: '#f0983a'}}>Weed ID</span>entification Database</Typography>
         </StyledTabs>
       </AppBar>
-      <TabPanel value={value} index={0}>
+      {
+        selectedTab === 0
+        &&
         <div className={classes.container}>
             <ReactiveSearchComponent />
         </div>
-      </TabPanel>
-      <TabPanel value={value} index={1}>
+      }
+      {
+        selectedTab === 1
+        &&
         <div className={classes.container}>
             <DatasetComponent />
         </div>
-      </TabPanel>
-      <TabPanel value={value} index={2}>
+      }
+      {
+        selectedTab === 2
+        &&
         <div className={classes.container}>
             <UploadComponent />
         </div>
-      </TabPanel>
-      <TabPanel value={value} index={3}>
+      }
+      {
+        selectedTab === 3
+        &&
         <div className={classes.container}>
             About Page Placeholder
         </div>
-      </TabPanel>
+      }
     </div>
   );
 }

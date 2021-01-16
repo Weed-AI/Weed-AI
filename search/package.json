@@ -19,6 +19,7 @@
     "react-dom": "^16.13.1",
     "react-dropzone-uploader": "^2.11.0",
     "react-flip-move": "^3.0.4",
+    "react-router-dom": "^5.2.0",
     "react-scripts": "3.4.3",
     "redux": "^2.0.0",
     "typescript": "^2.8.0"
