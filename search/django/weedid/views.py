@@ -156,3 +156,20 @@ def user_login_status(request):
         return HttpResponse("You have been logged in")
     else:
         return HttpResponseForbidden("You havent been logged in")
+
+
+def login_google(request):
+    if request.method == "POST":
+        body = json.loads(request.body)
+        email, googleId = body["email"], body["googleId"]
+        users = WeedidUser.objects.all().filter(email=email)
+        if len(users) > 0:
+            login(request, users[0])
+            return HttpResponse("You have been logged in")
+        else:
+            user = WeedidUser.objects.create_user(email.split("@")[0], email, googleId)
+            user.save()
+            login(request, user)
+            return HttpResponse("The account has been created and logged in")
+    else:
+        return HttpResponse("Only support POST request")

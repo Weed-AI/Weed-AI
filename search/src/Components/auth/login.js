@@ -6,7 +6,7 @@ import Typography from '@material-ui/core/Typography';
 import { withStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
 import axios from 'axios';
-import Cookies from 'js-cookie'
+import Cookies from 'js-cookie';
 
 
 const csrftoken = Cookies.get('csrftoken');

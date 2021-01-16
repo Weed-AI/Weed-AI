@@ -4,8 +4,14 @@ import Dialog from '@material-ui/core/Dialog';
 import DialogContent from '@material-ui/core/DialogContent';
 import LoginComponent from '../auth/login';
 import RegisterComponent from '../auth/register';
+import GoogleLogin from 'react-google-login';
+import axios from 'axios';
+import Cookies from 'js-cookie';
+
 
 export default function AuthPrompt(props) {
+  const baseURL = new URL(window.location.origin);
+  const csrftoken = Cookies.get('csrftoken');
   const [open, setOpen] = React.useState(false);
   const [prompt, setPrompt] = React.useState('login');
 
@@ -27,6 +33,18 @@ export default function AuthPrompt(props) {
     handleClickOpen();
   };
 
+  const responseGoogle = response => {
+    console.log(response.profileObj)
+    axios({
+        method: 'post',
+        url: baseURL + 'api/login_google/',
+        data: {'email': response.profileObj.email, 'googleId': response.profileObj.googleId},
+        headers: {'X-CSRFToken': csrftoken }
+    })
+    .then(() => props.handleLogin())
+    .catch(error => {console.log(error)})
+  }
+
   return (
     <div>
       <div style={{display: 'flex', flexDirection: 'row', alignItems: 'center'}}>
@@ -38,6 +56,13 @@ export default function AuthPrompt(props) {
         <Button variant="outlined" color="primary" onClick={handleRegister}>
             Sign up
         </Button>
+        &nbsp;or&nbsp;
+        <GoogleLogin
+          clientId="498415135978-367uphr3ccm5upas8o5lre1h8nsthf1d.apps.googleusercontent.com"
+          buttonText="Sign In with Google"
+          onSuccess={responseGoogle}
+          cookiePolicy={'single_host_origin'}
+        />
       </div>
       <Dialog open={open} onClose={handleClose}>
         <DialogContent>

@@ -12,6 +12,7 @@ api_urlpatterns = [
     path("login/", views.user_login, name="user_login"),
     path("logout/", views.user_logout, name="user_logout"),
     path("login_status/", views.user_login_status, name="user_login_status"),
+    path("login_google/", views.login_google, name="login_google"),
 ]
 
 urlpatterns = [
