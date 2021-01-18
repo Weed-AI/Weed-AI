@@ -44,6 +44,7 @@ class UploadComponent extends Component {
         this.setState({isLoggedIn: true})
         this.retrieveUploadStatus()
         this.intervalID = setInterval(this.retrieveUploadStatus, 5000)
+        window.location.reload(false)
     }
 
     handleLogout(){
