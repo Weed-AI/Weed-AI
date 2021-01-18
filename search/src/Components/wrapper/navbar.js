@@ -36,13 +36,6 @@ TabPanel.propTypes = {
   value: PropTypes.any.isRequired,
 };
 
-function a11yProps(index) {
-  return {
-    id: `simple-tab-${index}`,
-    'aria-controls': `simple-tabpanel-${index}`,
-  };
-}
-
 const useStyles = makeStyles((theme) => ({
   root: {
     flexGrow: 1,

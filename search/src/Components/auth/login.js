@@ -48,6 +48,7 @@ class LoginComponent extends React.Component {
         axios({
             method: 'post',
             url: baseURL + 'api/login/',
+            mode: 'same-origin',
             data: bodyFormData,
             headers: {'Content-Type': 'multipart/form-data', 'X-CSRFToken': csrftoken }
         })

@@ -63,6 +63,7 @@ class DatasetSummary extends Component {
     axios({
         method: 'post',
         url: baseURL + "api/upload_info/",
+        mode: 'same-origin',
         data: body,
         headers: {'Content-Type': 'multipart/form-data', 'X-CSRFToken': csrftoken }
     })

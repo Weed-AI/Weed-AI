@@ -49,6 +49,7 @@ class RegisterComponent extends React.Component {
         axios({
             method: 'post',
             url: baseURL + 'api/register/',
+            mode: 'same-origin',
             data: bodyFormData,
             headers: {'Content-Type': 'multipart/form-data', 'X-CSRFToken': csrftoken }
         })

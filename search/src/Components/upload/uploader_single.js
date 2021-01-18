@@ -12,6 +12,7 @@ const UploaderSingle  = (props) => {
         const body = new FormData()
         body.append('weedcoco', file)
         return { url: baseURL + 'api/upload/',
+                 mode: 'same-origin',
                  headers: {'X-CSRFToken': csrftoken},
                  body
                }

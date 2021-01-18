@@ -38,6 +38,7 @@ export default function AuthPrompt(props) {
     axios({
         method: 'post',
         url: baseURL + 'api/login_google/',
+        mode: 'same-origin',
         data: {'email': response.profileObj.email, 'googleId': response.profileObj.googleId},
         headers: {'X-CSRFToken': csrftoken }
     })
