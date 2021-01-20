@@ -30,7 +30,7 @@ def generate_segmentations(mask_path, color_map, colors_not_found):
     Yields
     ------
     segmentation : str
-        COCO segmentation string
+        COCO segmentation string in compressed RLE format
     category
         Value from color_map
     """
