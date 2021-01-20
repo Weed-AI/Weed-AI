@@ -5,6 +5,13 @@ import pytest
 
 from weedcoco.importers.mask import main
 
+# TODO: Further testing plan:
+# * check segmentation RLE string can be read back in and reproduces the mask
+# * check handling of missing correspondence between mask and image files
+# * check handling of different image file formats
+# * check handling of agcontext
+# * ensure order of images, annotations and categories is deterministic
+
 TEST_DATA_DIR = pathlib.Path(__file__).parent / "mask_data"
 TEST_MASK_DIR = TEST_DATA_DIR / "cobbity_lbl"
 TEST_IMAGE_DIR = TEST_DATA_DIR / "cobbity_img"
@@ -34,6 +41,7 @@ def converter(tmpdir):
 
 
 def test_basic(converter):
+    # Tests images with different number of categories present (2, 1, 0)
     actual = converter.run(
         ["--category-map", TEST_DATA_DIR / "category_name_cobbity.yaml"]
     )
