@@ -115,7 +115,7 @@ def masks_to_coco(
         mask_path = mask_dir / (_image_name_to_mask(path.name))
         if not mask_path.exists():
             raise FileNotFoundError(
-                f"Found image named {path.name} but no mask at {mask_path}"
+                f"No mask found at {mask_path} for image named {path.name}."
             )
         dims = get_image_dimensions(mask_path)
         if get_image_dimensions(path) != dims:
