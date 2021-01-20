@@ -163,7 +163,7 @@ def masks_to_coco(
         warnings.warn(
             f"{len(categories)} categories defined, but only "
             f"{len(categories_found)} of these are present in masks. "
-            f"Missing are {missing_category_colors}"
+            f"These categories were not found: {missing_category_colors}"
         )
 
     out = {
