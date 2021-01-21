@@ -13,6 +13,11 @@ import { shadows } from '@material-ui/system';
 const Form = withTheme(MuiTheme);
 
 class AgContextForm extends Component {
+    constructor(props) {
+        super(props);
+        this.state = {formData: this.props.formData};
+    }
+
     render() {
         const schema = agcontextSchema;
 
@@ -20,12 +25,36 @@ class AgContextForm extends Component {
           title: "AgContext Entry Form"
         };
 
-        const log = type => console.log.bind(console, type);
+        return (
+            <Form
+              schema={schema}
+              uiSchema={uiSchema}
+              formData={this.state.formData}
+              onChange={e => {
+                  this.setState({formData: e.formData});
+                  if (this.props.onChange) {
+                      this.props.onChange(e);
+                  }
+              }}
+              children={true}  // hides submit
+            />
+        );
+    }
+}
+
+
+class StandaloneEditor extends Component {
+    constructor(props) {
+        super(props);
+        this.state = {formData: this.props.formData || {crop_type: "oats"} }
+    }
+    render() {
 
         const onSubmit = ({formData}, e) => console.log("Data submitted", formData);
 
+        const toJSON = (payload) => JSON.stringify(payload, null, 2);
         const handleSaveToPC = (payload) => {
-            const fileData = JSON.stringify(payload.formData);
+            const fileData = toJSON(payload.formData);
             const blob = new Blob([fileData], {type: "text/plain"});
             const url = URL.createObjectURL(blob);
             const link = document.createElement('a');
@@ -35,28 +64,16 @@ class AgContextForm extends Component {
         }
 
         return (
-            <Form
-              schema={schema}
-              uiSchema={uiSchema}
-              onSubmit={handleSaveToPC}
-              //formData={formData}
-              //onChange={e => setFormData(e.formData)}
-            />
-        );
-    }
-}
-
-
-class StandaloneEditor extends Component {
-    render() {
-        return (
-///            <div style={{maxWidth: "600px", margin: "2em auto", border: "thin" }}>
             <Container maxWidth="sm">
-                <Box boxShadow={3} px={2}>
-                    <AgContextForm />
+                <Box boxShadow={3} px={2} py={1} my={2}>
+                    <AgContextForm formData={this.state.formData} onChange={e => this.setState({formData: e.formData})} />
+                </Box>
+                <Box boxShadow={3} px={2} py={1} my={2}>
+                    <label>JSON representation of AgContext</label>
+                    <textarea style={{width: "100%", height: "5em"}} value={toJSON(this.state.formData)} / >
+                    <button onClick={e => handleSaveToPC(this.state.formData)}>Download</button>
                 </Box>
             </Container>
-///            </div>
         );
     }
 }

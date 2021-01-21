@@ -90,7 +90,7 @@ services:
     ports:
       - "8080:80"
     environment:
-      - NODE_ENV=production
+      - NODE_ENV=development
     networks:
       - elastic
     stdin_open: true
