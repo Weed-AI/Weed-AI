@@ -9,7 +9,7 @@ from pathlib import Path
 
 
 @shared_task
-def upload_task(weedcoco_path, image_dir, upload_id):
+def submit_upload_task(weedcoco_path, image_dir, upload_id):
     upload_entity = Dataset.objects.get(upload_id=upload_id)
     upload_entity.status = "P"
     upload_entity.status_details = ""

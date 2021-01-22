@@ -3,7 +3,7 @@ import requests
 import os
 import json
 from core.settings import UPLOAD_DIR
-from weedid.tasks import upload_task
+from weedid.tasks import submit_upload_task
 from weedid.utils import (
     store_tmp_weedcoco,
     setup_upload_dir,
@@ -64,7 +64,7 @@ def submit_deposit(request):
             UPLOAD_DIR, str(user_id), str(upload_id), "weedcoco.json"
         )
         images_dir = os.path.join(UPLOAD_DIR, str(user_id), str(upload_id), "images")
-        upload_task.delay(weedcoco_path, images_dir, upload_id)
+        submit_upload_task.delay(weedcoco_path, images_dir, upload_id)
         return HttpResponse(f"Work on user {user_id}'s upload{upload_id}")
     else:
         return HttpResponse("Only support POST request")
