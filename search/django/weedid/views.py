@@ -3,6 +3,7 @@ import requests
 import os
 import json
 from core.settings import UPLOAD_DIR
+from weedcoco.validation import validate
 from weedid.tasks import upload_task
 from weedid.utils import (
     store_tmp_weedcoco,
@@ -31,6 +32,7 @@ def upload(request):
         user_id = request.user.id
         images = []
         file_weedcoco = request.FILES["weedcoco"]
+        validate(json.load(file_weedcoco))
         for image_reference in json.load(file_weedcoco)["images"]:
             images.append(image_reference["file_name"].split("/")[-1])
         upload_dir, upload_id = setup_upload_dir(os.path.join(UPLOAD_DIR, str(user_id)))
