@@ -11,6 +11,7 @@ from weedid.utils import (
     create_upload_entity,
 )
 from weedid.models import Dataset, WeedidUser
+from weedcoco.validation import validate
 from django.contrib.auth import login, logout
 from django.contrib.auth.hashers import check_password
 from django.http import HttpResponseForbidden
@@ -31,7 +32,9 @@ def upload(request):
         user_id = request.user.id
         images = []
         file_weedcoco = request.FILES["weedcoco"]
-        for image_reference in json.load(file_weedcoco)["images"]:
+        weedcoco_json = json.load(file_weedcoco)
+        validate(weedcoco_json)
+        for image_reference in weedcoco_json["images"]:
             images.append(image_reference["file_name"].split("/")[-1])
         upload_dir, upload_id = setup_upload_dir(os.path.join(UPLOAD_DIR, str(user_id)))
         weedcoco_path = store_tmp_weedcoco(file_weedcoco, upload_dir)
