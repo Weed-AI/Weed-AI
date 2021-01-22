@@ -1,6 +1,7 @@
 import os
-import re
 import json
+from uuid import uuid4
+from weedcoco.repo.deposit import mkdir_safely
 from django.core.files.storage import FileSystemStorage
 from weedid.models import Dataset, WeedidUser
 
@@ -19,20 +20,11 @@ def store_tmp_weedcoco(weedcoco, upload_dir):
 
 def setup_upload_dir(upload_userid_dir):
     if not os.path.isdir(upload_userid_dir):
-        os.mkdir(upload_userid_dir)
-        latest_upload_dir_index = 0
-    else:
-        latest_upload_dir_index = max(
-            [
-                int(dir.split("_")[-1])
-                for dir in os.listdir(upload_userid_dir)
-                if re.fullmatch(r"^upload_\d+$", dir)
-            ],
-            default=0,
-        )
-    upload_dir = upload_userid_dir + f"/upload_{latest_upload_dir_index + 1}"
-    os.mkdir(upload_dir)
-    return upload_dir, f"upload_{latest_upload_dir_index + 1}"
+        mkdir_safely(upload_userid_dir)
+    upload_id = str(uuid4())
+    upload_dir = upload_userid_dir + f"/{upload_id}"
+    mkdir_safely(upload_dir)
+    return upload_dir, upload_id
 
 
 def create_upload_entity(weedcoco_path, upload_id, upload_userid):
@@ -41,9 +33,9 @@ def create_upload_entity(weedcoco_path, upload_id, upload_userid):
         weedcoco_json = json.load(f)
     upload_entity = Dataset(
         upload_id=upload_id,
-        upload_agcontext=weedcoco_json["agcontexts"],
-        upload_user=upload_user,
-        upload_status="N",
+        agcontext=weedcoco_json["agcontexts"],
+        user=upload_user,
+        status="N",
         metadata={
             "info": weedcoco_json["info"],
             "license": weedcoco_json["license"],

@@ -11,8 +11,8 @@ from pathlib import Path
 @shared_task
 def upload_task(weedcoco_path, image_dir, upload_id):
     upload_entity = Dataset.objects.get(upload_id=upload_id)
-    upload_entity.upload_status = "P"
-    upload_entity.upload_status_details = ""
+    upload_entity.status = "P"
+    upload_entity.status_details = ""
     upload_entity.save()
     try:
         new_weedcoco_path = deposit(
@@ -23,8 +23,8 @@ def upload_task(weedcoco_path, image_dir, upload_id):
             upload_id,
         )
     except Exception as e:
-        upload_entity.upload_status = "F"
-        upload_entity.upload_status_details = str(e)
+        upload_entity.status = "F"
+        upload_entity.status_details = str(e)
         upload_entity.save()
     else:
         update_index_and_thumbnails.delay(new_weedcoco_path, upload_id)
@@ -49,10 +49,10 @@ def update_index_and_thumbnails(
         es_index.post_to_index()
         thumbnailing(Path(thumbnails_dir), Path(repository_dir))
     except Exception as e:
-        upload_entity.upload_status = "F"
-        upload_entity.upload_status_details = str(e)
+        upload_entity.status = "F"
+        upload_entity.status_details = str(e)
     else:
-        upload_entity.upload_status = "C"
-        upload_entity.upload_status_details = "It has been successfully uploaded."
+        upload_entity.status = "C"
+        upload_entity.status_details = "It has been successfully uploaded."
     finally:
         upload_entity.save()

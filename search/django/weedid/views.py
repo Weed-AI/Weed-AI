@@ -3,7 +3,6 @@ import requests
 import os
 import json
 from core.settings import UPLOAD_DIR
-from weedcoco.validation import validate
 from weedid.tasks import upload_task
 from weedid.utils import (
     store_tmp_weedcoco,
@@ -32,7 +31,6 @@ def upload(request):
         user_id = request.user.id
         images = []
         file_weedcoco = request.FILES["weedcoco"]
-        validate(json.load(file_weedcoco))
         for image_reference in json.load(file_weedcoco)["images"]:
             images.append(image_reference["file_name"].split("/")[-1])
         upload_dir, upload_id = setup_upload_dir(os.path.join(UPLOAD_DIR, str(user_id)))
@@ -76,8 +74,8 @@ def upload_status(request):
         return HttpResponse(
             json.dumps(
                 {
-                    "upload_status": upload_entity.upload_status,
-                    "upload_status_details": upload_entity.upload_status_details,
+                    "upload_status": upload_entity.status,
+                    "upload_status_details": upload_entity.status_details,
                 }
             )
         )
@@ -93,7 +91,7 @@ def upload_info(request):
             json.dumps(
                 {
                     "metadata": upload_entity.metadata,
-                    "agcontexts": upload_entity.upload_agcontext,
+                    "agcontexts": upload_entity.agcontext,
                 }
             )
         )
@@ -108,10 +106,10 @@ def upload_list(request):
             if "name" in queryEntity.metadata["info"][0]
             else "",
             "upload_id": queryEntity.upload_id,
-            "upload_date": str(queryEntity.upload_date),
-            "contributor": queryEntity.upload_user.username,
+            "upload_date": str(queryEntity.date),
+            "contributor": queryEntity.user.username,
         },
-        Dataset.objects.filter(upload_status="C"),
+        Dataset.objects.filter(status="C"),
     )
     return HttpResponse(json.dumps(list(upload_list)))
 
