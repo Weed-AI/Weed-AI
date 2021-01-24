@@ -54,8 +54,8 @@ class StandaloneEditor extends Component {
 
         const toJSON = (payload) => JSON.stringify(payload, null, 2);
         const handleSaveToPC = (payload) => {
-            const fileData = toJSON(payload.formData);
-            const blob = new Blob([fileData], {type: "text/plain"});
+            const fileData = toJSON(payload);
+            const blob = new Blob([fileData], {type: "application/json"});
             const url = URL.createObjectURL(blob);
             const link = document.createElement('a');
             link.download = `AgContext.json`;
