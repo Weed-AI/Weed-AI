@@ -35,7 +35,7 @@ class ReactiveSearchComponent extends Component {
 					checkbox: "filter-checkbox"
 				},
 				queryFormat: "or",
-				URLParams: true,
+				URLParams: false,
 				react: {
 					and: [
 						"searchbox",
@@ -143,7 +143,8 @@ class ReactiveSearchComponent extends Component {
 						}}
 						stepValue={10000}
 						showHistogram={true}
-						interval={10000}
+						showFilter={true}
+						interval={15000}
 						{...makeProps("resslider", false)}
 					/>
 				</div>
@@ -167,12 +168,12 @@ class ReactiveSearchComponent extends Component {
 												src={item.thumbnail}
 											/>
 											<ResultCard.Description>
-												<ul class="annotations">
+												<ul className="annotations">
 												{
 													// TODO: make this more idiomatically React
 													Array.from(new Set(item.annotation__category__name)).map((annotName) => {
 														const annot = annotName.match(/^[^:]*/)
-														return annot.length > 0 ? (<li class={annot[0]}>{annot[0]}</li>) : ""
+														return annot.length > 0 ? (<li className={annot[0]}>{annot[0]}</li>) : ""
 													})
 												}
 												</ul>
