@@ -1,0 +1,4 @@
+FF0000: "weed: broadleaf"
+FFFF00: "crop: triticum aestivum"
+0000FF: "weed: grass"
+00FF00: "weed: something else"
