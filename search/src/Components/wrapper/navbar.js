@@ -86,7 +86,7 @@ export default function NavbarComponent(props) {
   const classes = useStyles();
   const { match, history } = props;
   const { params } = match;
-  const { page } = params;
+  const { page, dataset_id } = params;
 
   const tabNameToIndex = {
     0: "explore",
@@ -131,7 +131,7 @@ export default function NavbarComponent(props) {
         selectedTab === 1
         &&
         <div className={classes.container}>
-            <DatasetComponent />
+            <DatasetComponent upload_id={dataset_id}/>
         </div>
       }
       {

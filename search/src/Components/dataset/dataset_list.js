@@ -24,6 +24,7 @@ const useStyles = makeStyles((theme) => ({
 }))
 
 export default function DatasetList(props) {
+  const baseURL = new URL(window.location.origin);
   const classes = useStyles();
 
   return (
@@ -44,7 +45,7 @@ export default function DatasetList(props) {
             {props.upload_list.map((row) => (
               <TableRow key={row.name}>
                 <TableCell component="th" scope="row">
-                <Link href="#" onClick={() => {props.handleUploadid(row.upload_id)}} color='blue'>
+                <Link href={baseURL + 'datasets/' + row.upload_id} color='blue'>
                   {row.name}
                 </Link>
                 </TableCell>

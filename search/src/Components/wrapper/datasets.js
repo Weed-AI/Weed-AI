@@ -10,6 +10,7 @@ class DatasetComponent extends Component {
         super()
         this.state = {
             upload_id: "*",
+            upload_id_list: [],
             upload_list: []
         }
         this.handleUploadid = this.handleUploadid.bind(this)
@@ -20,6 +21,11 @@ class DatasetComponent extends Component {
         .then(res => res.data)
         .then(json => {
             this.setState({upload_list: json})
+            const upload_id_list = json.map(row => row.upload_id)
+            this.setState({upload_id_list: upload_id_list})
+            if (upload_id_list.includes(this.props.upload_id)) {
+                this.setState({upload_id: this.props.upload_id})
+            }
         })
     }
 
