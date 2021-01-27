@@ -26,7 +26,7 @@ class ElasticSearchIndex:
         es_index_name="weedid",
         es_type_name="image",
         batch_size=30,
-        es_host="http://localhost",
+        es_host="localhost",
         es_port=9200,
         indexes=None,
     ):
