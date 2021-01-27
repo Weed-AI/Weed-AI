@@ -84,7 +84,7 @@ const StyledTab = withStyles((theme) => ({
 export default function NavbarComponent(props) {
 
   const classes = useStyles();
-  const { match, history } = props;
+  const { match } = props;
   const { params } = match;
   const { page, dataset_id } = params;
 
@@ -105,8 +105,7 @@ export default function NavbarComponent(props) {
   const [selectedTab, setSelectedTab] = React.useState(indexToTabName[page]);
 
   const handleChange = (event, newValue) => {
-    history.push(`/${tabNameToIndex[newValue]}`);
-    setSelectedTab(newValue);
+    window.location.assign(`/${tabNameToIndex[newValue]}`);
   };
 
   return (

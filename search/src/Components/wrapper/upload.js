@@ -73,7 +73,7 @@ class UploadComponent extends Component {
         return new Promise((resolve, reject) => {
             axios.get(baseURL + "api/login_status/")
             .then(res => {
-                if(res.status == 200){
+                if(res.status === 200){
                     this.setState({isLoggedIn: true})
                     resolve(true)
                 }

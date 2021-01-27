@@ -88,7 +88,7 @@ class DatasetSummary extends Component {
           <Grid item xs={10}>
             <div className={classes.summary}>
               <div style={{display: 'flex'}}>
-                <IconButton aria-label="back to list" color="secondary" onClick={() => window.location.replace(baseURL + 'datasets')}>
+                <IconButton aria-label="back to list" color="secondary" onClick={() => window.location.assign(baseURL + 'datasets')}>
                   <ListIcon />
                 </IconButton>
                 <Typography variant='h4' style={{fontWeight: 600}}>{getAttribute(this.state.metadata.info, "name")}</Typography>
