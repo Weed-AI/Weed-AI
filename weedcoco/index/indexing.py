@@ -35,7 +35,8 @@ class ElasticSearchIndex:
         self.es_index_name = es_index_name
         self.es_type_name = es_type_name
         self.batch_size = batch_size
-        self.es_client = Elasticsearch(HOST=es_host, PORT=es_port)
+        hosts = [{"host": es_host, "port": es_port}]
+        self.es_client = Elasticsearch(hosts=hosts)
         self.indexes = indexes if indexes is not None else {}
 
     def modify_coco(self):
