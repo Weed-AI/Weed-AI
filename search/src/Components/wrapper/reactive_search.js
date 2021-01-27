@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import {
 	ReactiveBase,
-	DynamicRangeSlider,
+	RangeSlider,
 	ResultCard,
 	MultiList,
 	ReactiveList,
@@ -129,7 +129,7 @@ class ReactiveSearchComponent extends Component {
 						filterLabel="Lighting"
 						{...makeProps("lighting_filter", true)}
 					/>
-					<DynamicRangeSlider
+					<RangeSlider
 						componentId="resslider"
 						dataField="resolution"
 						title="Image Resolution (pixels)"
@@ -144,7 +144,6 @@ class ReactiveSearchComponent extends Component {
 						stepValue={10000}
 						showHistogram={true}
 						interval={10000}
-						URLParams={false}
 						{...makeProps("resslider", false)}
 					/>
 				</div>
