@@ -13,23 +13,64 @@ services:
       - "80:80"
     networks:
       - elastic
+    restart: always
 
+  # django backend
   django:
     image: django
     container_name: django
     depends_on:
       - elasticsearch
       - db
+      - redis
     build:
       context: ./django
       dockerfile:  Dockerfile
     environment:
       - DJANGO_SECRET_KEY=${DJANGO_SECRET_KEY}
+      - CELERY_BROKER=redis://redis:6379/0
+      - CELERY_BACKEND=redis://redis:6379/0
+    volumes:
+      - thumbnails_dir:/code/thumbnails
+      - repository_dir:/code/repository
+      - upload_dir:/code/upload
+      - download_dir:/code/download
     command: python manage.py runserver 0.0.0.0:8000
+    entrypoint: /entrypoint.sh
     ports:
       - "8000:8000"
     networks:
       - elastic
+    restart: always
+
+  celery:
+    image: celery
+    container_name: celery
+    build:
+      context: ./django
+      dockerfile:  Dockerfile
+    command: celery -A core worker -l INFO
+    environment:
+      - DJANGO_SECRET_KEY=${DJANGO_SECRET_KEY}
+      - CELERY_BROKER=redis://redis:6379/0
+      - CELERY_BACKEND=redis://redis:6379/0
+    volumes:
+      - thumbnails_dir:/code/thumbnails
+      - repository_dir:/code/repository
+      - upload_dir:/code/upload
+      - download_dir:/code/download
+    depends_on:
+      - django
+      - redis
+    networks:
+      - elastic
+    restart: always
+
+  redis:
+    image: redis:alpine
+    networks:
+      - elastic
+    restart: always
 
   db:
     image: postgres:12.0-alpine
@@ -44,6 +85,7 @@ services:
       - "5432:5432"
     networks:
       - elastic
+    restart: always
 
   # search engine
   elasticsearch:
@@ -75,6 +117,7 @@ services:
       interval: 30s
       timeout: 30s
       retries: 3
+    restart: always
 
   reactivesearch:
     image: my-reactivesearch
@@ -91,6 +134,35 @@ services:
     stdin_open: true
     depends_on:
       - elasticsearch
+    restart: always
+
+  thumbnails:
+    image: thumbnails
+    container_name: thumbnails
+    build:
+      context: ./nginx/thumbnails
+    volumes:
+      - thumbnails_dir:/tmp/thumbnails
+    ports:
+      - "8081:80"
+    networks:
+      - elastic
+    stdin_open: true
+    restart: always
+
+  download:
+    image: download
+    container_name: download
+    build:
+      context: ./nginx/download
+    volumes:
+      - download_dir:/tmp/download
+    ports:
+      - "8082:80"
+    networks:
+      - elastic
+    stdin_open: true
+    restart: always
 
 networks:
   elastic:
@@ -100,3 +172,12 @@ volumes:
   esdata1:
     driver: local
   postgres_data:
+    driver: local
+  repository_dir:
+    driver: local
+  thumbnails_dir:
+    driver: local
+  download_dir:
+    driver: local
+  upload_dir:
+    driver: local
