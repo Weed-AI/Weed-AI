@@ -9,12 +9,13 @@ from weedid.utils import (
     setup_upload_dir,
     store_tmp_image,
     create_upload_entity,
+    add_agcontexts,
 )
 from weedid.models import Dataset, WeedidUser
 from weedcoco.validation import validate
 from django.contrib.auth import login, logout
 from django.contrib.auth.hashers import check_password
-from django.http import HttpResponseForbidden
+from django.http import HttpResponseForbidden, HttpResponseNotAllowed
 
 
 def elasticsearch_query(request):
@@ -52,6 +53,27 @@ def upload_image(request):
         upload_dir = os.path.join(UPLOAD_DIR, str(user_id), upload_id, "images")
         store_tmp_image(upload_image, upload_dir)
         return HttpResponse(f"Uploaded {upload_image.name} to {upload_dir}")
+    else:
+        return HttpResponse("Only support POST request")
+
+
+def upload_agcontexts(request):
+    if request.method == "POST":
+        user_id = request.user.id
+        data = json.loads(request.body)
+        upload_id, ag_contexts = data["upload_id"], data["ag_contexts"]
+        weedcoco_path = os.path.join(
+            UPLOAD_DIR, str(user_id), str(upload_id), "weedcoco.json"
+        )
+        try:
+            add_agcontexts(weedcoco_path, ag_contexts)
+            Dataset.objects.filter(upload_id=upload_id).update(agcontext=[ag_contexts])
+        except Exception:
+            return HttpResponseNotAllowed("Failed to add AgContexts")
+        else:
+            return HttpResponse(
+                f"Updated AgContexts for user {user_id}'s upload{upload_id}"
+            )
     else:
         return HttpResponse("Only support POST request")
 

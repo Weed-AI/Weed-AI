@@ -7,7 +7,7 @@ import Button from '@material-ui/core/Button';
 import Typography from '@material-ui/core/Typography';
 import UploaderSingle from './uploader_single';
 import UploaderImages from './uploader_images';
-import AgContextForm from '../../AgContextForm';
+import AgContextForm, {handleSaveToPC, toJSON} from '../../AgContextForm';
 import axios from 'axios';
 import Cookies from 'js-cookie';
 
@@ -35,13 +35,22 @@ function getSteps(upload_type) {
          ['Upload Coco', 'Add Agcontext', 'Upload Images']
 }
 
-function getStepContent(step, upload_type, upload_id, images, formData, handleUploadId, handleImages, handleFormData) {
+function getStepContent(step, upload_type, upload_id, images, formData, handleUploadId, handleImages, handleFormData, handleUploadAgcontexts) {
     if (upload_type === 'coco') {
         switch (step) {
             case 0:
               return <UploaderSingle upload_id={upload_id} images={images} handleUploadId={handleUploadId} handleImages={handleImages}/>;
             case 1:
-              return <AgContextForm formData={formData} onChange={e => handleFormData(e.formData)} />;
+              return (
+                <React.Fragment>
+                    <AgContextForm formData={formData} onChange={e => handleFormData(e.formData)} />
+                    <textarea style={{width: "100%", height: "5em"}} value={toJSON(formData)} ></textarea>
+                    <React.Fragment>
+                        <button onClick={e => handleSaveToPC(formData)}>Download</button>
+                        <button onClick={e => handleUploadAgcontexts()}>Upload</button>
+                    </React.Fragment>
+                </React.Fragment>
+              );
             case 2:
               return <UploaderImages upload_id={upload_id} images={images}/>;
             default:
@@ -91,6 +100,7 @@ class UploadStepper extends React.Component {
         this.handleBack = this.handleBack.bind(this);
         this.handleSkip = this.handleSkip.bind(this);
         this.handleReset = this.handleReset.bind(this);
+        this.handleUploadAgcontexts = this.handleUploadAgcontexts.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
     }
 
@@ -154,6 +164,20 @@ class UploadStepper extends React.Component {
         this.setState({activeStep: 0})
     };
 
+    handleUploadAgcontexts(){
+        const baseURL = new URL(window.location.origin);
+        axios({
+            method: 'post',
+            url: baseURL + "api/upload_agcontexts/",
+            data: {
+                "upload_id": this.state.upload_id,
+                "ag_contexts": this.state.ag_context
+            },
+            headers: {'X-CSRFToken': csrftoken }
+        }).then(msg => console.log(msg))
+        .catch(err => console.log(err))
+    }
+
     handleSubmit(){
         const baseURL = new URL(window.location.origin);
         const body = new FormData()
@@ -189,7 +213,7 @@ class UploadStepper extends React.Component {
             </Stepper>
             <div>
                 <Typography className={classes.instructions}>
-                    {getStepContent(this.state.activeStep, this.props.upload_type, this.state.upload_id, this.state.images, this.state.ag_context, this.handleUploadId, this.handleImages, this.handleFormData)}
+                    {getStepContent(this.state.activeStep, this.props.upload_type, this.state.upload_id, this.state.images, this.state.ag_context, this.handleUploadId, this.handleImages, this.handleFormData, this.handleUploadAgcontexts)}
                 </Typography>
                 <div>
                     <Button disabled={this.state.activeStep === 0} onClick={this.handleBack} className={classes.button}>

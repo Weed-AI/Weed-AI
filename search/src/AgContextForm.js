@@ -11,6 +11,18 @@ import { shadows } from '@material-ui/system';
 
 
 const Form = withTheme(MuiTheme);
+const onSubmit = ({formData}, e) => console.log("Data submitted", formData);
+
+export const toJSON = (payload) => JSON.stringify(payload, null, 2);
+export const handleSaveToPC = (payload) => {
+    const fileData = toJSON(payload);
+    const blob = new Blob([fileData], {type: "application/json"});
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.download = `AgContext.json`;
+    link.href = url;
+    link.click();
+}
 
 class AgContextForm extends Component {
     constructor(props) {
@@ -49,20 +61,6 @@ class StandaloneEditor extends Component {
         this.state = {formData: this.props.formData || {crop_type: "oats"} }
     }
     render() {
-
-        const onSubmit = ({formData}, e) => console.log("Data submitted", formData);
-
-        const toJSON = (payload) => JSON.stringify(payload, null, 2);
-        const handleSaveToPC = (payload) => {
-            const fileData = toJSON(payload);
-            const blob = new Blob([fileData], {type: "application/json"});
-            const url = URL.createObjectURL(blob);
-            const link = document.createElement('a');
-            link.download = `AgContext.json`;
-            link.href = url;
-            link.click();
-        }
-
         return (
             <Container maxWidth="sm">
                 <Box boxShadow={3} px={2} py={1} my={2}>
