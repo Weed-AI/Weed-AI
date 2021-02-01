@@ -1,16 +1,126 @@
-import React, { Component, useState } from 'react'
-import { render } from "react-dom";
-import { withTheme } from "react-jsonschema-form";
-import { Theme as MuiTheme } from 'rjsf-material-ui';
+import React, { Component } from 'react'
 import { withRouter } from 'react-router-dom';
-import { agcontextSchema } from './schemas'
-import './AgContextForm.css';
+import agcontextSchema from './Schemas/AgContext.json'
 import Container from '@material-ui/core/Container';
 import Box from '@material-ui/core/Box';
-import { shadows } from '@material-ui/system';
+import {
+  materialCells,
+  materialRenderers,
+} from '@jsonforms/material-renderers';
+import { JsonForms } from '@jsonforms/react';
+import GrowthStageControl from './GrowthStageControl';
+import growthStageControlTester from './growthStageControlTester';
 
+const uischema = {
+  "type": "VerticalLayout",
+  "elements": [
+    {
+      "type": "Group",
+      "label": "The Crop",
+      "elements": [
+        {
+          "type": "Control",
+          "scope": "#/properties/crop_type"
+        },
+        {
+          "type": "Control",
+          "label": "BBCH Growth Stage",
+          "scope": "#/properties/bbch_growth_stage"
+        },
+        {
+          "type": "Control",
+          "scope": "#/properties/soil_colour"
+        },
+        {
+          "type": "Control",
+          "scope": "#/properties/surface_cover"
+        },
+        {
+          "type": "Control",
+          "scope": "#/properties/surface_coverage"
+        },
+        {
+          "type": "HorizontalLayout",
+          "elements": [
+            {
+              "type": "Control",
+              "scope": "#/properties/location_datum"
+            },
+            {
+              "type": "Control",
+              "scope": "#/properties/location_lat"
+            },
+            {
+              "type": "Control",
+              "scope": "#/properties/location_long"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "Group",
+      "label": "The Photography",
+      "elements": [
+        {
+          "type": "Control",
+          "scope": "#/properties/camera_make"
+        },
+        {
+          "type": "Control",
+          "scope": "#/properties/camera_lens"
+        },
+        {
+          "type": "Control",
+          "scope": "#/properties/camera_lens_focallength"
+        },
+        {
+          "type": "Control",
+          "scope": "#/properties/camera_height"
+        },
+        {
+          "type": "Control",
+          "scope": "#/properties/camera_angle"
+        },
+        {
+          "type": "Control",
+          "scope": "#/properties/camera_fov"
+        },
+        {
+          "type": "Control",
+          "scope": "#/properties/lighting"
+        },
+        {
+          "type": "Control",
+          "scope": "#/properties/photography_description"
+        }
+      ]
+    },
+    {
+      "type": "Group",
+      "label": "Other Details",
+      "elements": [
+        {
+          "type": "Control",
+          "scope": "#/properties/cropped_to_plant"
+        },
+        {
+          "type": "Control",
+          "scope": "#/properties/emr_channels"
+        },
+        {
+          "type": "Control",
+          "scope": "#/properties/weather_description"
+        }
+      ]
+    }
+  ]
+};
 
-const Form = withTheme(MuiTheme);
+const renderers = [
+  ...materialRenderers,
+  { tester: growthStageControlTester, renderer: GrowthStageControl },
+];
 
 class AgContextForm extends Component {
     constructor(props) {
@@ -21,22 +131,19 @@ class AgContextForm extends Component {
     render() {
         const schema = agcontextSchema;
 
-        const uiSchema = {
-          title: "AgContext Entry Form"
-        };
-
         return (
-            <Form
+            <JsonForms
               schema={schema}
-              uiSchema={uiSchema}
-              formData={this.state.formData}
+              uischema={uischema}
+              data={this.state.formData}
+              renderers={renderers}
+              cells={materialCells}
               onChange={e => {
-                  this.setState({formData: e.formData});
+                  this.setState({formData: e.data});
                   if (this.props.onChange) {
                       this.props.onChange(e);
                   }
               }}
-              children={true}  // hides submit
             />
         );
     }
@@ -49,9 +156,6 @@ class StandaloneEditor extends Component {
         this.state = {formData: this.props.formData || {crop_type: "oats"} }
     }
     render() {
-
-        const onSubmit = ({formData}, e) => console.log("Data submitted", formData);
-
         const toJSON = (payload) => JSON.stringify(payload, null, 2);
         const handleSaveToPC = (payload) => {
             const fileData = toJSON(payload.formData);
