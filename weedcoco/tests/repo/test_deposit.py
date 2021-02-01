@@ -18,9 +18,16 @@ TEST_DUPLICATE_DIR = TEST_DATA_DIR / "duplicate"
 @pytest.fixture
 def executor(tmpdir):
     test_repo_dir = tmpdir / "test_repo"
+    test_download_dir = tmpdir / "test_download"
 
     class Executor:
-        def run(self, weedcoco_path, image_dir, repository_dir=test_repo_dir):
+        def run(
+            self,
+            weedcoco_path,
+            image_dir,
+            repository_dir=test_repo_dir,
+            download_dir=test_download_dir,
+        ):
             args = [
                 "--weedcoco-path",
                 weedcoco_path,
@@ -28,6 +35,8 @@ def executor(tmpdir):
                 image_dir,
                 "--repository-dir",
                 repository_dir,
+                "--download-dir",
+                download_dir,
             ]
             args = [str(arg) for arg in args]
             main(args)
