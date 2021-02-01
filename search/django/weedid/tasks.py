@@ -44,6 +44,7 @@ def update_index_and_thumbnails(
             Path(thumbnails_dir),
             es_host="elasticsearch",
             es_port=9200,
+            upload_id=upload_id,
         )
         es_index.modify_coco()
         es_index.post_to_index()
