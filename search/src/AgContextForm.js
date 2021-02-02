@@ -25,7 +25,7 @@ const uischema = {
         {
           "type": "Control",
           "label": "BBCH Growth Stage",
-          "scope": "#/properties/bbch_growth_stage"
+          "scope": "#/properties/bbch_growth_range"
         },
         {
           "type": "Control",

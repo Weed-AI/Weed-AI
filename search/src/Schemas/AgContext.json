@@ -4,7 +4,7 @@
   "required": [
     "id",
     "crop_type",
-    "bbch_growth_stage",
+    "bbch_growth_range",
     "soil_colour",
     "surface_cover",
     "surface_coverage",
@@ -54,7 +54,7 @@
       ],
       "description": "Crop type.\nOne of several strings describing the crop grown in the image."
     },
-    "bbch_growth_stage": {
+    "bbch_growth_range": {
       "type": "string",
       "pattern": "^gs[1-9][0-9]$|^gs0[1-9]$|^na$",
       "description": "BBCG Growth Stage code.\nOne of several possible strings describing the stage of the crop, chosen from a list of codes used by the BBCH.\nIf this AgContext is not in a cropping environment, use value \"na\"."

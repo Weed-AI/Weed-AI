@@ -3,7 +3,7 @@ type: object
 required:
   - id
   - crop_type
-  - bbch_growth_stage
+  - bbch_growth_range
   - soil_colour
   - surface_cover
   - surface_coverage
@@ -56,7 +56,7 @@ properties:
       Crop type.
       One of several strings describing the crop grown in the image.
 
-  bbch_growth_stage:
+  bbch_growth_range:
     oneOf:
       - type: array
         minItems: 2
