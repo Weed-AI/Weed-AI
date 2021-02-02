@@ -69,7 +69,7 @@ properties:
         enum:
           - na
     description: |-
-      BBCG Growth Stage range
+      BBCH Growth Stage range
       A pair of BBCH Growth Stage codes (00-99) representing the minimum and maximum crop growth stage in the images.
       If this AgContext is not in a cropping environment, or is in fallow, use value "na".
 
