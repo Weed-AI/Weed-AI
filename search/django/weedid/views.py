@@ -16,7 +16,7 @@ from weedid.models import Dataset, WeedidUser
 from weedcoco.validation import validate
 from django.contrib.auth import login, logout
 from django.contrib.auth.hashers import check_password
-from django.http import HttpResponseForbidden
+from django.http import HttpResponseForbidden, HttpResponseNotAllowed
 
 
 def elasticsearch_query(request):
@@ -105,19 +105,27 @@ def upload_info(request):
 
 
 def upload_list(request):
-    upload_list = map(
-        retrieve_listing_info,
-        Dataset.objects.filter(status="C"),
-    )
-    return HttpResponse(json.dumps(list(upload_list)))
+    user = request.user
+    if user and user.is_authenticated:
+        upload_list = map(
+            retrieve_listing_info,
+            Dataset.objects.filter(status="C"),
+        )
+        return HttpResponse(json.dumps(list(upload_list)))
+    else:
+        return HttpResponseForbidden("You dont have access to proceed")
 
 
 def awaiting_list(request):
-    awaiting_list = map(
-        retrieve_listing_info,
-        Dataset.objects.filter(status="AR"),
-    )
-    return HttpResponse(json.dumps(list(awaiting_list)))
+    user = request.user
+    if user and user.is_authenticated and user.is_staff:
+        awaiting_list = map(
+            retrieve_listing_info,
+            Dataset.objects.filter(status="AR"),
+        )
+        return HttpResponse(json.dumps(list(awaiting_list)))
+    else:
+        return HttpResponseForbidden("You dont have access to proceed")
 
 
 def dataset_approve(request, dataset_id):
@@ -131,7 +139,7 @@ def dataset_approve(request, dataset_id):
             update_index_and_thumbnails(weedcoco_path, dataset_id)
             return HttpResponse("It has been approved")
         else:
-            return HttpResponse("Dataset to be reviewed doesnt exist")
+            return HttpResponseNotAllowed("Dataset to be reviewed doesnt exist")
     else:
         return HttpResponseForbidden("You dont have access to proceed")
 
@@ -149,7 +157,7 @@ def dataset_reject(request, dataset_id):
                 upload_entity.save()
             return HttpResponse("The dataset has been rejected and removed")
         else:
-            return HttpResponse("Dataset to be rejected doesnt exist")
+            return HttpResponseNotAllowed("Dataset to be rejected doesnt exist")
     else:
         return HttpResponseForbidden("You dont have access to proceed")
 

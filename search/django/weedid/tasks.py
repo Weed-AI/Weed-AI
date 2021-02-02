@@ -52,6 +52,7 @@ def update_index_and_thumbnails(
         thumbnailing(Path(thumbnails_dir), Path(repository_dir))
     except Exception as e:
         upload_entity.status = "F"
+        print(e)
         upload_entity.status_details = str(e)
     else:
         upload_entity.status = "C"
