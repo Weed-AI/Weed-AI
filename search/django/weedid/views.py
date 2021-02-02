@@ -2,13 +2,15 @@ from django.http import HttpResponse
 import requests
 import os
 import json
-from core.settings import UPLOAD_DIR
-from weedid.tasks import submit_upload_task
+from core.settings import UPLOAD_DIR, REPOSITORY_DIR
+from weedid.tasks import submit_upload_task, update_index_and_thumbnails
 from weedid.utils import (
     store_tmp_weedcoco,
     setup_upload_dir,
     store_tmp_image,
     create_upload_entity,
+    retrieve_listing_info,
+    remove_entity_local_record,
 )
 from weedid.models import Dataset, WeedidUser
 from weedcoco.validation import validate
@@ -104,17 +106,52 @@ def upload_info(request):
 
 def upload_list(request):
     upload_list = map(
-        lambda queryEntity: {
-            "name": queryEntity.metadata["info"][0]["name"]
-            if "name" in queryEntity.metadata["info"][0]
-            else "",
-            "upload_id": queryEntity.upload_id,
-            "upload_date": str(queryEntity.date),
-            "contributor": queryEntity.user.username,
-        },
+        retrieve_listing_info,
         Dataset.objects.filter(status="C"),
     )
     return HttpResponse(json.dumps(list(upload_list)))
+
+
+def awaiting_list(request):
+    awaiting_list = map(
+        retrieve_listing_info,
+        Dataset.objects.filter(status="AR"),
+    )
+    return HttpResponse(json.dumps(list(awaiting_list)))
+
+
+def dataset_approve(request, dataset_id):
+    user = request.user
+    if user and dataset_id and user.is_authenticated and user.is_staff:
+        upload_entity = Dataset.objects.get(upload_id=dataset_id, status="AR")
+        if upload_entity:
+            weedcoco_path = os.path.join(
+                REPOSITORY_DIR, str(dataset_id), "weedcoco.json"
+            )
+            update_index_and_thumbnails(weedcoco_path, dataset_id)
+            return HttpResponse("It has been approved")
+        else:
+            return HttpResponse("Dataset to be reviewed doesnt exist")
+    else:
+        return HttpResponseForbidden("You dont have access to proceed")
+
+
+def dataset_reject(request, dataset_id):
+    user = request.user
+    if user and dataset_id and user.is_authenticated and user.is_staff:
+        upload_entity = Dataset.objects.get(upload_id=dataset_id, status="AR")
+        if upload_entity:
+            try:
+                remove_entity_local_record(str(upload_entity.user_id), str(dataset_id))
+            finally:
+                upload_entity.status = "F"
+                upload_entity.status_details = "It failed to proceed after review."
+                upload_entity.save()
+            return HttpResponse("The dataset has been rejected and removed")
+        else:
+            return HttpResponse("Dataset to be rejected doesnt exist")
+    else:
+        return HttpResponseForbidden("You dont have access to proceed")
 
 
 def user_register(request):
@@ -127,7 +164,7 @@ def user_register(request):
             user.save()
             return HttpResponse("The account has been created")
         except Exception:
-            return HttpResponseForbidden()
+            return HttpResponseForbidden("You dont have access to proceed")
     else:
         return HttpResponse("Only support POST request")
 
