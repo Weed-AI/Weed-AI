@@ -74,7 +74,8 @@ class ElasticSearchIndex:
                 lo, hi = agcontext["bbch_growth_range"]
                 for i in range(lo, hi + 1):
                     growth_stage_texts.add(
-                        lookup_growth_stage_name(i, scheme="grain_ranges"))
+                        lookup_growth_stage_name(i, scheme="grain_ranges")
+                    )
             except KeyError:
                 growth_stage_texts = ["na"]
             agcontext["growth_stage_texts"] = sorted(growth_stage_texts)
