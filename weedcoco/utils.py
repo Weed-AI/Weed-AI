@@ -74,9 +74,11 @@ def _get_growth_stage_names():
         return __GROWTH_STAGE_NAMES
     except NameError:
         pass
-    data = json.load(pathlib.Path(__file__).parent / "growth_stage_texts.json")
+    data_path = pathlib.Path(__file__).parent / "growth_stage_labels.json"
+    data = json.load(open(data_path))
     out = {}
-    out["fine"] = data.pop("fine")
+    # JSON requires string keys
+    out["fine"] = {int(k): v for k, v in data.pop("fine").items()}
     for scheme, ranges in data.items():
         out[scheme] = {}
         for range_ in ranges:
