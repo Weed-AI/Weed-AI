@@ -12,10 +12,10 @@ import GrowthStageControl from './GrowthStageControl';
 import growthStageControlTester from './growthStageControlTester';
 
 const uischema = {
-  "type": "VerticalLayout",
+  "type": "Categorization",
   "elements": [
     {
-      "type": "Group",
+      "type": "Category",
       "label": "The Crop",
       "elements": [
         {
@@ -59,7 +59,7 @@ const uischema = {
       ]
     },
     {
-      "type": "Group",
+      "type": "Category",
       "label": "The Photography",
       "elements": [
         {
@@ -97,7 +97,7 @@ const uischema = {
       ]
     },
     {
-      "type": "Group",
+      "type": "Category",
       "label": "Other Details",
       "elements": [
         {
