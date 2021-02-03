@@ -56,6 +56,7 @@ properties:
       Crop type.
       One of several strings describing the crop grown in the image.
 
+<<<<<<< HEAD
   bbch_growth_range:
     oneOf:
       - type: array
@@ -72,6 +73,61 @@ properties:
       BBCH Growth Stage range
       A pair of BBCH Growth Stage codes (00-99) representing the minimum and maximum crop growth stage in the images.
       If this AgContext is not in a cropping environment, or is in fallow, use value "na".
+=======
+  grains_descriptive_text:
+    type: string
+    enum:
+      - emergence
+      - seedling
+      - tillering
+      - stem_elongation
+      - booting
+      - ear_emergence
+      - flowering
+      - milky_dough
+      - dough
+      - ripening
+      - na
+    description: |-
+      Grains descriptive text.
+      One of ten possible strings describing the crop developmental stage.
+      If this AgContext is not in a cropping environment, use value "na".
+
+  bbch_descriptive_text:
+    type: string
+    enum:
+      - germination
+      - sprouting
+      - bud development
+      - leaf development
+      - formation of side shoots
+      - tillering
+      - stem elongation
+      - rosette growth
+      - shoot development
+      - development of harvestable vegetative parts
+      - bolting
+      - inflorescence emergence
+      - heading
+      - flowering
+      - development of fruit
+      - ripening or maturity of fruit and seed
+      - senescence
+      - beginning of dormancy
+      - na
+    description: |-
+      BBCG descriptive text.
+      One of several possible strings describing the stage of the crop, chosen from a list of possible terms used by the BBCH.
+      If this AgContext is not in a cropping environment, use value "na".
+
+  bbch_code:
+    type: string
+    pattern: "^gs[1-9][0-9]$|^gs0[1-9]$|^na$"
+    description: |-
+      BBCG descriptive text.
+      One of several possible strings describing the stage of the crop, chosen from a list of codes used by the BBCH.
+      If this AgContext is not in a cropping environment, use value "na".
+>>>>>>> AgContext-Form-Integration
 
   soil_colour:
     type: string
