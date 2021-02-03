@@ -30,6 +30,7 @@ class ElasticSearchIndex:
         es_host="localhost",
         es_port=9200,
         indexes=None,
+        upload_id="#",
     ):
         self.weedcoco_path = weedcoco_path
         self.thumbnail_dir = thumbnail_dir
@@ -39,6 +40,7 @@ class ElasticSearchIndex:
         hosts = [{"host": es_host, "port": es_port}]
         self.es_client = Elasticsearch(hosts=hosts)
         self.indexes = indexes if indexes is not None else {}
+        self.upload_id = upload_id
 
     def modify_coco(self):
         """
@@ -92,6 +94,7 @@ class ElasticSearchIndex:
                 / os.path.basename(image["file_name"])[:2]
                 / os.path.basename(image["file_name"])
             )
+            image["dataset_url"] = f"datasets/{self.upload_id}"
 
         for image in coco["images"]:
             try:

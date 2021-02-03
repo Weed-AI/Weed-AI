@@ -163,7 +163,7 @@ class ReactiveSearchComponent extends Component {
 							<ReactiveList.ResultCardsWrapper>
 								{
 									data.map(item => (
-										<ResultCard key={item._id}>
+										<ResultCard key={item._id} href={esURL + item.dataset_url}>
 											<ResultCard.Image
 												src={item.thumbnail}
 											/>
