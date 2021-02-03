@@ -1,5 +1,4 @@
 import React, { Component, useState } from 'react'
-import { render } from "react-dom";
 import { withTheme } from "react-jsonschema-form";
 import { Theme as MuiTheme } from 'rjsf-material-ui';
 import { withRouter } from 'react-router-dom';
@@ -7,11 +6,9 @@ import { agcontextSchema } from './schemas'
 import './AgContextForm.css';
 import Container from '@material-ui/core/Container';
 import Box from '@material-ui/core/Box';
-import { shadows } from '@material-ui/system';
 
 
 const Form = withTheme(MuiTheme);
-const onSubmit = ({formData}, e) => console.log("Data submitted", formData);
 
 export const toJSON = (payload) => JSON.stringify(payload, null, 2);
 export const handleSaveToPC = (payload) => {

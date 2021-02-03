@@ -92,7 +92,7 @@ class UploadStepper extends React.Component {
             steps: getSteps(this.props.upload_type),
             upload_id: 0,
             images: [],
-            ag_context: {crop_type: "oats"},
+            ag_context: {},
             error_message: "init"
         }
         this.isStepOptional = this.isStepOptional.bind(this);
