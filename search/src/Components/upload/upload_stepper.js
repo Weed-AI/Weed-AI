@@ -35,15 +35,18 @@ function getSteps(upload_type) {
          ['Upload Coco', 'Add Agcontext', 'Upload Images']
 }
 
-function getStepContent(step, upload_type, upload_id, images, formData, handleUploadId, handleImages, handleFormData, handleUploadAgcontexts) {
+function getStepContent(step, upload_type, upload_id, images, formData, handleUploadId, handleImages, handleFormData, handleUploadAgcontexts, handleErrorMessage) {
     if (upload_type === 'coco') {
         switch (step) {
             case 0:
-              return <UploaderSingle upload_id={upload_id} images={images} handleUploadId={handleUploadId} handleImages={handleImages}/>;
+              return <UploaderSingle upload_id={upload_id} images={images} handleUploadId={handleUploadId} handleImages={handleImages} handleErrorMessage={handleErrorMessage}/>;
             case 1:
               return (
                 <React.Fragment>
-                    <AgContextForm formData={formData} onChange={e => handleFormData(e.formData)} />
+                    <AgContextForm formData={formData} onChange={e => {
+                        handleFormData(e.formData)
+                        handleErrorMessage("init")
+                    }} />
                     <textarea style={{width: "100%", height: "5em"}} value={toJSON(formData)} ></textarea>
                     <React.Fragment>
                         <button onClick={e => handleSaveToPC(formData)}>Download</button>
@@ -59,7 +62,7 @@ function getStepContent(step, upload_type, upload_id, images, formData, handleUp
     } else if (upload_type === 'weedcoco') {
         switch (step) {
             case 0:
-              return <UploaderSingle upload_id={upload_id} images={images} handleUploadId={handleUploadId} handleImages={handleImages}/>;
+              return <UploaderSingle upload_id={upload_id} images={images} handleUploadId={handleUploadId} handleImages={handleImages} handleErrorMessage={handleErrorMessage}/>;
             case 1:
               return <UploaderImages upload_id={upload_id} images={images}/>;
             default:
@@ -68,7 +71,7 @@ function getStepContent(step, upload_type, upload_id, images, formData, handleUp
     } else {
         switch (step) {
             case 0:
-              return <UploaderSingle upload_id={upload_id} images={images} handleUploadId={handleUploadId} handleImages={handleImages}/>;
+              return <UploaderSingle upload_id={upload_id} images={images} handleUploadId={handleUploadId} handleImages={handleImages} handleErrorMessage={handleErrorMessage}/>;
             case 1:
               return <AgContextForm formData={formData} onChange={e => handleFormData(e.formData)} />;
             case 2:
@@ -89,13 +92,15 @@ class UploadStepper extends React.Component {
             steps: getSteps(this.props.upload_type),
             upload_id: 0,
             images: [],
-            ag_context: {crop_type: "oats"}
+            ag_context: {crop_type: "oats"},
+            error_message: "init"
         }
         this.isStepOptional = this.isStepOptional.bind(this);
         this.isStepSkipped = this.isStepSkipped.bind(this);
         this.handleUploadId = this.handleUploadId.bind(this);
         this.handleImages = this.handleImages.bind(this);
         this.handleFormData = this.handleFormData.bind(this);
+        this.handleErrorMessage = this.handleErrorMessage.bind(this);
         this.handleNext = this.handleNext.bind(this);
         this.handleBack = this.handleBack.bind(this);
         this.handleSkip = this.handleSkip.bind(this);
@@ -124,6 +129,10 @@ class UploadStepper extends React.Component {
         this.setState({ag_context: formData});
     }
 
+    handleErrorMessage(message) {
+        this.setState({error_message: message});
+    }
+
     handleNext() {
         if (this.state.activeStep === this.state.steps.length - 1){
             this.handleSubmit();
@@ -139,11 +148,13 @@ class UploadStepper extends React.Component {
             }
             this.setState(prevState => {return {activeStep: prevState.activeStep + 1}});
             this.setState({skipped: newSkipped});
+            this.handleErrorMessage("init")
         }
     };
 
     handleBack(){
         this.setState(prevState => {return {activeStep: prevState.activeStep - 1}});
+        this.handleErrorMessage("init")
     };
 
     handleSkip(){
@@ -175,7 +186,10 @@ class UploadStepper extends React.Component {
             },
             headers: {'X-CSRFToken': csrftoken }
         }).then(msg => console.log(msg))
-        .catch(err => console.log(err))
+        .catch(err => {
+            console.log(err)
+            this.handleErrorMessage("Invalid input for AgContext")
+        })
     }
 
     handleSubmit(){
@@ -213,8 +227,9 @@ class UploadStepper extends React.Component {
             </Stepper>
             <div>
                 <Typography className={classes.instructions}>
-                    {getStepContent(this.state.activeStep, this.props.upload_type, this.state.upload_id, this.state.images, this.state.ag_context, this.handleUploadId, this.handleImages, this.handleFormData, this.handleUploadAgcontexts)}
+                    {getStepContent(this.state.activeStep, this.props.upload_type, this.state.upload_id, this.state.images, this.state.ag_context, this.handleUploadId, this.handleImages, this.handleFormData, this.handleUploadAgcontexts, this.handleErrorMessage)}
                 </Typography>
+                {this.state.error_message.length > 0 && this.state.error_message !== 'init' ? <p style={{color: 'red', float: 'right', marginTop: '0.5em'}}>{this.state.error_message}</p> : ""}
                 <div>
                     <Button disabled={this.state.activeStep === 0} onClick={this.handleBack} className={classes.button}>
                         Back
@@ -227,6 +242,7 @@ class UploadStepper extends React.Component {
                         color="primary"
                         onClick={this.handleSkip}
                         className={classes.button}
+                        disabled={this.state.error_message.length > 0 && this.state.error_message !== "init"}
                         >
                         Skip
                         </Button>
@@ -237,6 +253,7 @@ class UploadStepper extends React.Component {
                         color="primary"
                         onClick={this.handleNext}
                         className={classes.button}
+                        disabled={this.state.error_message.length > 0}
                     >
                         {this.state.activeStep === this.state.steps.length - 1 ? 'Submit' : 'Next'}
                     </Button>
