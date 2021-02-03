@@ -55,9 +55,27 @@
       "description": "Crop type.\nOne of several strings describing the crop grown in the image."
     },
     "bbch_growth_range": {
-      "type": "string",
-      "pattern": "^gs[1-9][0-9]$|^gs0[1-9]$|^na$",
-      "description": "BBCG Growth Stage code.\nOne of several possible strings describing the stage of the crop, chosen from a list of codes used by the BBCH.\nIf this AgContext is not in a cropping environment, use value \"na\"."
+      "oneOf": [
+        {
+          "type": "array",
+          "title": "BBCH Range",
+          "minItems": 2,
+          "maxItems": 2,
+          "items": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 99
+          }
+        },
+        {
+          "type": "string",
+          "title": "Not Applicable",
+          "enum": [
+            "na"
+          ]
+        }
+      ],
+      "description": "BBCH Growth Stage range\nA pair of BBCH Growth Stage codes (00-99) representing the minimum and maximum crop growth stage in the images.\nIf this AgContext is not in a cropping environment, or is in fallow, use value \"na\"."
     },
     "soil_colour": {
       "type": "string",
@@ -100,7 +118,7 @@
         "75-100",
         "na"
       ],
-      "description": "Percent of coverage in image.\nApproximate measurement of the percent of the soil in the image that is covered by the surface cover."
+      "description": "Percent of coverage in image.\nApproximate percentage images that is covered by the surface cover."
     },
     "weather_description": {
       "type": "string",
@@ -151,11 +169,13 @@
       "anyOf": [
         {
           "type": "number",
+          "title": "Specific",
           "minimum": 1,
           "maximum": 180
         },
         {
           "type": "string",
+          "title": "Variable within AgContext",
           "enum": [
             "variable"
           ]
