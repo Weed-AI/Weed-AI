@@ -3,6 +3,7 @@ import os
 import pathlib
 import json
 from elasticsearch import Elasticsearch, helpers
+from weedcoco.utils import lookup_growth_stage_name
 
 
 class ElasticSearchIndex:
@@ -67,6 +68,17 @@ class ElasticSearchIndex:
             for field in variable_to_null_fields:
                 if agcontext.get(field) == "variable":
                     del agcontext[field]
+            # textual label for growth stage
+            if "bbch_growth_range" not in agcontext:
+                growth_stage_texts = ["na"]
+            else:
+                lo, hi = agcontext["bbch_growth_range"]
+                growth_stage_texts = set()
+                for i in range(lo, hi + 1):
+                    growth_stage_texts.add(
+                        lookup_growth_stage_name(i, scheme="grain_ranges")
+                    )
+            agcontext["growth_stage_texts"] = sorted(growth_stage_texts)
 
         for annotation in coco["annotations"]:
             image = id_lookup["images", annotation["image_id"]]
