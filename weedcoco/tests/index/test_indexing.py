@@ -17,9 +17,7 @@ THUMBNAIL_DIR = "arbitrary-thumbnail-dir"
 @elasticmock
 def test_smoke_indexing():
     # run indexing but check nothing
-    main(
-        ["--weedcoco-path", BASIC_INPUT_PATH, "--thumbnail-dir", THUMBNAIL_DIR,]
-    )
+    main(["--weedcoco-path", BASIC_INPUT_PATH, "--thumbnail-dir", THUMBNAIL_DIR])
 
 
 def test_batch_generation():

@@ -86,11 +86,7 @@ def voc_to_coco(
             )
         )
 
-    out = {
-        "images": images,
-        "annotations": annotations,
-        "info": {},
-    }
+    out = {"images": images, "annotations": annotations, "info": {}}
     if use_default_category_mapping:
         out["categories"] = [
             {"id": idx, "name": name} for name, idx in category_mapping.items()
