@@ -69,15 +69,15 @@ class ElasticSearchIndex:
                 if agcontext.get(field) == "variable":
                     del agcontext[field]
             # textual label for growth stage
-            try:
-                growth_stage_texts = set()
+            if "bbch_growth_range" not in agcontext:
+                growth_stage_texts = ["na"]
+            else:
                 lo, hi = agcontext["bbch_growth_range"]
+                growth_stage_texts = set()
                 for i in range(lo, hi + 1):
                     growth_stage_texts.add(
                         lookup_growth_stage_name(i, scheme="grain_ranges")
                     )
-            except KeyError:
-                growth_stage_texts = ["na"]
             agcontext["growth_stage_texts"] = sorted(growth_stage_texts)
 
         for annotation in coco["annotations"]:
