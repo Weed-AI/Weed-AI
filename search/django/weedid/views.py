@@ -30,64 +30,82 @@ def elasticsearch_query(request):
 
 def upload(request):
     if request.method == "POST":
-        user_id = request.user.id
-        images = []
-        file_weedcoco = request.FILES["weedcoco"]
-        weedcoco_json = json.load(file_weedcoco)
-        validate(weedcoco_json)
-        for image_reference in weedcoco_json["images"]:
-            images.append(image_reference["file_name"].split("/")[-1])
-        upload_dir, upload_id = setup_upload_dir(os.path.join(UPLOAD_DIR, str(user_id)))
-        weedcoco_path = store_tmp_weedcoco(file_weedcoco, upload_dir)
-        create_upload_entity(weedcoco_path, upload_id, user_id)
-        return HttpResponse(json.dumps({"upload_id": upload_id, "images": images}))
+        user = request.user
+        if user and user.is_authenticated:
+            images = []
+            file_weedcoco = request.FILES["weedcoco"]
+            weedcoco_json = json.load(file_weedcoco)
+            validate(weedcoco_json)
+            for image_reference in weedcoco_json["images"]:
+                images.append(image_reference["file_name"].split("/")[-1])
+            upload_dir, upload_id = setup_upload_dir(
+                os.path.join(UPLOAD_DIR, str(user.id))
+            )
+            weedcoco_path = store_tmp_weedcoco(file_weedcoco, upload_dir)
+            create_upload_entity(weedcoco_path, upload_id, user.id)
+            return HttpResponse(json.dumps({"upload_id": upload_id, "images": images}))
+        else:
+            return HttpResponseForbidden("You dont have access to proceed")
     else:
         return HttpResponse("Only support POST request")
 
 
 def upload_image(request):
     if request.method == "POST":
-        user_id = request.user.id
-        upload_id = request.POST["upload_id"]
-        upload_image = request.FILES["upload_image"]
-        upload_dir = os.path.join(UPLOAD_DIR, str(user_id), upload_id, "images")
-        store_tmp_image(upload_image, upload_dir)
-        return HttpResponse(f"Uploaded {upload_image.name} to {upload_dir}")
+        user = request.user
+        if user and user.is_authenticated:
+            upload_id = request.POST["upload_id"]
+            upload_image = request.FILES["upload_image"]
+            upload_dir = os.path.join(UPLOAD_DIR, str(user.id), upload_id, "images")
+            store_tmp_image(upload_image, upload_dir)
+            return HttpResponse(f"Uploaded {upload_image.name} to {upload_dir}")
+        else:
+            return HttpResponseForbidden("You dont have access to proceed")
     else:
         return HttpResponse("Only support POST request")
 
 
 def upload_agcontexts(request):
     if request.method == "POST":
-        user_id = request.user.id
-        data = json.loads(request.body)
-        upload_id, ag_contexts = data["upload_id"], data["ag_contexts"]
-        weedcoco_path = os.path.join(
-            UPLOAD_DIR, str(user_id), str(upload_id), "weedcoco.json"
-        )
-        try:
-            add_agcontexts(weedcoco_path, ag_contexts)
-            Dataset.objects.filter(upload_id=upload_id).update(agcontext=[ag_contexts])
-        except Exception:
-            return HttpResponseNotAllowed("Failed to add AgContexts")
-        else:
-            return HttpResponse(
-                f"Updated AgContexts for user {user_id}'s upload{upload_id}"
+        user = request.user
+        if user and user.is_authenticated:
+            data = json.loads(request.body)
+            upload_id, ag_contexts = data["upload_id"], data["ag_contexts"]
+            weedcoco_path = os.path.join(
+                UPLOAD_DIR, str(user.id), str(upload_id), "weedcoco.json"
             )
+            try:
+                add_agcontexts(weedcoco_path, ag_contexts)
+                Dataset.objects.filter(upload_id=upload_id).update(
+                    agcontext=[ag_contexts]
+                )
+            except Exception:
+                return HttpResponseNotAllowed("Failed to add AgContexts")
+            else:
+                return HttpResponse(
+                    f"Updated AgContexts for user {user.id}'s upload{upload_id}"
+                )
+        else:
+            return HttpResponseForbidden("You dont have access to proceed")
     else:
         return HttpResponse("Only support POST request")
 
 
 def submit_deposit(request):
     if request.method == "POST":
-        user_id = request.user.id
-        upload_id = request.POST["upload_id"]
-        weedcoco_path = os.path.join(
-            UPLOAD_DIR, str(user_id), str(upload_id), "weedcoco.json"
-        )
-        images_dir = os.path.join(UPLOAD_DIR, str(user_id), str(upload_id), "images")
-        submit_upload_task.delay(weedcoco_path, images_dir, upload_id)
-        return HttpResponse(f"Work on user {user_id}'s upload{upload_id}")
+        user = request.user
+        if user and user.is_authenticated:
+            upload_id = request.POST["upload_id"]
+            weedcoco_path = os.path.join(
+                UPLOAD_DIR, str(user.id), str(upload_id), "weedcoco.json"
+            )
+            images_dir = os.path.join(
+                UPLOAD_DIR, str(user.id), str(upload_id), "images"
+            )
+            submit_upload_task.delay(weedcoco_path, images_dir, upload_id)
+            return HttpResponse(f"Work on user {user.id}'s upload{upload_id}")
+        else:
+            return HttpResponseForbidden("You dont have access to proceed")
     else:
         return HttpResponse("Only support POST request")
 
