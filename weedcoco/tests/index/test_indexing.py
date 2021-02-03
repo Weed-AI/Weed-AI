@@ -4,19 +4,22 @@ import pytest
 from elasticmock import elasticmock as elasticmock
 from weedcoco.index.indexing import main, ElasticSearchIndexer
 
-BASIC_INPUT_PATH = str(pathlib.Path(__file__).parent.parent / "repo" / "deposit_data" / "basic_1" / "weedcoco.json")
+BASIC_INPUT_PATH = str(
+    pathlib.Path(__file__).parent.parent
+    / "repo"
+    / "deposit_data"
+    / "basic_1"
+    / "weedcoco.json"
+)
 THUMBNAIL_DIR = "arbitrary-thumbnail-dir"
 
 
 @elasticmock
 def test_smoke_indexing():
     # run indexing but check nothing
-    main([
-        "--weedcoco-path",
-        BASIC_INPUT_PATH,
-        "--thumbnail-dir",
-        THUMBNAIL_DIR,
-    ])
+    main(
+        ["--weedcoco-path", BASIC_INPUT_PATH, "--thumbnail-dir", THUMBNAIL_DIR,]
+    )
 
 
 def test_batch_generation():
@@ -25,8 +28,9 @@ def test_batch_generation():
 
 
 def test_task_type():
-    indexer = ElasticSearchIndexer(weedcoco_path=BASIC_INPUT_PATH,
-                                   thumbnail_dir=THUMBNAIL_DIR)
+    indexer = ElasticSearchIndexer(
+        weedcoco_path=BASIC_INPUT_PATH, thumbnail_dir=THUMBNAIL_DIR
+    )
     for entry in indexer.generate_index_entries():
         assert isinstance(entry["task_type"], list)
     # TODO: test the task type for different input annotation data
