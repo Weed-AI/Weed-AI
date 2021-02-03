@@ -12,8 +12,8 @@ class App extends Component {
 			<ThemeProvider theme={theme}>
 				<Switch>
 					<Redirect exact from="/" to="/explore" />
+					<Route exact path='/agcontext/editor' component={AgContextEditor} />
 					<Route exact path="/:page/:dataset_id?" render={props => <NavbarComponent {...props} />} />
-                    <Route exact path='/agcontext/editor' component={AgContextEditor} />
 				</Switch>
 			</ThemeProvider>
 		);
