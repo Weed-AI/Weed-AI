@@ -185,7 +185,10 @@ class UploadStepper extends React.Component {
                 "ag_contexts": this.state.ag_context
             },
             headers: {'X-CSRFToken': csrftoken }
-        }).then(msg => console.log(msg))
+        }).then(res => {
+            console.log(res)
+            this.handleErrorMessage("")
+        })
         .catch(err => {
             console.log(err)
             this.handleErrorMessage("Invalid input for AgContext")
