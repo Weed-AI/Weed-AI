@@ -119,7 +119,7 @@ const uischema = {
 
 const renderers = [
   ...materialRenderers,
-  { tester: growthStageControlTester, renderer: GrowthStageControl },
+  // { tester: growthStageControlTester, renderer: GrowthStageControl },
 ];
 
 class AgContextForm extends Component {
