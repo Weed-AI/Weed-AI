@@ -144,6 +144,7 @@ class AgContextForm extends Component {
                   this.setState({formData: e.data});
                   if (this.props.onChange) {
 					  e.formData = e.data;
+					  e.formData["id"] = 0;
                       this.props.onChange(e);
                   }
               }}

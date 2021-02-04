@@ -165,7 +165,7 @@
       "description": "Angle of camera. A number representing the angle at which the camera is positioned, in degrees. A camera facing straight down would be 90. A camera facing forward would be 0."
     },
     "camera_fov": {
-      "anyOf": [
+      "oneOf": [
         {
           "type": "number",
           "title": "Specific",
