@@ -35,7 +35,7 @@ function getSteps(upload_type) {
          ['Upload Coco', 'Add Agcontext', 'Upload Images']
 }
 
-function getStepContent(step, upload_type, upload_id, images, formData, handleUploadId, handleImages, handleFormData, handleUploadAgcontexts, handleErrorMessage) {
+function getStepContent(step, upload_type, upload_id, images, formData, handleUploadId, handleImages, handleFormData, handleErrorMessage) {
     if (upload_type === 'coco') {
         switch (step) {
             case 0:
@@ -50,7 +50,6 @@ function getStepContent(step, upload_type, upload_id, images, formData, handleUp
                     <textarea style={{width: "100%", height: "5em"}} value={toJSON(formData)} ></textarea>
                     <React.Fragment>
                         <button onClick={e => handleSaveToPC(formData)}>Download</button>
-                        <button onClick={e => handleUploadAgcontexts()}>Upload</button>
                     </React.Fragment>
                 </React.Fragment>
               );
@@ -108,6 +107,7 @@ class UploadStepper extends React.Component {
         this.handleReset = this.handleReset.bind(this);
         this.handleUploadAgcontexts = this.handleUploadAgcontexts.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
+        this.handleAgContextExempt = this.handleAgContextExempt.bind(this);
     }
 
     isStepOptional(step, upload_type) {
@@ -189,6 +189,7 @@ class UploadStepper extends React.Component {
         }).then(res => {
             console.log(res)
             this.handleErrorMessage("")
+            this.handleNext()
         })
         .catch(err => {
             console.log(err)
@@ -206,6 +207,10 @@ class UploadStepper extends React.Component {
             data: body,
             headers: {'Content-Type': 'multipart/form-data', 'X-CSRFToken': csrftoken }
         })
+    }
+
+    handleAgContextExempt(){
+        return this.state.activeStep === 1 && this.props.upload_type === 'coco'
     }
 
     render(){
@@ -231,7 +236,7 @@ class UploadStepper extends React.Component {
             </Stepper>
             <div>
                 <Typography className={classes.instructions}>
-                    {getStepContent(this.state.activeStep, this.props.upload_type, this.state.upload_id, this.state.images, this.state.ag_context, this.handleUploadId, this.handleImages, this.handleFormData, this.handleUploadAgcontexts, this.handleErrorMessage)}
+                    {getStepContent(this.state.activeStep, this.props.upload_type, this.state.upload_id, this.state.images, this.state.ag_context, this.handleUploadId, this.handleImages, this.handleFormData, this.handleErrorMessage)}
                 </Typography>
                 {this.state.error_message.length > 0 && this.state.error_message !== 'init' ? <p style={{color: 'red', float: 'right', marginTop: '0.5em'}}>{this.state.error_message}</p> : ""}
                 <div>
@@ -254,9 +259,9 @@ class UploadStepper extends React.Component {
                     <Button
                         variant="contained"
                         color="primary"
-                        onClick={this.handleNext}
+                        onClick={this.handleAgContextExempt() ? this.handleUploadAgcontexts : this.handleNext}
                         className={classes.button}
-                        disabled={this.state.error_message.length > 0 && this.state.activeStep !== this.state.steps.length - 1}
+                        disabled={this.state.error_message.length > 0 && this.state.activeStep !== this.state.steps.length - 1 && !this.handleAgContextExempt()}
                     >
                         {this.state.activeStep === this.state.steps.length - 1 ? 'Submit' : 'Next'}
                     </Button>
