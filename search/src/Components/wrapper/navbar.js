@@ -116,7 +116,7 @@ export default function NavbarComponent(props) {
           <StyledTab label="Datasets" />
           <StyledTab label="Upload" />
           <StyledTab label="About" disabled />
-          <Typography variant='p' className={classes.logo}><span style={{color: '#f0983a'}}>Weed ID</span>entification Database</Typography>
+          <Typography variant='p' className={classes.logo}><span style={{color: '#f0983a'}}>Weed</span>AI</Typography>
         </StyledTabs>
       </AppBar>
       {
