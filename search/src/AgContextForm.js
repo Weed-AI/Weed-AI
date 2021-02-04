@@ -6,6 +6,7 @@ import { agcontextSchema } from './schemas'
 import './AgContextForm.css';
 import Container from '@material-ui/core/Container';
 import Box from '@material-ui/core/Box';
+import UploadJsonButton from './Components/ui/UploadJsonButton';
 
 
 const Form = withTheme(MuiTheme);
@@ -67,6 +68,7 @@ class StandaloneEditor extends Component {
                     <label>JSON representation of AgContext</label>
                     <textarea style={{width: "100%", height: "5em"}} value={toJSON(this.state.formData)} / >
                     <button onClick={e => handleSaveToPC(this.state.formData)}>Download</button>
+                    <UploadJsonButton initialValue={toJSON(this.state.formData)} onClose={(value) => {this.setState({formData: JSON.parse(value)})}} />
                 </Box>
             </Container>
         );
