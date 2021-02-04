@@ -7,7 +7,7 @@ required:
   - datePublished
   - license
 definitions:
-  - Person:
+  Person:
     type: object
     required:
       - name
@@ -21,9 +21,10 @@ definitions:
       sameAs:
         type: string
         format: uri
-        label: ORCID ID
+        title: ORCID ID
         description: ORCID ID (see https://orcid.org)
-  - Organization:
+    title: Person
+  Organization:
     type: object
     required:
       - name
@@ -33,8 +34,9 @@ definitions:
       sameAs:
         type: string
         format: uri
-        label: ROR ID
+        title: ROR ID
         description: ROR ID (see https://ror.org)
+    title: Organization
 properties:
   name:
     type: string
@@ -50,27 +52,24 @@ properties:
   description:
     type: string
     description: A description of this dataset
-  identfier:
+  identifier:
     type: array
     items:
       type: string
       format: uri
       description: Digital Object Identifier or other URL established as identifiers for this dataset.
-    label: Identifiers (including DOIs)
+    title: Identifiers (including DOIs)
   sameAs:
     type: array
     items:
       type: string
       format: uri
       description: "Another URL for this dataset"
-    label: Other URLs
+    title: Other URIs for this dataset (e.g. GitHub, institutional repository)
   datePublished:
     type: string
     format: date
     description: Date of first publication
-  citation:
-    type: string
-    description: Identifies academic articles that are recommended by the data provider be cited in addition to the dataset itself.
   funder:
     type: array
     items:
@@ -79,3 +78,5 @@ properties:
   license:
     type: string
     format: uri
+    default: https://creativecommons.org/licenses/by/4.0/
+    description: URL of license document. Currently, the repository requires all contributions to be CC-BY-4.0
