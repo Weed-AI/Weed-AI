@@ -35,7 +35,7 @@ function getSteps(upload_type) {
          ['Upload Coco', 'Add Agcontext', 'Upload Images']
 }
 
-function getStepContent(step, upload_type, upload_id, images, formData, handleUploadId, handleImages, handleFormData, handleUploadAgcontexts, handleErrorMessage) {
+function getStepContent(step, upload_type, upload_id, images, formData, handleUploadId, handleImages, handleFormData, handleErrorMessage) {
     if (upload_type === 'coco') {
         switch (step) {
             case 0:
@@ -50,7 +50,6 @@ function getStepContent(step, upload_type, upload_id, images, formData, handleUp
                     <textarea style={{width: "100%", height: "5em"}} value={toJSON(formData)} ></textarea>
                     <React.Fragment>
                         <button onClick={e => handleSaveToPC(formData)}>Download</button>
-                        <button onClick={e => handleUploadAgcontexts()}>Upload</button>
                     </React.Fragment>
                 </React.Fragment>
               );
@@ -88,6 +87,7 @@ class UploadStepper extends React.Component {
         super(props);
         this.state = {
             activeStep: 0,
+            skip_mapping: {'weedcoco': -1, 'coco': -1},
             skipped: new Set(),
             steps: getSteps(this.props.upload_type),
             upload_id: 0,
@@ -107,10 +107,11 @@ class UploadStepper extends React.Component {
         this.handleReset = this.handleReset.bind(this);
         this.handleUploadAgcontexts = this.handleUploadAgcontexts.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
+        this.handleAgContextExempt = this.handleAgContextExempt.bind(this);
     }
 
-    isStepOptional(step) {
-        return step === 1;
+    isStepOptional(step, upload_type) {
+        return this.state.skip_mapping[upload_type] === step;
     };
 
     isStepSkipped(step) {
@@ -158,7 +159,7 @@ class UploadStepper extends React.Component {
     };
 
     handleSkip(){
-        if (!this.isStepOptional(this.state.activeStep)) {
+        if (!this.isStepOptional(this.state.activeStep, this.props.upload_type)) {
             // You probably want to guard against something like this,
             // it should never occur unless someone's actively trying to break something.
             throw new Error("You can't skip a step that isn't optional.");
@@ -188,6 +189,7 @@ class UploadStepper extends React.Component {
         }).then(res => {
             console.log(res)
             this.handleErrorMessage("")
+            this.handleNext()
         })
         .catch(err => {
             console.log(err)
@@ -207,6 +209,10 @@ class UploadStepper extends React.Component {
         })
     }
 
+    handleAgContextExempt(){
+        return this.state.activeStep === 1 && this.props.upload_type === 'coco'
+    }
+
     render(){
         const { classes } = this.props;
         return (
@@ -215,7 +221,7 @@ class UploadStepper extends React.Component {
                 {this.state.steps.map((label, index) => {
                 const stepProps = {};
                 const labelProps = {};
-                if (this.isStepOptional(index)) {
+                if (this.isStepOptional(index, this.props.upload_type)) {
                     labelProps.optional = <Typography variant="caption">Optional</Typography>;
                 }
                 if (this.isStepSkipped(index)) {
@@ -230,15 +236,14 @@ class UploadStepper extends React.Component {
             </Stepper>
             <div>
                 <Typography className={classes.instructions}>
-                    {getStepContent(this.state.activeStep, this.props.upload_type, this.state.upload_id, this.state.images, this.state.ag_context, this.handleUploadId, this.handleImages, this.handleFormData, this.handleUploadAgcontexts, this.handleErrorMessage)}
+                    {getStepContent(this.state.activeStep, this.props.upload_type, this.state.upload_id, this.state.images, this.state.ag_context, this.handleUploadId, this.handleImages, this.handleFormData, this.handleErrorMessage)}
                 </Typography>
                 {this.state.error_message.length > 0 && this.state.error_message !== 'init' ? <p style={{color: 'red', float: 'right', marginTop: '0.5em'}}>{this.state.error_message}</p> : ""}
                 <div>
                     <Button disabled={this.state.activeStep === 0} onClick={this.handleBack} className={classes.button}>
                         Back
                     </Button>
-                    {this.isStepOptional(this.state.activeStep) 
-                    && this.props.upload_type === 'coco'
+                    {this.isStepOptional(this.state.activeStep, this.props.upload_type)
                     && (
                         <Button
                         variant="contained"
@@ -254,9 +259,9 @@ class UploadStepper extends React.Component {
                     <Button
                         variant="contained"
                         color="primary"
-                        onClick={this.handleNext}
+                        onClick={this.handleAgContextExempt() ? this.handleUploadAgcontexts : this.handleNext}
                         className={classes.button}
-                        disabled={this.state.error_message.length > 0 && this.state.activeStep !== this.state.steps.length - 1}
+                        disabled={this.state.error_message.length > 0 && this.state.activeStep !== this.state.steps.length - 1 && !this.handleAgContextExempt()}
                     >
                         {this.state.activeStep === this.state.steps.length - 1 ? 'Submit' : 'Next'}
                     </Button>
