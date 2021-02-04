@@ -7,8 +7,7 @@ import {
   materialCells,
   materialRenderers,
 } from '@jsonforms/material-renderers';
-import { JsonForms, withJsonFormsControlProps } from '@jsonforms/react';
-import { schemaMatches, rankWith } from '@jsonforms/core';
+import { JsonForms } from '@jsonforms/react';
 import { fixedItemsTester, FixedItemsRenderer } from './Components/formRenderers/FixedItemsRenderer';
 import { constTester, ConstRenderer } from './Components/formRenderers/ConstRenderer';
 
