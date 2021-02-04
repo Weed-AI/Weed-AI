@@ -123,12 +123,12 @@ class UploadComponent extends Component {
                                 Select annotation format
                             </MenuItem>
                             <MenuItem value="weedcoco">WeedCOCO</MenuItem>
-                            <MenuItem value="coco" disabled>COCO (not implemented)</MenuItem>
+                            <MenuItem value="coco">COCO</MenuItem>
                             <MenuItem value="voc" disabled>VOC (not implemented)</MenuItem>
                             <MenuItem value="masks" disabled>Segmentation masks (not implemented)</MenuItem>
                         </Select>
                     </FormControl>
-                    <UploadDialog handleUploadStatus={this.retrieveUploadStatus} uploadType={this.state.upload_type}/>
+                    <UploadDialog handleUploadStatus={this.retrieveUploadStatus} upload_type={this.state.upload_type}/>
                 </div>
             </div>
         )

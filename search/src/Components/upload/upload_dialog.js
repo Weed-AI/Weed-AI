@@ -45,6 +45,7 @@ const DialogTitle = withStyles(styles)((props) => {
 const DialogContent = withStyles((theme) => ({
   root: {
     padding: theme.spacing(2),
+    width: '40vw'
   },
 }))(MuiDialogContent);
 
@@ -62,14 +63,14 @@ export default function UploadDialog(props) {
 
   return (
     <React.Fragment>
-      <Button disabled={!props.uploadType} className={classes.uploadButton} variant="contained" onClick={handleClickOpen}>
+      <Button disabled={!props.upload_type} className={classes.uploadButton} variant="contained" onClick={handleClickOpen}>
         Begin upload
       </Button>
-      <Dialog onClose={handleClose} aria-labelledby="upload-dialog-title" open={open}>
+      <Dialog maxWidth='md' onClose={handleClose} aria-labelledby="upload-dialog-title" open={open}>
         <DialogTitle id="upload-dialog-title" onClose={handleClose}>
         </DialogTitle>
         <DialogContent>
-            <UploadSteper handleClose={handleClose}/>
+            <UploadSteper handleClose={handleClose} upload_type={props.upload_type}/>
         </DialogContent>
       </Dialog>
     </React.Fragment>

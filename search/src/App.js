@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import { Route, Switch, Redirect, withRouter } from "react-router-dom"
 import {ThemeProvider} from '@material-ui/styles'
 import NavbarComponent from './Components/wrapper/navbar'
+import { Standalone as AgContextEditor } from './AgContextForm'
 import theme from './Components/ui/theme'
 import { Standalone as AgContextEditor } from './AgContextForm';
 import './App.css'

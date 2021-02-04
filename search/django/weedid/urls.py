@@ -4,6 +4,7 @@ from weedid import views
 api_urlpatterns = [
     path("upload/", views.upload, name="upload"),
     path("upload_image/", views.upload_image, name="upload_image"),
+    path("upload_agcontexts/", views.upload_agcontexts, name="upload_agcontexts"),
     path("submit_deposit/", views.submit_deposit, name="submit_deposit"),
     path("upload_status/", views.upload_status, name="upload_status"),
     path("upload_info/", views.upload_info, name="upload_info"),
