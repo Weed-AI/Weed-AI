@@ -172,6 +172,7 @@ class StandaloneEditor extends Component {
     render() {
         return (
             <Container maxWidth="sm">
+                <h2>AgContext</h2>
                 <Box boxShadow={3} px={2} py={1} my={2}>
                     <AgContextForm formData={this.state.formData} onChange={e => this.setState({formData: e.formData})} />
                 </Box>
