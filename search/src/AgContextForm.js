@@ -8,8 +8,8 @@ import {
   materialRenderers,
 } from '@jsonforms/material-renderers';
 import { JsonForms } from '@jsonforms/react';
-import GrowthStageControl from './GrowthStageControl';
-import growthStageControlTester from './growthStageControlTester';
+import { schemaMatches, rankWith } from '@jsonforms/core';
+import FixedItemsRenderer from './FixedItemsRenderer';
 
 const uischema = {
   "type": "Categorization",
@@ -117,9 +117,26 @@ const uischema = {
   ]
 };
 
+const ConstRenderer = ({schema, handleChange, path}) => {
+  console.log(schema, handleChange, path)
+  return (<p>{schema['const']}{handleChange(path, schema['const'])})</p>);
+}
+
+
+const constTester = rankWith(
+  3, //increase rank as needed
+  schemaMatches((schema) => schema["const"])
+);
+
+const fixedItemsTester = rankWith(
+	5, schemaMatches((schema) => {if (schema.minItems) { console.log(schema); let out= ((schema.minItems !== undefined) && (schema.minItems === schema.maxItems)); console.log(out); return out } return false; })
+);
+
 const renderers = [
   ...materialRenderers,
   // { tester: growthStageControlTester, renderer: GrowthStageControl },
+  //{ tester: constTester, renderer: ConstRenderer },
+  { tester: fixedItemsTester, renderer: FixedItemsRenderer },
 ];
 
 class AgContextForm extends Component {
@@ -174,7 +191,7 @@ class StandaloneEditor extends Component {
                 </Box>
                 <Box boxShadow={3} px={2} py={1} my={2}>
                     <label>JSON representation of AgContext</label>
-                    <textarea style={{width: "100%", height: "5em"}} value={toJSON(this.state.formData)} / >
+                    <textarea readOnly={true} style={{width: "100%", height: "5em"}} value={toJSON(this.state.formData)} / >
                     <button onClick={e => handleSaveToPC(this.state.formData)}>Download</button>
                 </Box>
             </Container>

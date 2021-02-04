@@ -68,8 +68,7 @@ properties:
           maximum: 99
       - type: string
         title: Not Applicable
-        enum:
-          - na
+        const: na
     description: |-
       BBCH Growth Stage range
       A pair of BBCH Growth Stage codes (00-99) representing the minimum and maximum crop growth stage in the images.
@@ -191,8 +190,7 @@ properties:
         maximum: 180
       - type: string
         title: Variable within AgContext
-        enum:
-          - variable
+        const: variable
     description: |-
       Field of view for camera.
       A number representing the angle captured by the camera across the diagonal of an image, measured in degrees.

@@ -70,9 +70,7 @@
         {
           "type": "string",
           "title": "Not Applicable",
-          "enum": [
-            "na"
-          ]
+          "const": "na"
         }
       ],
       "description": "BBCH Growth Stage range\nA pair of BBCH Growth Stage codes (00-99) representing the minimum and maximum crop growth stage in the images.\nIf this AgContext is not in a cropping environment, or is in fallow, use value \"na\"."
@@ -176,9 +174,7 @@
         {
           "type": "string",
           "title": "Variable within AgContext",
-          "enum": [
-            "variable"
-          ]
+          "const": "variable"
         }
       ],
       "description": "Field of view for camera.\nA number representing the angle captured by the camera across the diagonal of an image, measured in degrees.\nIf this is not fixed within the AgContext, use value \"variable\"."
