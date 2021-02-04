@@ -7,9 +7,10 @@ import {
   materialCells,
   materialRenderers,
 } from '@jsonforms/material-renderers';
-import { JsonForms } from '@jsonforms/react';
+import { JsonForms, withJsonFormsControlProps } from '@jsonforms/react';
 import { schemaMatches, rankWith } from '@jsonforms/core';
-import FixedItemsRenderer from './FixedItemsRenderer';
+import { fixedItemsTester, FixedItemsRenderer } from './Components/formRenderers/FixedItemsRenderer';
+import { constTester, ConstRenderer } from './Components/formRenderers/ConstRenderer';
 
 const uischema = {
   "type": "Categorization",
@@ -117,25 +118,9 @@ const uischema = {
   ]
 };
 
-const ConstRenderer = ({schema, handleChange, path}) => {
-  console.log(schema, handleChange, path)
-  return (<p>{schema['const']}{handleChange(path, schema['const'])})</p>);
-}
-
-
-const constTester = rankWith(
-  3, //increase rank as needed
-  schemaMatches((schema) => schema["const"])
-);
-
-const fixedItemsTester = rankWith(
-	5, schemaMatches((schema) => {if (schema.minItems) { console.log(schema); let out= ((schema.minItems !== undefined) && (schema.minItems === schema.maxItems)); console.log(out); return out } return false; })
-);
-
 const renderers = [
   ...materialRenderers,
-  // { tester: growthStageControlTester, renderer: GrowthStageControl },
-  //{ tester: constTester, renderer: ConstRenderer },
+  { tester: constTester, renderer: ConstRenderer },
   { tester: fixedItemsTester, renderer: FixedItemsRenderer },
 ];
 
@@ -158,6 +143,7 @@ class AgContextForm extends Component {
               onChange={e => {
                   this.setState({formData: e.data});
                   if (this.props.onChange) {
+					  e.formData = e.data;
                       this.props.onChange(e);
                   }
               }}

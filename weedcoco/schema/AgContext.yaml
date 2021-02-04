@@ -66,6 +66,7 @@ properties:
           type: integer
           minimum: 0
           maximum: 99
+          description: Minimum and maximum BBCH growth stages (00-99) in the dataset
       - type: string
         title: Not Applicable
         const: na
@@ -183,7 +184,7 @@ properties:
       A camera facing straight down would be 90. A camera facing forward would be 0.
 
   camera_fov:
-    anyOf:
+    oneOf:
       - type: number
         title: Specific
         minimum: 1

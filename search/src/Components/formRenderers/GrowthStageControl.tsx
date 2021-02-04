@@ -4,6 +4,7 @@ import Slider from '@material-ui/core/Slider';
 import Tooltip from '@material-ui/core/Tooltip';
 import Typography from '@material-ui/core/Typography';
 import { withStyles } from '@material-ui/core/styles';
+import { rankWith, scopeEndsWith } from '@jsonforms/core';
 
 
 function ValueLabelComponent(props: any) {
@@ -185,5 +186,10 @@ const GrowthStageControl = ({ data, handleChange, path }: GrowthStageControlProp
     </div>
   );
 };
+
+export const growthStageControlTester = rankWith(
+  3, //increase rank as needed
+  scopeEndsWith('bbch_growth_range')
+);
 
 export default withJsonFormsControlProps(GrowthStageControl);

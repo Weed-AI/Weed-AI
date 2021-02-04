@@ -64,7 +64,8 @@
           "items": {
             "type": "integer",
             "minimum": 0,
-            "maximum": 99
+            "maximum": 99,
+            "description": "Minimum and maximum BBCH growth stages (00-99) in the dataset"
           }
         },
         {
