@@ -1,0 +1,82 @@
+$id: https://weedid.sydney.edu.au/schema/Metadata.json
+# Designed to be conformant to flattened schema.org/Dataset
+type: object
+required:
+  - name
+  - creator
+  - datePublished
+  - license
+definitions:
+  Person:
+    type: object
+    required:
+      - name
+    properties:
+      name:
+        type: string
+      givenName:
+        type: string
+      familyName:
+        type: string
+      sameAs:
+        type: string
+        format: uri
+        title: ORCID ID
+        description: ORCID ID (see https://orcid.org)
+    title: Person
+  Organization:
+    type: object
+    required:
+      - name
+    properties:
+      name:
+        type: string
+      sameAs:
+        type: string
+        format: uri
+        title: ROR ID
+        description: ROR ID (see https://ror.org)
+    title: Organization
+properties:
+  name:
+    type: string
+    description: A name for this dataset, or its publication title
+  creator:
+    type: array
+    items:
+      minItems: 1
+      oneOf:
+        - $ref: "#/definitions/Person"
+        - $ref: "#/definitions/Organization"
+    description: People and organizations who created this dataset.
+  description:
+    type: string
+    description: A description of this dataset
+  identifier:
+    type: array
+    items:
+      type: string
+      format: uri
+      description: Digital Object Identifier or other URL established as identifiers for this dataset.
+    title: Identifiers (including DOIs)
+  sameAs:
+    type: array
+    items:
+      type: string
+      format: uri
+      description: "Another URL for this dataset"
+    title: Other URIs for this dataset (e.g. GitHub, institutional repository)
+  datePublished:
+    type: string
+    format: date
+    description: Date of first publication
+  funder:
+    type: array
+    items:
+      $ref: "#/definitions/Organization"
+    description: People and organizations who created this dataset.
+  license:
+    type: string
+    format: uri
+    default: https://creativecommons.org/licenses/by/4.0/
+    description: URL of license document. Currently, the repository requires all contributions to be CC-BY-4.0
