@@ -8,6 +8,26 @@ import yaml
 import imagehash
 
 
+def set_info(coco, metadata):
+    info = coco.get("info", {}).copy()
+    info["metadata"] = metadata
+    info["description"] = metadata["name"]
+    try:
+        info["year"] = int(metadata["datePublished"][:4])
+    except Exception:
+        pass
+    coco["info"] = info
+
+
+def set_licenses(coco, metadata=None):
+    """Set the license for each image to be that from the metadata"""
+    if metadata is None:
+        metadata = coco["info"]["metadata"]
+    coco["licenses"] = [{"id": 0, "url": metadata["license"]}]
+    for image in coco["images"]:
+        image["license"] = 0
+
+
 def get_image_dimensions(path):
     """
     Function to measure image dimensions and calculate resolution.

@@ -16,7 +16,7 @@ from tqdm import tqdm
 import humanfriendly
 import os
 
-from weedcoco.utils import get_image_dimensions
+from weedcoco.utils import get_image_dimensions, set_info, set_licenses
 
 """Constants and environment"""
 
@@ -194,34 +194,16 @@ license = [
     }
 ]
 
-"""
-Create collection object
-"""
-collections = [
-    {
-        "author": "Olsen, Alex",
-        "title": "DeepWeeds: A Multiclass Weed Species Image Dataset for Deep Learning",
-        "year": 2019,
-        "identifier": "doi:10.1038/s41598-018-38343-3",
-        "rights": "Apache License 2.0",
-        "accrual_policy": "closed",
-        "id": 0,
-    }
-]
+metadata = {
+    "creator": [{"name": "Alex Olsen"}],
+    "name": "DeepWeeds: A Multiclass Weed Species Image Dataset for Deep Learning",
+    "datePublished": "2019-02-14",
+    "sameAs": ["https://github.com/AlexOlsen/DeepWeeds"],
+    "identifier": ["doi:10.1038/s41598-018-38343-3"],
+    "license": "https://creativecommons.org/licenses/by/4.0/",
+    "citation": "A. Olsen, D. A. Konovalov, B. Philippa, P. Ridd, J. C. Wood, J. Johns, W. Banks, B. Girgenti, O. Kenny, J. Whinney, B. Calvert, M. Rahimi Azghadi, and R. D. White, “DeepWeeds: A Multiclass Weed Species Image Dataset for Deep Learning,” Scientific Reports, vol. 9, no. 2058, 2 2019. [Online]. Available: doi.org/10.1038/s41598-018-38343-3"
+}
 
-# TODO: Create subset memberships from multiple csv files...
-collection_memberships = [
-    {"annotation_id": ann["id"], "collection_id": 0} for ann in annotations
-]
-
-"""
-Create agcontext object.
-
-A list of information necessary to provide appropriate agricultural context.
-This information is invariant across a dataset upon upload.
-
-Datasets can be concatenated to include images from multiple different agcontexts.
-"""
 agcontext = [
     {
         "id": 0,
@@ -249,19 +231,20 @@ agcontext = [
     }
 ]
 
+coco = {
+    "images": images,
+    "annotations": annotations,
+    "categories": categories,
+    "agcontexts": agcontext,
+}
+
+set_info(coco, metadata)
+set_licenses(coco)
+
 """Write output"""
 with args.out_path.open("w") as fout:
     json.dump(
-        {
-            "images": images,
-            "annotations": annotations,
-            "categories": categories,
-            "info": info,
-            "license": license,
-            "agcontexts": agcontext,
-            "collections": collections,
-            "collection_memberships": collection_memberships,
-        },
+        coco,
         fout,
         indent=4,
     )
