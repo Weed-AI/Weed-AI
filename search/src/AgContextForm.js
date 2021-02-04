@@ -10,6 +10,7 @@ import {
 import { JsonForms } from '@jsonforms/react';
 import { fixedItemsTester, FixedItemsRenderer } from './Components/formRenderers/FixedItemsRenderer';
 import { constTester, ConstRenderer } from './Components/formRenderers/ConstRenderer';
+import UploadJsonButton from './Components/ui/UploadJsonButton';
 
 const uischema = {
   "type": "Categorization",
@@ -181,7 +182,9 @@ class StandaloneEditor extends Component {
                 <Box boxShadow={3} px={2} py={1} my={2}>
                     <label>JSON representation of AgContext</label>
                     <textarea readOnly={true} style={{width: "100%", height: "5em"}} value={toJSON(this.state.formData)} / >
+                    <button onClick={e => {e.target.parentNode.getElementsByTagName('textarea')[0].select(); document.execCommand('copy');}}>Copy</button>
                     <button onClick={e => handleSaveToPC(this.state.formData)}>Download</button>
+                    <UploadJsonButton initialValue={toJSON(this.state.formData)} onClose={(value) => {this.setState({formData: JSON.parse(value)})}} />
                 </Box>
             </Container>
         );
