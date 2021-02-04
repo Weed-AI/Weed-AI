@@ -92,7 +92,8 @@ const uischema = {
         },
         {
           "type": "Control",
-          "scope": "#/properties/photography_description"
+          "scope": "#/properties/photography_description",
+          "options": {"multi": true}
         }
       ]
     },
@@ -110,7 +111,8 @@ const uischema = {
         },
         {
           "type": "Control",
-          "scope": "#/properties/weather_description"
+          "scope": "#/properties/weather_description",
+          "options": {"multi": true}
         }
       ]
     }
@@ -172,6 +174,7 @@ class StandaloneEditor extends Component {
     render() {
         return (
             <Container maxWidth="sm">
+                <h2>AgContext Editor</h2>
                 <Box boxShadow={3} px={2} py={1} my={2}>
                     <AgContextForm formData={this.state.formData} onChange={e => this.setState({formData: e.formData})} />
                 </Box>
