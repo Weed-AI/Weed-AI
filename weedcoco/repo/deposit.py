@@ -4,7 +4,7 @@ import json
 import os
 import re
 import tempfile
-from shutil import copyfile, move
+from shutil import copyfile, copy
 from zipfile import ZipFile
 from weedcoco.utils import get_image_average_hash, check_if_approved_image_extension
 from weedcoco.validation import ValidationError, validate
@@ -120,7 +120,7 @@ def compress_to_download(dataset_dir, deposit_id, download_dir):
             zip.write(dataset_dir / "weedcoco.json", "weedcoco.json")
             for image, image_name in retrieve_image_paths(dataset_dir / "images"):
                 zip.write(image, "images/" + image_name)
-        move(zip_path, download_path)
+        copy(zip_path, download_path)
 
 
 def deposit(weedcoco_path, image_dir, repository_dir, download_dir, upload_id=None):
