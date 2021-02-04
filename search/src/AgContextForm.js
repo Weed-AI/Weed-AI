@@ -153,7 +153,7 @@ class AgContextForm extends Component {
 class StandaloneEditor extends Component {
     constructor(props) {
         super(props);
-        this.state = {formData: this.props.formData || {crop_type: "oats"} }
+        this.state = {formData: this.props.formData || {} }
     }
     render() {
         const toJSON = (payload) => JSON.stringify(payload, null, 2);
