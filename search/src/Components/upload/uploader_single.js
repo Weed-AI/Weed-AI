@@ -37,14 +37,14 @@ const UploaderSingle  = (props) => {
             props.handleImages(res.images)
             props.handleErrorMessage("")
         }
-        else if (status == 'error_upload'){
+        else if (status === 'error_upload'){
             // Weird things happen here
             props.handleErrorMessage("There is something wrong with the file")
         }
-        else if (status == 'error_file_size') {
+        else if (status === 'error_file_size') {
             props.handleErrorMessage("The file size exceeds the limitation")
         }
-        else if (status == 'removed') {
+        else if (status === 'removed') {
             props.handleErrorMessage("")
         }
     }

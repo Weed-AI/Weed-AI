@@ -88,6 +88,7 @@ class UploadStepper extends React.Component {
         super(props);
         this.state = {
             activeStep: 0,
+            skip_mapping: {'weedcoco': -1, 'coco': -1},
             skipped: new Set(),
             steps: getSteps(this.props.upload_type),
             upload_id: 0,
@@ -109,8 +110,8 @@ class UploadStepper extends React.Component {
         this.handleSubmit = this.handleSubmit.bind(this);
     }
 
-    isStepOptional(step) {
-        return step === 1;
+    isStepOptional(step, upload_type) {
+        return this.state.skip_mapping[upload_type] === step;
     };
 
     isStepSkipped(step) {
@@ -158,7 +159,7 @@ class UploadStepper extends React.Component {
     };
 
     handleSkip(){
-        if (!this.isStepOptional(this.state.activeStep)) {
+        if (!this.isStepOptional(this.state.activeStep, this.props.upload_type)) {
             // You probably want to guard against something like this,
             // it should never occur unless someone's actively trying to break something.
             throw new Error("You can't skip a step that isn't optional.");
@@ -215,7 +216,7 @@ class UploadStepper extends React.Component {
                 {this.state.steps.map((label, index) => {
                 const stepProps = {};
                 const labelProps = {};
-                if (this.isStepOptional(index)) {
+                if (this.isStepOptional(index, this.props.upload_type)) {
                     labelProps.optional = <Typography variant="caption">Optional</Typography>;
                 }
                 if (this.isStepSkipped(index)) {
@@ -237,8 +238,7 @@ class UploadStepper extends React.Component {
                     <Button disabled={this.state.activeStep === 0} onClick={this.handleBack} className={classes.button}>
                         Back
                     </Button>
-                    {this.isStepOptional(this.state.activeStep) 
-                    && this.props.upload_type === 'coco'
+                    {this.isStepOptional(this.state.activeStep, this.props.upload_type)
                     && (
                         <Button
                         variant="contained"
