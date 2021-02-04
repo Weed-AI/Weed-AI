@@ -46,6 +46,7 @@ const useStyles = makeStyles((theme) => ({
 }))
 
 export default function DatasetList(props) {
+  const inReview = props.inReview;  // should we list 
   const baseURL = new URL(window.location.origin);
   const classes = useStyles();
   const [loading, setLoading] = useState(false);
@@ -70,7 +71,7 @@ export default function DatasetList(props) {
          })
   }
 
-  const datalist_table = (table_list, command) => (
+  return (
     <div className={classes.root}>
       <TableContainer component={Paper}>
         <Table className={classes.table} aria-label="simple table">
@@ -82,7 +83,7 @@ export default function DatasetList(props) {
               <TableCell className={classes.tableHeader}>Weed Species</TableCell>
               <TableCell className={classes.tableHeader}>Contributor</TableCell>
               <TableCell className={classes.tableHeader}>Upload Date</TableCell>
-              {command ? <TableCell className={classes.tableHeader}>Command</TableCell> : ""}
+              {inReview ? <TableCell className={classes.tableHeader}>Command</TableCell> : ""}
             </TableRow>
           </TableHead>
           <TableBody>
@@ -98,7 +99,7 @@ export default function DatasetList(props) {
                 <TableCell></TableCell>
                 <TableCell>{row.contributor}</TableCell>
                 <TableCell>{row.upload_date}</TableCell>
-                {command
+                {inReview
                   ?<TableCell className={classes.commandCol}>
                     <button className={`${classes.command} ${classes.approval}`} onClick={() => handleApprove(row.upload_id)}>Approve</button>
                     <button className={`${classes.command} ${classes.reject}`} onClick={() => handleReject(row.upload_id)}>Reject</button>
@@ -112,11 +113,4 @@ export default function DatasetList(props) {
       </TableContainer>
     </div>
   )
-
-  return (
-    <React.Fragment>
-      {datalist_table(props.upload_list, false)}
-      {props.is_staff ? datalist_table(props.awaiting_list, true) : ""}
-    </React.Fragment>
-  );
 }
