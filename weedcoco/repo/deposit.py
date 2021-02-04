@@ -120,7 +120,9 @@ def compress_to_download(dataset_dir, deposit_id, download_dir):
             zip.write(dataset_dir / "weedcoco.json", "weedcoco.json")
             for image, image_name in retrieve_image_paths(dataset_dir / "images"):
                 zip.write(image, "images/" + image_name)
-        copy(zip_path, download_path)
+        # XXX: this should be move() not copy(), but move resulted in files
+        #      that we could not delete or move in the Docker volume.
+        copy(zip_path, download_path)  
 
 
 def deposit(weedcoco_path, image_dir, repository_dir, download_dir, upload_id=None):
