@@ -46,7 +46,6 @@ export const FixedItemsRenderer = ({ data, path, uischemas, schema, uischema, fi
                 );
             })
         }
-        <p>{schema.description}</p>
         </div>
     );
 };
