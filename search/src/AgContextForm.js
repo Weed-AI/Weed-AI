@@ -39,7 +39,7 @@ class AgContextForm extends Component {
             <Form
               schema={schema}
               uiSchema={uiSchema}
-              formData={this.state.formData}
+              formData={this.props.formData}
               onChange={e => {
                   this.setState({formData: e.formData});
                   if (this.props.onChange) {
