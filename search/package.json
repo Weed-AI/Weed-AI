@@ -20,9 +20,13 @@
     "react-dropzone-uploader": "^2.11.0",
     "react-flip-move": "^3.0.4",
     "react-google-login": "^5.2.2",
+    "react-jsonschema-form": "^1.8.1",
+    "react-jsonschema-form-manager": "^0.4.7",
+    "react-reactive-form": "^1.0.32",
     "react-router-dom": "^5.2.0",
     "react-scripts": "3.4.3",
     "redux": "^2.0.0",
+    "rjsf-material-ui": "^0.3.9",
     "typescript": "^2.8.0"
   },
   "scripts": {
