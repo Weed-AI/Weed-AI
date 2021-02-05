@@ -4,6 +4,7 @@ import pytest
 import os
 import filecmp
 import re
+import subprocess
 from weedcoco.repo.deposit import main
 from weedcoco.validation import ValidationError
 
@@ -18,9 +19,16 @@ TEST_DUPLICATE_DIR = TEST_DATA_DIR / "duplicate"
 @pytest.fixture
 def executor(tmpdir):
     test_repo_dir = tmpdir / "test_repo"
+    test_download_dir = tmpdir / "test_download"
 
     class Executor:
-        def run(self, weedcoco_path, image_dir, repository_dir=test_repo_dir):
+        def run(
+            self,
+            weedcoco_path,
+            image_dir,
+            repository_dir=test_repo_dir,
+            download_dir=test_download_dir,
+        ):
             args = [
                 "--weedcoco-path",
                 weedcoco_path,
@@ -28,6 +36,8 @@ def executor(tmpdir):
                 image_dir,
                 "--repository-dir",
                 repository_dir,
+                "--download-dir",
+                download_dir,
             ]
             args = [str(arg) for arg in args]
             main(args)
@@ -45,6 +55,9 @@ def assert_files_equal(dir1, dir2):
     match, mismatch, errors = filecmp.cmpfiles(
         dir1, dir2, dirs_cmp.common_files, shallow=False
     )
+    for filename in mismatch:
+        print(f"Differences in {filename}")
+        subprocess.run(["diff", f"{dir1}/{filename}", f"{dir2}/{filename}"])
     assert len(mismatch) == 0
     assert len(errors) == 0
     for common_dir in dirs_cmp.common_dirs:

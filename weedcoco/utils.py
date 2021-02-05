@@ -1,4 +1,5 @@
 import json
+import pathlib
 import os
 import warnings
 
@@ -65,3 +66,30 @@ def check_if_approved_image_extension(image_name):
 
 def check_if_approved_image_format(image_ext):
     return image_ext in ("PNG", "JPG", "JPEG", "TIFF")
+
+
+def _get_growth_stage_names():
+    global __GROWTH_STAGE_NAMES
+    try:
+        return __GROWTH_STAGE_NAMES
+    except NameError:
+        pass
+    data_path = pathlib.Path(__file__).parent / "growth_stage_labels.json"
+    data = json.load(open(data_path))
+    out = {}
+    # JSON requires string keys
+    out["fine"] = {int(k): v for k, v in data.pop("fine").items()}
+    for scheme, ranges in data.items():
+        out[scheme] = {}
+        for range_ in ranges:
+            for i in range(range_["lo"], range_["hi"] + 1):
+                out[scheme][i] = range_["label"]
+    __GROWTH_STAGE_NAMES = out
+    return out
+
+
+def lookup_growth_stage_name(idx, scheme):
+    valid = ["fine", "bbch_ranges", "grain_ranges"]
+    if scheme not in valid:
+        raise ValueError(f"scheme must be one of {valid}. Got {scheme}")
+    return _get_growth_stage_names()[scheme][idx]

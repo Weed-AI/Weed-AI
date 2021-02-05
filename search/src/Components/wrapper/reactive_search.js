@@ -102,7 +102,7 @@ class ReactiveSearchComponent extends Component {
 					<MultiList
 						componentId="grains_text_filter"
 						title="Crop Growth Stage"
-						dataField="agcontext__grains_descriptive_text.keyword"
+						dataField="agcontext__growth_stage_texts.keyword"
 						sortBy="asc"
 						selectAllLabel="All growth stages"
 						placeholder="Search growth stage"
@@ -177,7 +177,7 @@ class ReactiveSearchComponent extends Component {
 													})
 												}
 												</ul>
-												{" in " + item.agcontext__grains_descriptive_text + " " + item.agcontext__crop_type}
+												{" in " + item.agcontext__growth_stage_texts + " " + item.agcontext__crop_type}
 											</ResultCard.Description>
 										</ResultCard>
 									))
