@@ -94,7 +94,7 @@ class ElasticSearchIndex:
                 / os.path.basename(image["file_name"])[:2]
                 / os.path.basename(image["file_name"])
             )
-            image["dataset_url"] = f"datasets/{self.upload_id}"
+            image["upload_id"] = f"{self.upload_id}"
 
         for image in coco["images"]:
             try:
