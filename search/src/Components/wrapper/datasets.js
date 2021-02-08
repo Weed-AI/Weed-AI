@@ -57,10 +57,8 @@ class DatasetComponent extends Component {
             } else {
                 return (
                     <React.Fragment>
-                        <h2>Awaiting approval</h2>
-                        <DatasetList handleUploadid={this.handleUploadid} upload_list={this.state.awaiting_list} inReview={true} />
-                        <h2>Public</h2>
-						<DatasetList handleUploadid={this.handleUploadid} upload_list={this.state.upload_list} />
+                        <DatasetList title={"Awaiting approval"} handleUploadid={this.handleUploadid} upload_list={this.state.awaiting_list} inReview={true} />
+						<DatasetList title={"Public"} handleUploadid={this.handleUploadid} upload_list={this.state.upload_list} />
                     </React.Fragment>
                 );
             }

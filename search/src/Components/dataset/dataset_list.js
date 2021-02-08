@@ -73,6 +73,7 @@ export default function DatasetList(props) {
 
   return (
     <div className={classes.root}>
+      <h2>{props.title}</h2>
       <TableContainer component={Paper}>
         <Table className={classes.table} aria-label="simple table">
           <TableHead>
@@ -87,7 +88,7 @@ export default function DatasetList(props) {
             </TableRow>
           </TableHead>
           <TableBody>
-            {table_list.map((row) => (
+            {props.upload_list.map((row) => (
               <TableRow key={row.name}>
                 <TableCell component="th" scope="row">
                 <Link href={baseURL + 'datasets/' + row.upload_id} color='blue'>
