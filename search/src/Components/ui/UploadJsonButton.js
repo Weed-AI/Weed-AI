@@ -26,30 +26,30 @@ export default function UploadJsonButton({ onClose, initialValue }) {
 
   return (
     <div>
-      <Button variant="outlined" color="primary" onClick={handleClickOpen}>
-        Upload
+      <Button variant="outlined" color="default" onClick={handleClickOpen}>
+        Upload and Download Form Contents
       </Button>
       <Dialog open={open} onClose={handleClose} aria-labelledby="form-dialog-title">
         <DialogTitle id="form-dialog-title">Upload JSON/YAML</DialogTitle>
         <DialogContent>
           <DialogContentText>
-            Paste content below.
+            Copy/Paste Content below.
           </DialogContentText>
           <TextField
             autoFocus
             margin="dense"
             label="JSON data"
-            value={value}
+            defaultValue={initialValue}
             multiline={true}
             onChange={(e) => {setValue(e.target.value);}}
             fullWidth
           />
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleClose} color="primary">
+          <Button onClick={handleClose}>
             Cancel
           </Button>
-          <Button onClick={handleOkay} color="primary">
+          <Button onClick={handleOkay}>
             Okay
           </Button>
         </DialogActions>
