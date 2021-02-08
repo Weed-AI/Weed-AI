@@ -179,13 +179,7 @@ class StandaloneEditor extends Component {
                 <Box boxShadow={3} px={2} py={1} my={2}>
                     <AgContextForm formData={this.state.formData} onChange={e => this.setState({formData: e.formData})} />
                 </Box>
-                <Box boxShadow={3} px={2} py={1} my={2}>
-                    <label>JSON representation of AgContext</label>
-                    <textarea readOnly={true} style={{width: "100%", height: "5em"}} value={toJSON(this.state.formData)} / >
-                    <button onClick={e => {e.target.parentNode.getElementsByTagName('textarea')[0].select(); document.execCommand('copy');}}>Copy</button>
-                    <button onClick={e => handleSaveToPC(this.state.formData)}>Download</button>
-                    <UploadJsonButton initialValue={toJSON(this.state.formData)} onClose={(value) => {this.setState({formData: JSON.parse(value)})}} />
-                </Box>
+				<UploadJsonButton initialValue={toJSON(this.state.formData)} onClose={(value) => {this.setState({formData: JSON.parse(value)})}} />
             </Container>
         );
     }
