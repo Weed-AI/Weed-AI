@@ -88,65 +88,37 @@ export default function NavbarComponent(props) {
   const { params } = match;
   const { page, dataset_id } = params;
 
-  const tabNameToIndex = {
-    0: "explore",
-    1: "datasets",
-    2: "upload",
-    3: "about"
-  };
-
-  const indexToTabName = {
-    explore: 0,
-    datasets: 1,
-    upload: 2,
-    about: 3
-  };
-
-  const [selectedTab, setSelectedTab] = React.useState(indexToTabName[page]);
+  const [selectedTab, setSelectedTab] = React.useState(page);
 
   const handleChange = (event, newValue) => {
-    window.location.assign(`/${tabNameToIndex[newValue]}`);
+    window.location.assign(`/${newValue}`);
   };
 
   return (
     <div className={classes.root}>
       <AppBar position="fixed">
         <StyledTabs onChange={handleChange} value={selectedTab}>
-          <StyledTab label="Explore" />
-          <StyledTab label="Datasets" />
-          <StyledTab label="Upload" />
-          <StyledTab label="About" disabled />
+          <StyledTab value="explore" label="Explore" />
+          <StyledTab value="datasets" label="Datasets" />
+          <StyledTab value="upload" label="Upload" />
+          <StyledTab value="about" label="About" disabled />
           <Typography variant='p' className={classes.logo}><span style={{color: '#f0983a'}}>Weed</span>AI</Typography>
         </StyledTabs>
       </AppBar>
+      <div className={classes.container}>
       {
-        selectedTab === 0
-        &&
-        <div className={classes.container}>
-            <ReactiveSearchComponent />
-        </div>
+        selectedTab === "explore" && <ReactiveSearchComponent />
       }
       {
-        selectedTab === 1
-        &&
-        <div className={classes.container}>
-            <DatasetComponent upload_id={dataset_id}/>
-        </div>
+        selectedTab === "datasets" && <DatasetComponent upload_id={dataset_id}/>
       }
       {
-        selectedTab === 2
-        &&
-        <div className={classes.container}>
-            <UploadComponent />
-        </div>
+        selectedTab === "upload" && <UploadComponent />
       }
       {
-        selectedTab === 3
-        &&
-        <div className={classes.container}>
-            About Page Placeholder
-        </div>
+        selectedTab === "about" && <p>About Page Placeholder</p>
       }
+      </div>
     </div>
   );
 }
