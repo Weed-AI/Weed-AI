@@ -33,6 +33,7 @@ jobs:
       - name: Install weedcoco library
         run: |
           pip install .
+          rm -r weedcoco
       - name: Index test data
         run: |
           bash search/scripts/index_test_images.sh
