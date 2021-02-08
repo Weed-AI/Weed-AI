@@ -1,1 +1,2 @@
 include weedcoco/schema/*.yaml
+include weedcoco/growth_stage_labels.json
