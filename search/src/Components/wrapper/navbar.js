@@ -79,7 +79,7 @@ const StyledTab = withStyles((theme) => ({
     },
   },
   selected: {}
-}))((props) => <Tab disableRipple {...props} />);
+}))((props) => <Tab component="a" disableRipple {...props} />);
 
 export default function NavbarComponent(props) {
 
@@ -112,10 +112,10 @@ export default function NavbarComponent(props) {
     <div className={classes.root}>
       <AppBar position="fixed">
         <StyledTabs onChange={handleChange} value={selectedTab}>
-          <StyledTab label="Explore" />
-          <StyledTab label="Datasets" />
-          <StyledTab label="Upload" />
-          <StyledTab label="About" disabled />
+          <StyledTab href="/explore" label="Explore" />
+          <StyledTab href="/datasets" label="Datasets" />
+          <StyledTab href="/upload" label="Upload" />
+          <StyledTab href="/about" label="About" disabled />
           <Typography variant='p' className={classes.logo}><span style={{color: '#f0983a'}}>Weed</span>AI</Typography>
         </StyledTabs>
       </AppBar>
