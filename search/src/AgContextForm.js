@@ -127,15 +127,6 @@ const renderers = [
 ];
 
 export const toJSON = (payload) => JSON.stringify(payload, null, 2);
-export const handleSaveToPC = (payload) => {
-    const fileData = toJSON(payload);
-    const blob = new Blob([fileData], {type: "application/json"});
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.download = `AgContext.json`;
-    link.href = url;
-    link.click();
-}
 
 class AgContextForm extends Component {
     constructor(props) {
@@ -179,7 +170,7 @@ class StandaloneEditor extends Component {
                 <Box boxShadow={3} px={2} py={1} my={2}>
                     <AgContextForm formData={this.state.formData} onChange={e => this.setState({formData: e.formData})} />
                 </Box>
-				<UploadJsonButton initialValue={toJSON(this.state.formData)} onClose={(value) => {this.setState({formData: JSON.parse(value)})}} />
+                <UploadJsonButton initialValue={toJSON(this.state.formData)} downloadName="agcontext" onClose={(value) => {this.setState({formData: JSON.parse(value)})}} />
             </Container>
         );
     }

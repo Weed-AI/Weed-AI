@@ -7,10 +7,9 @@ import Button from '@material-ui/core/Button';
 import Typography from '@material-ui/core/Typography';
 import UploaderSingle from './uploader_single';
 import UploaderImages from './uploader_images';
-import AgContextForm, {handleSaveToPC, toJSON} from '../../AgContextForm';
+import AgContextForm, {toJSON} from '../../AgContextForm';
 import axios from 'axios';
 import Cookies from 'js-cookie';
-
 
 const csrftoken = Cookies.get('csrftoken');
 
@@ -79,6 +78,16 @@ function getStepContent(step, upload_type, upload_id, images, formData, handleUp
               return 'Unknown step';
         }
     }
+}
+
+const handleSaveToPC = (payload) => {
+    const fileData = toJSON(payload);
+    const blob = new Blob([fileData], {type: "application/json"});
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.download = `AgContext.json`;
+    link.href = url;
+    link.click();
 }
 
 class UploadStepper extends React.Component {
