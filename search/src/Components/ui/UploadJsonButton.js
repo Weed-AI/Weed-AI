@@ -7,10 +7,12 @@ import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import Dropzone from 'react-dropzone-uploader';
+const yaml = require('js-yaml');
 
 export default function UploadJsonButton({ onClose, initialValue, downloadName }) {
   const [open, setOpen] = React.useState(false);
   const [value, setValue] = React.useState(initialValue || '');
+  const [errors, setErrors] = React.useState([]);
   const textAreaRef = React.createRef();
 
   const handleClickOpen = () => {
@@ -25,17 +27,6 @@ export default function UploadJsonButton({ onClose, initialValue, downloadName }
     onClose(value);
     handleClose()
   };
-
-  const setClipboard = (value) => {
-    // From https://stackoverflow.com/a/42416105/1017546 by Dan Stevens
-    var tempInput = document.createElement("textarea");
-    tempInput.style = "position: absolute; left: -1000px; top: -1000px";
-    tempInput.value = value;
-    document.body.appendChild(tempInput);
-    tempInput.select();
-    document.execCommand("copy");
-    document.body.removeChild(tempInput);
-  }
 
   const saveToPC = () => {
     const blob = new Blob([value], {type: "application/json"});
@@ -64,10 +55,22 @@ export default function UploadJsonButton({ onClose, initialValue, downloadName }
       return;
     const reader = new FileReader();
     const ta = getTextArea();
+    setErrors([]);
     reader.onload = (e) => {
-      setValue(e.target.result);
-      // HACK: this is bad ReactJS. What's the right way to do it?
-      ta.value = e.target.result;
+      try {
+        const doc = yaml.load(e.target.result, {
+          filename: fileWithMeta.meta.name,
+          // TODO: handle onWarning to show messages
+        })
+        console.log(doc);
+        const jsonDoc = JSON.stringify(doc, null, 2)
+        setValue(jsonDoc);
+        // HACK: this is bad ReactJS. What's the right way to do it?
+        ta.value = jsonDoc;
+      } catch (e) {
+        setErrors(errors.concat([e.reason]));
+        return;
+      }
     }
     reader.readAsText(fileWithMeta.file)
   }
@@ -82,23 +85,29 @@ export default function UploadJsonButton({ onClose, initialValue, downloadName }
         <DialogTitle id="form-dialog-title">Edit Form as JSON</DialogTitle>
         <DialogContent>
           <DialogContentText>
-            Upload JSON form contents
+            Upload from disk, or Copy/Paste JSON content below.
           </DialogContentText>
+          { errors.length ? (
+              <React.Fragment>
+              <h3>Upload Errors:</h3>
+              <ul>
+              { errors.map((errorMessage) => (<li className="error"> { errorMessage } </li>)) }
+              </ul>
+              </React.Fragment>
+            ) : []
+          }
           <Dropzone
             onChangeStatus={handleDropzoneChangeStatus}
             maxFiles={1}
             multiple={false}
             maxSizeBytes={10 ** 7}
             canCancel={false}
-            inputContent="Drop a JSON file"
+            inputContent="Drop a JSON or YAML file"
             styles={{
               dropzone: { width: 400, height: 100 },
               dropzoneActive: { borderColor: 'green' },
             }}
           />
-          <DialogContentText>
-            Copy/Paste Content below.
-          </DialogContentText>
           <TextField
             autoFocus
             ref={textAreaRef}
