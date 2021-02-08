@@ -9,11 +9,29 @@ import DialogTitle from '@material-ui/core/DialogTitle';
 import Dropzone from 'react-dropzone-uploader';
 const yaml = require('js-yaml');
 
+export const toJSON = (payload) => JSON.stringify(payload, null, 2);
+
 export default function UploadJsonButton({ onClose, initialValue, downloadName }) {
   const [open, setOpen] = React.useState(false);
-  const [value, setValue] = React.useState(initialValue || '');
+  const [value, setValue] = React.useState(initialValue);
+  const [jsonValue, setJsonValue] = React.useState(toJSON(initialValue));
   const [errors, setErrors] = React.useState([]);
   const textAreaRef = React.createRef();
+
+  const changeJsonValue = (jsonValue) => {
+    setJsonValue(jsonValue);
+    try {
+      const parsed = JSON.parse(jsonValue);
+      if (parsed instanceof Object) {
+        setValue(parsed);
+      } else {
+        setValue(null);
+      }
+    } catch (e) {
+      setValue(null);
+      return;
+    }
+  }
 
   const handleClickOpen = () => {
     setOpen(true);
@@ -24,12 +42,12 @@ export default function UploadJsonButton({ onClose, initialValue, downloadName }
   };
 
   const handleOkay = () => {
-    onClose(value);
+    onClose(JSON.parse(jsonValue));
     handleClose()
   };
 
   const saveToPC = () => {
-    const blob = new Blob([value], {type: "application/json"});
+    const blob = new Blob([jsonValue], {type: "application/json"});
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.download = (downloadName || "form") + ".json";
@@ -47,7 +65,7 @@ export default function UploadJsonButton({ onClose, initialValue, downloadName }
   }
 
   const handleDownload = (event) => {
-    saveToPC(value);
+    saveToPC(jsonValue);
   }
 
   const handleDropzoneChangeStatus = (fileWithMeta, status) => {
@@ -62,9 +80,8 @@ export default function UploadJsonButton({ onClose, initialValue, downloadName }
           filename: fileWithMeta.meta.name,
           // TODO: handle onWarning to show messages
         })
-        console.log(doc);
-        const jsonDoc = JSON.stringify(doc, null, 2)
-        setValue(jsonDoc);
+        const jsonDoc = toJSON(doc);
+        changeJsonValue(jsonDoc);
         // HACK: this is bad ReactJS. What's the right way to do it?
         ta.value = jsonDoc;
       } catch (e) {
@@ -113,13 +130,14 @@ export default function UploadJsonButton({ onClose, initialValue, downloadName }
             ref={textAreaRef}
             margin="dense"
             label="JSON data"
-            defaultValue={initialValue}
+            defaultValue={toJSON(initialValue)}
             multiline={true}
-            onChange={(e) => {setValue(e.target.value);}}
+            onChange={(e) => {changeJsonValue(e.target.value);}}
             fullWidth
           />
         </DialogContent>
         <DialogActions>
+          { (value === null) ? <span className="error small">JSON not a valid object</span> : [] }
           <Button onClick={handleDownload}>
             Download JSON
           </Button>
@@ -131,7 +149,7 @@ export default function UploadJsonButton({ onClose, initialValue, downloadName }
           <Button onClick={handleClose}>
             Cancel
           </Button>
-          <Button onClick={handleOkay}>
+          <Button disabled={value === null} onClick={handleOkay}>
             Set Form
           </Button>
         </DialogActions>

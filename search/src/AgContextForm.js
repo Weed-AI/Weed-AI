@@ -11,7 +11,6 @@ import UploadJsonButton from './Components/ui/UploadJsonButton';
 
 const Form = withTheme(MuiTheme);
 
-export const toJSON = (payload) => JSON.stringify(payload, null, 2);
 
 class AgContextForm extends Component {
     constructor(props) {
@@ -55,7 +54,7 @@ class StandaloneEditor extends Component {
                 <Box boxShadow={3} px={2} py={1} my={2}>
                     <AgContextForm formData={this.state.formData} onChange={e => this.setState({formData: e.formData})} />
                 </Box>
-                <UploadJsonButton initialValue={toJSON(this.state.formData)} downloadName="agcontext" onClose={(value) => {this.setState({formData: JSON.parse(value)})}} />
+                <UploadJsonButton initialValue={this.state.formData} downloadName="agcontext" onClose={(value) => {this.setState({formData: value})}} />
             </Container>
         );
     }
