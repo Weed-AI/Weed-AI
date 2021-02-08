@@ -33,7 +33,6 @@ export default function UploadJsonButton({ onClose, initialValue, downloadName }
     tempInput.value = value;
     document.body.appendChild(tempInput);
     tempInput.select();
-    console.log('hello!')
     document.execCommand("copy");
     document.body.removeChild(tempInput);
   }
@@ -66,7 +65,6 @@ export default function UploadJsonButton({ onClose, initialValue, downloadName }
     const reader = new FileReader();
     const ta = getTextArea();
     reader.onload = (e) => {
-      console.log(status, e.target.result);
       setValue(e.target.result);
       // HACK: this is bad ReactJS. What's the right way to do it?
       ta.value = e.target.result;
