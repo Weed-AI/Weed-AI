@@ -53,8 +53,6 @@ class ElasticSearchIndex:
             coco = json.load(f)
         if "info" in coco:
             del coco["info"]
-        if "collection_memberships" in coco:
-            del coco["collection_memberships"]
 
         id_lookup = {}
         for key, objs in coco.items():
@@ -84,9 +82,8 @@ class ElasticSearchIndex:
             image = id_lookup["images", annotation["image_id"]]
             image.setdefault("annotations", []).append(annotation)
             annotation["category"] = id_lookup["categories", annotation["category_id"]]
-            # todo: add collection, license
+            # todo: add data from info, license?
             _flatten(annotation["category"], annotation, "category")
-            # todo: add collection from collection_memberships
             image["thumbnail"] = str(
                 self.thumbnail_dir
                 / os.path.basename(image["file_name"])[:2]

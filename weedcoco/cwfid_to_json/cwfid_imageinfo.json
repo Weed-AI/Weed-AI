@@ -17226,12 +17226,17 @@
     ],
     "info": {
         "year": 2015,
-        "description": "Cwfid annotations converted into WeedCOCO",
+        "description": "A Crop/Weed Field Image Dataset for the Evaluation of Computer Vision Based Precision Agriculture Tasks",
         "metadata": {
-            "name": "Cwfid annotations converted into WeedCOCO",
-            "creator": [{"name": "Sebastian Haug"}],
-            "datePublished": "2015-XX-XX",
-            "license": "https://github.com/cwfid/dataset"
+            "creator": [
+                {"name": "Sebastian Haug"},
+                {"name": "J\u00f6rn Ostermann"}
+            ],
+            "name": "A Crop/Weed Field Image Dataset for the Evaluation of Computer Vision Based Precision Agriculture Tasks",
+            "datePublished": "2015-03-19",
+            "identifier": ["doi:10.1007/978-3-319-16220-1_8"],
+            "license": "https://github.com/cwfid/dataset",
+            "citation": "Sebastian Haug, Jörn Ostermann: A Crop/Weed Field Image Dataset for the Evaluation of Computer Vision Based Precision Agriculture Tasks, CVPPP 2014 Workshop, ECCV 2014"
         }
     },
     "license": [
@@ -17265,16 +17270,5 @@
             "cropped_to_plant": false,
             "url": "https://github.com/cwfid/dataset"
         }
-    ],
-    "metadata": {
-        "creator": [
-            {"name": "Sebastian Haug"},
-            {"name": "J\u00f6rn Ostermann"} 
-        ],
-        "name": "A Crop/Weed Field Image Dataset for the Evaluation of Computer Vision Based Precision Agriculture Tasks",
-        "datePublished": "2015-03-19",
-        "identifier": ["doi:10.1007/978-3-319-16220-1_8"],
-        "license": "https://github.com/cwfid/dataset",
-        "citation": "Sebastian Haug, Jörn Ostermann: A Crop/Weed Field Image Dataset for the Evaluation of Computer Vision Based Precision Agriculture Tasks, CVPPP 2014 Workshop, ECCV 2014"
-    }
+    ]
 }

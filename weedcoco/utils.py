@@ -62,16 +62,11 @@ def add_agcontext_from_file(coco, agcontext_path):
     return coco
 
 
-def add_collection_from_file(coco, collection_path):
-    """Make all annotations members of one collection loaded from YAML or JSON"""
-    collection = load_json_or_yaml(collection_path)
-    if "id" not in collection:
-        collection["id"] = 0
-    coco["collections"] = [collection]
-    coco["collection_memberships"] = [
-        {"annotation_id": annotation["id"], "collection_id": collection["id"]}
-        for annotation in coco["annotations"]
-    ]
+def add_metadata_from_file(coco, metadata_path):
+    """Load metadata from YAML or JSON to set info and licenses"""
+    metadata = load_json_or_yaml(metadata_path)
+    set_info(coco, metadata)
+    set_licenses(coco)
     return coco
 
 

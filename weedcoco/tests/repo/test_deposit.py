@@ -108,7 +108,7 @@ def test_existing_images(executor):
         executor.run(TEST_BASIC_DIR_1 / "weedcoco.json", TEST_BASIC_DIR_1 / "images")
 
 
-def test_multiple_collections(executor, rewrite_deposit_truth):
+def test_multiple_datasets(executor, rewrite_deposit_truth):
     executor.run(TEST_BASIC_DIR_1 / "weedcoco.json", TEST_BASIC_DIR_1 / "images")
     test_repo_dir = executor.run(
         TEST_BASIC_DIR_2 / "weedcoco.json", TEST_BASIC_DIR_2 / "images"

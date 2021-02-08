@@ -153,21 +153,8 @@ metadata = {
     "datePublished": "2015-03-15",
     "identifier": ["doi:10.1007/978-3-319-16220-1_8"],
     "license": "https://github.com/cwfid/dataset",
-    "citation": "Sebastian Haug, Jörn Ostermann: A Crop/Weed Field Image Dataset for the Evaluation of Computer Vision Based Precision Agriculture Tasks, CVPPP 2014 Workshop, ECCV 2014"
+    "citation": "Sebastian Haug, Jörn Ostermann: A Crop/Weed Field Image Dataset for the Evaluation of Computer Vision Based Precision Agriculture Tasks, CVPPP 2014 Workshop, ECCV 2014",
 }
-
-#### TODO: store 
-###with args.split_path.open() as subset_file:
-###    subsets = yaml.safe_load(subset_file)
-
-###    # TODO: iterate over value key pairs and create individual collection membership per image.
-###    # TODO: refer to all annotations associated with an image?
-###    collection_memberships = []
-###    for train_or_test, image_ids in subsets.items():
-###        for image_id in image_ids:
-###            collection_memberships.append(
-###                {"image_id": image_id, "subset": train_or_test, "collection_id": 0}
-###            )
 
 coco = {
     "images": images,
