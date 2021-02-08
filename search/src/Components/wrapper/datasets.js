@@ -50,13 +50,21 @@ class DatasetComponent extends Component {
     }
 
     render() {
-        return (
-            <React.Fragment>
-                {this.state.upload_id === "*"?
-                <DatasetList handleUploadid={this.handleUploadid} upload_list={this.state.upload_list} awaiting_list={this.state.awaiting_list} is_staff={this.state.is_staff}/>:
-                <DatasetSummary upload_id={this.state.upload_id} handleUploadid={this.handleUploadid}/>}
-            </React.Fragment>
-        )
+        if (this.state.upload_id === "*") {
+            // Dataset listing
+            if (!this.state.is_staff || this.state.awaiting_list.length == 0) {
+                return (<DatasetList handleUploadid={this.handleUploadid} upload_list={this.state.upload_list} />);
+            } else {
+                return (
+                    <React.Fragment>
+                        <DatasetList title={"Awaiting approval"} handleUploadid={this.handleUploadid} upload_list={this.state.awaiting_list} inReview={true} />
+						<DatasetList title={"Public"} handleUploadid={this.handleUploadid} upload_list={this.state.upload_list} />
+                    </React.Fragment>
+                );
+            }
+       } else {
+           return (<DatasetSummary upload_id={this.state.upload_id} handleUploadid={this.handleUploadid}/>);
+       }
     }
 }
 
