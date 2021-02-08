@@ -53,7 +53,7 @@ class DatasetComponent extends Component {
         if (this.state.upload_id === "*") {
             // Dataset listing
             if (!this.state.is_staff || this.state.awaiting_list.length == 0) {
-                return (<DatasetList handleUploadid={this.handleUploadid} upload_list={this.state.upload_list} />);
+                return (<DatasetList title={""} handleUploadid={this.handleUploadid} upload_list={this.state.upload_list} />);
             } else {
                 return (
                     <React.Fragment>
