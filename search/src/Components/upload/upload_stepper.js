@@ -8,7 +8,7 @@ import Typography from '@material-ui/core/Typography';
 import UploaderSingle from './uploader_single';
 import UploaderImages from './uploader_images';
 import AgContextForm from '../../AgContextForm';
-import {toJSON} from '../ui/UploadJsonButton';
+import UploadJsonButton from '../ui/UploadJsonButton';
 import axios from 'axios';
 import Cookies from 'js-cookie';
 
@@ -47,10 +47,7 @@ function getStepContent(step, upload_type, upload_id, images, formData, handleUp
                         handleFormData(e.formData)
                         handleErrorMessage("init")
                     }} />
-                    <textarea style={{width: "100%", height: "5em"}} value={toJSON(formData)} ></textarea>
-                    <React.Fragment>
-                        <button onClick={e => handleSaveToPC(formData)}>Download</button>
-                    </React.Fragment>
+                    <UploadJsonButton initialValue={formData} downloadName="agcontext" onClose={(value) => {handleFormData(value)}} />
                 </React.Fragment>
               );
             case 2:
@@ -79,16 +76,6 @@ function getStepContent(step, upload_type, upload_id, images, formData, handleUp
               return 'Unknown step';
         }
     }
-}
-
-const handleSaveToPC = (payload) => {
-    const fileData = toJSON(payload);
-    const blob = new Blob([fileData], {type: "application/json"});
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.download = `AgContext.json`;
-    link.href = url;
-    link.click();
 }
 
 class UploadStepper extends React.Component {
