@@ -163,7 +163,7 @@ class ReactiveSearchComponent extends Component {
 							<ReactiveList.ResultCardsWrapper>
 								{
 									data.map(item => (
-										<ResultCard key={item._id} href={esURL + item.dataset_url}>
+										<ResultCard key={item._id}>
 											<ResultCard.Image
 												src={item.thumbnail}
 											/>
@@ -179,6 +179,7 @@ class ReactiveSearchComponent extends Component {
 												</ul>
 												{" in " + item.agcontext__growth_stage_texts + " " + item.agcontext__crop_type}
 											</ResultCard.Description>
+											<div><a title={item.info ? item.info.name : ""} href={esURL + item.dataset_url}>See Dataset</a></div>
 										</ResultCard>
 									))
 								}
