@@ -60,10 +60,12 @@ COMPLETE_WEEDCOCO = {
     ],
     "info": {
         "description": "Dataset collected at Narrabri under artificial illumination",
+        "year": 2020,
         "metadata": {
             "name": "Dataset collected at Narrabri under artificial illumination",
             "creator": [{"name": "Plony"}],
             "datePublished": "2020-XX-XX",
+            "license": "https://creativecommons.org/licenses/by/4.0/",
         },
     },
 }
