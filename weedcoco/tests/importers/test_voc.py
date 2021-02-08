@@ -70,7 +70,14 @@ COMPLETE_WEEDCOCO = {
             "width": 1536,
         },
     ],
-    "info": {},
+    "info": {
+        "description": "foobar",
+        "metadata": {
+            "name": "foobar",
+            "creator": [{"name": "Plony"}],
+            "datePublished": "2020-XX-XX",
+        },
+    },
 }
 
 
@@ -112,7 +119,7 @@ def test_no_extras(converter):
                 "width": 1536,
             },
         ],
-        "info": {},
+        "info": COMPLETE_WEEDCOCO["info"],
     }
     assert expected == converter.run([])
 

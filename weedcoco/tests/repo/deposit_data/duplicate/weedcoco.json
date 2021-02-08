@@ -664,23 +664,20 @@
             "id": 1
         }
     ],
-    "info": [
-        {
-            "year": 2015,
-            "version": 1,
-            "description": "YAML annotations and PNG images converted into WeedCOCO",
-            "secondary_contributor": "Converted to WeedCOCO by Henry Lydecker",
-            "contributor": "Sebastian Haug",
-            "id": 0
+    "info": {
+        "year": 2015,
+        "description": "Cwfid annotations converted into WeedCOCO",
+        "metadata": {
+            "name": "Cwfid annotations converted into WeedCOCO",
+            "creator": [{"name": "Sebastian Haug"}],
+            "datePublished": "2015-XX-XX",
+            "license": "https://github.com/cwfid/dataset"
         }
-    ],
+    },
     "license": [
         {
             "id": 0,
-            "license_name": "CC BY 4.0",
-            "license_fullname": "Creative Commons Attribution 4.0",
-            "license_version": "4.0",
-            "url": "https://creativecommons.org/licenses/by/4.0/"
+            "url": "https://github.com/cwfid/dataset"
         }
     ],
     "agcontexts": [

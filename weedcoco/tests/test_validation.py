@@ -25,9 +25,15 @@ MINIMAL_WEEDCOCO = {
     "annotations": [],
     "categories": [],
     "agcontexts": [],
-    "collections": [],
-    "collection_memberships": [],
-    "info": {},
+    "info": {
+        "description": "Something",
+        "metadata": {
+            "name": "Something",
+            "creator": [{"name": "Someone"}],
+            "datePublished": "XXXX-XX-XX",
+            "license": "https://creativecommons.org/licenses/by/4.0/",
+        },
+    },
 }
 
 SMALL_WEEDCOCO = {
@@ -104,17 +110,18 @@ SMALL_WEEDCOCO = {
         },
     ],
     "info": {
-        "version": 1,
         "description": "Cwfid annotations converted into WeedCOCO",
-        "id": 0,
+        "metadata": {
+            "name": "Cwfid annotations converted into WeedCOCO",
+            "creator": [{"name": "Sebastian Haug"}],
+            "datePublished": "2015-XX-XX",
+            "license": "https://github.com/cwfid/dataset",
+        },
     },
     "license": [
         {
             "id": 0,
-            "license_name": "CC BY 4.0",
-            "license_fullname": "Creative Commons Attribution 4.0",
-            "license_version": "4.0",
-            "url": "https://creativecommons.org/licenses/by/4.0/",
+            "url": "https://github.com/cwfid/dataset",
         }
     ],
     "agcontexts": [
@@ -140,25 +147,6 @@ SMALL_WEEDCOCO = {
             "lighting": "natural",
             "cropped_to_plant": False,
         }
-    ],
-    "collections": [
-        {
-            "author": "Haug, Sebastian and Ostermann, J\u00f6rn",
-            "title": "A Crop/Weed Field Image Dataset for the Evaluation of Computer Vision Based Precision Agriculture Tasks",
-            "year": 2015,
-            "identifier": "doi:10.1007/978-3-319-16220-1_8",
-            "rights": "All data is subject to copyright and may only be used for non-commercial research. In case of use please cite our publication.",
-            "accrual_policy": "closed",
-            "url": "https://github.com/cwfid/dataset",
-            "id": 0,
-        }
-    ],
-    "collection_memberships": [
-        {"annotation_id": 0, "subset": "train", "collection_id": 0},
-        {"annotation_id": 1, "subset": "train", "collection_id": 0},
-        {"annotation_id": 2, "subset": "train", "collection_id": 0},
-        {"annotation_id": 3, "subset": "train", "collection_id": 0},
-        {"annotation_id": 4, "subset": "train", "collection_id": 0},
     ],
 }
 
@@ -215,8 +203,6 @@ def _make_duplicate_id(weedcoco, key, idx, insert_at=-1):
         "images",
         "annotations",
         "categories",
-        "collections",
-        "collection_memberships",
         "agcontexts",
     ],
 )
@@ -234,7 +220,6 @@ def test_missing_section(func, removed_section):
         _make_duplicate_id(SMALL_WEEDCOCO, "images", idx=0),
         _make_duplicate_id(SMALL_WEEDCOCO, "images", idx=0, insert_at=0),
         _make_duplicate_id(SMALL_WEEDCOCO, "annotations", idx=2, insert_at=4),
-        _make_duplicate_id(SMALL_WEEDCOCO, "collections", idx=0),
     ],
 )  # TODO
 def test_duplicate_id(func, bad_weedcoco):
@@ -254,8 +239,6 @@ def _make_unknown_id(weedcoco, section, ref_key, new_id=1000):
     [
         _make_unknown_id(SMALL_WEEDCOCO, "annotations", "image_id"),
         _make_unknown_id(SMALL_WEEDCOCO, "annotations", "category_id"),
-        _make_unknown_id(SMALL_WEEDCOCO, "collection_memberships", "collection_id"),
-        _make_unknown_id(SMALL_WEEDCOCO, "collection_memberships", "annotation_id"),
     ],
 )  # TODO
 def test_nonexistent_referent(func, bad_weedcoco):
@@ -275,7 +258,6 @@ def _make_unreferenced(weedcoco, section, new_id=1000):
 @pytest.mark.parametrize(
     "bad_weedcoco",
     [
-        _make_unreferenced(SMALL_WEEDCOCO, "collections"),
         _make_unreferenced(SMALL_WEEDCOCO, "images"),
     ],
 )  # TODO

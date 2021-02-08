@@ -174,7 +174,7 @@ if missingFiles:
 info = [
     {
         "year": 2019,
-        "version": 1,
+        "version": "1",
         "description": "CSV annotations and JPEG images converted into WeedCOCO",
         "secondary_contributor": "Converted to WeedCOCO by Henry Lydecker",
         "contributor": "Alex Olsen",
@@ -201,7 +201,7 @@ metadata = {
     "sameAs": ["https://github.com/AlexOlsen/DeepWeeds"],
     "identifier": ["doi:10.1038/s41598-018-38343-3"],
     "license": "https://creativecommons.org/licenses/by/4.0/",
-    "citation": "A. Olsen, D. A. Konovalov, B. Philippa, P. Ridd, J. C. Wood, J. Johns, W. Banks, B. Girgenti, O. Kenny, J. Whinney, B. Calvert, M. Rahimi Azghadi, and R. D. White, “DeepWeeds: A Multiclass Weed Species Image Dataset for Deep Learning,” Scientific Reports, vol. 9, no. 2058, 2 2019. [Online]. Available: doi.org/10.1038/s41598-018-38343-3"
+    "citation": "A. Olsen, D. A. Konovalov, B. Philippa, P. Ridd, J. C. Wood, J. Johns, W. Banks, B. Girgenti, O. Kenny, J. Whinney, B. Calvert, M. Rahimi Azghadi, and R. D. White, “DeepWeeds: A Multiclass Weed Species Image Dataset for Deep Learning,” Scientific Reports, vol. 9, no. 2058, 2 2019. [Online]. Available: doi.org/10.1038/s41598-018-38343-3",
 }
 
 agcontext = [

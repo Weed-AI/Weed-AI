@@ -45,7 +45,7 @@ properties:
     type: array
     items:
       minItems: 1
-      oneOf:
+      anyOf:
         - $ref: "#/definitions/Person"
         - $ref: "#/definitions/Organization"
     description: People and organizations who created this dataset.
