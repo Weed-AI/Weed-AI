@@ -4,6 +4,7 @@ import pytest
 import os
 import filecmp
 import re
+import subprocess
 from weedcoco.repo.deposit import main
 from weedcoco.validation import ValidationError
 
@@ -54,6 +55,9 @@ def assert_files_equal(dir1, dir2):
     match, mismatch, errors = filecmp.cmpfiles(
         dir1, dir2, dirs_cmp.common_files, shallow=False
     )
+    for filename in mismatch:
+        print(f"Differences in {filename}")
+        subprocess.run(["diff", f"{dir1}/{filename}", f"{dir2}/{filename}"])
     assert len(mismatch) == 0
     assert len(errors) == 0
     for common_dir in dirs_cmp.common_dirs:
