@@ -48,11 +48,7 @@ class DatasetSummary extends Component {
   constructor (){
     super()
     this.state = {
-      metadata: {
-        info: [],
-        license: [],
-        collections: []
-      },
+      metadata: {},
       agcontexts: []
     }
   }
@@ -80,8 +76,7 @@ class DatasetSummary extends Component {
     const {classes} = this.props
     const capitalFirstLetter = (string) => string.charAt(0).toUpperCase() + string.slice(1)
     const converter = (snakeName) => snakeName.split("_").map(string => capitalFirstLetter(string)).join(" ")
-    const getAttribute = (collection, key) => collection.length > 0 && key in collection[0] ? collection[0][key] : ""
-    const esURL = new URL(window.location.origin)
+    const getAttribute = (collection, key) => key in collection ? collection[key] : ""
     return (
       <div className={classes.root}>
         <Grid container spacing={3}>
@@ -91,28 +86,21 @@ class DatasetSummary extends Component {
                 <IconButton aria-label="back to list" color="secondary" onClick={() => window.location.assign(baseURL + 'datasets')}>
                   <ListIcon />
                 </IconButton>
-                <Typography variant='h4' style={{fontWeight: 600}}>{getAttribute(this.state.metadata.info, "name")}</Typography>
+                <Typography variant='h4' style={{fontWeight: 600}}>{getAttribute(this.state.metadata, "name")}</Typography>
               </div>
               <p>
-                {getAttribute(this.state.metadata.collections, "title")}
-              </p>
-              <p>
-                Author:
-                &nbsp;
-                {getAttribute(this.state.metadata.collections, "author")}
+                {getAttribute(this.state.metadata, "citation")}
               </p>
               <p>
                 Licence:
                 &nbsp;
-                {getAttribute(this.state.metadata.license, "license_name")}
-                &nbsp;
-                {getAttribute(this.state.metadata.license, "url")}
+                {getAttribute(this.state.metadata, "license")}
               </p>
             </div>
           </Grid>
           <Grid item xs={2}>
             <div className={classes.summary}>
-                <Button className={classes.download} onClick={() => window.open(`${esURL}code/download/${this.props.upload_id}.zip`)}>Download in WeedCOCO format</Button>
+                <Button className={classes.download} onClick={() => window.open(`${baseURL}code/download/${this.props.upload_id}.zip`)}>Download in WeedCOCO format</Button>
             </div>
           </Grid>
         </Grid>
