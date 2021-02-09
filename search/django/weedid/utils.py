@@ -2,6 +2,7 @@ import os
 import json
 from uuid import uuid4
 from weedcoco.repo.deposit import mkdir_safely
+from weedcoco.stats import WeedCOCOStats
 from django.core.files.storage import FileSystemStorage
 from weedid.models import Dataset, WeedidUser
 
@@ -38,6 +39,17 @@ def add_agcontexts(weedcoco_path, ag_contexts):
 
 
 def make_upload_entity_fields(weedcoco):
+    category_to_name = {
+        category["id"]: category["name"] for category in weedcoco["categories"]
+    }
+
+    stats = WeedCOCOStats(weedcoco).summary
+    count_by_agcontext = (
+        stats["image_count"].unstack(level=0).rename(index=category_to_name).to_dict()
+    )
+    for agcontext in weedcoco["agcontexts"]:
+        agcontext["image_count"] = count_by_agcontext[agcontext["id"]]
+
     return {
         "agcontext": weedcoco["agcontexts"],
         "metadata": {
