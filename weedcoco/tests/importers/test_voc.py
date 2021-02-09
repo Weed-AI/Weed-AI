@@ -112,7 +112,7 @@ def test_no_extras(converter):
                 "width": 1536,
             },
         ],
-        "info": COMPLETE_WEEDCOCO["info"],
+        "info": {},
     }
     assert expected == converter.run([])
 
