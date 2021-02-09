@@ -49,6 +49,7 @@ COMPLETE_WEEDCOCO = {
             "height": 960,
             "id": 0,
             "width": 1536,
+            "license": 0,
         },
         {
             "agcontext_id": 0,
@@ -56,8 +57,10 @@ COMPLETE_WEEDCOCO = {
             "height": 960,
             "id": 1,
             "width": 1536,
+            "license": 0,
         },
     ],
+    "licenses": [{"id": 0, "url": "https://creativecommons.org/licenses/by/4.0/"}],
     "info": {
         "description": "Dataset collected at Narrabri under artificial illumination",
         "year": 2020,
