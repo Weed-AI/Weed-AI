@@ -39,3 +39,14 @@ def test_annotation_and_category():
     "Check annotations and categories are correctly indexed with each image"
     # TODO
     pytest.xfail("Not yet implemented")
+
+
+def test_growth_range():
+    indexer = ElasticSearchIndexer(
+        weedcoco_path=BASIC_INPUT_PATH, thumbnail_dir=THUMBNAIL_DIR
+    )
+    for entry in indexer.generate_index_entries():
+        growth_range = entry["agcontext"]["bbch_growth_range"]
+        assert growth_range == [10, 20]
+        growth_stage_texts = entry["agcontext"]["growth_stage_texts"]
+        assert len(growth_stage_texts) == 2
