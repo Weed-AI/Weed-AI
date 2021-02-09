@@ -99,7 +99,7 @@ class DatasetSummary extends Component {
               <p>
                 Author:
                 &nbsp;
-                {getAttribute(this.state.metadata.info.metadata, "creator").map(name)}
+                {getAttribute(this.state.metadata.info.metadata, "creator").map((creator) => creator.name)}
               </p>
               <p>
                 Licence:
