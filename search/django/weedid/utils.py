@@ -37,21 +37,25 @@ def add_agcontexts(weedcoco_path, ag_contexts):
         json.dump(data, jsonFile)
 
 
+def make_upload_entity_fields(weedcoco):
+    return {
+        "agcontext": weedcoco["agcontexts"],
+        "metadata": {
+            "info": weedcoco["info"],
+            "license": weedcoco["license"],
+            "collections": weedcoco["collections"],
+        },
+    }
+
+
 def create_upload_entity(weedcoco_path, upload_id, upload_userid):
     upload_user = WeedidUser.objects.get(id=upload_userid)
+
     with open(weedcoco_path) as f:
         weedcoco_json = json.load(f)
-    upload_entity = Dataset(
-        upload_id=upload_id,
-        agcontext=weedcoco_json["agcontexts"],
-        user=upload_user,
-        status="N",
-        metadata={
-            "info": weedcoco_json["info"],
-            "license": weedcoco_json["license"],
-            "collections": weedcoco_json["collections"],
-        },
-    )
+    fields = make_upload_entity_fields(weedcoco_json)
+
+    upload_entity = Dataset(upload_id=upload_id, user=upload_user, status="N", **fields)
     upload_entity.save()
     upload_user.latest_upload = upload_entity
     upload_user.save()
