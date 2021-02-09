@@ -67,6 +67,26 @@ class ReactiveSearchComponent extends Component {
             {datasetNames[dataset.upload_id] = dataset.name;}
         ));
 
+        const makeCropDescription = (image) => {
+            if (item.agcontext__crop_type == "other") {
+                return "non-crop";
+            }
+            if (item.agcontext__growth_stage_min_text == item.agcontext__growth_stage_min_text) {
+                return (
+                    item.agcontext__growth_stage_min_text +
+                    " " +
+                    item.agcontext__crop_type
+                );
+            }
+            return (
+                item.agcontext__growth_stage_min_text +
+                " to " +
+                item.agcontext__growth_stage_max_text +
+                " " +
+                item.agcontext__crop_type
+            );
+        }
+
 		return (
 			<ReactiveBase
 				app="weedid"
@@ -185,7 +205,7 @@ class ReactiveSearchComponent extends Component {
 													})
 												}
 												</ul>
-												{" in " + item.agcontext__growth_stage_texts + " " + item.agcontext__crop_type}
+												{" in " + makeCropDescription(item)}
 											</ResultCard.Description>
 											<div><a title={item.upload_id in datasetNames ? datasetNames[item.upload_id] : ""} href={`${baseURL}datasets/${item.upload_id}`}>See Dataset</a></div>
 										</ResultCard>

@@ -80,6 +80,13 @@ class ElasticSearchIndex:
                     growth_stage_texts.add(
                         lookup_growth_stage_name(i, scheme="grain_ranges")
                     )
+                agcontext["growth_stage_min_text"] = lookup_growth_stage_name(
+                    lo, scheme="grain_ranges"
+                )
+                agcontext["growth_stage_max_text"] = lookup_growth_stage_name(
+                    hi, scheme="grain_ranges"
+                )
+
             agcontext["growth_stage_texts"] = sorted(growth_stage_texts)
 
         for annotation in coco["annotations"]:
