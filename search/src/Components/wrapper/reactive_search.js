@@ -7,7 +7,8 @@ import {
 	ReactiveList,
 	SelectedFilters
 } from '@appbaseio/reactivesearch';
-import Cookies from 'js-cookie'
+import Cookies from 'js-cookie';
+import axios from 'axios';
 
 
 const csrftoken = Cookies.get('csrftoken');
@@ -57,12 +58,19 @@ class ReactiveSearchComponent extends Component {
 			return (facetProps)
 		}
 
-		const esURL = new URL(window.location.origin);
+		const baseURL = new URL(window.location.origin);
+
+		const datasetNames = {};
+        axios.get(baseURL + 'api/upload_list/')
+		.then(res => res.data)
+		.then(json => json.map((dataset) =>
+            {datasetNames[dataset.upload_id] = dataset.name;}
+        ));
 
 		return (
 			<ReactiveBase
 				app="weedid"
-				url={esURL + "elasticsearch/"}
+				url={baseURL + "elasticsearch/"}
 				theme={{
 					typography: {
 						fontFamily: 'Raleway, Helvetica, sans-serif',
@@ -179,7 +187,7 @@ class ReactiveSearchComponent extends Component {
 												</ul>
 												{" in " + item.agcontext__growth_stage_texts + " " + item.agcontext__crop_type}
 											</ResultCard.Description>
-											<div><a title={item.info ? item.info.name : ""} href={esURL + item.dataset_url}>See Dataset</a></div>
+											<div><a title={item.upload_id in datasetNames ? datasetNames[item.upload_id] : ""} href={`${baseURL}datasets/${item.upload_id}`}>See Dataset</a></div>
 										</ResultCard>
 									))
 								}
