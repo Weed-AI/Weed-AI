@@ -44,7 +44,7 @@ properties:
         type: string
       date_created:
         type: string
-        format: datetime
+        format: date-time
       year:
         url: string
       metadata:
