@@ -94,17 +94,15 @@ class DatasetSummary extends Component {
                 <Typography variant='h4' style={{fontWeight: 600}}>{getAttribute(this.state.metadata.info, "name")}</Typography>
               </div>
               <p>
-                {getAttribute(this.state.metadata.collections, "title")}
+                {getAttribute(this.state.metadata.info.metadata, "name")}
               </p>
               <p>
                 Author:
                 &nbsp;
-                {getAttribute(this.state.metadata.collections, "author")}
+                {getAttribute(this.state.metadata.info.metadata, "creator").map(name)}
               </p>
               <p>
                 Licence:
-                &nbsp;
-                {getAttribute(this.state.metadata.license, "license_name")}
                 &nbsp;
                 {getAttribute(this.state.metadata.license, "url")}
               </p>
