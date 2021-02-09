@@ -2,6 +2,7 @@ import os
 import json
 from uuid import uuid4
 from weedcoco.repo.deposit import mkdir_safely
+from weedcoco.utils import set_info, set_licenses
 from django.core.files.storage import FileSystemStorage
 from weedid.models import Dataset, WeedidUser
 
@@ -33,6 +34,15 @@ def add_agcontexts(weedcoco_path, ag_contexts):
     data["agcontexts"] = [ag_contexts]
     for image in data["images"]:
         image["agcontext_id"] = ag_contexts["id"]
+    with open(weedcoco_path, "w") as jsonFile:
+        json.dump(data, jsonFile)
+
+
+def add_metadata(weedcoco_path, metadata):
+    with open(weedcoco_path, "r") as jsonFile:
+        data = json.load(jsonFile)
+    set_info(data, metadata)
+    set_licenses(data)
     with open(weedcoco_path, "w") as jsonFile:
         json.dump(data, jsonFile)
 
