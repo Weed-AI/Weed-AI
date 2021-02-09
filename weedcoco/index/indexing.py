@@ -3,6 +3,7 @@ import os
 import pathlib
 import json
 from elasticsearch import Elasticsearch, helpers
+from weedcoco.utils import lookup_growth_stage_name
 
 
 class ElasticSearchIndexer:
@@ -29,6 +30,7 @@ class ElasticSearchIndexer:
         es_host="localhost",
         es_port=9200,
         indexes=None,
+        upload_id="#",
     ):
         self.weedcoco_path = pathlib.Path(weedcoco_path)
         self.thumbnail_dir = pathlib.Path(thumbnail_dir)
@@ -38,6 +40,7 @@ class ElasticSearchIndexer:
         hosts = [{"host": es_host, "port": es_port}]
         self.es_client = Elasticsearch(hosts=hosts)
         self.indexes = indexes if indexes is not None else {}
+        self.upload_id = upload_id
 
     def generate_index_entries(self):
         """
@@ -67,6 +70,17 @@ class ElasticSearchIndexer:
             for field in variable_to_null_fields:
                 if agcontext.get(field) == "variable":
                     del agcontext[field]
+            # textual label for growth stage
+            if "bbch_growth_range" not in agcontext:
+                growth_stage_texts = ["na"]
+            else:
+                lo, hi = agcontext["bbch_growth_range"]
+                growth_stage_texts = set()
+                for i in range(lo, hi + 1):
+                    growth_stage_texts.add(
+                        lookup_growth_stage_name(i, scheme="grain_ranges")
+                    )
+            agcontext["growth_stage_texts"] = sorted(growth_stage_texts)
 
         for annotation in coco["annotations"]:
             image = id_lookup["images", annotation["image_id"]]
@@ -80,6 +94,7 @@ class ElasticSearchIndexer:
                 / os.path.basename(image["file_name"])[:2]
                 / os.path.basename(image["file_name"])
             )
+            image["upload_id"] = f"{self.upload_id}"
 
         for image in coco["images"]:
             try:

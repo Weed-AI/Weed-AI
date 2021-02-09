@@ -44,6 +44,7 @@ def update_index_and_thumbnails(
             Path(thumbnails_dir),
             es_host="elasticsearch",
             es_port=9200,
+            upload_id=upload_id,
         )
         es_index.post_index_entries()
         thumbnailing(Path(thumbnails_dir), Path(repository_dir))

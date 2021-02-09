@@ -9,8 +9,7 @@ TEST_DATA_DIR = pathlib.Path(__file__).parent / "voc_data"
 TEST_VOC_DIR = TEST_DATA_DIR / "VOC"
 TEST_IMAGE_DIR = TEST_DATA_DIR / "images"
 AGCONTEXT = {
-    "bbch_code": "na",
-    "bbch_descriptive_text": "na",
+    "bbch_growth_range": "na",
     "camera_angle": 12,
     "camera_fov": "variable",
     "camera_height": 666,
@@ -19,7 +18,6 @@ AGCONTEXT = {
     "camera_make": "dunno",
     "crop_type": "wheat",
     "cropped_to_plant": False,
-    "grains_descriptive_text": "na",
     "id": 0,
     "lighting": "artificial",
     "location_datum": 4326,
