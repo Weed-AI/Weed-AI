@@ -58,7 +58,7 @@ def create_upload_entity(weedcoco_path, upload_id, upload_userid):
         status="N",
         metadata={
             "info": weedcoco_json["info"],
-            "license": weedcoco_json["license"]
+            "license": weedcoco_json["license"],
         },
     )
     upload_entity.save()
