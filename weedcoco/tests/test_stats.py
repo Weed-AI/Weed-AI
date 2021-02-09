@@ -68,7 +68,6 @@ SMALL_WEEDCOCO = {
             "id": 5,
             "image_id": 2,
             "category_id": 1,
-            "segmentation": [[810, 225, 841, 234]],
             "iscrowd": 0,
         },
     ],
@@ -131,17 +130,59 @@ SMALL_WEEDCOCO = {
 }
 
 
-def test_annotations():
+def test_stats():
     stats = WeedCOCOStats(SMALL_WEEDCOCO)
     assert len(stats.annotations) == len(SMALL_WEEDCOCO["annotations"])
     annot2 = stats.annotations.set_index("annotation_id").loc[2]
     assert annot2["image_id"] == 46
     assert annot2["agcontext_id"] == 0
     assert annot2["category_id"] == 1
+    assert annot2["classification"] == 1
+    assert annot2["segmentation"] == 1
+    assert annot2["bounding box"] == 1
 
-    assert stats.summary.index.names == ["agcontext_id", "category_id"]
-    assert stats.summary.reset_index().to_dict(orient="records") == [
-        {"agcontext_id": 0, "category_id": 0, "annotation_count": 2, "image_count": 1},
-        {"agcontext_id": 0, "category_id": 1, "annotation_count": 3, "image_count": 2},
-        {"agcontext_id": 1, "category_id": 1, "annotation_count": 1, "image_count": 1},
+    assert stats.category_summary.index.names == ["agcontext_id", "category_id"]
+    assert stats.category_summary.reset_index().to_dict(orient="records") == [
+        {
+            "agcontext_id": 0,
+            "category_id": 0,
+            "annotation_count": 2,
+            "image_count": 1,
+            "segmentation_count": 2,
+            "bounding_box_count": 2,
+        },
+        {
+            "agcontext_id": 0,
+            "category_id": 1,
+            "annotation_count": 3,
+            "image_count": 2,
+            "segmentation_count": 3,
+            "bounding_box_count": 3,
+        },
+        {
+            "agcontext_id": 1,
+            "category_id": 1,
+            "annotation_count": 1,
+            "image_count": 1,
+            "segmentation_count": 0,
+            "bounding_box_count": 0,
+        },
+    ]
+
+    assert stats.agcontext_summary.index.names == ["agcontext_id"]
+    assert stats.agcontext_summary.reset_index().to_dict(orient="records") == [
+        {
+            "agcontext_id": 0,
+            "annotation_count": 5,
+            "image_count": 2,
+            "segmentation_count": 5,
+            "bounding_box_count": 5,
+        },
+        {
+            "agcontext_id": 1,
+            "annotation_count": 1,
+            "image_count": 1,
+            "segmentation_count": 0,
+            "bounding_box_count": 0,
+        },
     ]

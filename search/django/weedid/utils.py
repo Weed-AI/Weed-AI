@@ -43,12 +43,21 @@ def make_upload_entity_fields(weedcoco):
         category["id"]: category["name"] for category in weedcoco["categories"]
     }
 
-    stats = WeedCOCOStats(weedcoco).summary
-    count_by_agcontext = (
-        stats["image_count"].unstack(level=0).rename(index=category_to_name).to_dict()
+    stats = WeedCOCOStats(weedcoco)
+    stats_with_cat_name = stats.category_summary.rename(
+        index=category_to_name, level="category_id"
+    )
+    cat_counts_by_agcontext = dict(
+        iter(stats_with_cat_name.groupby(level="agcontext_id"))
     )
     for agcontext in weedcoco["agcontexts"]:
-        agcontext["image_count"] = count_by_agcontext[agcontext["id"]]
+        agcontext["n_images"] = stats.agcontext_summary.loc[agcontext["id"]].image_count
+
+        # Should produce something like:
+        # {"crop: daugus carota": {"image_count": 1, "annotation_count": 1, "bounding_box_count": 1, "segmentation_count": 1}}
+        agcontext["category_statistics"] = cat_counts_by_agcontext[
+            agcontext["id"]
+        ].to_dict(orient="index")
 
     return {
         "agcontext": weedcoco["agcontexts"],

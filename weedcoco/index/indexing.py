@@ -3,7 +3,7 @@ import os
 import pathlib
 import json
 from elasticsearch import Elasticsearch, helpers
-from weedcoco.utils import lookup_growth_stage_name
+from weedcoco.utils import lookup_growth_stage_name, get_task_types
 
 
 class ElasticSearchIndex:
@@ -107,19 +107,11 @@ class ElasticSearchIndex:
             )  # for deterministic random order
             _flatten(image["agcontext"], image, "agcontext")
             # todo: add license
-            image["task_type"] = set()
             for annotation in image["annotations"]:
                 for k in annotation:
                     image.setdefault(f"annotation__{k}", []).append(annotation[k])
 
-                # determine available task types
-                image["task_type"].add("classification")
-                if "segmentation" in annotation:
-                    image["task_type"].add("segmentation")
-                    image["task_type"].add("bounding box")
-                if "bbox" in annotation:
-                    image["task_type"].add("bounding box")
-            image["task_type"] = sorted(image["task_type"])
+            image["task_type"] = sorted(get_task_types(image["annotations"]))
 
         self.indexes = coco
 
