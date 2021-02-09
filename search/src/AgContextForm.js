@@ -1,14 +1,129 @@
-import React, { Component, useState } from 'react'
-import { withTheme } from "react-jsonschema-form";
-import { Theme as MuiTheme } from 'rjsf-material-ui';
+import React, { Component } from 'react'
 import { withRouter } from 'react-router-dom';
-import { agcontextSchema } from './schemas'
-import './AgContextForm.css';
+import agcontextSchema from './Schemas/AgContext.json'
 import Container from '@material-ui/core/Container';
 import Box from '@material-ui/core/Box';
+import {
+  materialCells,
+  materialRenderers,
+} from '@jsonforms/material-renderers';
+import { JsonForms } from '@jsonforms/react';
+import { fixedItemsTester, FixedItemsRenderer } from './Components/formRenderers/FixedItemsRenderer';
+import { constTester, ConstRenderer } from './Components/formRenderers/ConstRenderer';
 
+const uischema = {
+  "type": "Categorization",
+  "elements": [
+    {
+      "type": "Category",
+      "label": "The Crop",
+      "elements": [
+        {
+          "type": "Control",
+          "scope": "#/properties/crop_type"
+        },
+        {
+          "type": "Control",
+          "label": "BBCH Growth Stage",
+          "scope": "#/properties/bbch_growth_range"
+        },
+        {
+          "type": "Control",
+          "scope": "#/properties/soil_colour"
+        },
+        {
+          "type": "Control",
+          "scope": "#/properties/surface_cover"
+        },
+        {
+          "type": "Control",
+          "scope": "#/properties/surface_coverage"
+        },
+        {
+          "type": "HorizontalLayout",
+          "elements": [
+            {
+              "type": "Control",
+              "scope": "#/properties/location_datum"
+            },
+            {
+              "type": "Control",
+              "scope": "#/properties/location_lat"
+            },
+            {
+              "type": "Control",
+              "scope": "#/properties/location_long"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "Category",
+      "label": "The Photography",
+      "elements": [
+        {
+          "type": "Control",
+          "scope": "#/properties/camera_make"
+        },
+        {
+          "type": "Control",
+          "scope": "#/properties/camera_lens"
+        },
+        {
+          "type": "Control",
+          "scope": "#/properties/camera_lens_focallength"
+        },
+        {
+          "type": "Control",
+          "scope": "#/properties/camera_height"
+        },
+        {
+          "type": "Control",
+          "scope": "#/properties/camera_angle"
+        },
+        {
+          "type": "Control",
+          "scope": "#/properties/camera_fov"
+        },
+        {
+          "type": "Control",
+          "scope": "#/properties/lighting"
+        },
+        {
+          "type": "Control",
+          "scope": "#/properties/photography_description",
+          "options": {"multi": true}
+        }
+      ]
+    },
+    {
+      "type": "Category",
+      "label": "Other Details",
+      "elements": [
+        {
+          "type": "Control",
+          "scope": "#/properties/cropped_to_plant"
+        },
+        {
+          "type": "Control",
+          "scope": "#/properties/emr_channels"
+        },
+        {
+          "type": "Control",
+          "scope": "#/properties/weather_description",
+          "options": {"multi": true}
+        }
+      ]
+    }
+  ]
+};
 
-const Form = withTheme(MuiTheme);
+const renderers = [
+  ...materialRenderers,
+  { tester: constTester, renderer: ConstRenderer },
+  { tester: fixedItemsTester, renderer: FixedItemsRenderer },
+];
 
 export const toJSON = (payload) => JSON.stringify(payload, null, 2);
 export const handleSaveToPC = (payload) => {
@@ -30,22 +145,21 @@ class AgContextForm extends Component {
     render() {
         const schema = agcontextSchema;
 
-        const uiSchema = {
-          title: "AgContext Entry Form"
-        };
-
         return (
-            <Form
+            <JsonForms
               schema={schema}
-              uiSchema={uiSchema}
-              formData={this.state.formData}
+              uischema={uischema}
+              data={this.state.formData}
+              renderers={renderers}
+              cells={materialCells}
               onChange={e => {
-                  this.setState({formData: e.formData});
+                  this.setState({formData: e.data});
                   if (this.props.onChange) {
+					  e.formData = e.data;
+					  e.formData["id"] = 0;
                       this.props.onChange(e);
                   }
               }}
-              children={true}  // hides submit
             />
         );
     }
@@ -55,17 +169,18 @@ class AgContextForm extends Component {
 class StandaloneEditor extends Component {
     constructor(props) {
         super(props);
-        this.state = {formData: this.props.formData || {crop_type: "oats"} }
+        this.state = {formData: this.props.formData || {} }
     }
     render() {
         return (
             <Container maxWidth="sm">
+                <h2>AgContext Editor</h2>
                 <Box boxShadow={3} px={2} py={1} my={2}>
                     <AgContextForm formData={this.state.formData} onChange={e => this.setState({formData: e.formData})} />
                 </Box>
                 <Box boxShadow={3} px={2} py={1} my={2}>
                     <label>JSON representation of AgContext</label>
-                    <textarea style={{width: "100%", height: "5em"}} value={toJSON(this.state.formData)} / >
+                    <textarea readOnly={true} style={{width: "100%", height: "5em"}} value={toJSON(this.state.formData)} / >
                     <button onClick={e => handleSaveToPC(this.state.formData)}>Download</button>
                 </Box>
             </Container>
