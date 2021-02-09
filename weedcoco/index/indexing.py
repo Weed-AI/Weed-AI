@@ -3,9 +3,10 @@ import os
 import pathlib
 import json
 from elasticsearch import Elasticsearch, helpers
+from weedcoco.utils import lookup_growth_stage_name
 
 
-class ElasticSearchIndex:
+class ElasticSearchIndexer:
 
     """
     Args:
@@ -29,17 +30,19 @@ class ElasticSearchIndex:
         es_host="localhost",
         es_port=9200,
         indexes=None,
+        upload_id="#",
     ):
-        self.weedcoco_path = weedcoco_path
-        self.thumbnail_dir = thumbnail_dir
+        self.weedcoco_path = pathlib.Path(weedcoco_path)
+        self.thumbnail_dir = pathlib.Path(thumbnail_dir)
         self.es_index_name = es_index_name
         self.es_type_name = es_type_name
         self.batch_size = batch_size
         hosts = [{"host": es_host, "port": es_port}]
         self.es_client = Elasticsearch(hosts=hosts)
         self.indexes = indexes if indexes is not None else {}
+        self.upload_id = upload_id
 
-    def modify_coco(self):
+    def generate_index_entries(self):
         """
         Create index entries for request to ElasticSearch
         """
@@ -67,6 +70,17 @@ class ElasticSearchIndex:
             for field in variable_to_null_fields:
                 if agcontext.get(field) == "variable":
                     del agcontext[field]
+            # textual label for growth stage
+            if "bbch_growth_range" not in agcontext:
+                growth_stage_texts = ["na"]
+            else:
+                lo, hi = agcontext["bbch_growth_range"]
+                growth_stage_texts = set()
+                for i in range(lo, hi + 1):
+                    growth_stage_texts.add(
+                        lookup_growth_stage_name(i, scheme="grain_ranges")
+                    )
+            agcontext["growth_stage_texts"] = sorted(growth_stage_texts)
 
         for annotation in coco["annotations"]:
             image = id_lookup["images", annotation["image_id"]]
@@ -80,6 +94,7 @@ class ElasticSearchIndex:
                 / os.path.basename(image["file_name"])[:2]
                 / os.path.basename(image["file_name"])
             )
+            image["upload_id"] = f"{self.upload_id}"
 
         for image in coco["images"]:
             try:
@@ -105,30 +120,27 @@ class ElasticSearchIndex:
                 if "bbox" in annotation:
                     image["task_type"].add("bounding box")
             image["task_type"] = sorted(image["task_type"])
-
-        self.indexes = coco
+            yield image
 
     def generate_batches(self):
         """
         Split indexes into batches to reduce payload size of each request to ElasticSearch
         """
-        indexes = self.indexes
-        if "images" in indexes and len(indexes["images"]) > 0:
-            images = indexes["images"]
-            for start in range(0, len(images), self.batch_size):
-                blobs = []
-                batch = images[start : start + self.batch_size]
-                for image in batch:
-                    blobs.append(
-                        {
-                            "_index": self.es_index_name,
-                            "_type": self.es_type_name,
-                            "_source": image,
-                        }
-                    )
-                yield blobs
+        images = list(self.generate_index_entries())
+        for start in range(0, len(images), self.batch_size):
+            blobs = []
+            batch = images[start : start + self.batch_size]
+            for image in batch:
+                blobs.append(
+                    {
+                        "_index": self.es_index_name,
+                        "_type": self.es_type_name,
+                        "_source": image,
+                    }
+                )
+            yield blobs
 
-    def post_to_index(self):
+    def post_index_entries(self):
         """
         Send post request to ElasticSearch
         """
@@ -141,10 +153,9 @@ def main(args=None):
     ap.add_argument("--weedcoco-path", type=pathlib.Path, required=True)
     ap.add_argument("--thumbnail-dir", type=pathlib.Path, required=True)
     args = ap.parse_args(args)
-    return ElasticSearchIndex(args.weedcoco_path, args.thumbnail_dir)
+    return ElasticSearchIndexer(args.weedcoco_path, args.thumbnail_dir)
 
 
 if __name__ == "__main__":
     es_index = main()
-    es_index.modify_coco()
-    es_index.post_to_index()
+    es_index.post_index_entries()

@@ -29,6 +29,16 @@ def setup_upload_dir(upload_userid_dir):
     return upload_dir, upload_id
 
 
+def add_agcontexts(weedcoco_path, ag_contexts):
+    with open(weedcoco_path, "r") as jsonFile:
+        data = json.load(jsonFile)
+    data["agcontexts"] = [ag_contexts]
+    for image in data["images"]:
+        image["agcontext_id"] = ag_contexts["id"]
+    with open(weedcoco_path, "w") as jsonFile:
+        json.dump(data, jsonFile)
+
+
 def create_upload_entity(weedcoco_path, upload_id, upload_userid):
     upload_user = WeedidUser.objects.get(id=upload_userid)
     with open(weedcoco_path) as f:
