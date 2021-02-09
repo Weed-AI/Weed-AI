@@ -1,7 +1,7 @@
 from __future__ import absolute_import, unicode_literals
 from celery import shared_task
 from weedcoco.repo.deposit import deposit
-from weedcoco.index.indexing import ElasticSearchIndex
+from weedcoco.index.indexing import ElasticSearchIndexer
 from weedcoco.index.thumbnailing import thumbnailing
 from weedid.models import Dataset
 from core.settings import THUMBNAILS_DIR, REPOSITORY_DIR, DOWNLOAD_DIR
@@ -39,15 +39,14 @@ def update_index_and_thumbnails(
 ):
     upload_entity = Dataset.objects.get(upload_id=upload_id)
     try:
-        es_index = ElasticSearchIndex(
+        es_index = ElasticSearchIndexer(
             Path(weedcoco_path),
             Path(thumbnails_dir),
             es_host="elasticsearch",
             es_port=9200,
             upload_id=upload_id,
         )
-        es_index.modify_coco()
-        es_index.post_to_index()
+        es_index.post_index_entries()
         thumbnailing(Path(thumbnails_dir), Path(repository_dir))
     except Exception as e:
         upload_entity.status = "F"
