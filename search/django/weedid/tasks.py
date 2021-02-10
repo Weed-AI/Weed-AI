@@ -1,9 +1,11 @@
 from __future__ import absolute_import, unicode_literals
+import json
 from celery import shared_task
 from weedcoco.repo.deposit import deposit
 from weedcoco.index.indexing import ElasticSearchIndexer
 from weedcoco.index.thumbnailing import thumbnailing
 from weedid.models import Dataset
+from weedid.utils import make_upload_entity_fields
 from core.settings import THUMBNAILS_DIR, REPOSITORY_DIR, DOWNLOAD_DIR
 from pathlib import Path
 
@@ -13,6 +15,14 @@ def submit_upload_task(weedcoco_path, image_dir, upload_id):
     upload_entity = Dataset.objects.get(upload_id=upload_id)
     upload_entity.status = "P"
     upload_entity.status_details = ""
+
+    # Update fields in database
+    # XXX: maybe this should be delayed
+    with open(weedcoco_path) as f:
+        weedcoco = json.load(f)
+    for k, v in make_upload_entity_fields(weedcoco).items():
+        setattr(upload_entity, k, v)
+
     upload_entity.save()
     try:
         new_weedcoco_path = deposit(
