@@ -38,7 +38,7 @@ class WeedCOCOStats:
             {
                 "annotation_count": gb.size(),
                 "image_count": gb["image_id"].nunique(),
-                "segmentation_count": gb["segmentation"].sum(),
-                "bounding_box_count": gb["bounding box"].sum(),
+                "segmentation_count": gb["segmentation"].sum().astype(int),
+                "bounding_box_count": gb["bounding box"].sum().astype(int),
             }
         )

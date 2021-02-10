@@ -55,9 +55,11 @@ def make_upload_entity_fields(weedcoco):
 
         # Should produce something like:
         # {"crop: daugus carota": {"image_count": 1, "annotation_count": 1, "bounding_box_count": 1, "segmentation_count": 1}}
-        agcontext["category_statistics"] = cat_counts_by_agcontext[
-            agcontext["id"]
-        ].to_dict(orient="index")
+        agcontext["category_statistics"] = (
+            cat_counts_by_agcontext[agcontext["id"]]
+            .droplevel("agcontext_id")
+            .to_dict(orient="index")
+        )
 
     return {
         "agcontext": weedcoco["agcontexts"],
