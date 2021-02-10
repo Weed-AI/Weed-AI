@@ -27,7 +27,7 @@
     "react-scripts": "3.4.3",
     "redux": "^2.0.0",
     "rjsf-material-ui": "^0.3.9",
-    "typescript": "^2.8.0"
+    "typescript": "^3.8.0"
   },
   "scripts": {
     "start": "PORT=80 react-scripts start",

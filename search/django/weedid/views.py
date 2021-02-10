@@ -153,8 +153,8 @@ def upload_info(request):
 def upload_list(request):
     upload_list = map(
         lambda queryEntity: {
-            "name": queryEntity.metadata["info"][0]["name"]
-            if "name" in queryEntity.metadata["info"][0]
+            "name": queryEntity.metadata["name"]
+            if "name" in queryEntity.metadata
             else "",
             "upload_id": queryEntity.upload_id,
             "upload_date": str(queryEntity.date),

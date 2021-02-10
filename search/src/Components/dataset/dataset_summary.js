@@ -127,20 +127,20 @@ export const DatasetSummary = (props) => {
                 <IconButton aria-label="back to list" color="secondary" onClick={() => window.location.assign(baseURL + 'datasets')}>
                   <ListIcon />
                 </IconButton>
-                <Typography variant='h4' style={{fontWeight: 600}}>{metadata.info.metadata.name}</Typography>
+                <Typography variant='h4' style={{fontWeight: 600}}>{metadata.name}</Typography>
               </div>
               <p>
-                {metadata.info.metadata.description /* TODO: perhaps render as markdown */}
+                {metadata.description /* TODO: perhaps render as markdown */}
               </p>
               <dl>
                 <dt>Creators:</dt>
                 <dd>
                   <ul>
-                  {metadata.info.metadata.creator.map((creator, i) => (<li key={i}>{creator.sameAs ? (<a href={creator.sameAs}>{creator.name}</a>) : creator.name}</li>))}
+                  {metadata.creator.map((creator, i) => (<li key={i}>{creator.sameAs ? (<a href={creator.sameAs}>{creator.name}</a>) : creator.name}</li>))}
                   </ul>
                 </dd>
                 <dt>Licence:</dt>
-                <dd>{<a href={metadata.info.metadata.license}>{metadata.info.metadata.license}</a>}</dd>
+                <dd>{<a href={metadata.license}>{metadata.license}</a>}</dd>
               </dl>
               { /* TODO: link to Explore searching for just this dataset */ }
             </div>
@@ -165,9 +165,10 @@ class DatasetSummaryPage extends Component {
     super()
     this.state = {
       metadata: {
-        info: [],
-        license: [],
-        collections: []
+        name: "",
+        description: "",
+        creator: [],
+        license: ""       
       },
       agcontexts: []
     }

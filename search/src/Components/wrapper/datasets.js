@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import DatasetList from '../dataset/dataset_list';
-import DatasetSummary from '../dataset/dataset_summary';
+import DatasetSummaryPage from '../dataset/dataset_summary';
 import axios from 'axios';
 
 const baseURL = new URL(window.location.origin); 
@@ -38,7 +38,7 @@ class DatasetComponent extends Component {
     render() {
         return (
             <React.Fragment>
-                {this.state.upload_id === "*" ? <DatasetList handleUploadid={this.handleUploadid} upload_list={this.state.upload_list}/> : <DatasetSummary upload_id={this.state.upload_id} handleUploadid={this.handleUploadid}/>}
+                {this.state.upload_id === "*" ? <DatasetList handleUploadid={this.handleUploadid} upload_list={this.state.upload_list}/> : <DatasetSummaryPage upload_id={this.state.upload_id} handleUploadid={this.handleUploadid}/>}
             </React.Fragment>
         )
     }
