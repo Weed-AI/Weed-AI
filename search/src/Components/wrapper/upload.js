@@ -20,13 +20,21 @@ const useStyles = (theme) => ({
 })
 
 const baseURL = new URL(window.location.origin);
+const upload_status_mapping = {
+    'N': 'None',
+    'P': 'Processing',
+    'I': 'Incomplete',
+    'AR': 'Awaiting Review',
+    'F': 'Failed',
+    'C': 'Complete'
+}
 
 class UploadComponent extends Component {
     constructor(){
         super()
         this.state = {
             isLoggedIn: false,
-            upload_status: "N",
+            upload_status: "None",
             upload_status_details: "",
             upload_type: "",
         }
@@ -60,11 +68,11 @@ class UploadComponent extends Component {
         axios.get(baseURL + "api/upload_status/")
         .then(res => res.data)
         .then(json => {
-            this.setState({upload_status: json.upload_status,
+            this.setState({upload_status: upload_status_mapping[json.upload_status],
                            upload_status_details: json.upload_status_details})
         })
         .catch(() => {
-            this.setState({upload_status: "N",
+            this.setState({upload_status: "None",
                 upload_status_details: ""})
         })
     }
