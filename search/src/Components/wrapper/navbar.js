@@ -9,6 +9,7 @@ import Box from '@material-ui/core/Box';
 import ReactiveSearchComponent from './reactive_search';
 import UploadComponent from './upload';
 import DatasetComponent from './datasets';
+import WeedCOCOComponent from './weedcoco';
 import AboutComponent from './about';
 
 const useStyles = makeStyles((theme) => ({
@@ -76,6 +77,7 @@ export default function NavbarComponent(props) {
           <StyledTab value="explore" label="Explore" />
           <StyledTab value="datasets" label="Datasets" />
           <StyledTab value="upload" label="Upload" />
+          <StyledTab value="weedcoco" label="WeedCOCO" />
           <StyledTab value="about" label="About" />
           <Typography variant='p' className={classes.logo}><span style={{color: '#f0983a'}}>Weed</span>AI</Typography>
         </StyledTabs>
@@ -89,6 +91,9 @@ export default function NavbarComponent(props) {
       }
       {
         selectedTab === "upload" && <UploadComponent />
+      }
+      {
+        selectedTab === "weedcoco" && <WeedCOCOComponent />
       }
       {
         selectedTab === "about" && <AboutComponent />
