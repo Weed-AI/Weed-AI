@@ -56,6 +56,6 @@ def update_index_and_thumbnails(
         upload_entity.status_details = str(e)
     else:
         upload_entity.status = "C"
-        upload_entity.status_details = "It has been successfully proceeded."
+        upload_entity.status_details = "It has been successfully submitted."
     finally:
         upload_entity.save()

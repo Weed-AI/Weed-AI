@@ -63,20 +63,20 @@ def remove_entity_local_record(user_id, upload_id):
     upload_dir_record = os.path.join(UPLOAD_DIR, user_id, upload_id)
     repository_dir_record = os.path.join(REPOSITORY_DIR, upload_id)
     download_dir_record = os.path.join(DOWNLOAD_DIR, f"{upload_id}.zip")
-    for dirPath in [upload_dir_record, repository_dir_record, download_dir_record]:
-        if os.path.exists(dirPath):
-            if os.path.isdir(dirPath):
-                rmtree(dirPath, ignore_errors=True)
-            elif os.path.isfile(dirPath):
-                os.remove(dirPath)
+    for dir_path in [upload_dir_record, repository_dir_record, download_dir_record]:
+        if os.path.isdir(dir_path):
+            rmtree(dir_path, ignore_errors=True)
+        elif os.path.isfile(dir_path):
+            os.remove(dir_path)
 
 
-def retrieve_listing_info(queryEntity):
+def retrieve_listing_info(query_entity):
+    """Retrieving info from specific upload entity"""
     return {
-        "name": queryEntity.metadata["info"][0]["name"]
-        if "name" in queryEntity.metadata["info"][0]
+        "name": query_entity.metadata["info"][0]["name"]
+        if "name" in query_entity.metadata["info"][0]
         else "",
-        "upload_id": queryEntity.upload_id,
-        "upload_date": str(queryEntity.date),
-        "contributor": queryEntity.user.username,
+        "upload_id": query_entity.upload_id,
+        "upload_date": str(query_entity.date),
+        "contributor": query_entity.user.username,
     }
