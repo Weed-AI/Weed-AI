@@ -9,6 +9,7 @@ import Box from '@material-ui/core/Box';
 import ReactiveSearchComponent from './reactive_search';
 import UploadComponent from './upload';
 import DatasetComponent from './datasets';
+import AboutComponent from './about';
 
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -115,7 +116,7 @@ export default function NavbarComponent(props) {
           <StyledTab label="Explore" />
           <StyledTab label="Datasets" />
           <StyledTab label="Upload" />
-          <StyledTab label="About" disabled />
+          <StyledTab label="About" />
           <Typography variant='p' className={classes.logo}><span style={{color: '#f0983a'}}>Weed</span>AI</Typography>
         </StyledTabs>
       </AppBar>
@@ -144,7 +145,7 @@ export default function NavbarComponent(props) {
         selectedTab === 3
         &&
         <div className={classes.container}>
-            About Page Placeholder
+            <AboutComponent />
         </div>
       }
     </div>
