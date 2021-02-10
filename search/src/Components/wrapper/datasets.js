@@ -63,7 +63,7 @@ class DatasetComponent extends Component {
                 );
             }
        } else {
-           return (<DatasetSummary upload_id={this.state.upload_id} handleUploadid={this.handleUploadid}/>);
+           return (<DatasetSummaryPage upload_id={this.state.upload_id} handleUploadid={this.handleUploadid}/>);
        }
     }
 }

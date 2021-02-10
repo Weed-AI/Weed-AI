@@ -109,9 +109,7 @@ def remove_entity_local_record(user_id, upload_id):
 
 def retrieve_listing_info(queryEntity):
     return {
-        "name": queryEntity.metadata["info"][0]["name"]
-        if "name" in queryEntity.metadata["info"][0]
-        else "",
+        "name": queryEntity.metadata["name"] if "name" in queryEntity.metadata else "",
         "upload_id": queryEntity.upload_id,
         "upload_date": str(queryEntity.date),
         "contributor": queryEntity.user.username,
