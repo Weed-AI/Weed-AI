@@ -124,7 +124,7 @@ export const DatasetSummary = (props) => {
           <Grid item xs={10}>
             <div className={classes.summary}>
               <div style={{display: 'flex'}}>
-                <IconButton aria-label="back to list" color="secondary" onClick={() => window.location.assign(baseURL + 'datasets')}>
+                <IconButton aria-label="back to list" color="secondary" onClick={() => window.location.assign(rootURL + 'datasets')}>
                   <ListIcon />
                 </IconButton>
                 <Typography variant='h4' style={{fontWeight: 600}}>{metadata.name}</Typography>
@@ -147,7 +147,7 @@ export const DatasetSummary = (props) => {
           </Grid>
           <Grid item xs={2}>
             <div className={classes.summary}>
-                <Button className={classes.download} onClick={() => window.open(`${rootURL}/code/download/${this.props.upload_id}.zip`)}>Download in WeedCOCO format</Button>
+                <Button className={classes.download} onClick={() => window.open(`${rootURL}/code/download/${props.upload_id}.zip`)}>Download in WeedCOCO format</Button>
             </div>
           </Grid>
         </Grid>
