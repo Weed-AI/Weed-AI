@@ -120,6 +120,18 @@ export const DatasetSummary = (props) => {
     const {metadata, agcontexts, classes, rootURL} = props;
     return (
       <React.Fragment>
+        <script type="application/ld+json">
+        {
+          JSON.stringify({
+            ...{
+              "@context": "https://schema.org/",
+              "@type": "Dataset",
+              "url": window.location.href
+            },
+            ...metadata
+          })
+        }
+        </script>
         <Grid container spacing={3}>
           <Grid item xs={10}>
             <div className={classes.summary}>
@@ -205,7 +217,7 @@ class DatasetSummaryPage extends Component {
 }
 
 export const TestDatasetSummary = () => {
-    const props = {"metadata": {"info": {"description": "Crop/Weed Field Image Dataset", "year": 2015, "version": 1, 
+    const props = {
         "metadata": {
             "creator": [
                 {"name": "Sebastian Haug"},
@@ -217,7 +229,6 @@ export const TestDatasetSummary = () => {
             "license": "https://github.com/cwfid/dataset",
             "citation": "Sebastian Haug, Jörn Ostermann: A Crop/Weed Field Image Dataset for the Evaluation of Computer Vision Based Precision Agriculture Tasks, CVPPP 2014 Workshop, ECCV 2014"
         },
-    }, "license": [{"id": 0, "url": "https://creativecommons.org/licenses/by/4.0/", "license_name": "CC BY 4.0", "license_version": "4.0", "license_fullname": "Creative Commons Attribution 4.0"}]},
         "agcontexts": [
             {"n_images": 3, "category_statistics": 
         {"crop: foo": {"annotation_count": 2, "image_count": 1, "segmentation_count": 2, "bounding_box_count": 2},
