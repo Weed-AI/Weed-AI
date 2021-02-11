@@ -77,8 +77,8 @@ export default function NavbarComponent(props) {
           <StyledTab value="explore" href="/explore" label="Explore" />
           <StyledTab value="datasets" href="/datasets" label="Datasets" />
           <StyledTab value="upload" href="/upload" label="Upload" />
-          <StyledTab value="weedcoco" href="/weedcoco" label="WeedCOCO" disabled />
-          <StyledTab value="about" href="/about" label="About" disabled />
+          <StyledTab value="weedcoco" href="/weedcoco" label="WeedCOCO" />
+          <StyledTab value="about" href="/about" label="About" />
           <Typography variant='p' className={classes.logo}><span style={{color: '#f0983a'}}>Weed</span>AI</Typography>
         </StyledTabs>
       </AppBar>
