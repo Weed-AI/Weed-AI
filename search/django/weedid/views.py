@@ -36,7 +36,8 @@ def upload(request):
                 images = []
                 file_weedcoco = request.FILES["weedcoco"]
                 weedcoco_json = json.load(file_weedcoco)
-                validate(weedcoco_json)
+                # initially use more lenient validation.
+                validate(weedcoco_json, schema="compatible-coco")
                 for image_reference in weedcoco_json["images"]:
                     images.append(image_reference["file_name"].split("/")[-1])
                 upload_dir, upload_id = setup_upload_dir(

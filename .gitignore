@@ -11,6 +11,9 @@ weedcoco/cwfid_to_json/*.yaml
 weedcoco/cwfid_to_json/annotations/*.yaml
 weedcoco/concatenation/*.json
 
+# generated files
+weedcoco/schema/*.json
+
 # Images
 # JPEG
 *.jpg
