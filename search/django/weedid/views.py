@@ -164,7 +164,7 @@ def dataset_approve(request, dataset_id):
         update_index_and_thumbnails(weedcoco_path, dataset_id)
         return HttpResponse("It has been approved")
     else:
-        return HttpResponseNotAllowed("Dataset to be reviewed doesnt exist")
+        return HttpResponseNotAllowed("Dataset to be reviewed doesn't exist")
 
 
 def dataset_reject(request, dataset_id):
@@ -181,7 +181,7 @@ def dataset_reject(request, dataset_id):
             upload_entity.save()
         return HttpResponse("The dataset has been rejected and removed")
     else:
-        return HttpResponseNotAllowed("Dataset to be rejected doesnt exist")
+        return HttpResponseNotAllowed("Dataset to be rejected doesn't exist")
 
 
 def user_register(request):
