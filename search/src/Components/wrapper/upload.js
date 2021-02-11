@@ -118,7 +118,8 @@ class UploadComponent extends Component {
                 <br />
                 <p>We welcome new contributions of datasets of images with weeds already annotated.</p>
                 <p>See <em>our guide</em> for collecting and annotating images.</p>
-                <p>We support several standard formats of upload, accompanied with detailed metadata.</p>
+                <p>We natively support WeedCOCO format which extends on MS COCO to specify a weed ID-oriented category naming scheme, to include agricultural context and <a href="https://schema.org/Dataset" title="The Dataset schema at schema.org">schema.org/Dataset</a>-compatible metadata. We provide an uploader for MS COCO format, with forms to enter agricultural context and metadata please ensure the category names are conformant before uploading.</p>
+                <p>We require that contributors license their images and annotations under the liberal <a href="https://creativecommons.org/licenses/by/4.0/" title="Creative Commons Attribution Required 4.0">CC-BY 4.0 licence</a>. Uploaders must have the rights to the content that they upload.</p>
                 <br />
                 <div style={{ display: 'flex', alignItems: 'center' }}>
                     <FormControl className={classes.formControl}>
