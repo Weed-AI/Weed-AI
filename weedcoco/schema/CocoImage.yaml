@@ -1,0 +1,49 @@
+$id: https://weedid.sydney.edu.au/schema/CocoImage.json
+type: object
+required:
+  - id
+  - file_name
+  # - license  - See #104
+  - width
+  - height
+
+properties:
+
+  id:
+    type: number
+    description: |-
+      A number identifying the image.
+
+  file_name:
+    type: string
+    description: |-
+      A string identifying the filename of the image.
+      This string does not include the path of the image.
+
+  license:
+    type: number
+    description: |-
+      A number identifying the relevant license object.
+
+  agcontext_id:
+    type: number
+    description: |-
+      A number identifying the relevant agcontext object.
+
+  width:
+    type: number
+    minimum: 1
+    description: |-
+      Horizontal pixel count.
+
+  height:
+    type: number
+    minimum: 1
+    description: |-
+      Vertical pixel count.
+
+  date_captured:
+    type: string
+    format: date-time
+    description: |-
+      Datetime when the image was captured.

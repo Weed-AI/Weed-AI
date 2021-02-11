@@ -5,7 +5,6 @@ import copy
 import random
 
 import pytest
-import jsonschema
 
 from weedcoco.validation import (
     validate,
@@ -151,6 +150,13 @@ SMALL_WEEDCOCO = {
 }
 
 
+def _set_category_name(coco, name):
+    coco = copy.deepcopy(coco)
+    print(coco)
+    coco["categories"][0]["name"] = name
+    return coco
+
+
 @pytest.mark.parametrize("func", [validate, validate_json])
 @pytest.mark.parametrize(
     "bad_weedcoco",
@@ -161,7 +167,7 @@ SMALL_WEEDCOCO = {
     ],
 )
 def test_missing_required_at_root(func, bad_weedcoco):
-    with pytest.raises(jsonschema.ValidationError, match="is a required property"):
+    with pytest.raises(ValidationError, match="is a required property"):
         func(bad_weedcoco)
 
 
@@ -181,13 +187,13 @@ def test_okay(func):
     func(SMALL_WEEDCOCO)
 
 
-"""
 @pytest.mark.parametrize("func", [validate, validate_json])
-@pytest.mark.parametrize("bad_name", [])
+@pytest.mark.parametrize("bad_name", ["foobar", "weed 1"])
 def test_bad_category_name(func, bad_name):
     weedcoco = copy.deepcopy(SMALL_WEEDCOCO)
-    weedcoco["categories"][0]["name"] == name
-"""
+    weedcoco = _set_category_name(weedcoco, bad_name)
+    with pytest.raises(ValidationError):
+        func(weedcoco)
 
 
 def _make_duplicate_id(weedcoco, key, idx, insert_at=-1):
@@ -209,7 +215,7 @@ def _make_duplicate_id(weedcoco, key, idx, insert_at=-1):
 def test_missing_section(func, removed_section):
     bad_weedcoco = copy.deepcopy(SMALL_WEEDCOCO)
     del bad_weedcoco[removed_section]
-    with pytest.raises(jsonschema.ValidationError):
+    with pytest.raises(ValidationError):
         func(bad_weedcoco)
 
 
@@ -264,3 +270,51 @@ def _make_unreferenced(weedcoco, section, new_id=1000):
 def test_id_not_referenced(func, bad_weedcoco):
     with pytest.raises(ValidationError, match="is unreferenced"):
         func(bad_weedcoco)
+
+
+def _weedcoco_to_coco(weedcoco):
+    coco = copy.deepcopy(weedcoco)
+    del coco["agcontexts"]
+    del coco["collections"]
+    del coco["collection_memberships"]
+    # del coco["info"]["metadata"]
+    for image in coco["images"]:
+        del image["agcontext_id"]
+    return coco
+
+
+@pytest.mark.parametrize("func", [validate, validate_json])
+@pytest.mark.parametrize(
+    "coco",
+    [
+        _weedcoco_to_coco(MINIMAL_WEEDCOCO),
+        _weedcoco_to_coco(SMALL_WEEDCOCO),
+    ],
+)
+def test_coco_compatible_good(func, coco):
+    func(coco, schema="compatible-coco")
+
+
+@pytest.mark.parametrize("func", [validate, validate_json])
+@pytest.mark.parametrize(
+    "bad_coco",
+    [
+        # drop categories:
+        {
+            k: v
+            for k, v in _weedcoco_to_coco(MINIMAL_WEEDCOCO).items()
+            if k != "categories"
+        },
+        # drop annotations:
+        {
+            k: v
+            for k, v in _weedcoco_to_coco(MINIMAL_WEEDCOCO).items()
+            if k != "annotations"
+        },
+        # rename to WeedCOCO-incompatible categories:
+        _set_category_name(_weedcoco_to_coco(SMALL_WEEDCOCO), "foobar"),
+    ],
+)
+def test_coco_compatible_bad(func, bad_coco):
+    with pytest.raises(ValidationError):
+        func(bad_coco, schema="compatible-coco")

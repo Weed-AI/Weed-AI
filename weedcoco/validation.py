@@ -6,18 +6,24 @@ import sys
 import json
 
 import jsonschema
+import jsonschema.exceptions
 import yaml
 
 SCHEMA_DIR = pathlib.Path(__file__).parent / "schema"
-MAIN_SCHEMA_URI = "https://weedid.sydney.edu.au/schema/main.json"
+MAIN_SCHEMAS = {
+    "weedcoco": "https://weedid.sydney.edu.au/schema/main.json",
+    "compatible-coco": "https://weedid.sydney.edu.au/schema/compatible-coco.json",
+}
 
 
 class ValidationError(Exception):
     pass
 
 
-def validate_json(weedcoco, schema_dir=SCHEMA_DIR):
+def validate_json(weedcoco, schema="weedcoco", schema_dir=SCHEMA_DIR):
     """Check that the weedcoco matches its JSON schema"""
+    if schema not in MAIN_SCHEMAS:
+        raise ValueError(f"schema should be one of {sorted(MAIN_SCHEMAS)}")
     try:
         # memoise the schema
         ref_store = validate_json.ref_store
@@ -27,12 +33,16 @@ def validate_json(weedcoco, schema_dir=SCHEMA_DIR):
         ]
         validate_json.ref_store = {obj["$id"]: obj for obj in schema_objects}
         ref_store = validate_json.ref_store
-    main_schema = ref_store[MAIN_SCHEMA_URI]
-    jsonschema.validate(
-        weedcoco,
-        schema=main_schema,
-        resolver=jsonschema.RefResolver(MAIN_SCHEMA_URI, main_schema, store=ref_store),
-    )
+    schema_uri = MAIN_SCHEMAS[schema]
+    main_schema = ref_store[schema_uri]
+    try:
+        jsonschema.validate(
+            weedcoco,
+            schema=main_schema,
+            resolver=jsonschema.RefResolver(schema_uri, main_schema, store=ref_store),
+        )
+    except jsonschema.ValidationError as e:
+        raise ValidationError(str(e)) from e
 
 
 def validate_references(
@@ -93,10 +103,10 @@ def validate_image_sizes(weedcoco, images_root):
     # TODO
 
 
-def validate(weedcoco, images_root=None):
+def validate(weedcoco, images_root=None, schema="weedcoco"):
     if hasattr(weedcoco, "read"):
         weedcoco = json.load(weedcoco)
-    validate_json(weedcoco)
+    validate_json(weedcoco, schema=schema)
     validate_references(weedcoco)
     validate_coordinates(weedcoco)
     if images_root is not None:
@@ -106,6 +116,7 @@ def validate(weedcoco, images_root=None):
 def main():
     ap = argparse.ArgumentParser("WeedCOCO Validator")
     ap.add_argument("paths", nargs="+", type=argparse.FileType("r"))
+    ap.add_argument("--schema", default="weedcoco", choices=MAIN_SCHEMAS.keys())
     ap.add_argument(
         "--images-root", default=".", help="Root for image file names. Default=."
     )
