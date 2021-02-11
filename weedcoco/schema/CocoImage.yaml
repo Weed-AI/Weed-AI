@@ -43,6 +43,7 @@ properties:
       Vertical pixel count.
 
   date_captured:
-    type: datetime
+    type: string
+    format: date-time
     description: |-
       Datetime when the image was captured.
