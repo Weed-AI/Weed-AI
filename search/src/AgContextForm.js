@@ -10,6 +10,7 @@ import {
 import { JsonForms } from '@jsonforms/react';
 import { fixedItemsTester, FixedItemsRenderer } from './Components/formRenderers/FixedItemsRenderer';
 import { constTester, ConstRenderer } from './Components/formRenderers/ConstRenderer';
+import UploadJsonButton from './Components/ui/UploadJsonButton';
 
 const uischema = {
   "type": "Categorization",
@@ -125,16 +126,6 @@ const renderers = [
   { tester: fixedItemsTester, renderer: FixedItemsRenderer },
 ];
 
-export const toJSON = (payload) => JSON.stringify(payload, null, 2);
-export const handleSaveToPC = (payload) => {
-    const fileData = toJSON(payload);
-    const blob = new Blob([fileData], {type: "application/json"});
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.download = `AgContext.json`;
-    link.href = url;
-    link.click();
-}
 
 class AgContextForm extends Component {
     constructor(props) {
@@ -149,7 +140,7 @@ class AgContextForm extends Component {
             <JsonForms
               schema={schema}
               uischema={uischema}
-              data={this.state.formData}
+              data={this.props.formData}
               renderers={renderers}
               cells={materialCells}
               onChange={e => {
@@ -178,11 +169,7 @@ class StandaloneEditor extends Component {
                 <Box boxShadow={3} px={2} py={1} my={2}>
                     <AgContextForm formData={this.state.formData} onChange={e => this.setState({formData: e.formData})} />
                 </Box>
-                <Box boxShadow={3} px={2} py={1} my={2}>
-                    <label>JSON representation of AgContext</label>
-                    <textarea readOnly={true} style={{width: "100%", height: "5em"}} value={toJSON(this.state.formData)} / >
-                    <button onClick={e => handleSaveToPC(this.state.formData)}>Download</button>
-                </Box>
+                <UploadJsonButton initialValue={this.state.formData} downloadName="agcontext" onClose={(value) => {this.setState({formData: value})}} />
             </Container>
         );
     }
