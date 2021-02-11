@@ -56,10 +56,7 @@ def create_upload_entity(weedcoco_path, upload_id, upload_userid):
         agcontext=weedcoco_json["agcontexts"],
         user=upload_user,
         status="N",
-        metadata={
-            "info": weedcoco_json["info"],
-            "license": weedcoco_json["license"],
-        },
+        metadata=weedcoco_json["info"]["metadata"],
     )
     upload_entity.save()
     upload_user.latest_upload = upload_entity

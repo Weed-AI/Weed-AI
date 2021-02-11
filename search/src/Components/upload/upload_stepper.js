@@ -37,7 +37,7 @@ function getSteps(upload_type) {
          ['Upload Coco', 'Add Agcontext', 'Add Metadata', 'Upload Images']
 }
 
-function getStepContent(step, upload_type, upload_id, images, formData, handleUploadId, handleImages, handleAgContextsFormData, handleMetadataFormData, handleErrorMessage) {
+function getStepContent(step, upload_type, upload_id, images, agcontextsFormData, metadataFormData, handleUploadId, handleImages, handleAgContextsFormData, handleMetadataFormData, handleErrorMessage) {
     if (upload_type === 'coco') {
         switch (step) {
             case 0:
@@ -45,26 +45,26 @@ function getStepContent(step, upload_type, upload_id, images, formData, handleUp
             case 1:
               return (
                 <React.Fragment>
-                    <AgContextForm formData={formData} onChange={e => {
+                    <AgContextForm formData={agcontextsFormData} onChange={e => {
                         handleAgContextsFormData(e.formData)
                         handleErrorMessage("init")
                     }} />
-                    <textarea style={{width: "100%", height: "5em"}} value={toJSON(formData)} ></textarea>
+                    <textarea style={{width: "100%", height: "5em"}} value={toJSON(agcontextsFormData)} ></textarea>
                     <React.Fragment>
-                        <button onClick={e => saveAgContextToPC(formData)}>Download</button>
+                        <button onClick={e => saveAgContextToPC(agcontextsFormData)}>Download</button>
                     </React.Fragment>
                 </React.Fragment>
               );
             case 2:
               return (
                 <React.Fragment>
-                    <MetadataForm formData={formData} onChange={e => {
+                    <MetadataForm formData={metadataFormData} onChange={e => {
                         handleMetadataFormData(e.formData)
                         handleErrorMessage("init")
                     }} />
-                    <textarea style={{width: "100%", height: "5em"}} value={toJSON(formData)} ></textarea>
+                    <textarea style={{width: "100%", height: "5em"}} value={toJSON(metadataFormData)} ></textarea>
                     <React.Fragment>
-                        <button onClick={e => saveMetadataToPC(formData)}>Download</button>
+                        <button onClick={e => saveMetadataToPC(metadataFormData)}>Download</button>
                     </React.Fragment>
                 </React.Fragment>
               );
@@ -87,9 +87,9 @@ function getStepContent(step, upload_type, upload_id, images, formData, handleUp
             case 0:
               return <UploaderSingle upload_id={upload_id} images={images} handleUploadId={handleUploadId} handleImages={handleImages} handleErrorMessage={handleErrorMessage}/>;
             case 1:
-              return <AgContextForm formData={formData} onChange={e => handleAgContextsFormData(e.formData)} />;
+              return <AgContextForm formData={agcontextsFormData} onChange={e => handleAgContextsFormData(e.formData)} />;
             case 2:
-              return <MetadataForm formData={formData} onChange={e => handleMetadataFormData(e.formData)} />;
+              return <MetadataForm formData={metadataFormData} onChange={e => handleMetadataFormData(e.formData)} />;
             case 3:
               return <UploaderImages upload_id={upload_id} images={images}/>;
             default:
@@ -285,7 +285,7 @@ class UploadStepper extends React.Component {
             </Stepper>
             <div>
                 <Typography className={classes.instructions}>
-                    {getStepContent(this.state.activeStep, this.props.upload_type, this.state.upload_id, this.state.images, this.state.ag_context, this.handleUploadId, this.handleImages, this.handleAgContextsFormData, this.handleMetadataFormData, this.handleErrorMessage)}
+                    {getStepContent(this.state.activeStep, this.props.upload_type, this.state.upload_id, this.state.images, this.state.ag_context, this.state.metadata, this.handleUploadId, this.handleImages, this.handleAgContextsFormData, this.handleMetadataFormData, this.handleErrorMessage)}
                 </Typography>
                 {this.state.error_message.length > 0 && this.state.error_message !== 'init' ? <p style={{color: 'red', float: 'right', marginTop: '0.5em'}}>{this.state.error_message}</p> : ""}
                 <div>
@@ -308,7 +308,7 @@ class UploadStepper extends React.Component {
                     <Button
                         variant="contained"
                         color="primary"
-                        onClick={this.handleExempt() === 'agcontexts' ? this.handleUploadAgcontexts : this.handleExempt() === 'metadata' ? this.handle : this.handleNext}
+                        onClick={this.handleExempt() === 'agcontexts' ? this.handleUploadAgcontexts : this.handleExempt() === 'metadata' ? this.handleUploadMetadata : this.handleNext}
                         className={classes.button}
                         disabled={this.state.error_message.length > 0 && this.state.activeStep !== this.state.steps.length - 1 && !this.handleExempt()}
                     >

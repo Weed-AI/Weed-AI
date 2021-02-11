@@ -17,6 +17,7 @@ from weedcoco.validation import validate, ValidationError
 from django.contrib.auth import login, logout
 from django.contrib.auth.hashers import check_password
 from django.http import HttpResponseForbidden, HttpResponseNotAllowed
+import traceback
 
 
 def elasticsearch_query(request):
@@ -48,6 +49,7 @@ def upload(request):
             except ValidationError as e:
                 return HttpResponseForbidden(str(e))
             except Exception:
+                traceback.print_exc()
                 return HttpResponseForbidden("There is something wrong with the file")
             else:
                 return HttpResponse(
@@ -111,7 +113,7 @@ def upload_metadata(request):
             )
             try:
                 add_metadata(weedcoco_path, metadata)
-                Dataset.objects.filter(upload_id=upload_id).update(metadata=[metadata])
+                Dataset.objects.filter(upload_id=upload_id).update(metadata=metadata)
             except Exception:
                 return HttpResponseNotAllowed("Failed to add Metadata")
             else:
@@ -178,8 +180,8 @@ def upload_info(request):
 def upload_list(request):
     upload_list = map(
         lambda queryEntity: {
-            "name": queryEntity.metadata["info"][0]["name"]
-            if "name" in queryEntity.metadata["info"][0]
+            "name": queryEntity.metadata["name"]
+            if "name" in queryEntity.metadata
             else "",
             "upload_id": queryEntity.upload_id,
             "upload_date": str(queryEntity.date),
