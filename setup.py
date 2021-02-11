@@ -34,6 +34,13 @@ setup(
     keywords=[""],
     python_requires=">=3.6",
     install_requires=requirements,
+    extras_require={
+        "test": [
+            "pytest==6.2.*",
+            "pytest-cov",
+            "elasticmock==1.7.*",
+        ]
+    },
     classifiers=[
         "Development Status :: 2 - Pre-Alpha",
         "Intended Audience :: Developers",
