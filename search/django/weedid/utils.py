@@ -1,9 +1,11 @@
 import os
+from shutil import rmtree
 import json
 from uuid import uuid4
 from weedcoco.repo.deposit import mkdir_safely
 from django.core.files.storage import FileSystemStorage
 from weedid.models import Dataset, WeedidUser
+from core.settings import UPLOAD_DIR, REPOSITORY_DIR, DOWNLOAD_DIR
 
 
 def store_tmp_image(image, image_dir):
@@ -55,3 +57,26 @@ def create_upload_entity(weedcoco_path, upload_id, upload_userid):
     upload_entity.save()
     upload_user.latest_upload = upload_entity
     upload_user.save()
+
+
+def remove_entity_local_record(user_id, upload_id):
+    upload_dir_record = os.path.join(UPLOAD_DIR, user_id, upload_id)
+    repository_dir_record = os.path.join(REPOSITORY_DIR, upload_id)
+    download_dir_record = os.path.join(DOWNLOAD_DIR, f"{upload_id}.zip")
+    for dir_path in [upload_dir_record, repository_dir_record, download_dir_record]:
+        if os.path.isdir(dir_path):
+            rmtree(dir_path, ignore_errors=True)
+        elif os.path.isfile(dir_path):
+            os.remove(dir_path)
+
+
+def retrieve_listing_info(query_entity):
+    """Retrieving info from specific upload entity"""
+    return {
+        "name": query_entity.metadata["info"][0]["name"]
+        if "name" in query_entity.metadata["info"][0]
+        else "",
+        "upload_id": query_entity.upload_id,
+        "upload_date": str(query_entity.date),
+        "contributor": query_entity.user.username,
+    }
