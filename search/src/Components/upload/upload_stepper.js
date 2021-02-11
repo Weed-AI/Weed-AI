@@ -50,7 +50,7 @@ function getStepContent(step, upload_type, upload_id, images, agcontextsFormData
                         handleErrorMessage("init")
                     }} />
                     <textarea style={{width: "100%", height: "5em"}} value={toJSON(agcontextsFormData)} ></textarea>
-                    <UploadJsonButton initialValue={formData} downloadName="agcontext" onClose={(value) => {handleAgContextsFormData(value)}} />
+                    <UploadJsonButton initialValue={agcontextsFormData} downloadName="agcontext" onClose={(value) => {handleAgContextsFormData(value)}} />
                 </React.Fragment>
               );
             case 2:
