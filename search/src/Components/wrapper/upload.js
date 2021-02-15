@@ -7,6 +7,8 @@ import FormControl from '@material-ui/core/FormControl';
 import Select from '@material-ui/core/Select';
 import axios from 'axios';
 import Button from '@material-ui/core/Button';
+import ReactMarkdown from "react-markdown";
+import content from './upload.md'
 
 
 const useStyles = (theme) => ({
@@ -92,6 +94,12 @@ class UploadComponent extends Component {
         })
     }
 
+    componentWillMount() {
+      fetch(content).then((response) => response.text()).then((text) => {
+        this.setState({ markdownContent: text })
+      })
+    }
+
     async componentDidMount(){
         const isLoggedIn = await this.retrieveLoginStatus()
         if(isLoggedIn){
@@ -104,8 +112,11 @@ class UploadComponent extends Component {
         const {classes} = this.props;
         return (
             <div className={classes.upload_container}>
+                <h1>Sign In and Upload</h1>
+                <p>We welcome new contributions of datasets of images with weeds already annotated.</p>
                 { this.state.isLoggedIn
                 ?
+                <React.Fragment>
                 <div>
                     <h2>Current upload status: {this.state.upload_status}</h2>
                     <p style={{color: "#f0983a"}}>{this.state.upload_status_details}</p>
@@ -113,13 +124,6 @@ class UploadComponent extends Component {
                         Log out
                     </Button>
                 </div>
-                :
-                <AuthPrompt handleLogin={this.handleLogin} handleLogout={this.handleLogout}/> }
-                <br />
-                <p>We welcome new contributions of datasets of images with weeds already annotated.</p>
-                <p>See <em>our guide</em> for collecting and annotating images.</p>
-                <p>We support several standard formats of upload, accompanied with detailed metadata.</p>
-                <br />
                 <div style={{ display: 'flex', alignItems: 'center' }}>
                     <FormControl className={classes.formControl}>
                         <Select
@@ -138,6 +142,11 @@ class UploadComponent extends Component {
                     </FormControl>
                     <UploadDialog handleUploadStatus={this.retrieveUploadStatus} upload_type={this.state.upload_type}/>
                 </div>
+                </React.Fragment>
+                :
+                <AuthPrompt handleLogin={this.handleLogin} handleLogout={this.handleLogout}/> }
+
+                <ReactMarkdown source={this.state.markdownContent} />
             </div>
         )
     }

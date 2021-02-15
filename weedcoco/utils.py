@@ -108,3 +108,19 @@ def lookup_growth_stage_name(idx, scheme):
     if scheme not in valid:
         raise ValueError(f"scheme must be one of {valid}. Got {scheme}")
     return _get_growth_stage_names()[scheme][idx]
+
+
+def get_task_types(annotations):
+    if not annotations:
+        return set()
+    if hasattr(annotations, "items"):
+        annotations = [annotations]
+    out = {"classification"}
+    for annotation in annotations:
+        if "segmentation" in annotation:
+            out.add("segmentation")
+            # FIXME: should we be assuming that one should turn segmentation into bbox?
+            out.add("bounding box")
+        if "bbox" in annotation:
+            out.add("bounding box")
+    return out
