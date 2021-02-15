@@ -8,6 +8,26 @@ import yaml
 import imagehash
 
 
+def set_info(coco, metadata):
+    info = coco.get("info", {}).copy()
+    info["metadata"] = metadata
+    info["description"] = metadata["name"]
+    try:
+        info["year"] = int(metadata["datePublished"][:4])
+    except Exception:
+        pass
+    coco["info"] = info
+
+
+def set_licenses(coco, metadata=None):
+    """Set the license for each image to be that from the metadata"""
+    if metadata is None:
+        metadata = coco["info"]["metadata"]
+    coco["licenses"] = [{"id": 0, "url": metadata["license"]}]
+    for image in coco["images"]:
+        image["license"] = 0
+
+
 def get_image_dimensions(path):
     """
     Function to measure image dimensions and calculate resolution.
@@ -42,16 +62,11 @@ def add_agcontext_from_file(coco, agcontext_path):
     return coco
 
 
-def add_collection_from_file(coco, collection_path):
-    """Make all annotations members of one collection loaded from YAML or JSON"""
-    collection = load_json_or_yaml(collection_path)
-    if "id" not in collection:
-        collection["id"] = 0
-    coco["collections"] = [collection]
-    coco["collection_memberships"] = [
-        {"annotation_id": annotation["id"], "collection_id": collection["id"]}
-        for annotation in coco["annotations"]
-    ]
+def add_metadata_from_file(coco, metadata_path):
+    """Load metadata from YAML or JSON to set info and licenses"""
+    metadata = load_json_or_yaml(metadata_path)
+    set_info(coco, metadata)
+    set_licenses(coco)
     return coco
 
 
@@ -93,3 +108,19 @@ def lookup_growth_stage_name(idx, scheme):
     if scheme not in valid:
         raise ValueError(f"scheme must be one of {valid}. Got {scheme}")
     return _get_growth_stage_names()[scheme][idx]
+
+
+def get_task_types(annotations):
+    if not annotations:
+        return set()
+    if hasattr(annotations, "items"):
+        annotations = [annotations]
+    out = {"classification"}
+    for annotation in annotations:
+        if "segmentation" in annotation:
+            out.add("segmentation")
+            # FIXME: should we be assuming that one should turn segmentation into bbox?
+            out.add("bounding box")
+        if "bbox" in annotation:
+            out.add("bounding box")
+    return out

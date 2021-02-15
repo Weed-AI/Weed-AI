@@ -3,10 +3,10 @@ import os
 import pathlib
 import json
 from elasticsearch import Elasticsearch, helpers
-from weedcoco.utils import lookup_growth_stage_name
+from weedcoco.utils import lookup_growth_stage_name, get_task_types
 
 
-class ElasticSearchIndex:
+class ElasticSearchIndexer:
 
     """
     Args:
@@ -30,17 +30,19 @@ class ElasticSearchIndex:
         es_host="localhost",
         es_port=9200,
         indexes=None,
+        upload_id="#",
     ):
-        self.weedcoco_path = weedcoco_path
-        self.thumbnail_dir = thumbnail_dir
+        self.weedcoco_path = pathlib.Path(weedcoco_path)
+        self.thumbnail_dir = pathlib.Path(thumbnail_dir)
         self.es_index_name = es_index_name
         self.es_type_name = es_type_name
         self.batch_size = batch_size
         hosts = [{"host": es_host, "port": es_port}]
         self.es_client = Elasticsearch(hosts=hosts)
         self.indexes = indexes if indexes is not None else {}
+        self.upload_id = upload_id
 
-    def modify_coco(self):
+    def generate_index_entries(self):
         """
         Create index entries for request to ElasticSearch
         """
@@ -53,8 +55,6 @@ class ElasticSearchIndex:
             coco = json.load(f)
         if "info" in coco:
             del coco["info"]
-        if "collection_memberships" in coco:
-            del coco["collection_memberships"]
 
         id_lookup = {}
         for key, objs in coco.items():
@@ -84,14 +84,14 @@ class ElasticSearchIndex:
             image = id_lookup["images", annotation["image_id"]]
             image.setdefault("annotations", []).append(annotation)
             annotation["category"] = id_lookup["categories", annotation["category_id"]]
-            # todo: add collection, license
+            # todo: add data from info, license?
             _flatten(annotation["category"], annotation, "category")
-            # todo: add collection from collection_memberships
             image["thumbnail"] = str(
                 self.thumbnail_dir
                 / os.path.basename(image["file_name"])[:2]
                 / os.path.basename(image["file_name"])
             )
+            image["upload_id"] = f"{self.upload_id}"
 
         for image in coco["images"]:
             try:
@@ -104,43 +104,32 @@ class ElasticSearchIndex:
             )  # for deterministic random order
             _flatten(image["agcontext"], image, "agcontext")
             # todo: add license
-            image["task_type"] = set()
             for annotation in image["annotations"]:
                 for k in annotation:
                     image.setdefault(f"annotation__{k}", []).append(annotation[k])
 
-                # determine available task types
-                image["task_type"].add("classification")
-                if "segmentation" in annotation:
-                    image["task_type"].add("segmentation")
-                    image["task_type"].add("bounding box")
-                if "bbox" in annotation:
-                    image["task_type"].add("bounding box")
-            image["task_type"] = sorted(image["task_type"])
-
-        self.indexes = coco
+            image["task_type"] = sorted(get_task_types(image["annotations"]))
+            yield image
 
     def generate_batches(self):
         """
         Split indexes into batches to reduce payload size of each request to ElasticSearch
         """
-        indexes = self.indexes
-        if "images" in indexes and len(indexes["images"]) > 0:
-            images = indexes["images"]
-            for start in range(0, len(images), self.batch_size):
-                blobs = []
-                batch = images[start : start + self.batch_size]
-                for image in batch:
-                    blobs.append(
-                        {
-                            "_index": self.es_index_name,
-                            "_type": self.es_type_name,
-                            "_source": image,
-                        }
-                    )
-                yield blobs
+        images = list(self.generate_index_entries())
+        for start in range(0, len(images), self.batch_size):
+            blobs = []
+            batch = images[start : start + self.batch_size]
+            for image in batch:
+                blobs.append(
+                    {
+                        "_index": self.es_index_name,
+                        "_type": self.es_type_name,
+                        "_source": image,
+                    }
+                )
+            yield blobs
 
-    def post_to_index(self):
+    def post_index_entries(self):
         """
         Send post request to ElasticSearch
         """
@@ -153,10 +142,9 @@ def main(args=None):
     ap.add_argument("--weedcoco-path", type=pathlib.Path, required=True)
     ap.add_argument("--thumbnail-dir", type=pathlib.Path, required=True)
     args = ap.parse_args(args)
-    return ElasticSearchIndex(args.weedcoco_path, args.thumbnail_dir)
+    return ElasticSearchIndexer(args.weedcoco_path, args.thumbnail_dir)
 
 
 if __name__ == "__main__":
     es_index = main()
-    es_index.modify_coco()
-    es_index.post_to_index()
+    es_index.post_index_entries()

@@ -9,7 +9,7 @@ from lxml import etree
 from weedcoco.validation import validate
 from weedcoco.utils import load_json_or_yaml
 from weedcoco.utils import add_agcontext_from_file
-from weedcoco.utils import add_collection_from_file
+from weedcoco.utils import add_metadata_from_file
 
 
 def generate_coco_annotations(
@@ -86,11 +86,7 @@ def voc_to_coco(
             )
         )
 
-    out = {
-        "images": images,
-        "annotations": annotations,
-        "info": {},
-    }
+    out = {"images": images, "annotations": annotations, "info": {}}
     if use_default_category_mapping:
         out["categories"] = [
             {"id": idx, "name": name} for name, idx in category_mapping.items()
@@ -109,7 +105,7 @@ def main(args=None):
         help="JSON or YAML mapping of VOC names to WeedCOCO category names",
     )
     ap.add_argument("--agcontext-path", type=Path)
-    ap.add_argument("--collection-path", type=Path)
+    ap.add_argument("--metadata-path", type=Path)
     ap.add_argument("--validate", action="store_true", default=False)
     ap.add_argument("-o", "--out-path", default="coco_from_voc.json", type=Path)
     args = ap.parse_args(args)
@@ -132,8 +128,8 @@ def main(args=None):
         coco["categories"] = categories
     if args.agcontext_path:
         add_agcontext_from_file(coco, args.agcontext_path)
-    if args.collection_path:
-        add_collection_from_file(coco, args.collection_path)
+    if args.metadata_path:
+        add_metadata_from_file(coco, args.metadata_path)
 
     if args.validate:
         validate(coco)

@@ -11,7 +11,7 @@ import datetime
 from tqdm import tqdm
 import os
 
-from weedcoco.utils import get_image_dimensions
+from weedcoco.utils import get_image_dimensions, set_info, set_licenses
 
 """Constants and environment"""
 
@@ -117,25 +117,6 @@ agcontext = [
     }
 ]
 
-license = [
-    {
-        "id": 0,
-        "license_name": "CC BY 4.0",
-        "license_fullname": "Creative Commons Attribution 4.0",
-        "license_version": "4.0",
-        "url": "https://creativecommons.org/licenses/by/4.0/",
-    }
-]
-info = [
-    {
-        "year": 2015,
-        "version": 1,
-        "description": "YAML annotations and PNG images converted into WeedCOCO",
-        "secondary_contributor": "Converted to WeedCOCO by Henry Lydecker",
-        "contributor": "Sebastian Haug",
-        "id": 0,
-    }
-]
 annotations = []
 images = []
 progress = tqdm(args.annotations_dir.glob("*_annotation.yaml"))
@@ -147,7 +128,6 @@ for ann_path in progress:
     image = {
         "id": image_id,
         "file_name": os.path.join(args.image_dir, ann_blob["filename"]),
-        "license": 0,  # TODO
         "agcontext_id": 0,
     }
     dims = get_image_dimensions(args.image_dir / ann_blob["filename"])
@@ -164,43 +144,31 @@ for ann_path in progress:
         create_annotations(ann_blob, image_id, starting_idx=starting_idx)
     )
 
-    collections = [
-        # TODO: DCMI conformance
-        {
-            "author": "Haug, Sebastian and Ostermann, Jörn",
-            "title": "A Crop/Weed Field Image Dataset for the Evaluation of Computer Vision Based Precision Agriculture Tasks",
-            "year": 2015,
-            "identifier": "doi:10.1007/978-3-319-16220-1_8",
-            "rights": "All data is subject to copyright and may only be used for non-commercial research. In case of use please cite our publication.",
-            "accrual_policy": "closed",
-            "id": 0,
-        }
-    ]
+metadata = {
+    "creator": [
+        {"name": "Sebastian Haug"},
+        {"name": "J\u00f6rn Ostermann"},
+    ],
+    "name": "A Crop/Weed Field Image Dataset for the Evaluation of Computer Vision Based Precision Agriculture Tasks",
+    "datePublished": "2015-03-15",
+    "identifier": ["doi:10.1007/978-3-319-16220-1_8"],
+    "license": "https://github.com/cwfid/dataset",
+    "citation": "Sebastian Haug, Jörn Ostermann: A Crop/Weed Field Image Dataset for the Evaluation of Computer Vision Based Precision Agriculture Tasks, CVPPP 2014 Workshop, ECCV 2014",
+}
 
-with args.split_path.open() as subset_file:
-    subsets = yaml.safe_load(subset_file)
+coco = {
+    "images": images,
+    "annotations": annotations,
+    "categories": categories,
+    "agcontexts": agcontext,
+}
+set_info(coco, metadata)
+set_licenses(coco)
 
-    # TODO: iterate over value key pairs and create individual collection membership per image.
-    # TODO: refer to all annotations associated with an image?
-    collection_memberships = []
-    for train_or_test, image_ids in subsets.items():
-        for image_id in image_ids:
-            collection_memberships.append(
-                {"image_id": image_id, "subset": train_or_test, "collection_id": 0}
-            )
 """Write output"""
 with args.out_path.open("w") as fout:
     json.dump(
-        {
-            "images": images,
-            "annotations": annotations,
-            "categories": categories,
-            "info": info,
-            "license": license,
-            "agcontexts": agcontext,
-            "collections": collections,
-            "collection_memberships": collection_memberships,
-        },
+        coco,
         fout,
         indent=4,
     )

@@ -13,7 +13,7 @@ from weedcoco.validation import validate
 from weedcoco.utils import load_json_or_yaml
 from weedcoco.utils import get_image_dimensions
 from weedcoco.utils import add_agcontext_from_file
-from weedcoco.utils import add_collection_from_file
+from weedcoco.utils import add_metadata_from_file
 
 
 def generate_segmentations(mask_path, color_map, colors_not_found):
@@ -197,7 +197,7 @@ def main(args=None):
         ),
     )
     ap.add_argument("--agcontext-path", type=Path)
-    ap.add_argument("--collection-path", type=Path)
+    ap.add_argument("--metadata-path", type=Path)
     ap.add_argument("--validate", action="store_true", default=False)
     ap.add_argument("-o", "--out-path", default="coco_from_mask.json", type=Path)
     args = ap.parse_args(args)
@@ -212,8 +212,8 @@ def main(args=None):
 
     if args.agcontext_path:
         add_agcontext_from_file(coco, args.agcontext_path)
-    if args.collection_path:
-        add_collection_from_file(coco, args.collection_path)
+    if args.metadata_path:
+        add_metadata_from_file(coco, args.metadata_path)
 
     if args.validate:
         validate(coco)

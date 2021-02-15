@@ -5,10 +5,20 @@ api_urlpatterns = [
     path("upload/", views.upload, name="upload"),
     path("upload_image/", views.upload_image, name="upload_image"),
     path("upload_agcontexts/", views.upload_agcontexts, name="upload_agcontexts"),
+    path("upload_metadata/", views.upload_metadata, name="upload_metadata"),
     path("submit_deposit/", views.submit_deposit, name="submit_deposit"),
     path("upload_status/", views.upload_status, name="upload_status"),
     path("upload_info/", views.upload_info, name="upload_info"),
     path("upload_list/", views.upload_list, name="upload_list"),
+    path("awaiting_list/", views.awaiting_list, name="awaiting_list"),
+    path(
+        "dataset_approve/<str:dataset_id>",
+        views.dataset_approve,
+        name="dataset_approve",
+    ),
+    path(
+        "dataset_reject/<str:dataset_id>", views.dataset_reject, name="dataset_reject"
+    ),
     path("register/", views.user_register, name="user_register"),
     path("login/", views.user_login, name="user_login"),
     path("logout/", views.user_logout, name="user_logout"),
