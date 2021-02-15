@@ -2,6 +2,7 @@
 # Clean refresh of ES data and thumbnails given path to RDS
 # For use by the project team at the University of Sydney
 
+# XXX: This file is now out of date.
 # TODO: make elastic index name configurable and/or use index aliases to make the change atomic
 # TODO: handle demo mode, e.g. to export random 10 images from each dataset
 

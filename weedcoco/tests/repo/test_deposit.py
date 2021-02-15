@@ -5,6 +5,7 @@ import os
 import filecmp
 import re
 import subprocess
+import shutil
 from weedcoco.repo.deposit import main
 from weedcoco.validation import ValidationError
 
@@ -58,6 +59,7 @@ def assert_files_equal(dir1, dir2):
     for filename in mismatch:
         print(f"Differences in {filename}")
         subprocess.run(["diff", f"{dir1}/{filename}", f"{dir2}/{filename}"])
+        print("Is rerunning pytest with --rewrite-deposit-truth appropriate?")
     assert len(mismatch) == 0
     assert len(errors) == 0
     for common_dir in dirs_cmp.common_dirs:
@@ -74,10 +76,17 @@ def assert_weedcoco_equal(dir1, dir2):
             )
 
 
-def test_basic(executor):
+def rewrite_outputs(actual_dir, expected_dir):
+    shutil.rmtree(expected_dir)
+    shutil.copytree(actual_dir, expected_dir, symlinks=True)
+
+
+def test_basic(executor, rewrite_deposit_truth):
     test_repo_dir = executor.run(
         TEST_BASIC_DIR_1 / "weedcoco.json", TEST_BASIC_DIR_1 / "images"
     )
+    if rewrite_deposit_truth:
+        rewrite_outputs(test_repo_dir, TEST_DATA_SAMPLE_DIR / "basic")
     assert_files_equal(test_repo_dir, TEST_DATA_SAMPLE_DIR / "basic")
     assert_weedcoco_equal(test_repo_dir, TEST_DATA_SAMPLE_DIR / "basic")
 
@@ -99,10 +108,12 @@ def test_existing_images(executor):
         executor.run(TEST_BASIC_DIR_1 / "weedcoco.json", TEST_BASIC_DIR_1 / "images")
 
 
-def test_multiple_collections(executor):
+def test_multiple_datasets(executor, rewrite_deposit_truth):
     executor.run(TEST_BASIC_DIR_1 / "weedcoco.json", TEST_BASIC_DIR_1 / "images")
     test_repo_dir = executor.run(
         TEST_BASIC_DIR_2 / "weedcoco.json", TEST_BASIC_DIR_2 / "images"
     )
+    if rewrite_deposit_truth:
+        rewrite_outputs(test_repo_dir, TEST_DATA_SAMPLE_DIR / "multiple")
     assert_files_equal(test_repo_dir, TEST_DATA_SAMPLE_DIR / "multiple")
     assert_weedcoco_equal(test_repo_dir, TEST_DATA_SAMPLE_DIR / "multiple")
