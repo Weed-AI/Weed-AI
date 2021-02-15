@@ -1,5 +1,7 @@
 # Spec Overview
 
+Some aspects of this are now outdated.
+
 ## Summary
 
 To support an open weed image recognition database, we have worked on adapting existing image annotation standards to meet the specific needs of our use case. 
