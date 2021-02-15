@@ -3,6 +3,7 @@ from shutil import rmtree
 import json
 from uuid import uuid4
 from weedcoco.repo.deposit import mkdir_safely
+from weedcoco.stats import WeedCOCOStats
 from django.core.files.storage import FileSystemStorage
 from weedid.models import Dataset, WeedidUser
 from core.settings import UPLOAD_DIR, REPOSITORY_DIR, DOWNLOAD_DIR
@@ -39,21 +40,47 @@ def add_agcontexts(weedcoco_path, ag_contexts):
         json.dump(data, jsonFile)
 
 
+def make_upload_entity_fields(weedcoco):
+    category_to_name = {
+        category["id"]: category["name"] for category in weedcoco["categories"]
+    }
+
+    stats = WeedCOCOStats(weedcoco)
+    stats_with_cat_name = stats.category_summary.rename(
+        index=category_to_name, level="category_id"
+    )
+    cat_counts_by_agcontext = dict(
+        iter(stats_with_cat_name.groupby(level="agcontext_id"))
+    )
+    for agcontext in weedcoco["agcontexts"]:
+        agcontext["n_images"] = int(
+            stats.agcontext_summary.loc[agcontext["id"]].image_count
+        )
+
+        # Should produce something like:
+        # {"crop: daugus carota": {"image_count": 1, "annotation_count": 1, "bounding_box_count": 1, "segmentation_count": 1}}
+        # XXX: we use json.loads and to_json instead of to_dict, since to_dict
+        #      was returning numpy.int64 numbers that could not be serialised.
+        agcontext["category_statistics"] = json.loads(
+            cat_counts_by_agcontext[agcontext["id"]]
+            .droplevel("agcontext_id")
+            .to_json(orient="index")
+        )
+
+    return {
+        "agcontext": weedcoco["agcontexts"],
+        "metadata": weedcoco["info"]["metadata"],
+    }
+
+
 def create_upload_entity(weedcoco_path, upload_id, upload_userid):
     upload_user = WeedidUser.objects.get(id=upload_userid)
+
     with open(weedcoco_path) as f:
         weedcoco_json = json.load(f)
-    upload_entity = Dataset(
-        upload_id=upload_id,
-        agcontext=weedcoco_json["agcontexts"],
-        user=upload_user,
-        status="N",
-        metadata={
-            "info": weedcoco_json["info"],
-            "license": weedcoco_json["license"],
-            "collections": weedcoco_json["collections"],
-        },
-    )
+    fields = make_upload_entity_fields(weedcoco_json)
+
+    upload_entity = Dataset(upload_id=upload_id, user=upload_user, status="N", **fields)
     upload_entity.save()
     upload_user.latest_upload = upload_entity
     upload_user.save()
