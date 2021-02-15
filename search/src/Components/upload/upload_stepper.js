@@ -236,7 +236,7 @@ class UploadStepper extends React.Component {
         })
         .catch(err => {
             console.log(err)
-            this.handleErrorMessage("Invalid input for Metadata")
+            this.handleErrorMessage("Failed to submit metadata")
         })
     }
 
