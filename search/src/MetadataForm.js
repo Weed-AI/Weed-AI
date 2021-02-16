@@ -8,6 +8,8 @@ import {
   materialRenderers,
 } from '@jsonforms/material-renderers';
 import { JsonForms } from '@jsonforms/react';
+import UploadJsonButton from './Components/ui/UploadJsonButton';
+
 
 const uischema = {
     "type": "Categorization",
