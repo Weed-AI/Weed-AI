@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { withRouter } from 'react-router-dom';
-import agcontextSchema from './Schemas/AgContext.json'
+import agcontextSchema from '../../Schemas/AgContext.json'
 import Container from '@material-ui/core/Container';
 import Box from '@material-ui/core/Box';
 import {
@@ -8,9 +8,9 @@ import {
   materialRenderers,
 } from '@jsonforms/material-renderers';
 import { JsonForms } from '@jsonforms/react';
-import { fixedItemsTester, FixedItemsRenderer } from './Components/formRenderers/FixedItemsRenderer';
-import { constTester, ConstRenderer } from './Components/formRenderers/ConstRenderer';
-import UploadJsonButton from './Components/forms/UploadJsonButton';
+import { fixedItemsTester, FixedItemsRenderer } from '../formRenderers/FixedItemsRenderer';
+import { constTester, ConstRenderer } from '../formRenderers/ConstRenderer';
+import UploadJsonButton from './UploadJsonButton';
 
 const uischema = {
   "type": "Categorization",

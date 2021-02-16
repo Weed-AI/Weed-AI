@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { withRouter } from 'react-router-dom';
-import schema from './Schemas/Metadata.json'
+import schema from '../../Schemas/Metadata.json'
 import Container from '@material-ui/core/Container';
 import Box from '@material-ui/core/Box';
 import {
@@ -8,7 +8,7 @@ import {
   materialRenderers,
 } from '@jsonforms/material-renderers';
 import { JsonForms } from '@jsonforms/react';
-import UploadJsonButton from './Components/ui/UploadJsonButton';
+import UploadJsonButton from './UploadJsonButton';
 
 
 const uischema = {
