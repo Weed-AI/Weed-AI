@@ -9,7 +9,7 @@ import UploaderSingle from './uploader_single';
 import UploaderImages from './uploader_images';
 import AgContextForm from '../../AgContextForm';
 import UploadJsonButton from '../ui/UploadJsonButton';
-import MetadataForm, {handleSaveToPC as saveMetadataToPC} from '../../MetadataForm';
+import MetadataForm, {handleSaveToPC as saveMetadataToPC, toJSON} from '../../MetadataForm';
 import axios from 'axios';
 import Cookies from 'js-cookie';
 
@@ -49,7 +49,7 @@ function getStepContent(step, upload_type, upload_id, images, agcontextsFormData
                         handleAgContextsFormData(e.formData)
                         handleErrorMessage("init")
                     }} />
-                    <UploadJsonButton initialValue={formData} downloadName="agcontext" onClose={(value) => {handleFormData(value)}} />
+                    <UploadJsonButton initialValue={agcontextsFormData} downloadName="agcontext" onClose={(value) => {handleAgContextsFormData(value)}} />
                 </React.Fragment>
               );
             case 2:
