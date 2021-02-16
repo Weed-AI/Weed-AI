@@ -9,7 +9,7 @@ import UploaderSingle from './uploader_single';
 import UploaderImages from './uploader_images';
 import AgContextForm from '../forms/AgContextForm';
 import UploadJsonButton from '../forms/UploadJsonButton';
-import MetadataForm, {handleSaveToPC as saveMetadataToPC, toJSON} from '../forms/MetadataForm';
+import MetadataForm from '../forms/MetadataForm';
 import axios from 'axios';
 import Cookies from 'js-cookie';
 
@@ -59,10 +59,7 @@ function getStepContent(step, upload_type, upload_id, images, agcontextsFormData
                         handleMetadataFormData(e.formData)
                         handleErrorMessage("init")
                     }} />
-                    <textarea style={{width: "100%", height: "5em"}} value={toJSON(metadataFormData)} ></textarea>
-                    <React.Fragment>
-                        <button onClick={e => saveMetadataToPC(metadataFormData)}>Download</button>
-                    </React.Fragment>
+                    <UploadJsonButton initialValue={metadataFormData} downloadName="dataset-meta" onClose={(value) => {handleMetadataFormData(value)}} />
                 </React.Fragment>
               );
             case 3:
