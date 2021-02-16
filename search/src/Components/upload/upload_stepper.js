@@ -47,7 +47,7 @@ function getStepContent(step, upload_type, upload_id, images, formData, handleUp
                         handleFormData(e.formData)
                         handleErrorMessage("init")
                     }} />
-                    <UploadJsonButton initialValue={formData} downloadName="agcontext" onClose={(value) => {handleFormData(value)}} />
+                    <UploadJsonButton initialValue={agcontextsFormData} downloadName="agcontext" onClose={(value) => {handleAgContextsFormData(value)}} />
                 </React.Fragment>
               );
             case 2:
