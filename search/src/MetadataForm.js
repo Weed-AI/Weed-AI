@@ -126,11 +126,7 @@ class StandaloneEditor extends Component {
                 <Box boxShadow={3} px={2} py={1} my={2}>
                     <MetadataForm formData={this.state.formData} onChange={e => this.setState({formData: e.formData})} />
                 </Box>
-                <Box boxShadow={3} px={2} py={1} my={2}>
-                    <label>JSON representation of Metadata</label>
-                    <textarea readOnly={true} style={{width: "100%", height: "5em"}} value={toJSON(this.state.formData)} / >
-                    <button onClick={e => handleSaveToPC(this.state.formData)}>Download</button>
-                </Box>
+                <UploadJsonButton initialValue={this.state.formData} downloadName="dataset-meta" onClose={(value) => {this.setState({formData: value})}} />
             </Container>
         );
     }
