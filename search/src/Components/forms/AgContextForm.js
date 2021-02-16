@@ -10,7 +10,7 @@ import {
 import { JsonForms } from '@jsonforms/react';
 import { fixedItemsTester, FixedItemsRenderer } from './Components/formRenderers/FixedItemsRenderer';
 import { constTester, ConstRenderer } from './Components/formRenderers/ConstRenderer';
-import UploadJsonButton from './Components/ui/UploadJsonButton';
+import UploadJsonButton from './Components/forms/UploadJsonButton';
 
 const uischema = {
   "type": "Categorization",

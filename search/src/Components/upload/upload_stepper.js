@@ -7,9 +7,9 @@ import Button from '@material-ui/core/Button';
 import Typography from '@material-ui/core/Typography';
 import UploaderSingle from './uploader_single';
 import UploaderImages from './uploader_images';
-import AgContextForm from '../../AgContextForm';
-import UploadJsonButton from '../ui/UploadJsonButton';
-import MetadataForm, {handleSaveToPC as saveMetadataToPC, toJSON} from '../../MetadataForm';
+import AgContextForm from '../forms/AgContextForm';
+import UploadJsonButton from '../forms/UploadJsonButton';
+import MetadataForm, {handleSaveToPC as saveMetadataToPC, toJSON} from '../forms/MetadataForm';
 import axios from 'axios';
 import Cookies from 'js-cookie';
 
