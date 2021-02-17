@@ -122,7 +122,7 @@ class UploadStepper extends React.Component {
         this.handleUploadAgcontexts = this.handleUploadAgcontexts.bind(this);
         this.handleUploadMetadata = this.handleUploadMetadata.bind(this)
         this.handleSubmit = this.handleSubmit.bind(this);
-        this.handleExempt = this.handleExempt.bind(this);
+        this.isNextEnabled = this.isNextEnabled.bind(this);
         this.handleValidation = this.handleValidation.bind(this);
     }
 
@@ -256,7 +256,7 @@ class UploadStepper extends React.Component {
         })
     }
 
-    handleExempt(){
+    isNextEnabled(){
         if (this.state.activeStep === 1) {
             return this.props.upload_type === 'coco' && this.state.coco_form_validation['agcontexts'] && 'agcontexts'
         } else if (this.state.activeStep === 2) {
@@ -312,9 +312,9 @@ class UploadStepper extends React.Component {
                     <Button
                         variant="contained"
                         color="primary"
-                        onClick={this.handleExempt() === 'agcontexts' ? this.handleUploadAgcontexts : this.handleExempt() === 'metadata' ? this.handleUploadMetadata : this.handleNext}
+                        onClick={this.isNextEnabled() === 'agcontexts' ? this.handleUploadAgcontexts : this.isNextEnabled() === 'metadata' ? this.handleUploadMetadata : this.handleNext}
                         className={classes.button}
-                        disabled={this.state.error_message.length > 0 && this.state.activeStep !== this.state.steps.length - 1 && !this.handleExempt()}
+                        disabled={this.state.error_message.length > 0 && this.state.activeStep !== this.state.steps.length - 1 && !this.isNextEnabled()}
                     >
                         {this.state.activeStep === this.state.steps.length - 1 ? 'Submit' : 'Next'}
                     </Button>
