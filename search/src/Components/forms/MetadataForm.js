@@ -104,6 +104,13 @@ class MetadataForm extends Component {
               renderers={renderers}
               cells={materialCells}
               onChange={e => {
+                  if (this.props.handleCocoFormValidation){
+                    if (e.errors.length === 0) {
+                        this.props.handleCocoFormValidation('metadata', true);
+                    } else {
+                        this.props.handleCocoFormValidation('metadata', false);
+                    }
+                  }
                   this.setState({formData: e.data});
                   if (this.props.onChange) {
                       e.formData = e.data;
