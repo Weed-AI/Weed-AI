@@ -37,7 +37,7 @@ function getSteps(upload_type) {
          ['Upload Coco', 'Add Agcontext', 'Add Metadata', 'Upload Images']
 }
 
-function getStepContent(step, upload_type, upload_id, images, agcontextsFormData, metadataFormData, handleUploadId, handleImages, handleAgContextsFormData, handleMetadataFormData, handleErrorMessage, handleCocoFormValidation) {
+function getStepContent(step, upload_type, upload_id, images, agcontextsFormData, metadataFormData, handleUploadId, handleImages, handleAgContextsFormData, handleMetadataFormData, handleErrorMessage, handleValidation) {
     if (upload_type === 'coco') {
         switch (step) {
             case 0:
@@ -45,7 +45,7 @@ function getStepContent(step, upload_type, upload_id, images, agcontextsFormData
             case 1:
               return (
                 <React.Fragment>
-                    <AgContextForm formData={agcontextsFormData} handleCocoFormValidation={handleCocoFormValidation} onChange={e => {
+                    <AgContextForm formData={agcontextsFormData} handleValidation={handleValidation} onChange={e => {
                         handleAgContextsFormData(e.formData)
                         handleErrorMessage("init")
                     }} />
@@ -55,7 +55,7 @@ function getStepContent(step, upload_type, upload_id, images, agcontextsFormData
             case 2:
               return (
                 <React.Fragment>
-                    <MetadataForm formData={metadataFormData} handleCocoFormValidation={handleCocoFormValidation} onChange={e => {
+                    <MetadataForm formData={metadataFormData} handleValidation={handleValidation} onChange={e => {
                         handleMetadataFormData(e.formData)
                         handleErrorMessage("init")
                     }} />
@@ -123,7 +123,7 @@ class UploadStepper extends React.Component {
         this.handleUploadMetadata = this.handleUploadMetadata.bind(this)
         this.handleSubmit = this.handleSubmit.bind(this);
         this.handleExempt = this.handleExempt.bind(this);
-        this.handleCocoFormValidation = this.handleCocoFormValidation.bind(this);
+        this.handleValidation = this.handleValidation.bind(this);
     }
 
     isStepOptional(step, upload_type) {
@@ -248,11 +248,10 @@ class UploadStepper extends React.Component {
         })
     }
 
-    handleCocoFormValidation(formKey, status){
+    handleValidation(formKey, status){
         this.setState(prevState => {
             const newState = {coco_form_validation: {...prevState.coco_form_validation}}
             newState.coco_form_validation[formKey] = status
-            console.log(newState)
             return newState
         })
     }
@@ -290,7 +289,7 @@ class UploadStepper extends React.Component {
             </Stepper>
             <div>
                 <Typography className={classes.instructions}>
-                    {getStepContent(this.state.activeStep, this.props.upload_type, this.state.upload_id, this.state.images, this.state.ag_context, this.state.metadata, this.handleUploadId, this.handleImages, this.handleAgContextsFormData, this.handleMetadataFormData, this.handleErrorMessage, this.handleCocoFormValidation)}
+                    {getStepContent(this.state.activeStep, this.props.upload_type, this.state.upload_id, this.state.images, this.state.ag_context, this.state.metadata, this.handleUploadId, this.handleImages, this.handleAgContextsFormData, this.handleMetadataFormData, this.handleErrorMessage, this.handleValidation)}
                 </Typography>
                 {this.state.error_message.length > 0 && this.state.error_message !== 'init' ? <p style={{color: 'red', float: 'right', marginTop: '0.5em'}}>{this.state.error_message}</p> : ""}
                 <div>
