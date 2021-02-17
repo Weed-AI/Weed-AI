@@ -27,8 +27,6 @@ const useStyles = makeStyles((theme) => ({
     fontSize: '1.8rem',
     fontWeight: 700,
     color: "white",
-    "-webkit-text-stroke-width": ".5px",
-    "-webkit-text-stroke-color": "black",
   }
 }));
 
