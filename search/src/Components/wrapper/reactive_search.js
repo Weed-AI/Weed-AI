@@ -157,7 +157,7 @@ class ReactiveSearchComponent extends Component {
                     />
                 </div>
                 <div style={{ position: "absolute", left: "20rem", paddingRight: "1rem" }}>
-                    <SelectedFilters />
+                    <SelectedFilters clearAllLabel="Clear filters" />
                     <ReactiveList
                         componentId="result"
                         dataField="results"
