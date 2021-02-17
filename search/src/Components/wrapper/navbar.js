@@ -11,6 +11,7 @@ import UploadComponent from './upload';
 import DatasetComponent from './datasets';
 import WeedCOCOComponent from './weedcoco';
 import AboutComponent from './about';
+import PrivacyComponent from './privacy';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -26,6 +27,11 @@ const useStyles = makeStyles((theme) => ({
     top: '0.2em',
     fontSize: '1.8rem',
     fontWeight: 700
+  },
+  footer: {
+    backgroundColor: theme.palette.primary.main,
+    textAlign: "center",
+    padding: '.2em',
   }
 }));
 
@@ -54,7 +60,7 @@ const StyledTab = withStyles((theme) => ({
       opacity: 1
     },
   },
-  selected: {}
+  selected: {},
 }))((props) => <Tab component="a" disableRipple {...props} />);
 
 export default function NavbarComponent(props) {
@@ -71,7 +77,7 @@ export default function NavbarComponent(props) {
   };
 
   return (
-    <div className={classes.root}>
+    <main className={classes.root}>
       <AppBar position="fixed">
         <StyledTabs onChange={handleChange} value={selectedTab}>
           <StyledTab value="explore" href="/explore" label="Explore" />
@@ -98,7 +104,20 @@ export default function NavbarComponent(props) {
       {
         selectedTab === "about" && <AboutComponent />
       }
+      {
+        selectedTab === "privacy" && <PrivacyComponent />
+      }
       </div>
-    </div>
+      <footer className={classes.root}>
+        <Box pt={4}>
+          <footer className={classes.footer}>
+            <Typography variant='caption'>
+              <p>Site Copyright &copy; 2021 The University of Sydney. <a href="https://github.com/Sydney-Informatics-Hub/Weed-ID-Interchange/">Contribute on GitHub</a> (MIT Licensed). See our <a href="/privacy">Privacy Policy</a>.</p>
+              <p>Images and annotations are licensed under <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>. See <a href="/datasets">Dataset</a> pages for attribution.</p>
+            </Typography>
+          </footer>
+        </Box>
+      </footer>
+    </main>
   );
 }
