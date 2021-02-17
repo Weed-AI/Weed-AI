@@ -20,7 +20,6 @@ AGCONTEXT = {
     "cropped_to_plant": False,
     "id": 0,
     "lighting": "artificial",
-    "location_datum": 4326,
     "location_lat": 90,
     "location_long": 90,
     "photography_description": "foobar",
