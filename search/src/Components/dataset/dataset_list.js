@@ -100,7 +100,7 @@ export default function DatasetList(props) {
                 <TableCell>Pasture</TableCell>
                 <TableCell></TableCell>
                 <TableCell>{row.contributor}</TableCell>
-                {inReview ? <TableCell>{row.contributor_email}</TableCell> : ""}
+                {inReview ? <TableCell><a href="mailto:{row.contributor_email}">{row.contributor_email}</a></TableCell> : ""}
                 <TableCell>{row.upload_date}</TableCell>
                 {inReview
                   ?<TableCell className={classes.commandCol}>
