@@ -25,6 +25,7 @@ class AboutComponent extends Component {
   render() {
     return (
       <article className={this.props.classes.page}>
+		<img src="/weedai-logo-small.png" title="Weed-AI" alt="Weed-AI logo" style={{float: "right"}} />
         <ReactMarkdown source={this.state.markdownContent} />
       </article>
     );
