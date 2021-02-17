@@ -18,6 +18,11 @@ export default function UploadJsonButton({ onClose, initialValue, downloadName }
   const [errors, setErrors] = React.useState([]);
   const textAreaRef = React.createRef();
 
+  React.useEffect(() => {
+    setValue(initialValue);
+    setJsonValue(toJSON(initialValue));
+  }, [initialValue])
+
   const changeJsonValue = (jsonValue) => {
     setJsonValue(jsonValue);
     try {

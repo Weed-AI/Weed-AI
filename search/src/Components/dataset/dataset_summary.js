@@ -117,7 +117,7 @@ const AgContextDetails = (props) => {
 }
 
 export const DatasetSummary = (props) => {
-    const {metadata, agcontexts, classes, rootURL} = props;
+    const {metadata, agcontexts, classes, rootURL, upload_id} = props;
     return (
       <React.Fragment>
         <script type="application/ld+json">
@@ -159,7 +159,7 @@ export const DatasetSummary = (props) => {
           </Grid>
           <Grid item xs={2}>
             <div className={classes.summary}>
-                <Button className={classes.download} onClick={() => window.open(`${rootURL}/code/download/${props.upload_id}.zip`)}>Download in WeedCOCO format</Button>
+                <Button className={classes.download} onClick={() => window.open(`${rootURL}/code/download/${upload_id}.zip`)}>Download in WeedCOCO format</Button>
             </div>
           </Grid>
         </Grid>
@@ -210,7 +210,7 @@ class DatasetSummaryPage extends Component {
     const esURL = new URL(window.location.origin)
     return (
       <div className={classes.root}>
-        <DatasetSummary metadata={this.state.metadata} agcontexts={this.state.agcontexts} classes={classes} rootURL={esURL} />
+        <DatasetSummary metadata={this.state.metadata} agcontexts={this.state.agcontexts} classes={classes} rootURL={esURL} upload_id={this.props.upload_id} />
       </div>
     );
   }
