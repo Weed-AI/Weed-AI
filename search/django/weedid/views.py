@@ -161,22 +161,22 @@ def upload_info(request):
 
 
 def upload_list(request):
-    upload_list = map(
-        retrieve_listing_info,
-        Dataset.objects.filter(status="C"),
-    )
-    return HttpResponse(json.dumps(list(upload_list)))
+    upload_list = [
+        retrieve_listing_info(dataset, awaiting_review=False)
+        for dataset in Dataset.objects.filter(status="C")
+    ]
+    return HttpResponse(json.dumps(upload_list))
 
 
 def awaiting_list(request):
     user = request.user
     if not (user and user.is_authenticated and user.is_staff):
         return HttpResponseForbidden("You dont have access to proceed")
-    awaiting_list = map(
-        retrieve_listing_info,
-        Dataset.objects.filter(status="AR"),
-    )
-    return HttpResponse(json.dumps(list(awaiting_list)))
+    awaiting_list = [
+        retrieve_listing_info(dataset, awaiting_review=True)
+        for dataset in Dataset.objects.filter(status="AR")
+    ]
+    return HttpResponse(json.dumps(awaiting_list))
 
 
 def dataset_approve(request, dataset_id):
