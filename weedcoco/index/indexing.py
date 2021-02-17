@@ -2,6 +2,7 @@ import argparse
 import os
 import pathlib
 import json
+import sys
 from elasticsearch import Elasticsearch, helpers
 from weedcoco.utils import lookup_growth_stage_name, get_task_types
 
@@ -18,6 +19,7 @@ class ElasticSearchIndexer:
         es_host (string): ElasticSearch server host to send request
         es_port (int): ElasticSearch server port to send request
         indexes (dict): base file to build index json file
+        dry_run (bool): when True, ignore elastic server and print to stdout
     """
 
     def __init__(
@@ -31,6 +33,7 @@ class ElasticSearchIndexer:
         es_port=9200,
         indexes=None,
         upload_id="#",
+        dry_run=False,
     ):
         self.weedcoco_path = pathlib.Path(weedcoco_path)
         self.thumbnail_dir = pathlib.Path(thumbnail_dir)
@@ -38,7 +41,10 @@ class ElasticSearchIndexer:
         self.es_type_name = es_type_name
         self.batch_size = batch_size
         hosts = [{"host": es_host, "port": es_port}]
-        self.es_client = Elasticsearch(hosts=hosts)
+        if dry_run:
+            self.es_client = sys.stdout
+        else:
+            self.es_client = Elasticsearch(hosts=hosts)
         self.indexes = indexes if indexes is not None else {}
         self.upload_id = upload_id
 
@@ -134,15 +140,27 @@ class ElasticSearchIndexer:
         Send post request to ElasticSearch
         """
         for index_batch in self.generate_batches():
-            helpers.bulk(self.es_client, index_batch)
+            if hasattr(self.es_client, "bulk"):
+                helpers.bulk(self.es_client, index_batch)
+            else:
+                # a file for dry run
+                self.es_client.write(json.dumps(index_batch, indent=2))
 
 
 def main(args=None):
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--weedcoco-path", type=pathlib.Path, required=True)
     ap.add_argument("--thumbnail-dir", type=pathlib.Path, required=True)
+    ap.add_argument(
+        "--dry-run",
+        action="store_true",
+        default=False,
+        help="When set, index entries will be printed to stdout instead of the Elastic server.",
+    )
     args = ap.parse_args(args)
-    return ElasticSearchIndexer(args.weedcoco_path, args.thumbnail_dir)
+    return ElasticSearchIndexer(
+        args.weedcoco_path, args.thumbnail_dir, dry_run=args.dry_run
+    )
 
 
 if __name__ == "__main__":
