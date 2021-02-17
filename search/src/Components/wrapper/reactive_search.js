@@ -29,7 +29,12 @@ const theme = {
 const WeedAIResultCard = (props) => {
   const {item, datasetNames, baseURL} = props;
   const formatCropType = (typ) => {
-    return typ == "other" ? "unspecified crop type" : typ;
+    return typ == "other" ? "other crop type" : typ;
+  }
+  const formatGrowthRange = (item) => {
+    if (item.agcontext__growth_stage_min_text == item.agcontext__growth_stage_max_text)
+      return item.agcontext__growth_stage_min_text;
+    return item.agcontext__growth_stage_min_text + " to " + item.agcontext__growth_stage_max_text;
   }
   return (
     <ResultCard>
@@ -46,7 +51,7 @@ const WeedAIResultCard = (props) => {
                 })
             }
             </ul>
-            {" in " + item.agcontext__growth_stage_texts + " " + formatCropType(item.agcontext__crop_type)}
+            {" in " + formatCropType(item.agcontext__crop_type) + (item.agcontext__bbch_growth_range == "na" ? "" : " (" + formatGrowthRange(item) + ")") + "."}
           <div><a title={item.upload_id in datasetNames ? datasetNames[item.upload_id] : ""} href={`${baseURL}datasets/${item.upload_id}`}>See Dataset</a></div>
         </ResultCard.Description>
     </ResultCard>
@@ -263,6 +268,8 @@ export const TestWeedAIResultCard = () => {
           "lighting": "natural",
           "cropped_to_plant": false,
           "url": "https://github.com/cwfid/dataset",
+          "growth_stage_min_text": "Seedling",
+          "growth_stage_max_text": "Tillering",
           "growth_stage_texts": [
             "Seedling",
             "Tillering"
@@ -294,6 +301,8 @@ export const TestWeedAIResultCard = () => {
         "agcontext__lighting": "natural",
         "agcontext__cropped_to_plant": false,
         "agcontext__url": "https://github.com/cwfid/dataset",
+        "agcontext__growth_stage_min_text": "Seedling",
+        "agcontext__growth_stage_max_text": "Tillering",
         "agcontext__growth_stage_texts": [
           "Seedling",
           "Tillering"
