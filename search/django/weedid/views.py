@@ -12,6 +12,7 @@ from weedid.utils import (
     retrieve_listing_info,
     remove_entity_local_record,
     add_agcontexts,
+    add_metadata,
 )
 from weedid.models import Dataset, WeedidUser
 from weedcoco.validation import validate, ValidationError
@@ -87,6 +88,30 @@ def upload_agcontexts(request):
         return HttpResponse(
             f"Updated AgContexts for user {user.id}'s upload{upload_id}"
         )
+
+
+def upload_metadata(request):
+    if request.method == "POST":
+        user = request.user
+        if user and user.is_authenticated:
+            data = json.loads(request.body)
+            upload_id, metadata = data["upload_id"], data["metadata"]
+            weedcoco_path = os.path.join(
+                UPLOAD_DIR, str(user.id), str(upload_id), "weedcoco.json"
+            )
+            try:
+                add_metadata(weedcoco_path, metadata)
+                Dataset.objects.filter(upload_id=upload_id).update(metadata=metadata)
+            except Exception:
+                return HttpResponseNotAllowed("Failed to add Metadata")
+            else:
+                return HttpResponse(
+                    f"Updated Metadata for user {user.id}'s upload{upload_id}"
+                )
+        else:
+            return HttpResponseForbidden("You dont have access to proceed")
+    else:
+        return HttpResponseNotAllowed(request.method)
 
 
 def submit_deposit(request):

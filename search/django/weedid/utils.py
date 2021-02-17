@@ -3,6 +3,7 @@ from shutil import rmtree
 import json
 from uuid import uuid4
 from weedcoco.repo.deposit import mkdir_safely
+from weedcoco.utils import set_info, set_licenses
 from weedcoco.stats import WeedCOCOStats
 from django.core.files.storage import FileSystemStorage
 from weedid.models import Dataset, WeedidUser
@@ -36,6 +37,15 @@ def add_agcontexts(weedcoco_path, ag_contexts):
     data["agcontexts"] = [ag_contexts]
     for image in data["images"]:
         image["agcontext_id"] = ag_contexts["id"]
+    with open(weedcoco_path, "w") as jsonFile:
+        json.dump(data, jsonFile)
+
+
+def add_metadata(weedcoco_path, metadata):
+    with open(weedcoco_path, "r") as jsonFile:
+        data = json.load(jsonFile)
+    set_info(data, metadata)
+    set_licenses(data)
     with open(weedcoco_path, "w") as jsonFile:
         json.dump(data, jsonFile)
 
@@ -100,8 +110,8 @@ def remove_entity_local_record(user_id, upload_id):
 def retrieve_listing_info(query_entity):
     """Retrieving info from specific upload entity"""
     return {
-        "name": query_entity.metadata["info"][0]["name"]
-        if "name" in query_entity.metadata["info"][0]
+        "name": query_entity.metadata["name"]
+        if "name" in query_entity.metadata
         else "",
         "upload_id": query_entity.upload_id,
         "upload_date": str(query_entity.date),

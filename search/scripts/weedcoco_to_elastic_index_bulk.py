@@ -2,6 +2,8 @@
 # coding: utf-8
 # Exports Weed COCO on stdin to ElasticSearch _bulk data on stdout
 
+# XXX: This file is now out of date.
+
 import sys
 import json
 import argparse

@@ -38,7 +38,7 @@ def validate_json(weedcoco, schema_dir=SCHEMA_DIR):
 def validate_references(
     weedcoco,
     schema_dir=SCHEMA_DIR,
-    require_reference=("collection", "image", "agcontext"),
+    require_reference=("image", "agcontext"),
 ):
     """Check that all IDs are unique and references valid"""
     known_ids = set()
@@ -54,9 +54,6 @@ def validate_references(
             section_name_singular = section_name
         if isinstance(section, list):
             for obj in section:
-                if "id" not in obj:
-                    # collection_memberships objects do not require 'id'
-                    continue
                 id_key = (section_name_singular, obj["id"])
                 if id_key in known_ids:
                     raise ValidationError(f"Duplicate ID: {id_key}")
