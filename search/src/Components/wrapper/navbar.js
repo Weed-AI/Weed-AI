@@ -22,11 +22,13 @@ const useStyles = makeStyles((theme) => ({
   },
   logo: {
     position: 'absolute',
-    right: '0.7em',
+    right: '4em',
     top: '0.2em',
     fontSize: '1.8rem',
     fontWeight: 700,
     color: "white",
+    "-webkit-text-stroke-width": ".5px",
+    "-webkit-text-stroke-color": "black",
   }
 }));
 
@@ -55,12 +57,6 @@ const StyledTab = withStyles((theme) => ({
       opacity: 1
     },
   },
-  header: {
-    backgroundImage: "url(/weedai-background.png)",
-    backgroundRepeat: "no-repeat",
-    backgroundPosition: "right center",
-    backgroundSize: "150px",
-  },
   selected: {}
 }))((props) => <Tab component="a" disableRipple {...props} />);
 
@@ -80,10 +76,10 @@ export default function NavbarComponent(props) {
   return (
     <div className={classes.root}>
       <AppBar position="fixed" style={{
-    backgroundImage: "url(/weedai-background.png)",
+    backgroundImage: "url(/weedai-background-trunc.png)",
     backgroundRepeat: "no-repeat",
     backgroundPosition: "right center",
-    backgroundSize: "12em",
+    backgroundSize: "20rem",
   }}>
         <StyledTabs onChange={handleChange} value={selectedTab}>
           <StyledTab value="explore" href="/explore" label="Explore" />
@@ -91,7 +87,7 @@ export default function NavbarComponent(props) {
           <StyledTab value="upload" href="/upload" label="Upload" />
           <StyledTab value="weedcoco" href="/weedcoco" label="WeedCOCO" />
           <StyledTab value="about" href="/about" label="About" />
-          <Typography variant='p' className={classes.logo}>Weed-AI</Typography>
+          <Typography variant='h1' className={classes.logo}>Weed-AI</Typography>
         </StyledTabs>
       </AppBar>
       <div className={classes.container}>
