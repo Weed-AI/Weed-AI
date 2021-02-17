@@ -100,7 +100,7 @@ class MetadataForm extends Component {
             <JsonForms
               schema={schema}
               uischema={uischema}
-              data={this.state.formData}
+              data={this.props.formData}
               renderers={renderers}
               cells={materialCells}
               onChange={e => {
