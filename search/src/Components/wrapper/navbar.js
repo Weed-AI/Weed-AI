@@ -6,6 +6,7 @@ import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
 import Typography from '@material-ui/core/Typography';
 import Box from '@material-ui/core/Box';
+import CookieConsent from "react-cookie-consent";
 import ReactiveSearchComponent from './reactive_search';
 import UploadComponent from './upload';
 import DatasetComponent from './datasets';
@@ -32,7 +33,12 @@ const useStyles = makeStyles((theme) => ({
     backgroundColor: theme.palette.primary.main,
     textAlign: "center",
     padding: '.2em',
-  }
+  },
+  cookieConsent: {
+    "& a": {
+      color: "#ccf",
+    },
+  },
 }));
 
 const StyledTabs = withStyles({
@@ -118,6 +124,15 @@ export default function NavbarComponent(props) {
           </footer>
         </Box>
       </footer>
+      <CookieConsent
+        location="bottom"
+        cookieName="consentCookie"
+        expires={150}
+        style={{ background: "#2B373B" }}
+        contentClasses={classes.cookieConsent}
+      >
+        This website uses cookies to manage your login to the web site for uploading, and optionally for site analytics. See our <a href="/privacy">Privacy Policy</a>.
+      </CookieConsent>
     </main>
   );
 }

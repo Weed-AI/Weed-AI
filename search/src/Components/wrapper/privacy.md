@@ -16,7 +16,7 @@ Personal information is not collected when public users view, analyse or downloa
  
 ### Use of your personal information
  
-For registered users who upload data, app administrators will only use your account information to contact you regarding the data you upload to Weed-AI or to support your use of the Weed-AI. App administrators are University employees and may in future also be community curators. All administrators are authorised and are aware of their responsibilities to protect personal information.
+For registered users who upload data, app administrators will only use your account information to contact you regarding the data you upload to Weed-AI or to support your use of the Weed-AI, and to inform you of updates to Weed-AI if you do not opt out. App administrators are University employees and may in future also be community curators. All administrators are authorised and are aware of their responsibilities to protect personal information.
  
 The University will also use a minimal build of Google Analytics to monitor aggregated data from Web App for reporting, analytics and improvement purposes. You may opt out of this tracking at any time by activating the “Do Not Track” setting in your browser.
  
