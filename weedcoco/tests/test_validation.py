@@ -136,7 +136,6 @@ SMALL_WEEDCOCO = {
             "weather_description": "sunny",
             "location_lat": 53,
             "location_long": 11,
-            "location_datum": 4326,
             "camera_make": "JAI AD-130GE",
             "camera_lens": "Fujinon TF15-DA-8",
             "camera_lens_focallength": 15,

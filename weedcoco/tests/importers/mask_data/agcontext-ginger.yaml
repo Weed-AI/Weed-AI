@@ -6,7 +6,6 @@ surface_coverage: na
 weather_description: Outdoors, bright sunny conditions.
 location_lat: -34.021635
 location_long: 150.665394
-location_datum: 3857
 camera_make: FLIR BFS 70S7C-C
 camera_lens: Computar 1.1" 12mm f/2.8 12MP Ultra Low Distortion Lens (C-Mount)
 camera_lens_focallength: 12 mm

@@ -216,7 +216,6 @@ agcontext = [
         "weather_description": "variable",
         "location_lat": -26,
         "location_long": 150,
-        "location_datum": 4326,
         "upload_time": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
         "camera_make": "FLIR Blackfly 23S6C",
         "camera_lens": "Fujinon CF25HA-1",
