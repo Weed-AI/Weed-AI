@@ -45,10 +45,6 @@ const uischema = {
           "elements": [
             {
               "type": "Control",
-              "scope": "#/properties/location_datum"
-            },
-            {
-              "type": "Control",
               "scope": "#/properties/location_lat"
             },
             {

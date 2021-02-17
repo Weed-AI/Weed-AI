@@ -60,7 +60,7 @@
       "type": "array",
       "items": {
         "minItems": 1,
-        "oneOf": [
+        "anyOf": [
           {
             "$ref": "#/definitions/Person"
           },
@@ -97,10 +97,6 @@
       "type": "string",
       "format": "date",
       "description": "Date of first publication"
-    },
-    "citation": {
-      "type": "string",
-      "description": "Identifies academic articles that are recommended by the data provider be cited in addition to the dataset itself."
     },
     "funder": {
       "type": "array",
