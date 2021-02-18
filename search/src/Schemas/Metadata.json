@@ -93,6 +93,10 @@
       },
       "title": "Other URIs for this dataset (e.g. GitHub, institutional repository)"
     },
+    "citation": {
+      "type": "string",
+      "description": "Identifies academic articles that are recommended by the data provider be cited in addition to the dataset itself."
+    },
     "datePublished": {
       "type": "string",
       "format": "date",
