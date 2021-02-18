@@ -11,7 +11,6 @@ import Cookies from 'js-cookie';
 
 export default function AuthPrompt(props) {
   const baseURL = new URL(window.location.origin);
-  const csrftoken = Cookies.get('csrftoken');
   const [open, setOpen] = React.useState(false);
   const [prompt, setPrompt] = React.useState('login');
 
@@ -40,7 +39,7 @@ export default function AuthPrompt(props) {
         url: baseURL + 'api/login_google/',
         mode: 'same-origin',
         data: {'email': response.profileObj.email, 'googleId': response.profileObj.googleId},
-        headers: {'X-CSRFToken': csrftoken }
+        headers: {'X-CSRFToken': Cookies.get('csrftoken') }
     })
     .then(() => props.handleLogin())
     .catch(error => {console.log(error)})

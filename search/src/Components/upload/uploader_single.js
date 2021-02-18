@@ -4,8 +4,6 @@ import Dropzone from 'react-dropzone-uploader';
 import Cookies from 'js-cookie'
 
 
-const csrftoken = Cookies.get('csrftoken');
-
 function readBody(xhr) {
     var data;
     if (!xhr.responseType || xhr.responseType === "text") {
@@ -25,7 +23,7 @@ const UploaderSingle  = (props) => {
         body.append('weedcoco', file)
         return { url: baseURL + 'api/upload/',
                  mode: 'same-origin',
-                 headers: {'X-CSRFToken': csrftoken},
+                 headers: {'X-CSRFToken': Cookies.get('csrftoken')},
                  body
                }
     }

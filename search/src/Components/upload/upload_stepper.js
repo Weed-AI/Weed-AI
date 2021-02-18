@@ -13,7 +13,6 @@ import MetadataForm from '../forms/MetadataForm';
 import axios from 'axios';
 import Cookies from 'js-cookie';
 
-const csrftoken = Cookies.get('csrftoken');
 const baseURL = new URL(window.location.origin);
 
 const useStyles = (theme) => ({
@@ -204,7 +203,7 @@ class UploadStepper extends React.Component {
                 "upload_id": this.state.upload_id,
                 "ag_contexts": this.state.ag_context
             },
-            headers: {'X-CSRFToken': csrftoken }
+            headers: {'X-CSRFToken': Cookies.get('csrftoken') }
         }).then(res => {
             console.log(res)
             this.handleErrorMessage("")
@@ -224,7 +223,7 @@ class UploadStepper extends React.Component {
                 "upload_id": this.state.upload_id,
                 "metadata": this.state.metadata
             },
-            headers: {'X-CSRFToken': csrftoken }
+            headers: {'X-CSRFToken': Cookies.get('csrftoken') }
         }).then(res => {
             console.log(res)
             this.handleErrorMessage("")
@@ -244,7 +243,7 @@ class UploadStepper extends React.Component {
             method: 'post',
             url: baseURL + "api/submit_deposit/",
             data: body,
-            headers: {'Content-Type': 'multipart/form-data', 'X-CSRFToken': csrftoken }
+            headers: {'Content-Type': 'multipart/form-data', 'X-CSRFToken': Cookies.get('csrftoken') }
         })
     }
 
