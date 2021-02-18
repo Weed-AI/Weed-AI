@@ -19,8 +19,6 @@ import IconButton from '@material-ui/core/IconButton';
 import Cookies from 'js-cookie'
 
 
-const csrftoken = Cookies.get('csrftoken');
-
 const useStyles = (theme) => ({
   root: {
     flexGrow: 1,
@@ -194,7 +192,7 @@ class DatasetSummaryPage extends Component {
         url: baseURL + "api/upload_info/",
         mode: 'same-origin',
         data: body,
-        headers: {'Content-Type': 'multipart/form-data', 'X-CSRFToken': csrftoken }
+        headers: {'Content-Type': 'multipart/form-data', 'X-CSRFToken': Cookies.get('csrftoken') }
     })
     .then(res => res.data)
     .then(json => {

@@ -11,8 +11,6 @@ import Cookies from 'js-cookie';
 import axios from 'axios';
 
 
-const csrftoken = Cookies.get('csrftoken');
-
 const theme = {
     typography: {
         fontFamily: 'Raleway, Helvetica, sans-serif',
@@ -64,7 +62,7 @@ export const TestWeedAIResultCard = () => {
         app="weedid"
         url={"https://localhost/elasticsearch/"}
         theme={theme}
-        headers={{'X-CSRFToken': csrftoken}}
+        headers={{'X-CSRFToken': Cookies.get('csrftoken')}}
     >
       <WeedAIResultCard item={ {
         "id": 20,
@@ -558,7 +556,7 @@ class ReactiveSearchComponent extends Component {
                 app="weedid"
                 url={baseURL + "elasticsearch/"}
                 theme={theme}
-                headers={{'X-CSRFToken': csrftoken}}
+                headers={{'X-CSRFToken': Cookies.get('csrftoken')}}
             >
                 <div style={{ position: "fixed", width: "20rem", overflow: "scroll", height: "90%", left: 0, padding: '0 1rem' }}>
                     <MultiList

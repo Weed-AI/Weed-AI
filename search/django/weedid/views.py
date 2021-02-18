@@ -16,10 +16,16 @@ from weedid.utils import (
     add_metadata,
 )
 from weedid.models import Dataset, WeedidUser
-from weedcoco.validation import validate, ValidationError
+from weedcoco.validation import validate
 from django.contrib.auth import login, logout
 from django.contrib.auth.hashers import check_password
 from django.http import HttpResponseForbidden, HttpResponseNotAllowed
+from django.views.decorators.csrf import ensure_csrf_cookie
+
+
+@ensure_csrf_cookie
+def set_csrf(request):
+    return HttpResponse("Success")
 
 
 def elasticsearch_query(request):
@@ -48,12 +54,9 @@ def upload(request):
         upload_dir, upload_id = setup_upload_dir(os.path.join(UPLOAD_DIR, str(user.id)))
         weedcoco_path = store_tmp_weedcoco(file_weedcoco, upload_dir)
         create_upload_entity(weedcoco_path, upload_id, user.id)
-    except ValidationError as e:
+    except Exception as e:
         traceback.print_exc()
         return HttpResponseForbidden(str(e))
-    except Exception:
-        traceback.print_exc()
-        return HttpResponseForbidden("There is something wrong with the file")
     else:
         return HttpResponse(json.dumps({"upload_id": upload_id, "images": images}))
 

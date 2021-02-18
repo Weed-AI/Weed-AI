@@ -4,20 +4,6 @@ import Dropzone from 'react-dropzone-uploader';
 import Cookies from 'js-cookie'
 
 
-const csrftoken = Cookies.get('csrftoken');
-
-function readBody(xhr) {
-    var data;
-    if (!xhr.responseType || xhr.responseType === "text") {
-        data = xhr.responseText;
-    } else if (xhr.responseType === "document") {
-        data = xhr.responseXML;
-    } else {
-        data = xhr.response;
-    }
-    return data;
-}
-
 const UploaderSingle  = (props) => {
     const baseURL = new URL(window.location.origin);
     const getUploadParams = ({ file, meta }) => {
@@ -25,7 +11,7 @@ const UploaderSingle  = (props) => {
         body.append('weedcoco', file)
         return { url: baseURL + 'api/upload/',
                  mode: 'same-origin',
-                 headers: {'X-CSRFToken': csrftoken},
+                 headers: {'X-CSRFToken': Cookies.get('csrftoken')},
                  body
                }
     }
@@ -38,8 +24,7 @@ const UploaderSingle  = (props) => {
             props.handleErrorMessage("")
         }
         else if (status === 'error_upload'){
-            // Weird things happen here
-            props.handleErrorMessage("There is something wrong with the file")
+            xhr.addEventListener('loadend', (e) => {props.handleErrorMessage(e.target.responseText)});
         }
         else if (status === 'error_file_size') {
             props.handleErrorMessage("The file size exceeds the limitation")
@@ -48,11 +33,6 @@ const UploaderSingle  = (props) => {
             props.handleErrorMessage("")
         }
     }
-  
-    // const handleSubmit = (files, allFiles) => {
-    //   files.map(f => f.restart())
-    //   allFiles.forEach(f => f.remove())
-    // }
   
     return (
       <Dropzone
