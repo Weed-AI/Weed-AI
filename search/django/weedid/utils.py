@@ -17,7 +17,7 @@ def store_tmp_image(image, image_dir):
 
 def store_tmp_weedcoco(weedcoco, upload_dir):
     fs = FileSystemStorage()
-    weedcoco_path = os.path.join(upload_dir, weedcoco.name)
+    weedcoco_path = os.path.join(upload_dir, "weedcoco.json")
     fs.save(weedcoco_path, weedcoco)
     return weedcoco_path
 
