@@ -19,7 +19,7 @@ from weedcoco.validation import validate, ValidationError
 from django.contrib.auth import login, logout
 from django.contrib.auth.hashers import check_password
 from django.http import HttpResponseForbidden, HttpResponseNotAllowed
-from django.views.decorators.csrf import ensure_csrf_cookie, csrf_exempt
+from django.views.decorators.csrf import ensure_csrf_cookie
 
 
 @ensure_csrf_cookie
@@ -27,13 +27,8 @@ def set_csrf(request):
     return HttpResponse("Success")
 
 
-@csrf_exempt
 def elasticsearch_query(request):
     elasticsearch_url = "/".join(request.path.split("/")[3:])
-    if not elasticsearch_url.startswith("_msearch"):
-        return HttpResponseForbidden("Only _msearch queries are currently forwarded")
-    if request.method not in ["POST", "GET"]:
-        return HttpResponseNotAllowed(request.method)
     elasticsearch_response = requests.post(
         url=f"http://elasticsearch:9200/{elasticsearch_url}",
         data=request.body,
