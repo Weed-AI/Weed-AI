@@ -30,7 +30,10 @@ jobs:
       - name: Test
         run: |
           rm -r weedcoco  # test from installation instead of source
-          pytest --cov=$(python -c "import weedcoco, os; print(os.path.dirname(weedcoco.__file__))") --cov-report=xml weedcoco
+          pkgpath=$(python -c "import weedcoco, os; print(os.path.dirname(weedcoco.__file__))")
+          cd "$pkgpath"/..
+          cwd=$(pwd)
+          pytest --cov=weedcoco --cov-report=xml:"$cwd"/coverage.xml weedcoco
       - uses: codecov/codecov-action@v1
         with:
           flags: weedcoco
