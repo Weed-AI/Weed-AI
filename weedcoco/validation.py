@@ -6,24 +6,18 @@ import sys
 import json
 
 import jsonschema
-import jsonschema.exceptions
 import yaml
 
 SCHEMA_DIR = pathlib.Path(__file__).parent / "schema"
-MAIN_SCHEMAS = {
-    "weedcoco": "https://weedid.sydney.edu.au/schema/main.json",
-    "compatible-coco": "https://weedid.sydney.edu.au/schema/compatible-coco.json",
-}
+MAIN_SCHEMA_URI = "https://weed-ai.sydney.edu.au/schema/main.json"
 
 
 class ValidationError(Exception):
     pass
 
 
-def validate_json(weedcoco, schema="weedcoco", schema_dir=SCHEMA_DIR):
+def validate_json(weedcoco, schema_dir=SCHEMA_DIR):
     """Check that the weedcoco matches its JSON schema"""
-    if schema not in MAIN_SCHEMAS:
-        raise ValueError(f"schema should be one of {sorted(MAIN_SCHEMAS)}")
     try:
         # memoise the schema
         ref_store = validate_json.ref_store
@@ -33,22 +27,18 @@ def validate_json(weedcoco, schema="weedcoco", schema_dir=SCHEMA_DIR):
         ]
         validate_json.ref_store = {obj["$id"]: obj for obj in schema_objects}
         ref_store = validate_json.ref_store
-    schema_uri = MAIN_SCHEMAS[schema]
-    main_schema = ref_store[schema_uri]
-    try:
-        jsonschema.validate(
-            weedcoco,
-            schema=main_schema,
-            resolver=jsonschema.RefResolver(schema_uri, main_schema, store=ref_store),
-        )
-    except jsonschema.ValidationError as e:
-        raise ValidationError(str(e)) from e
+    main_schema = ref_store[MAIN_SCHEMA_URI]
+    jsonschema.validate(
+        weedcoco,
+        schema=main_schema,
+        resolver=jsonschema.RefResolver(MAIN_SCHEMA_URI, main_schema, store=ref_store),
+    )
 
 
 def validate_references(
     weedcoco,
     schema_dir=SCHEMA_DIR,
-    require_reference=("image", "agcontext"),
+    require_reference=("collection", "image", "agcontext"),
 ):
     """Check that all IDs are unique and references valid"""
     known_ids = set()
@@ -64,6 +54,9 @@ def validate_references(
             section_name_singular = section_name
         if isinstance(section, list):
             for obj in section:
+                if "id" not in obj:
+                    # collection_memberships objects do not require 'id'
+                    continue
                 id_key = (section_name_singular, obj["id"])
                 if id_key in known_ids:
                     raise ValidationError(f"Duplicate ID: {id_key}")
@@ -103,10 +96,10 @@ def validate_image_sizes(weedcoco, images_root):
     # TODO
 
 
-def validate(weedcoco, images_root=None, schema="weedcoco"):
+def validate(weedcoco, images_root=None):
     if hasattr(weedcoco, "read"):
         weedcoco = json.load(weedcoco)
-    validate_json(weedcoco, schema=schema)
+    validate_json(weedcoco)
     validate_references(weedcoco)
     validate_coordinates(weedcoco)
     if images_root is not None:
@@ -116,7 +109,6 @@ def validate(weedcoco, images_root=None, schema="weedcoco"):
 def main():
     ap = argparse.ArgumentParser("WeedCOCO Validator")
     ap.add_argument("paths", nargs="+", type=argparse.FileType("r"))
-    ap.add_argument("--schema", default="weedcoco", choices=MAIN_SCHEMAS.keys())
     ap.add_argument(
         "--images-root", default=".", help="Root for image file names. Default=."
     )
