@@ -83,6 +83,7 @@ export default function DatasetList(props) {
               <TableCell className={classes.tableHeader}>Crop</TableCell>
               <TableCell className={classes.tableHeader}>Weed Species</TableCell>
               <TableCell className={classes.tableHeader}>Contributor</TableCell>
+              {inReview ? <TableCell className={classes.tableHeader}>Contact</TableCell> : ""}
               <TableCell className={classes.tableHeader}>Upload Date</TableCell>
               {inReview ? <TableCell className={classes.tableHeader}>Command</TableCell> : ""}
             </TableRow>
@@ -99,6 +100,7 @@ export default function DatasetList(props) {
                 <TableCell>Pasture</TableCell>
                 <TableCell></TableCell>
                 <TableCell>{row.contributor}</TableCell>
+                {inReview ? <TableCell><a href="mailto:{row.contributor_email}">{row.contributor_email}</a></TableCell> : ""}
                 <TableCell>{row.upload_date}</TableCell>
                 {inReview
                   ?<TableCell className={classes.commandCol}>

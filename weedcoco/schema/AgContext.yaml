@@ -132,7 +132,7 @@ properties:
     maximum: 90
     description: |-
       Latitude in decimal degrees.
-      Approximate latitude location of the AgContext, in decimal degrees.
+      Approximate latitude location of the AgContext, in decimal degrees (WGS84).
 
   location_long:
     type: number
@@ -140,7 +140,7 @@ properties:
     maximum: 180
     description: |-
       Longitude in decimal degrees.
-      Approximate longitude location of the AgContext, in decimal degrees.
+      Approximate longitude location of the AgContext, in decimal degrees (WGS84).
 
   camera_make:
     type: string
