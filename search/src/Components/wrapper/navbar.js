@@ -141,6 +141,7 @@ const DesktopNavbar = (props) => {
 const manageCsrf = () => {
   const csrftoken = Cookies.get('csrftoken');
   if (!csrftoken) {
+    // Reloading the page to set up csrf token is a hack
     axios.get('/api/set_csrf/').then(() => window.location.reload());
   }
 }
@@ -156,7 +157,7 @@ export default function NavbarComponent(props) {
   const [mobileView, setMobileView] = React.useState(false);
 
   useEffect(() => {
-    manageCsrf();  // should be included in componentWillMount rather
+    manageCsrf();
     const setResponsiveness = () => {
       return window.innerWidth < 1000
         ? setMobileView(true)
