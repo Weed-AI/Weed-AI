@@ -130,7 +130,7 @@ def main():
     args = ap.parse_args()
     for path in args.paths:
         try:
-            validate(path, images_root=args.images_root)
+            validate(path, images_root=args.images_root, schema=args.schema)
         except Exception:
             print(f"While validating {path}", file=sys.stderr)
             raise
