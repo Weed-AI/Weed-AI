@@ -1,6 +1,8 @@
 import pandas as pd
 from weedcoco.utils import get_task_types
 
+EXPECTED_FIELDS = ["segmentation", "bounding box"]
+
 
 class WeedCOCOStats:
     def __init__(self, weedcoco):
@@ -24,6 +26,9 @@ class WeedCOCOStats:
             for annotation in weedcoco["annotations"]
         ]
         out = pd.DataFrame(out)
+        for field in EXPECTED_FIELDS:
+            if field not in out:
+                out[field] = 0
 
         image_to_agcontext = pd.Series(
             {image["id"]: image["agcontext_id"] for image in weedcoco["images"]}
@@ -36,8 +41,6 @@ class WeedCOCOStats:
         gb = annotation_frame.groupby(by)
 
         def get_sums(field):
-            if field not in annotation_frame:
-                return 0
             return gb[field].sum().astype(int)
 
         return pd.DataFrame(
