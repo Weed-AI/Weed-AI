@@ -129,10 +129,9 @@ const DesktopNavbar = (props) => {
 const manageCsrf = () => {
   const csrftoken = Cookies.get('csrftoken');
   if (!csrftoken) {
-    axios.get('/set_csrf');
+    axios.get('/api/set_csrf');
   }
 }
-
 
 export default function NavbarComponent(props) {
 
@@ -144,9 +143,8 @@ export default function NavbarComponent(props) {
   const [selectedTab, setSelectedTab] = React.useState(page);
   const [mobileView, setMobileView] = React.useState(false);
 
-  manageCsrf();  // should be included in componentWillMount rather
-
   useEffect(() => {
+    manageCsrf();  // should be included in componentWillMount rather
     const setResponsiveness = () => {
       return window.innerWidth < 1000
         ? setMobileView(true)
