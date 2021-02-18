@@ -12,6 +12,7 @@ from weedid.utils import (
     retrieve_listing_info,
     remove_entity_local_record,
     add_agcontexts,
+    add_metadata,
 )
 from weedid.models import Dataset, WeedidUser
 from weedcoco.validation import validate, ValidationError
@@ -89,6 +90,30 @@ def upload_agcontexts(request):
         )
 
 
+def upload_metadata(request):
+    if request.method == "POST":
+        user = request.user
+        if user and user.is_authenticated:
+            data = json.loads(request.body)
+            upload_id, metadata = data["upload_id"], data["metadata"]
+            weedcoco_path = os.path.join(
+                UPLOAD_DIR, str(user.id), str(upload_id), "weedcoco.json"
+            )
+            try:
+                add_metadata(weedcoco_path, metadata)
+                Dataset.objects.filter(upload_id=upload_id).update(metadata=metadata)
+            except Exception:
+                return HttpResponseNotAllowed("Failed to add Metadata")
+            else:
+                return HttpResponse(
+                    f"Updated Metadata for user {user.id}'s upload{upload_id}"
+                )
+        else:
+            return HttpResponseForbidden("You dont have access to proceed")
+    else:
+        return HttpResponseNotAllowed(request.method)
+
+
 def submit_deposit(request):
     if not request.method == "POST":
         return HttpResponseNotAllowed(request.method)
@@ -136,22 +161,22 @@ def upload_info(request):
 
 
 def upload_list(request):
-    upload_list = map(
-        retrieve_listing_info,
-        Dataset.objects.filter(status="C"),
-    )
-    return HttpResponse(json.dumps(list(upload_list)))
+    upload_list = [
+        retrieve_listing_info(dataset, awaiting_review=False)
+        for dataset in Dataset.objects.filter(status="C")
+    ]
+    return HttpResponse(json.dumps(upload_list))
 
 
 def awaiting_list(request):
     user = request.user
     if not (user and user.is_authenticated and user.is_staff):
         return HttpResponseForbidden("You dont have access to proceed")
-    awaiting_list = map(
-        retrieve_listing_info,
-        Dataset.objects.filter(status="AR"),
-    )
-    return HttpResponse(json.dumps(list(awaiting_list)))
+    awaiting_list = [
+        retrieve_listing_info(dataset, awaiting_review=True)
+        for dataset in Dataset.objects.filter(status="AR")
+    ]
+    return HttpResponse(json.dumps(awaiting_list))
 
 
 def dataset_approve(request, dataset_id):

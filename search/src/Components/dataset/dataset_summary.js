@@ -117,7 +117,7 @@ const AgContextDetails = (props) => {
 }
 
 export const DatasetSummary = (props) => {
-    const {metadata, agcontexts, classes, rootURL} = props;
+    const {metadata, agcontexts, classes, rootURL, upload_id} = props;
     return (
       <React.Fragment>
         <script type="application/ld+json">
@@ -159,7 +159,7 @@ export const DatasetSummary = (props) => {
           </Grid>
           <Grid item xs={2}>
             <div className={classes.summary}>
-                <Button className={classes.download} onClick={() => window.open(`${rootURL}/code/download/${props.upload_id}.zip`)}>Download in WeedCOCO format</Button>
+                <Button className={classes.download} onClick={() => window.open(`${rootURL}/code/download/${upload_id}.zip`)}>Download in WeedCOCO format</Button>
             </div>
           </Grid>
         </Grid>
@@ -210,7 +210,7 @@ class DatasetSummaryPage extends Component {
     const esURL = new URL(window.location.origin)
     return (
       <div className={classes.root}>
-        <DatasetSummary metadata={this.state.metadata} agcontexts={this.state.agcontexts} classes={classes} rootURL={esURL} />
+        <DatasetSummary metadata={this.state.metadata} agcontexts={this.state.agcontexts} classes={classes} rootURL={esURL} upload_id={this.props.upload_id} />
       </div>
     );
   }
@@ -234,7 +234,7 @@ export const TestDatasetSummary = () => {
         {"crop: foo": {"annotation_count": 2, "image_count": 1, "segmentation_count": 2, "bounding_box_count": 2},
         "weed: bar": {"annotation_count": 3, "image_count": 2, "segmentation_count": 3, "bounding_box_count": 3},
         "weed: blah": {"annotation_count": 1, "image_count": 1, "segmentation_count": 0, "bounding_box_count": 0}},
-                "id": 77, "lighting": "natural", "bbch_code": "na", "crop_type": "sorghum", "camera_fov": "variable", "camera_lens": "Telephoto", "camera_make": "Canon", "soil_colour": "dark_brown", "camera_angle": 45, "emr_channels": "visual", "location_lat": 80, "camera_height": 500, "location_long": 80, "surface_cover": "oilseed", "location_datum": 4326, "cropped_to_plant": true, "surface_coverage": "0-25", "weather_description": "rainy", "bbch_descriptive_text": "stem elongation", "camera_lens_focallength": 180, "grains_descriptive_text": "emergence", "photography_description": "poor lighting"}]}
+                "id": 77, "lighting": "natural", "bbch_code": "na", "crop_type": "sorghum", "camera_fov": "variable", "camera_lens": "Telephoto", "camera_make": "Canon", "soil_colour": "dark_brown", "camera_angle": 45, "emr_channels": "visual", "location_lat": 80, "camera_height": 500, "location_long": 80, "surface_cover": "oilseed", "cropped_to_plant": true, "surface_coverage": "0-25", "weather_description": "rainy", "bbch_descriptive_text": "stem elongation", "camera_lens_focallength": 180, "grains_descriptive_text": "emergence", "photography_description": "poor lighting"}]}
     const Out = withStyles(useStyles)(DatasetSummary);
     return (<Out {...props} />);
 }
