@@ -141,7 +141,7 @@ const DesktopNavbar = (props) => {
 const manageCsrf = () => {
   const csrftoken = Cookies.get('csrftoken');
   if (!csrftoken) {
-    axios.get('/api/set_csrf');
+    axios.get('/api/set_csrf/').then(() => window.location.reload());
   }
 }
 
