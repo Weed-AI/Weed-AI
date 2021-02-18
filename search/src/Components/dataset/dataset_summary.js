@@ -187,14 +187,10 @@ class DatasetSummaryPage extends Component {
   }
 
   componentDidMount (){
-    const body = new FormData()
-    body.append('upload_id', this.props.upload_id)
     axios({
-        method: 'post',
-        url: baseURL + "api/upload_info/",
+        method: 'get',
+        url: baseURL + "api/upload_info/" + this.props.upload_id,
         mode: 'same-origin',
-        data: body,
-        headers: {'Content-Type': 'multipart/form-data', 'X-CSRFToken': csrftoken }
     })
     .then(res => res.data)
     .then(json => {
