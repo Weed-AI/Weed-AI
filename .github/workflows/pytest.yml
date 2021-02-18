@@ -28,7 +28,7 @@ jobs:
         run: |
           pip install .[test]
       - name: Test
-      - run:
+      - run: |
           rm -r weedcoco  # test from installation instead of source
           pytest --cov=$(python -c "import weedcoco, os; print(os.path.dirname(weedcoco.__file__))") --cov-report=xml
       - uses: codecov/codecov-action@v1
