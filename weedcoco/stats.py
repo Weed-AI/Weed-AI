@@ -34,11 +34,17 @@ class WeedCOCOStats:
     @staticmethod
     def compute_summary(annotation_frame, by):
         gb = annotation_frame.groupby(by)
+
+        def get_sums(field):
+            if field not in annotation_frame:
+                return 0
+            return gb[field].sum().astype(int)
+
         return pd.DataFrame(
             {
                 "annotation_count": gb.size(),
                 "image_count": gb["image_id"].nunique(),
-                "segmentation_count": gb["segmentation"].sum().astype(int),
-                "bounding_box_count": gb["bounding box"].sum().astype(int),
+                "segmentation_count": get_sums("segmentation"),
+                "bounding_box_count": get_sums("bounding box"),
             }
         )
