@@ -19,6 +19,12 @@ from weedcoco.validation import validate, ValidationError
 from django.contrib.auth import login, logout
 from django.contrib.auth.hashers import check_password
 from django.http import HttpResponseForbidden, HttpResponseNotAllowed
+from django.views.decorators.csrf import ensure_csrf_cookie
+
+
+@ensure_csrf_cookie
+def set_csrf(request):
+    return HttpResponse("Success")
 
 
 def elasticsearch_query(request):

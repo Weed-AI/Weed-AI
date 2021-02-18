@@ -17,6 +17,8 @@ import UploadComponent from './upload';
 import DatasetComponent from './datasets';
 import WeedCOCOComponent from './weedcoco';
 import AboutComponent from './about';
+import axios from 'axios';
+import Cookies from 'js-cookie';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -124,6 +126,14 @@ const DesktopNavbar = (props) => {
   );
 }
 
+const manageCsrf = () => {
+  const csrftoken = Cookies.get('csrftoken');
+  if (!csrftoken) {
+    axios.get('/set_csrf');
+  }
+}
+
+
 export default function NavbarComponent(props) {
 
   const classes = useStyles();
@@ -133,6 +143,8 @@ export default function NavbarComponent(props) {
 
   const [selectedTab, setSelectedTab] = React.useState(page);
   const [mobileView, setMobileView] = React.useState(false);
+
+  manageCsrf();  // should be included in componentWillMount rather
 
   useEffect(() => {
     const setResponsiveness = () => {
