@@ -2,6 +2,7 @@ from django.http import HttpResponse
 import requests
 import os
 import json
+import traceback
 from core.settings import UPLOAD_DIR, REPOSITORY_DIR
 from weedid.tasks import submit_upload_task, update_index_and_thumbnails
 from weedid.utils import (
@@ -48,8 +49,10 @@ def upload(request):
         weedcoco_path = store_tmp_weedcoco(file_weedcoco, upload_dir)
         create_upload_entity(weedcoco_path, upload_id, user.id)
     except ValidationError as e:
+        traceback.print_exc()
         return HttpResponseForbidden(str(e))
     except Exception:
+        traceback.print_exc()
         return HttpResponseForbidden("There is something wrong with the file")
     else:
         return HttpResponse(json.dumps({"upload_id": upload_id, "images": images}))
