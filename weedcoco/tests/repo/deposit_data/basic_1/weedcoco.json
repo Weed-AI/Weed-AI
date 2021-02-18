@@ -664,23 +664,20 @@
             "id": 1
         }
     ],
-    "info": [
-        {
-            "year": 2015,
-            "version": 1,
-            "description": "YAML annotations and PNG images converted into WeedCOCO",
-            "secondary_contributor": "Converted to WeedCOCO by Henry Lydecker",
-            "contributor": "Sebastian Haug",
-            "id": 0
+    "info": {
+        "year": 2015,
+        "description": "Cwfid annotations converted into WeedCOCO",
+        "metadata": {
+            "name": "Cwfid annotations converted into WeedCOCO",
+            "creator": [{"name": "Sebastian Haug"}],
+            "datePublished": "2015-XX-XX",
+            "license": "https://github.com/cwfid/dataset"
         }
-    ],
+    },
     "license": [
         {
             "id": 0,
-            "license_name": "CC BY 4.0",
-            "license_fullname": "Creative Commons Attribution 4.0",
-            "license_version": "4.0",
-            "url": "https://creativecommons.org/licenses/by/4.0/"
+            "url": "https://github.com/cwfid/dataset"
         }
     ],
     "agcontexts": [
@@ -698,7 +695,6 @@
             "weather_description": "sunny",
             "location_lat": 53,
             "location_long": 11,
-            "location_datum": 4326,
             "upload_time": "2020-10-27 09:58:36",
             "camera_make": "JAI AD-130GE",
             "camera_lens": "Fujinon TF15-DA-8",
@@ -710,24 +706,6 @@
             "lighting": "natural",
             "cropped_to_plant": false,
             "url": "https://github.com/cwfid/dataset"
-        }
-    ],
-    "collections": [
-        {
-            "author": "Haug, Sebastian and Ostermann, J\u00f6rn",
-            "title": "A Crop/Weed Field Image Dataset for the Evaluation of Computer Vision Based Precision Agriculture Tasks",
-            "year": 2015,
-            "identifier": "doi:10.1007/978-3-319-16220-1_8",
-            "rights": "All data is subject to copyright and may only be used for non-commercial research. In case of use please cite our publication.",
-            "accrual_policy": "closed",
-            "id": 0
-        }
-    ],
-    "collection_memberships": [
-        {
-            "image_id": 1,
-            "subset": "train",
-            "collection_id": 0
         }
     ]
 }

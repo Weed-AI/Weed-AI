@@ -7,6 +7,12 @@ import Typography from '@material-ui/core/Typography';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import { Button } from '@material-ui/core';
 import Grid from '@material-ui/core/Grid';
+import Table from '@material-ui/core/Table';
+import TableBody from '@material-ui/core/TableBody';
+import TableCell from '@material-ui/core/TableCell';
+import TableContainer from '@material-ui/core/TableContainer';
+import TableHead from '@material-ui/core/TableHead';
+import TableRow from '@material-ui/core/TableRow';
 import axios from 'axios';
 import ListIcon from '@material-ui/icons/List';
 import IconButton from '@material-ui/core/IconButton';
@@ -30,7 +36,6 @@ const useStyles = (theme) => ({
     borderRadius: '4px'
   },
   summary: {
-    height: '20vh'
   },
   download: {
     padding: '1.5em 0',
@@ -44,14 +49,138 @@ const useStyles = (theme) => ({
 
 const baseURL = new URL(window.location.origin);
 
-class DatasetSummary extends Component {
+const AgContextFieldList = (props) => {
+    const {title, agcontext, fields, classes, ...accordionProps} = props;
+    return (
+      <Accordion {...accordionProps}>
+        <AccordionSummary
+          expandIcon={<ExpandMoreIcon />}
+          aria-controls="panel1a-content"
+          id="panel1a-header"
+          className={classes.header}
+        >
+          <Typography className={classes.heading}>{title}</Typography>
+        </AccordionSummary>
+        <AccordionDetails>
+          <ul>
+            {fields.map(key =>
+            (agcontext[key] ? <li key={key}><Typography variant='body2'>{snakeToText(key)}:&nbsp;{agcontext[key]}</Typography></li> : ""))
+            }
+          </ul>
+        </AccordionDetails>
+      </Accordion>
+    );
+}
+
+const AgContextDetails = (props) => {
+    const {agcontext, ordinal, nContexts, classes} = props;
+    const tableFields = {"image_count": "# Images", "segmentation_count": "# Segments", "bounding_box_count": "# Bounding Boxes"}
+    return (
+      <article>
+        {nContexts > 1 ? <h2>Agricultural Context {ordinal} of {nContexts}</h2> : ""}
+        <Accordion defaultExpanded='true'>
+          <AccordionSummary
+            expandIcon={<ExpandMoreIcon />}
+            aria-controls="panel1a-content"
+            id="panel1a-header"
+            className={classes.header}
+          >
+            <Typography className={classes.heading}>Annotation Statistics</Typography>
+          </AccordionSummary>
+          <AccordionDetails>
+            <p>Total number of images: {agcontext.n_images}</p>
+            <TableContainer>
+              <Table>
+                <TableHead>
+                  <TableRow>
+                    <TableCell>Category</TableCell>
+                    {Object.keys(tableFields).map((field) => <TableCell key={field}>{tableFields[field]}</TableCell>)}
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {Object.keys(agcontext.category_statistics).map((catName) =>
+                    <TableRow key={catName}>
+                      <TableCell>{catName}</TableCell>
+                      {Object.keys(tableFields).map((field) => <TableCell key={field}>{agcontext.category_statistics[catName][field]}</TableCell>)}
+                    </TableRow>
+                  )}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          </AccordionDetails>
+        </Accordion>
+        <AgContextFieldList defaultExpanded="true" classes={classes} agcontext={agcontext} title="The Crop" fields={["crop_type", "bbch_growth_range", "soil_colour", "surface_cover", "surface_coverage", "location_lat", "location_long"]} />
+        <AgContextFieldList classes={classes} agcontext={agcontext} title="The Photography" fields={["camera_make", "camera_lens", "camera_lens_focallength", "camera_height", "camera_angle", "camera_fov", "lighting", "photography_description"]} />
+        <AgContextFieldList classes={classes} agcontext={agcontext} title="Other Details" fields={["cropped_to_plant", "emr_channels", "weather_description"]} />
+      </article>
+    );
+}
+
+export const DatasetSummary = (props) => {
+    const {metadata, agcontexts, classes, rootURL, upload_id} = props;
+    return (
+      <React.Fragment>
+        <script type="application/ld+json">
+        {
+          JSON.stringify({
+            ...{
+              "@context": "https://schema.org/",
+              "@type": "Dataset",
+              "url": window.location.href
+            },
+            ...metadata
+          })
+        }
+        </script>
+        <Grid container spacing={3}>
+          <Grid item xs={10}>
+            <div className={classes.summary}>
+              <div style={{display: 'flex'}}>
+                <IconButton aria-label="back to list" color="secondary" onClick={() => window.location.assign(rootURL + 'datasets')}>
+                  <ListIcon />
+                </IconButton>
+                <Typography variant='h4' style={{fontWeight: 600}}>{metadata.name}</Typography>
+              </div>
+              <p>
+                {metadata.description /* TODO: perhaps render as markdown */}
+              </p>
+              <dl>
+                <dt>Creators:</dt>
+                <dd>
+                  <ul>
+                  {metadata.creator.map((creator, i) => (<li key={i}>{creator.sameAs ? (<a href={creator.sameAs}>{creator.name}</a>) : creator.name}</li>))}
+                  </ul>
+                </dd>
+                <dt>Licence:</dt>
+                <dd>{<a href={metadata.license}>{metadata.license}</a>}</dd>
+              </dl>
+              { /* TODO: link to Explore searching for just this dataset */ }
+            </div>
+          </Grid>
+          <Grid item xs={2}>
+            <div className={classes.summary}>
+                <Button className={classes.download} onClick={() => window.open(`${rootURL}/code/download/${upload_id}.zip`)}>Download in WeedCOCO format</Button>
+            </div>
+          </Grid>
+        </Grid>
+        {agcontexts.map((agcontext, idx) =>
+          <AgContextDetails agcontext={agcontext} key={idx} ordinal={idx + 1} nContexts={agcontexts.length} classes={classes} />
+        )}
+      </React.Fragment>
+    );
+}
+const capitalFirstLetter = (string) => string.charAt(0).toUpperCase() + string.slice(1);
+const snakeToText = (snakeName) => snakeName.split("_").map(string => capitalFirstLetter(string)).join(" ");
+
+class DatasetSummaryPage extends Component {
   constructor (){
     super()
     this.state = {
       metadata: {
-        info: [],
-        license: [],
-        collections: []
+        name: "",
+        description: "",
+        creator: [],
+        license: ""       
       },
       agcontexts: []
     }
@@ -78,98 +207,36 @@ class DatasetSummary extends Component {
 
   render (){
     const {classes} = this.props
-    const capitalFirstLetter = (string) => string.charAt(0).toUpperCase() + string.slice(1)
-    const converter = (snakeName) => snakeName.split("_").map(string => capitalFirstLetter(string)).join(" ")
-    const getAttribute = (collection, key) => collection.length > 0 && key in collection[0] ? collection[0][key] : ""
     const esURL = new URL(window.location.origin)
     return (
       <div className={classes.root}>
-        <Grid container spacing={3}>
-          <Grid item xs={10}>
-            <div className={classes.summary}>
-              <div style={{display: 'flex'}}>
-                <IconButton aria-label="back to list" color="secondary" onClick={() => window.location.assign(baseURL + 'datasets')}>
-                  <ListIcon />
-                </IconButton>
-                <Typography variant='h4' style={{fontWeight: 600}}>{getAttribute(this.state.metadata.info, "name")}</Typography>
-              </div>
-              <p>
-                {getAttribute(this.state.metadata.collections, "title")}
-              </p>
-              <p>
-                Author:
-                &nbsp;
-                {getAttribute(this.state.metadata.collections, "author")}
-              </p>
-              <p>
-                Licence:
-                &nbsp;
-                {getAttribute(this.state.metadata.license, "license_name")}
-                &nbsp;
-                {getAttribute(this.state.metadata.license, "url")}
-              </p>
-            </div>
-          </Grid>
-          <Grid item xs={2}>
-            <div className={classes.summary}>
-                <Button className={classes.download} onClick={() => window.open(`${esURL}code/download/${this.props.upload_id}.zip`)}>Download in WeedCOCO format</Button>
-            </div>
-          </Grid>
-        </Grid>
-        <Accordion defaultExpanded='true'>
-          <AccordionSummary
-            expandIcon={<ExpandMoreIcon />}
-            aria-controls="panel1a-content"
-            id="panel1a-header"
-            className={classes.header}
-          >
-            <Typography className={classes.heading}>Agricultural Context</Typography>
-          </AccordionSummary>
-          <AccordionDetails>
-            <Grid container spacing={2}>
-              {this.state.agcontexts.length > 0 ?
-               Object.keys(this.state.agcontexts[0]).map(key =>
-              <Grid item xs={2}><Typography variant='p'>{converter(key)}:&nbsp;{this.state.agcontexts[0][key]}</Typography></Grid>)
-               :""
-              }
-            </Grid>
-          </AccordionDetails>
-        </Accordion>
-        <Accordion disabled>
-          <AccordionSummary
-            expandIcon={<ExpandMoreIcon />}
-            aria-controls="panel2a-content"
-            id="panel2a-header"
-            className={classes.header}
-          >
-            <Typography className={classes.heading}>Annotations for Classification</Typography>
-          </AccordionSummary>
-          <AccordionDetails>
-            <Typography>
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse malesuada lacus ex,
-              sit amet blandit leo lobortis eget.
-            </Typography>
-          </AccordionDetails>
-        </Accordion>
-        <Accordion disabled>
-          <AccordionSummary
-            expandIcon={<ExpandMoreIcon />}
-            aria-controls="panel2a-content"
-            id="panel2a-header"
-            className={classes.header}
-          >
-            <Typography className={classes.heading}>Sample of 17,509 Images</Typography>
-          </AccordionSummary>
-          <AccordionDetails>
-            <Typography>
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse malesuada lacus ex,
-              sit amet blandit leo lobortis eget.
-            </Typography>
-          </AccordionDetails>
-        </Accordion>
+        <DatasetSummary metadata={this.state.metadata} agcontexts={this.state.agcontexts} classes={classes} rootURL={esURL} upload_id={this.props.upload_id} />
       </div>
     );
   }
 }
 
-export default withStyles(useStyles)(DatasetSummary);
+export const TestDatasetSummary = () => {
+    const props = {
+        "metadata": {
+            "creator": [
+                {"name": "Sebastian Haug"},
+                {"name": "J\u00f6rn Ostermann", "sameAs": "https://orcid.org/0000-0002-6743-3324"}
+            ],
+            "name": "A Crop/Weed Field Image Dataset for the Evaluation of Computer Vision Based Precision Agriculture Tasks",
+            "datePublished": "2015-03-19",
+            "identifier": ["doi:10.1007/978-3-319-16220-1_8"],
+            "license": "https://github.com/cwfid/dataset",
+            "citation": "Sebastian Haug, Jörn Ostermann: A Crop/Weed Field Image Dataset for the Evaluation of Computer Vision Based Precision Agriculture Tasks, CVPPP 2014 Workshop, ECCV 2014"
+        },
+        "agcontexts": [
+            {"n_images": 3, "category_statistics": 
+        {"crop: foo": {"annotation_count": 2, "image_count": 1, "segmentation_count": 2, "bounding_box_count": 2},
+        "weed: bar": {"annotation_count": 3, "image_count": 2, "segmentation_count": 3, "bounding_box_count": 3},
+        "weed: blah": {"annotation_count": 1, "image_count": 1, "segmentation_count": 0, "bounding_box_count": 0}},
+                "id": 77, "lighting": "natural", "bbch_code": "na", "crop_type": "sorghum", "camera_fov": "variable", "camera_lens": "Telephoto", "camera_make": "Canon", "soil_colour": "dark_brown", "camera_angle": 45, "emr_channels": "visual", "location_lat": 80, "camera_height": 500, "location_long": 80, "surface_cover": "oilseed", "cropped_to_plant": true, "surface_coverage": "0-25", "weather_description": "rainy", "bbch_descriptive_text": "stem elongation", "camera_lens_focallength": 180, "grains_descriptive_text": "emergence", "photography_description": "poor lighting"}]}
+    const Out = withStyles(useStyles)(DatasetSummary);
+    return (<Out {...props} />);
+}
+
+export default withStyles(useStyles)(DatasetSummaryPage);

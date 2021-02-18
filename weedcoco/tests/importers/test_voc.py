@@ -20,7 +20,6 @@ AGCONTEXT = {
     "cropped_to_plant": False,
     "id": 0,
     "lighting": "artificial",
-    "location_datum": 4326,
     "location_lat": 90,
     "location_long": 90,
     "photography_description": "foobar",
@@ -42,18 +41,6 @@ COMPLETE_WEEDCOCO = {
         {"id": 0, "name": "weed: lolium perenne"},
         {"id": 1, "name": "weed: rapistrum rugosum"},
     ],
-    "collection_memberships": [
-        {"annotation_id": 0, "collection_id": 0},
-        {"annotation_id": 1, "collection_id": 0},
-        {"annotation_id": 2, "collection_id": 0},
-        {"annotation_id": 3, "collection_id": 0},
-    ],
-    "collections": [
-        {
-            "id": 0,
-            "title": "Dataset collected at Narrabri under artificial " "illumination",
-        }
-    ],
     "images": [
         {
             "agcontext_id": 0,
@@ -61,6 +48,7 @@ COMPLETE_WEEDCOCO = {
             "height": 960,
             "id": 0,
             "width": 1536,
+            "license": 0,
         },
         {
             "agcontext_id": 0,
@@ -68,9 +56,20 @@ COMPLETE_WEEDCOCO = {
             "height": 960,
             "id": 1,
             "width": 1536,
+            "license": 0,
         },
     ],
-    "info": {},
+    "licenses": [{"id": 0, "url": "https://creativecommons.org/licenses/by/4.0/"}],
+    "info": {
+        "description": "Dataset collected at Narrabri under artificial illumination",
+        "year": 2020,
+        "metadata": {
+            "name": "Dataset collected at Narrabri under artificial illumination",
+            "creator": [{"name": "Plony"}],
+            "datePublished": "2020-XX-XX",
+            "license": "https://creativecommons.org/licenses/by/4.0/",
+        },
+    },
 }
 
 
@@ -122,8 +121,8 @@ def test_complete(converter):
         [
             "--agcontext-path",
             TEST_DATA_DIR / "agcontext.yaml",
-            "--collection-path",
-            TEST_DATA_DIR / "collection1.json",
+            "--metadata-path",
+            TEST_DATA_DIR / "metadata1.json",
             "--category-name-map",
             TEST_DATA_DIR / "category_name_map1.yaml",
             "--validate",
@@ -136,8 +135,8 @@ def test_category_name_map2(converter):
         [
             "--agcontext-path",
             TEST_DATA_DIR / "agcontext.yaml",
-            "--collection-path",
-            TEST_DATA_DIR / "collection1.json",
+            "--metadata-path",
+            TEST_DATA_DIR / "metadata1.json",
             "--category-name-map",
             TEST_DATA_DIR / "category_name_map2.yaml",
             "--validate",
@@ -161,30 +160,3 @@ def test_category_name_map2(converter):
         assert _get_name_for_annotation(result, annotation) == _get_name_for_annotation(
             COMPLETE_WEEDCOCO, COMPLETE_WEEDCOCO["annotations"][i]
         )
-
-
-def test_collection_with_fixed_id(converter):
-    result = converter.run(
-        [
-            "--agcontext-path",
-            TEST_DATA_DIR / "agcontext.yaml",
-            "--collection-path",
-            TEST_DATA_DIR / "collection2.yaml",
-            "--category-name-map",
-            TEST_DATA_DIR / "category_name_map1.yaml",
-            "--validate",
-        ]
-    )
-    assert COMPLETE_WEEDCOCO["images"] == result["images"]
-    assert COMPLETE_WEEDCOCO["annotations"] == result["annotations"]
-    assert COMPLETE_WEEDCOCO["categories"] == result["categories"]
-    assert result["collections"] == [
-        {
-            "id": 123,
-            "title": "Dataset collected at Narrabri under artificial illumination",
-        }
-    ]
-    assert result["collection_memberships"] == [
-        {**membership, "collection_id": 123}
-        for membership in COMPLETE_WEEDCOCO["collection_memberships"]
-    ]

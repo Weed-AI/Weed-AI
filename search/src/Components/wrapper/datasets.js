@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import DatasetList from '../dataset/dataset_list';
-import DatasetSummary from '../dataset/dataset_summary';
+import DatasetSummaryPage from '../dataset/dataset_summary';
 import axios from 'axios';
 
 const baseURL = new URL(window.location.origin); 
@@ -63,7 +63,7 @@ class DatasetComponent extends Component {
                 );
             }
        } else {
-           return (<DatasetSummary upload_id={this.state.upload_id} handleUploadid={this.handleUploadid}/>);
+           return (<DatasetSummaryPage upload_id={this.state.upload_id} handleUploadid={this.handleUploadid}/>);
        }
     }
 }

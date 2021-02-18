@@ -1,19 +1,16 @@
-const agcontextSchema = {
+{
   "$id": "https://weedid.sydney.edu.au/schema/AgContext.json",
   "type": "object",
   "required": [
     "id",
     "crop_type",
-    "bbch_descriptive_text",
-    "bbch_code",
-    "grains_descriptive_text",
+    "bbch_growth_range",
     "soil_colour",
     "surface_cover",
     "surface_coverage",
     "weather_description",
     "location_lat",
     "location_long",
-    "location_datum",
     "camera_make",
     "camera_lens",
     "camera_lens_focallength",
@@ -56,52 +53,27 @@ const agcontextSchema = {
       ],
       "description": "Crop type.\nOne of several strings describing the crop grown in the image."
     },
-    "grains_descriptive_text": {
-      "type": "string",
-      "enum": [
-        "emergence",
-        "seedling",
-        "tillering",
-        "stem_elongation",
-        "booting",
-        "ear_emergence",
-        "flowering",
-        "milky_dough",
-        "dough",
-        "ripening",
-        "na"
+    "bbch_growth_range": {
+      "oneOf": [
+        {
+          "type": "array",
+          "title": "BBCH Range",
+          "minItems": 2,
+          "maxItems": 2,
+          "items": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 99,
+            "description": "Minimum and maximum BBCH growth stages (00-99) in the dataset"
+          }
+        },
+        {
+          "type": "string",
+          "title": "Not Applicable",
+          "const": "na"
+        }
       ],
-      "description": "Grains descriptive text.\nOne of ten possible strings describing the crop developmental stage.\nIf this AgContext is not in a cropping environment, use value \"na\"."
-    },
-    "bbch_descriptive_text": {
-      "type": "string",
-      "enum": [
-        "germination",
-        "sprouting",
-        "bud development",
-        "leaf development",
-        "formation of side shoots",
-        "tillering",
-        "stem elongation",
-        "rosette growth",
-        "shoot development",
-        "development of harvestable vegetative parts",
-        "bolting",
-        "inflorescence emergence",
-        "heading",
-        "flowering",
-        "development of fruit",
-        "ripening or maturity of fruit and seed",
-        "senescence",
-        "beginning of dormancy",
-        "na"
-      ],
-      "description": "BBCH descriptive text.\nOne of several possible strings describing the stage of the crop, chosen from a list of possible terms used by the BBCH.\nIf this AgContext is not in a cropping environment, use value \"na\"."
-    },
-    "bbch_code": {
-      "type": "string",
-      "pattern": "^gs[1-9][0-9]$|^gs0[1-9]$|^na$",
-      "description": "BBCG descriptive text.\nOne of several possible strings describing the stage of the crop, chosen from a list of codes used by the BBCH.\nIf this AgContext is not in a cropping environment, use value \"na\"."
+      "description": "BBCH Growth Stage range\nA pair of BBCH Growth Stage codes (00-99) representing the minimum and maximum crop growth stage in the images.\nIf this AgContext is not in a cropping environment, or is in fallow, use value \"na\"."
     },
     "soil_colour": {
       "type": "string",
@@ -144,7 +116,7 @@ const agcontextSchema = {
         "75-100",
         "na"
       ],
-      "description": "Percent of coverage in image.\nApproximate measurement of the percent of the soil in the image that is covered by the surface cover."
+      "description": "Percent of coverage in image.\nApproximate percentage images that is covered by the surface cover."
     },
     "weather_description": {
       "type": "string",
@@ -154,20 +126,13 @@ const agcontextSchema = {
       "type": "number",
       "minimum": -90,
       "maximum": 90,
-      "description": "Latitude in decimal degrees.\nApproximate latitude location of the AgContext, in decimal degrees."
+      "description": "Latitude in decimal degrees.\nApproximate latitude location of the AgContext, in decimal degrees (WGS84)."
     },
     "location_long": {
       "type": "number",
       "minimum": 0,
       "maximum": 180,
-      "description": "Longitude in decimal degrees.\nApproximate longitude location of the AgContext, in decimal degrees."
-    },
-    "location_datum": {
-      "type": "number",
-      "enum": [
-        4326
-      ],
-      "description": "EPSG code of spatial coordinates.\nEuropean Petroleum Survey Group code that identifies the projection used for the spatial coordinates."
+      "description": "Longitude in decimal degrees.\nApproximate longitude location of the AgContext, in decimal degrees (WGS84)."
     },
     "camera_make": {
       "type": "string",
@@ -192,17 +157,17 @@ const agcontextSchema = {
       "description": "Angle of camera. A number representing the angle at which the camera is positioned, in degrees. A camera facing straight down would be 90. A camera facing forward would be 0."
     },
     "camera_fov": {
-      "anyOf": [
+      "oneOf": [
         {
           "type": "number",
+          "title": "Specific",
           "minimum": 1,
           "maximum": 180
         },
         {
           "type": "string",
-          "enum": [
-            "variable"
-          ]
+          "title": "Variable within AgContext",
+          "const": "variable"
         }
       ],
       "description": "Field of view for camera.\nA number representing the angle captured by the camera across the diagonal of an image, measured in degrees.\nIf this is not fixed within the AgContext, use value \"variable\"."
@@ -229,5 +194,3 @@ const agcontextSchema = {
     }
   }
 }
-
-export { agcontextSchema };
