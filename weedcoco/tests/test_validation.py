@@ -274,9 +274,7 @@ def test_id_not_referenced(func, bad_weedcoco):
 def _weedcoco_to_coco(weedcoco):
     coco = copy.deepcopy(weedcoco)
     del coco["agcontexts"]
-    del coco["collections"]
-    del coco["collection_memberships"]
-    # del coco["info"]["metadata"]
+    del coco["info"]["metadata"]
     for image in coco["images"]:
         del image["agcontext_id"]
     return coco
