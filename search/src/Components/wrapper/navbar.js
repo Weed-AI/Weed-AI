@@ -12,6 +12,7 @@ import Tab from '@material-ui/core/Tab';
 import Tabs from '@material-ui/core/Tabs';
 import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
+import CookieConsent from "react-cookie-consent";
 import ReactiveSearchComponent from './reactive_search';
 import UploadComponent from './upload';
 import DatasetComponent from './datasets';
@@ -19,6 +20,7 @@ import WeedCOCOComponent from './weedcoco';
 import AboutComponent from './about';
 import axios from 'axios';
 import Cookies from 'js-cookie';
+import PrivacyComponent from './privacy';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -38,7 +40,17 @@ const useStyles = makeStyles((theme) => ({
     fontSize: '1.8rem',
     fontWeight: 700,
     color: "white",
-  }
+  },
+  footer: {
+    backgroundColor: theme.palette.primary.main,
+    textAlign: "center",
+    padding: '.2em',
+  },
+  cookieConsent: {
+    "& a": {
+      color: "#ccf",
+    },
+  },
 }));
 
 const StyledTabs = withStyles({
@@ -68,7 +80,7 @@ const StyledTab = withStyles((theme) => ({
       opacity: 1
     },
   },
-  selected: {}
+  selected: {},
 }))((props) => <Tab component="a" disableRipple {...props} />);
 
 const sections = [
@@ -159,13 +171,13 @@ export default function NavbarComponent(props) {
   };
 
   return (
-    <div className={classes.root}>
+    <main className={classes.root}>
       <AppBar position="fixed" style={{
-    backgroundImage: "url(/weedai-background-trunc.png)",
-    backgroundRepeat: "no-repeat",
-    backgroundPosition: "right center",
-    backgroundSize: "15rem",
-  }}>
+        backgroundImage: "url(/weedai-background-trunc.png)",
+        backgroundRepeat: "no-repeat",
+        backgroundPosition: "right center",
+        backgroundSize: "15rem",
+      }}>
         { mobileView ?
           <MobileNavbar selectedTab={selectedTab} classes={classes} handleChange={handleChange} /> :
           <DesktopNavbar selectedTab={selectedTab} classes={classes} handleChange={handleChange} /> }
@@ -186,7 +198,29 @@ export default function NavbarComponent(props) {
       {
         selectedTab === "about" && <AboutComponent />
       }
+      {
+        selectedTab === "privacy" && <PrivacyComponent />
+      }
       </div>
-    </div>
+      <footer className={classes.root}>
+        <Box pt={4}>
+          <footer className={classes.footer}>
+            <Typography variant='caption'>
+              <p>Site Copyright &copy; 2021 The University of Sydney. <a href="https://github.com/Sydney-Informatics-Hub/Weed-ID-Interchange/">Contribute on GitHub</a> (MIT Licensed). See our <a href="/privacy">Privacy Policy</a>.</p>
+              <p>Images and annotations are licensed under <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>. See <a href="/datasets">Dataset</a> pages for attribution.</p>
+            </Typography>
+          </footer>
+        </Box>
+      </footer>
+      <CookieConsent
+        location="bottom"
+        cookieName="consentCookie"
+        expires={150}
+        style={{ background: "#2B373B" }}
+        contentClasses={classes.cookieConsent}
+      >
+        This website uses cookies to manage your login to the web site for uploading, and optionally for site analytics. See our <a href="/privacy">Privacy Policy</a>.
+      </CookieConsent>
+    </main>
   );
 }

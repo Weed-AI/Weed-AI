@@ -57,4 +57,4 @@ The software is open source and open to contribution on [GitHub](https://github.
 
 # Privacy
 
-The collection of information is bound by our Privacy Policy.
+The collection of information is bound by our [Privacy Policy](/privacy).
