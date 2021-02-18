@@ -32,6 +32,7 @@ def test_task_type():
     for entry in indexer.generate_index_entries():
         assert isinstance(entry["task_type"], list)
     # TODO: test the task type for different input annotation data
+    # TODO: test for "segmentation": []
     pytest.xfail("Not yet implemented")
 
 
