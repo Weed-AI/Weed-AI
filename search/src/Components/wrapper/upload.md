@@ -49,4 +49,10 @@ will appear on the datasets page for other users to peruse.
 
 Only one dataset per uploader can be in submission and review at any time.
 
+## Prepare for your upload
 
+Some tips to prepare your dataset:
+
+1. [Construct and save an AgContext](/editor) (download it as JSON).
+2. Get a DOI and [construct and save metadata](/meta-editor).
+3. Get the annotations into MS COCO format. You might want to use the `weedcoco.importers` package of the [`weedcoco` Python library](https://github.com/Sydney-Informatics-Hub/Weed-ID-Interchange), or using a third party tool like [Roboflow](https://roboflow.com).
