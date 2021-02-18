@@ -5,7 +5,7 @@ set directory=Z:\weedAI_uploads\20200701_cp_st2_19345082
 set cocoName=20200701_cp_st2_19345082
 
 REM set this as the path to your downloaded weedcoco directory
-cd "C:\Users\gcol4791\PycharmProjects\Weed-ID-Interchange\Examples"
+cd REM INSERT YOUR PATH TO VOC_CONVERT.PY HERE
 
 python voc_to_coco.py^
  --voc-dir %directory%\voc^
