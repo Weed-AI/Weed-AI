@@ -1,0 +1,16 @@
+$id: https://weedid.sydney.edu.au/schema/CocoCategory.json
+type: object
+required:
+  - id
+  - name
+
+properties:
+  id:
+    type: number
+    description: |-
+      A number identifying the image.
+
+  name:
+    type: string
+    description: |-
+      A category for an annotation
