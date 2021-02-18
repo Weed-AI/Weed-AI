@@ -135,6 +135,11 @@ def main():
     ap.add_argument("--keep-original-ID", default=True, type=bool)
     ap.add_argument("--voc-to-coco", default=True, type=bool)
     ap.add_argument("--start-index", default=0, type=int)
+    ap.add_argument(
+        "--category-name-map",
+        type=Path,
+        help="JSON or YAML mapping of VOC names to WeedCOCO category names",
+    )
     ap.add_argument("--save-image-dir", type=str, help='existing save directory for images')
     ap.add_argument("--save-voc-dir", type=str, help='existing save directory for VOC files')
     ap.add_argument("--validate", action="store_true", default=False)
@@ -146,7 +151,7 @@ def main():
                                                     saveImageDir=args.save_image_dir, saveVOCDir=args.save_voc_dir)
 
     if args.voc_to_coco:
-        coco = voc_to_coco(vocDir, imageDir)
+        coco = voc_to_coco(vocDir, imageDir, category_mapping=args.category_name_map)
 
         if args.validate:
             validate(coco)
