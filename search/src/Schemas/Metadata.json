@@ -44,7 +44,7 @@
         "sameAs": {
           "type": "string",
           "format": "uri",
-          "title": "ROR ID",
+          "title": "Research Organization Registry (ROR) ID",
           "description": "ROR ID (see https://ror.org)"
         }
       },
