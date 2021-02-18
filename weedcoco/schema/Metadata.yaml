@@ -16,14 +16,12 @@ definitions:
         type: string
       givenName:
         type: string
-        title: Given Name (optional)
       familyName:
         type: string
-        title: Family Name (optional)
       sameAs:
         type: string
         format: uri
-        title: ORCID ID (optional)
+        title: ORCID ID
         description: ORCID ID (see https://orcid.org)
     title: Person
   Organization:
@@ -36,7 +34,7 @@ definitions:
       sameAs:
         type: string
         format: uri
-        title: Research Organization Registry (ROR) ID
+        title: ROR ID
         description: ROR ID (see https://ror.org)
     title: Organization
 properties:
