@@ -18,15 +18,17 @@
           "type": "string"
         },
         "givenName": {
-          "type": "string"
+          "type": "string",
+          "title": "Given Name (optional)"
         },
         "familyName": {
-          "type": "string"
+          "type": "string",
+          "title": "Family Name (optional)"
         },
         "sameAs": {
           "type": "string",
           "format": "uri",
-          "title": "ORCID ID",
+          "title": "ORCID ID (optional)",
           "description": "ORCID ID (see https://orcid.org)"
         }
       },
@@ -44,7 +46,7 @@
         "sameAs": {
           "type": "string",
           "format": "uri",
-          "title": "ROR ID",
+          "title": "Research Organization Registry (ROR) ID",
           "description": "ROR ID (see https://ror.org)"
         }
       },
@@ -92,6 +94,10 @@
         "description": "Another URL for this dataset"
       },
       "title": "Other URIs for this dataset (e.g. GitHub, institutional repository)"
+    },
+    "citation": {
+      "type": "string",
+      "description": "Identifies academic articles that are recommended by the data provider be cited in addition to the dataset itself."
     },
     "datePublished": {
       "type": "string",

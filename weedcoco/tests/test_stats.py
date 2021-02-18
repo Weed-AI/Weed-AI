@@ -107,7 +107,7 @@ SMALL_WEEDCOCO = {
             "id": 0,
             "agcontext_name": "cwfid",
             "crop_type": "other",
-            "bbch_growth_range": [10, 20],
+            "bbch_growth_range": {"min": 10, "max": 20},
             "soil_colour": "grey",
             "surface_cover": "none",
             "surface_coverage": "0-25",
