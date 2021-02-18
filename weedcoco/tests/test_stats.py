@@ -1,3 +1,4 @@
+import copy
 from weedcoco.stats import WeedCOCOStats
 
 
@@ -176,6 +177,62 @@ def test_stats():
             "image_count": 2,
             "segmentation_count": 5,
             "bounding_box_count": 5,
+        },
+        {
+            "agcontext_id": 1,
+            "annotation_count": 1,
+            "image_count": 1,
+            "segmentation_count": 0,
+            "bounding_box_count": 0,
+        },
+    ]
+
+
+def test_stats_some_missing():
+    coco_without_segmentation = copy.deepcopy(SMALL_WEEDCOCO)
+    for ann in coco_without_segmentation["annotations"]:
+        if "segmentation" in ann:
+            del ann["segmentation"]
+
+    stats = WeedCOCOStats(coco_without_segmentation)
+
+    assert "segmentation" in stats.annotations
+    assert "bounding box" in stats.annotations
+
+    assert stats.category_summary.reset_index().to_dict(orient="records") == [
+        {
+            "agcontext_id": 0,
+            "category_id": 0,
+            "annotation_count": 2,
+            "image_count": 1,
+            "segmentation_count": 0,
+            "bounding_box_count": 0,
+        },
+        {
+            "agcontext_id": 0,
+            "category_id": 1,
+            "annotation_count": 3,
+            "image_count": 2,
+            "segmentation_count": 0,
+            "bounding_box_count": 0,
+        },
+        {
+            "agcontext_id": 1,
+            "category_id": 1,
+            "annotation_count": 1,
+            "image_count": 1,
+            "segmentation_count": 0,
+            "bounding_box_count": 0,
+        },
+    ]
+
+    assert stats.agcontext_summary.reset_index().to_dict(orient="records") == [
+        {
+            "agcontext_id": 0,
+            "annotation_count": 5,
+            "image_count": 2,
+            "segmentation_count": 0,
+            "bounding_box_count": 0,
         },
         {
             "agcontext_id": 1,
