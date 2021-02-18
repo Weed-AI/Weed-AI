@@ -51,7 +51,7 @@ Each set of imagery used within the database should also be cited with the corre
 # Acknowledgements
 The development of Weed-AI has been funded by the [Grains Research and Development Corporation (GRDC)](https://grdc.com.au) PROC-9175960 grant. The platform was developed by the [Sydney Informatics Hub](https://www.sydney.edu.au/research/facilities/sydney-informatics-hub.html), a core research facility of the University of Sydney, as part of a research collaboration with the [Australian Centre for Field Robotics](https://www.sydney.edu.au/engineering/our-research/robotics-and-intelligent-systems/australian-centre-for-field-robotics.html) and the [Precision Weed Control Group](https://www.sydney.edu.au/science/our-research/research-areas/life-and-environmental-sciences/precision-weed-control-group.html) at the University of Sydney.
 
-The software is open source and open to contribution on [GitHub](https://github.com/Sydney-Informatics-Hub/Weed-ID-Interchange). If you have any issues, suggestions or would like to contribute to the project please do so through weed-ai@sydney.edu.au or GitHub.
+The software is open source and open to contribution on [GitHub](https://github.com/Sydney-Informatics-Hub/Weed-ID-Interchange). If you have any issues, suggestions or would like to contribute to the project please so through Github or by emailing m.j..walsh@sydney.edu.au.
 
 [![The University of Sydney logo](/usyd-logo.png "The University of Sydney")](https://sydney.edu.au)
 
