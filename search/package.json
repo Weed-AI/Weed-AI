@@ -24,6 +24,7 @@
     "node-fetch": "^2.6.1",
     "node-forge": "^0.10.0",
     "react": "^16.13.1",
+    "react-cookie-consent": "^6.2.2",
     "react-dom": "^16.13.1",
     "react-dropzone-uploader": "^2.11.0",
     "react-flip-move": "^3.0.4",

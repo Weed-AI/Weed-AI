@@ -47,6 +47,12 @@ def test_growth_range():
     )
     for entry in indexer.generate_index_entries():
         growth_range = entry["agcontext"]["bbch_growth_range"]
-        assert growth_range == [10, 20]
+        assert growth_range == {"min": 10, "max": 20}
         growth_stage_texts = entry["agcontext"]["growth_stage_texts"]
         assert len(growth_stage_texts) == 2
+        assert entry["agcontext"]["growth_stage_min_text"] in growth_stage_texts
+        assert entry["agcontext"]["growth_stage_max_text"] in growth_stage_texts
+        assert (
+            entry["agcontext"]["growth_stage_max_text"]
+            != entry["agcontext"]["growth_stage_min_text"]
+        )
