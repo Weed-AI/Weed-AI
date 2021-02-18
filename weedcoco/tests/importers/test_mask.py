@@ -1,5 +1,6 @@
 import pathlib
 import json
+import shutil
 
 import pytest
 
@@ -122,10 +123,51 @@ def test_excess_categories(converter):
 
 def test_too_many_colors_unmapped(converter):
     with pytest.warns(UserWarning, match="only 2 of these are present"):
-        actual = converter.run(
+        converter.run(
             [
                 "--category-map",
                 TEST_DATA_DIR / "category_name_cobbity-too_many_mapped.yaml",
             ]
         )
     # TODO: assert re relationship of actual to basic case
+
+
+@pytest.mark.parametrize(
+    "on_missing_mask,ctx",
+    [
+        ("error", pytest.raises(FileNotFoundError, match="unma.png")),
+        ("warn", pytest.warns(UserWarning, match="unma.png")),
+        ("skip", pytest.warns(None)),
+    ],
+)
+def test_on_missing_mask(on_missing_mask, ctx, converter, tmpdir):
+    tmpdir.mkdir("test_images")
+    for path in TEST_IMAGE_DIR.glob("*"):
+        shutil.copy(path, tmpdir / "test_images" / path.name)
+
+    baseline = converter.run(
+        [
+            "--category-map",
+            TEST_DATA_DIR / "category_name_cobbity.yaml",
+            "--image-dir",
+            tmpdir / "test_images",
+        ]
+    )
+    # add an additional image
+    shutil.copy(
+        next(TEST_IMAGE_DIR.glob("*")), tmpdir / "test_images" / "unmatched_name.jpg"
+    )
+
+    with ctx:
+        actual = converter.run(
+            [
+                "--category-map",
+                TEST_DATA_DIR / "category_name_cobbity.yaml",
+                "--image-dir",
+                tmpdir / "test_images",
+                "--on-missing-mask",
+                on_missing_mask,
+            ]
+        )
+    if on_missing_mask != "error":
+        assert actual == baseline

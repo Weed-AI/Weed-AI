@@ -56,15 +56,26 @@
     "bbch_growth_range": {
       "oneOf": [
         {
-          "type": "array",
+          "type": "object",
           "title": "BBCH Range",
-          "minItems": 2,
-          "maxItems": 2,
-          "items": {
-            "type": "integer",
-            "minimum": 0,
-            "maximum": 99,
-            "description": "Minimum and maximum BBCH growth stages (00-99) in the dataset"
+          "required": [
+            "min",
+            "max"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "min": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 99,
+              "description": "Minimum BBCH growth stage (00-99) in the dataset"
+            },
+            "max": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 99,
+              "description": "Maximum BBCH growth stage (00-99) in the dataset"
+            }
           }
         },
         {
