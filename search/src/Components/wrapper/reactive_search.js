@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import Tooltip from '@material-ui/core/Tooltip';
 import {
     ReactiveBase,
     RangeSlider,
@@ -47,7 +48,7 @@ const WeedAIResultCard = (props) => {
                 // TODO: make this more idiomatically React
                 Array.from(new Set(item.annotation__category__name)).map((annotName) => {
                     const annot = annotName.match(/^[^:]*/)
-                    return annot.length > 0 ? (<li className={annot[0]}>{annot[0]}</li>) : ""
+                    return annot.length > 0 ? (<Tooltip title={annotName}><li className={annot[0]}>{annot[0]}</li></Tooltip>) : ""
                 })
             }
             </ul>
