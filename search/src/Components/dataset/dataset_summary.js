@@ -51,6 +51,10 @@ const baseURL = new URL(window.location.origin);
 
 const AgContextFieldList = (props) => {
     const {title, agcontext, fields, classes, ...accordionProps} = props;
+    const formatters = {
+      bbch_growth_range: (val) => (val["min"] + " to " + val["max"]),
+    }
+    const format = (key, val) => (formatters.hasOwnProperty(key) ? formatters[key](val) : val);
     return (
       <Accordion {...accordionProps}>
         <AccordionSummary
@@ -64,7 +68,7 @@ const AgContextFieldList = (props) => {
         <AccordionDetails>
           <ul>
             {fields.map(key =>
-            (agcontext[key] ? <li key={key}><Typography variant='body2'>{snakeToText(key)}:&nbsp;{agcontext[key]}</Typography></li> : ""))
+            (agcontext[key] ? <li key={key}><Typography variant='body2'>{snakeToText(key)}:&nbsp;{format(key, agcontext[key])}</Typography></li> : ""))
             }
           </ul>
         </AccordionDetails>
