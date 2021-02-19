@@ -1,5 +1,3 @@
-from weedcoco.importers.voc import voc_to_coco
-from weedcoco.validation import validate
 from pascal_voc_writer import Writer
 from pathlib import Path
 from tqdm.auto import trange
@@ -10,6 +8,12 @@ import time
 import json
 import cv2
 import os
+
+from weedcoco.importers import voc
+from weedcoco.validation import validate
+from weedcoco.utils import load_json_or_yaml
+from weedcoco.utils import add_agcontext_from_file
+from weedcoco.utils import add_metadata_from_file
 
 def download_png(url, name, saveDir):
     '''
@@ -132,14 +136,14 @@ def main():
 
     ap.add_argument("--labelbox-json", required=True, type=str, help='path to downloaded labelbox JSON file')
     ap.add_argument("--save-dir", required=True, type=str)
-    ap.add_argument("--keep-original-ID", default=True, type=bool)
-    ap.add_argument("--voc-to-coco", default=True, type=bool)
+    ap.add_argument("--keep-original-ID", action="store_true", default=False)
+    ap.add_argument("--voc-to-coco", action="store_true", default=False)
     ap.add_argument("--start-index", default=0, type=int)
     ap.add_argument(
         "--category-name-map",
         type=Path,
-        help="JSON or YAML mapping of VOC names to WeedCOCO category names",
-    )
+        help="JSON or YAML mapping of VOC names to WeedCOCO category names")
+    ap.add_argument("--metadata-path", type=Path)
     ap.add_argument("--save-image-dir", type=str, help='existing save directory for images')
     ap.add_argument("--save-voc-dir", type=str, help='existing save directory for VOC files')
     ap.add_argument("--validate", action="store_true", default=False)
@@ -151,13 +155,38 @@ def main():
                                                     saveImageDir=args.save_image_dir, saveVOCDir=args.save_voc_dir)
 
     if args.voc_to_coco:
-        coco = voc_to_coco(vocDir, imageDir, category_mapping=args.category_name_map)
+        if args.category_name_map:
+            category_name_map = load_json_or_yaml(args.category_name_map)
+            keys, values = zip(*category_name_map.items())
+            categories = [{"id": i, "name": value} for i, value in enumerate(values)]
+            category_mapping = {key: i for i, key in enumerate(keys)}
+        else:
+            categories = None
+            category_mapping = None
+
+        coco = voc.voc_to_coco(vocDir, imageDir, category_mapping=category_mapping)
+
+        if not coco["images"]:
+            ap.error(f"Found no .xml files in {args.voc_dir}")
+
+        if categories is not None:
+            coco["categories"] = categories
+        if args.agcontext_path:
+            add_agcontext_from_file(coco, args.agcontext_path)
+        if args.metadata_path:
+            add_metadata_from_file(coco, args.metadata_path)
 
         if args.validate:
             validate(coco)
 
         with args.out_path.open("w") as out:
             json.dump(coco, out, indent=4)
+
+        try:
+            if args.vis_ann:
+                voc.inspect_annotations(cocofile=args.out_path, saveImageDir=args.image_dir)
+        except Exception:
+            print('Vis not possible')
 
 
 if __name__ == "__main__":

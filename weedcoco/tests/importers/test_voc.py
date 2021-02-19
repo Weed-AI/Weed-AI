@@ -3,7 +3,7 @@ import json
 
 import pytest
 
-from weedcoco.importers.voc import main
+from voc import main
 
 TEST_DATA_DIR = pathlib.Path(__file__).parent / "voc_data"
 TEST_VOC_DIR = TEST_DATA_DIR / "VOC"

@@ -8,9 +8,21 @@ follow these instructions starting at Step XX. This will explain the conversion 
 subsequent upload.
 
 ## Step 1: Downloading the LabelBox JSON
-Assuming you have labelled your images to the desired standard in the Labelbox editor and downloaded
-the JSON, 
+Assuming you have labelled your images to the standard required for the database in the Labelbox editor and downloaded
+the JSON
 
+```
+upload folder
+├── img
+│   ├── all your images will end up here
+│   └── weed1.png
+├── voc
+    ├── all you .xml files will end up here
+    ├── weed1.xml
+├──
+└── labelbox_output.json
+
+```
 ## Step 2: Download images, annotations and convert to COCO
 
 ## Step 2a: Convert VOC annotations to COCO (without downloading from Labelbox)

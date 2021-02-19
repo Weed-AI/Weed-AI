@@ -9,7 +9,7 @@ import jsonschema
 import yaml
 
 SCHEMA_DIR = pathlib.Path(__file__).parent / "schema"
-MAIN_SCHEMA_URI = "https://weed-ai.sydney.edu.au/schema/main.json"
+MAIN_SCHEMA_URI = "https://weedid.sydney.edu.au/schema/main.json"
 
 
 class ValidationError(Exception):

@@ -4,6 +4,18 @@ from typing import Optional, Mapping
 import argparse
 import json
 
+try:
+    from pycocotools.coco import COCO
+    import matplotlib.pyplot as plt
+    import numpy as np
+    import time
+    import cv2
+    import os
+
+    visualisation = True
+except ModuleNotFoundError:
+    visualisation = False
+
 from lxml import etree
 
 from weedcoco.validation import validate
@@ -95,6 +107,37 @@ def voc_to_coco(
     return out
 
 
+def inspect_annotations(cocofile, saveImageDir, inspectNumber=5):
+    '''
+    Displays a random selection of images and annotations for a sanity check to make sure the conversion worked
+    :param cocofile: path to the cocofile, not the file itself
+    :param saveImageDir: directory of the images
+    :param inspectNumber: number to inspect
+    :return:
+    '''
+    # load the file using pycocotools
+    annotations = COCO(annotation_file=cocofile)
+    imgIDs = annotations.getImgIds()
+
+    # iterate over random selection
+    for i in range(inspectNumber):
+        randID = imgIDs[np.random.randint(0, len(imgIDs))]
+        annIDs = annotations.getAnnIds(imgIds=[randID])
+        imageAnnotations = annotations.loadAnns(annIDs)
+        imageInfo = annotations.loadImgs([randID])[0]
+        imagePath = os.path.join(saveImageDir, imageInfo['file_name'])
+        image = cv2.imread(imagePath)
+        image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+
+        plt.figure()
+        plt.axis('off')
+        plt.imshow(image)
+
+        # use the inbuilt pycocotools showAnns function to display the annotation
+        annotations.showAnns(imageAnnotations, draw_bbox=True)
+        plt.show()
+
+
 def main(args=None):
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--voc-dir", required=True, default=".", type=Path)
@@ -136,6 +179,13 @@ def main(args=None):
 
     with args.out_path.open("w") as out:
         json.dump(coco, out, indent=4)
+
+    try:
+        if args.vis_ann and visualisation:
+            inspect_annotations(cocofile=args.out_path, saveImageDir=args.image_dir)
+    except Exception:
+        print('Vis not possible')
+
 
 
 if __name__ == "__main__":
