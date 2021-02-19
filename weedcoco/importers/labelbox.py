@@ -144,6 +144,7 @@ def main():
         type=Path,
         help="JSON or YAML mapping of VOC names to WeedCOCO category names")
     ap.add_argument("--metadata-path", type=Path)
+    ap.add_argument("--agcontext-path", type=Path)
     ap.add_argument("--save-image-dir", type=str, help='existing save directory for images')
     ap.add_argument("--save-voc-dir", type=str, help='existing save directory for VOC files')
     ap.add_argument("--validate", action="store_true", default=False)
