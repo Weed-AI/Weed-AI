@@ -79,10 +79,9 @@ export default function DatasetList(props) {
           <TableHead>
             <TableRow>
               <TableCell className={classes.tableHeader}>Dataset Title</TableCell>
-              <TableCell className={classes.tableHeader}>Task Type</TableCell>
-              <TableCell className={classes.tableHeader}>Crop</TableCell>
-              <TableCell className={classes.tableHeader}>Weed Species</TableCell>
-              <TableCell className={classes.tableHeader}>Contributor</TableCell>
+              <!-- <TableCell className={classes.tableHeader}>Task Type</TableCell> -->
+              <!-- <TableCell className={classes.tableHeader}>Crop</TableCell> -->
+              <!-- <TableCell className={classes.tableHeader}>Weed Species</TableCell> -->
               {inReview ? <TableCell className={classes.tableHeader}>Contact</TableCell> : ""}
               <TableCell className={classes.tableHeader}>Upload Date</TableCell>
               {inReview ? <TableCell className={classes.tableHeader}>Command</TableCell> : ""}
@@ -96,10 +95,9 @@ export default function DatasetList(props) {
                   {row.name}
                 </Link>
                 </TableCell>
-                <TableCell>Classification</TableCell>
-                <TableCell>Pasture</TableCell>
-                <TableCell></TableCell>
-                <TableCell>{row.contributor}</TableCell>
+                <!-- <TableCell>{row.task_type}</TableCell> -->
+                <!-- <TableCell>{row.crop_type}</TableCell> -->
+                <!-- <TableCell>{row.weed_species}</TableCell> -->
                 {inReview ? <TableCell><a href="mailto:{row.contributor_email}">{row.contributor_email}</a></TableCell> : ""}
                 <TableCell>{row.upload_date}</TableCell>
                 {inReview
