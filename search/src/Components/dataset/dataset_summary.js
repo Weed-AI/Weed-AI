@@ -52,7 +52,7 @@ const baseURL = new URL(window.location.origin);
 const AgContextFieldList = (props) => {
     const {title, agcontext, fields, classes, ...accordionProps} = props;
     const formatters = {
-      bbch_growth_range: (val) => (val["min"] + " to " + val["max"]),
+      bbch_growth_range: (val) => (val["min"] ? val["min"] + " to " + val["max"] : val),
     }
     const format = (key, val) => (formatters.hasOwnProperty(key) ? formatters[key](val) : val);
     return (
