@@ -529,7 +529,6 @@ class ReactiveSearchComponent extends Component {
                         "grains_text_filter",
                         "task_type_filter",
                         "lighting_filter",
-                        "resslider",
                     ]
                 },
                 ...multilistFacetProps
@@ -609,24 +608,6 @@ class ReactiveSearchComponent extends Component {
                         placeholder="Search Lighting"
                         filterLabel="Lighting"
                         {...makeProps("lighting_filter", true)}
-                    />
-                    <RangeSlider
-                        componentId="resslider"
-                        dataField="resolution"
-                        title="Image Resolution (pixels)"
-                        range={{
-                            "start": 0,
-                            "end": 1500000
-                        }}
-                        rangeLabels={{
-                            "start": "Start",
-                            "end": "End"
-                        }}
-                        stepValue={10000}
-                        showHistogram={true}
-                        showFilter={true}
-                        interval={15000}
-                        {...makeProps("resslider", false)}
                     />
                 </div>
                 <div style={{ position: "absolute", left: "20rem", paddingRight: "1rem" }}>
