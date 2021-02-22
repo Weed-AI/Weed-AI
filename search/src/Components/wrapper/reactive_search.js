@@ -50,7 +50,7 @@ const WeedAIResultCard = (props) => {
                 })
             }
             </ul>
-            {" in " + formatCropType(item.agcontext__crop_type) + (item.agcontext__bbch_growth_range == "na" ? "" : " (" + formatGrowthRange(item) + ")") + "."}
+            {" in " + formatCropType(item.agcontext__crop_type) + (item.agcontext__growth_stage_min_text ? " (" + formatGrowthRange(item) + ")" : "") + "."}
           <div><a title={item.upload_id in datasetNames ? datasetNames[item.upload_id] : ""} href={`${baseURL}datasets/${item.upload_id}`}>See Dataset</a></div>
         </ResultCard.Description>
     </ResultCard>

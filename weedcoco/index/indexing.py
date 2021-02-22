@@ -68,11 +68,15 @@ class ElasticSearchIndexer:
                 id_lookup[key, obj["id"]] = obj
 
         variable_to_null_fields = ["camera_fov", "camera_lens_focallength"]
+        na_to_null_fields = ["bbch_growth_range"]
 
         for agcontext in coco["agcontexts"]:
             # massage for ES
             for field in variable_to_null_fields:
                 if agcontext.get(field) == "variable":
+                    del agcontext[field]
+            for field in na_to_null_fields:
+                if agcontext.get(field) == "na":
                     del agcontext[field]
             # textual label for growth stage
             if "bbch_growth_range" not in agcontext:
@@ -85,13 +89,13 @@ class ElasticSearchIndexer:
                     growth_stage_texts.add(
                         lookup_growth_stage_name(i, scheme="grain_ranges")
                     )
+                agcontext["growth_stage_min_text"] = lookup_growth_stage_name(
+                    lo, scheme="grain_ranges"
+                )
+                agcontext["growth_stage_max_text"] = lookup_growth_stage_name(
+                    hi, scheme="grain_ranges"
+                )
             agcontext["growth_stage_texts"] = sorted(growth_stage_texts)
-            agcontext["growth_stage_min_text"] = lookup_growth_stage_name(
-                lo, scheme="grain_ranges"
-            )
-            agcontext["growth_stage_max_text"] = lookup_growth_stage_name(
-                hi, scheme="grain_ranges"
-            )
 
         for annotation in coco["annotations"]:
             image = id_lookup["images", annotation["image_id"]]
