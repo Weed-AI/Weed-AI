@@ -7,7 +7,9 @@ import {
   materialCells,
   materialRenderers,
 } from '@jsonforms/material-renderers';
+import { createAjv } from '@jsonforms/core';
 import { JsonForms } from '@jsonforms/react';
+import { constTester, ConstRenderer } from '../formRenderers/ConstRenderer';
 import UploadJsonButton from './UploadJsonButton';
 
 
@@ -18,6 +20,10 @@ const uischema = {
             "type": "Category",
             "label": "Basics",
             "elements": [
+                {
+                    "type": "Control",
+                    "scope": "#/properties/@type"
+                },
                 {
                     "type": "Control",
                     "scope": "#/properties/name"
@@ -74,7 +80,8 @@ const uischema = {
 };
 
 const renderers = [
-  ...materialRenderers
+  ...materialRenderers,
+  { tester: constTester, renderer: ConstRenderer },
 ];
 
 // TODO: refactor boilerplate wrt AgContextForm code
@@ -103,6 +110,7 @@ class MetadataForm extends Component {
               data={this.props.formData}
               renderers={renderers}
               cells={materialCells}
+              ajv = {createAjv({useDefaults: true})}
               onChange={e => {
                   if (this.props.handleValidation){
                     this.props.handleValidation('metadata', e.errors.length === 0);

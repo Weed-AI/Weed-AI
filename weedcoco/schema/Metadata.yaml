@@ -2,7 +2,9 @@ $id: https://weedid.sydney.edu.au/schema/Metadata.json
 # Designed to be conformant to flattened schema.org/Dataset
 type: object
 required:
+  - "@type"
   - name
+  - description  # required by Google Dataset Search (see Rich Results Test)
   - creator
   - datePublished
   - license
@@ -10,8 +12,12 @@ definitions:
   Person:
     type: object
     required:
+      - "@type"
       - name
     properties:
+      "@type":
+        type: string
+        const: Person
       name:
         type: string
       givenName:
@@ -29,8 +35,12 @@ definitions:
   Organization:
     type: object
     required:
+      - "@type"
       - name
     properties:
+      "@type":
+        type: string
+        const: Organization
       name:
         type: string
       sameAs:
@@ -40,6 +50,9 @@ definitions:
         description: ROR ID (see https://ror.org)
     title: Organization
 properties:
+  "@type":
+    type: string
+    const: Dataset
   name:
     type: string
     description: A name for this dataset, or its publication title
@@ -54,6 +67,7 @@ properties:
   description:
     type: string
     description: A description of this dataset
+    default: Crop photography with weeds annotated.
   identifier:
     type: array
     items:
