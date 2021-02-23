@@ -23,10 +23,10 @@ from django.http import HttpResponseForbidden, HttpResponseNotAllowed
 
 def elasticsearch_query(request):
     try:
-        elasticsearch_url = "/".join(request.path.split("/")[3:])
+        elasticsearch_url = "/".join(request.path.split("/")[2:])
     except Exception:
         return HttpResponseForbidden("Invalid query format")
-    if not elasticsearch_url.startswith("_msearch"):
+    if not elasticsearch_url.startswith("weedid/_msearch"):
         return HttpResponseForbidden("Only _msearch queries are currently forwarded")
     if request.method not in ["POST", "GET"]:
         return HttpResponseNotAllowed(request.method)
