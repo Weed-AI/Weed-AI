@@ -218,10 +218,11 @@ export const TestDatasetSummary = () => {
     const props = {
         "metadata": {
             "creator": [
-                {"name": "Sebastian Haug"},
-                {"name": "J\u00f6rn Ostermann", "sameAs": "https://orcid.org/0000-0002-6743-3324"}
+                {"name": "Sebastian Haug", "@type": "Person"},
+                {"name": "J\u00f6rn Ostermann", "sameAs": "https://orcid.org/0000-0002-6743-3324", "@type": "Person"}
             ],
             "name": "A Crop/Weed Field Image Dataset for the Evaluation of Computer Vision Based Precision Agriculture Tasks",
+            "description": "Weeds annotated in carrot crops.",
             "datePublished": "2015-03-19",
             "identifier": ["doi:10.1007/978-3-319-16220-1_8"],
             "license": "https://github.com/cwfid/dataset",

@@ -2,7 +2,6 @@ $id: https://weedid.sydney.edu.au/schema/Metadata.json
 # Designed to be conformant to flattened schema.org/Dataset
 type: object
 required:
-  - "@type"
   - name
   - description  # required by Google Dataset Search (see Rich Results Test)
   - creator

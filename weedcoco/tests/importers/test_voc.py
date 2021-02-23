@@ -65,7 +65,8 @@ COMPLETE_WEEDCOCO = {
         "year": 2020,
         "metadata": {
             "name": "Dataset collected at Narrabri under artificial illumination",
-            "creator": [{"name": "Plony"}],
+            "description": "Dataset collected at Narrabri under artificial illumination",
+            "creator": [{"name": "Plony", "@type": "Person"}],
             "datePublished": "2020-XX-XX",
             "license": "https://creativecommons.org/licenses/by/4.0/",
         },

@@ -2,7 +2,6 @@
   "$id": "https://weedid.sydney.edu.au/schema/Metadata.json",
   "type": "object",
   "required": [
-    "@type",
     "name",
     "description",
     "creator",
