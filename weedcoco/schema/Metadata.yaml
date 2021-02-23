@@ -28,9 +28,11 @@ definitions:
       email:
         type: string
         format: email
+        title: Email Address (optional)
       address:
         type: string
         description: Physical address
+        title: Address (optional)
       affiliation:
         $ref: "#/definitions/Organization"
     title: Person
