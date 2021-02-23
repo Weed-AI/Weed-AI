@@ -3,7 +3,7 @@ import requests
 import os
 import json
 import traceback
-from core.settings import UPLOAD_DIR, REPOSITORY_DIR
+from core.settings import UPLOAD_DIR, REPOSITORY_DIR, MAX_IMAGE_SIZE
 from weedid.tasks import submit_upload_task, update_index_and_thumbnails
 from weedid.utils import (
     store_tmp_weedcoco,
@@ -69,6 +69,8 @@ def upload_image(request):
         return HttpResponseForbidden("You dont have access to proceed")
     upload_id = request.POST["upload_id"]
     upload_image = request.FILES["upload_image"]
+    if upload_image.size > MAX_IMAGE_SIZE:
+        return HttpResponseForbidden("This image has exceeded the size limit!")
     upload_dir = os.path.join(UPLOAD_DIR, str(user.id), upload_id, "images")
     store_tmp_image(upload_image, upload_dir)
     return HttpResponse(f"Uploaded {upload_image.name} to {upload_dir}")
