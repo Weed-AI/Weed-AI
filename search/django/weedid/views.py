@@ -29,7 +29,14 @@ def set_csrf(request):
 
 
 def elasticsearch_query(request):
-    elasticsearch_url = "/".join(request.path.split("/")[3:])
+    try:
+        elasticsearch_url = "/".join(request.path.split("/")[2:])
+    except Exception:
+        return HttpResponseForbidden("Invalid query format")
+    if not elasticsearch_url.startswith("weedid/_msearch"):
+        return HttpResponseForbidden("Only _msearch queries are currently forwarded")
+    if request.method not in ["POST", "GET"]:
+        return HttpResponseNotAllowed(request.method)
     elasticsearch_response = requests.post(
         url=f"http://elasticsearch:9200/{elasticsearch_url}",
         data=request.body,
