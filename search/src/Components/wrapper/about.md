@@ -42,7 +42,9 @@ WeedCOCO is our format for representing weed identification annotations.
 
 If you found Weed-AI useful in your research or project, please cite the database as:
 
-CITATION TBA by mid 2021
+_Weed-AI: A repository of Weed Images in Crops._ Sydney Institute of Agriculture and Sydney Informatics Hub, the University of Sydney. https://weed-ai.sydney.edu.au/, accessed YYYY-MM-DD.
+
+An academic is TBA by mid 2021
 
 ## Specific Datasets
 
