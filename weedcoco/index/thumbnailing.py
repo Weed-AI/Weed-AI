@@ -48,6 +48,8 @@ def thumbnail_one(coco_image, image_path, thumbnails_dir, thumbnail_size):
 
         draw = ImageDraw.Draw(image)
         draw.rectangle([bx, by, bx + bw, by + bh], outline=color)
+
+    _ensure_dir(bbox_path)
     image.save(bbox_path)
 
 
