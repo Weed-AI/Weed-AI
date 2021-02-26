@@ -9493,6 +9493,14 @@ react-app-polyfill@^1.0.6:
     regenerator-runtime "^0.13.3"
     whatwg-fetch "^3.0.0"
 
+react-cookie-consent@^6.2.2:
+  version "6.2.2"
+  resolved "https://registry.yarnpkg.com/react-cookie-consent/-/react-cookie-consent-6.2.2.tgz#fd29567964bf48c7ce258093d25daf310b9579ee"
+  integrity sha512-lQ55b94orIM7BsKp0lo6/qywVZY4ncAlkiYfj9pFNGHeJR+bXgCGJhB0nt5RH2BYRqxeq1BtCaVDHaXR6n5Z0g==
+  dependencies:
+    js-cookie "^2.2.1"
+    prop-types "^15.7.2"
+
 react-day-picker@^7.0.5:
   version "7.4.8"
   resolved "https://registry.yarnpkg.com/react-day-picker/-/react-day-picker-7.4.8.tgz#675625240d3fae1b41c0a9d5177c968c8517c1d4"

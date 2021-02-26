@@ -1,16 +1,26 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { makeStyles, withStyles } from '@material-ui/core/styles';
 import AppBar from '@material-ui/core/AppBar';
-import Tabs from '@material-ui/core/Tabs';
-import Tab from '@material-ui/core/Tab';
-import Typography from '@material-ui/core/Typography';
 import Box from '@material-ui/core/Box';
+import Drawer from '@material-ui/core/Drawer';
+import IconButton from '@material-ui/core/IconButton';
+import Link from '@material-ui/core/Link';
+import MenuItem from '@material-ui/core/MenuItem';
+import MenuIcon from '@material-ui/icons/Menu';
+import Tab from '@material-ui/core/Tab';
+import Tabs from '@material-ui/core/Tabs';
+import Toolbar from '@material-ui/core/Toolbar';
+import Typography from '@material-ui/core/Typography';
+import CookieConsent from "react-cookie-consent";
 import ReactiveSearchComponent from './reactive_search';
 import UploadComponent from './upload';
 import DatasetComponent from './datasets';
 import WeedCOCOComponent from './weedcoco';
 import AboutComponent from './about';
+import axios from 'axios';
+import Cookies from 'js-cookie';
+import PrivacyComponent from './privacy';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -18,15 +28,29 @@ const useStyles = makeStyles((theme) => ({
     backgroundColor: theme.palette.background.paper,
   },
   container: {
-    marginTop: '3rem'
+    marginTop: '3rem',
+    '@media (max-width: 1000px)': {
+      marginTop: '4.5rem',
+    },
   },
   logo: {
     position: 'absolute',
-    right: '0.7em',
+    right: '2em',
     top: '0.2em',
     fontSize: '1.8rem',
-    fontWeight: 700
-  }
+    fontWeight: 700,
+    color: "white",
+  },
+  footer: {
+    backgroundColor: theme.palette.primary.main,
+    textAlign: "center",
+    padding: '.2em',
+  },
+  cookieConsent: {
+    "& a": {
+      color: "#ccf",
+    },
+  },
 }));
 
 const StyledTabs = withStyles({
@@ -47,6 +71,8 @@ const StyledTab = withStyles((theme) => ({
     fontWeight: theme.typography.fontWeightBold,
     fontSize: theme.typography.pxToRem(18),
     marginRight: theme.spacing(1),
+    paddingLeft: '0px',
+    paddingRight: '0px',
     '&$selected': {
       backgroundColor: 'orange',
     },
@@ -54,8 +80,71 @@ const StyledTab = withStyles((theme) => ({
       opacity: 1
     },
   },
-  selected: {}
+  selected: {},
 }))((props) => <Tab component="a" disableRipple {...props} />);
+
+const sections = [
+  {value: "explore", href: "/explore", label: "Explore"},
+  {value: "datasets", href: "/datasets", label: "Datasets"},
+  {value: "upload", href: "/upload", label: "Upload"},
+  {value: "weedcoco", href: "/weedcoco", label: "WeedCOCO"},
+  {value: "about", href: "/about", label: "About"},
+]
+
+
+const MobileNavbar = (props) => {
+  const {classes, selectedTab, handleChange} = props;
+  const [drawerOpen, setDrawerOpen] = React.useState(false);
+  const getCurrentLabel = () => {
+    const idx = sections.findIndex((x) => x.value == selectedTab);
+    return idx == -1 ? "" : sections[idx].label;
+  }
+  return (
+    <Toolbar>
+      <IconButton
+        edge="start" className={classes.menuButton} color="inherit"
+        aria-label="menu" aria-has-popup="true"
+        onClick={() => {setDrawerOpen(true)}}
+      >
+        <MenuIcon />
+      </IconButton>
+      <Drawer open={drawerOpen} anchor="left" onClose={() => {setDrawerOpen(false)}}>
+        { sections.map((section) =>
+          <Link onClick={handleChange} href={section.href} color="inherit" style={{ textDecoration: "none" }} key={section.label} >
+            <MenuItem selected={selectedTab == section.value}>{section.label}</MenuItem>
+          </Link>
+        ) }
+      </Drawer>
+      <Typography>{getCurrentLabel()}</Typography>
+      <Logo classes={classes} />
+    </Toolbar>
+  );
+}
+
+const Logo = (props) => {
+  const {classes} = props;
+  return (
+      <Typography variant='p' className={classes.logo}><span style={{color: '#f0983a'}}>Weed-</span>AI</Typography>
+  );
+}
+
+const DesktopNavbar = (props) => {
+  const {handleChange, selectedTab, classes} = props;
+  return (
+    <StyledTabs onChange={handleChange} value={selectedTab}>
+      { sections.map((section) => <StyledTab value={section.value} href={section.href} label={section.label} />) }
+      <Logo classes={classes} />
+    </StyledTabs>
+  );
+}
+
+const manageCsrf = () => {
+  const csrftoken = Cookies.get('csrftoken');
+  if (!csrftoken) {
+    // Reloading the page to set up csrf token is a hack
+    axios.get('/api/set_csrf/').then(() => window.location.reload());
+  }
+}
 
 export default function NavbarComponent(props) {
 
@@ -65,22 +154,34 @@ export default function NavbarComponent(props) {
   const { page, dataset_id } = params;
 
   const [selectedTab, setSelectedTab] = React.useState(page);
+  const [mobileView, setMobileView] = React.useState(false);
+
+  useEffect(() => {
+    manageCsrf();
+    const setResponsiveness = () => {
+      return window.innerWidth < 1000
+        ? setMobileView(true)
+        : setMobileView(false);
+    };
+    setResponsiveness();
+    window.addEventListener("resize", () => setResponsiveness());
+  }, []);
 
   const handleChange = (event, newValue) => {
     window.location.assign(`/${newValue}`);
   };
 
   return (
-    <div className={classes.root}>
-      <AppBar position="fixed">
-        <StyledTabs onChange={handleChange} value={selectedTab}>
-          <StyledTab value="explore" href="/explore" label="Explore" />
-          <StyledTab value="datasets" href="/datasets" label="Datasets" />
-          <StyledTab value="upload" href="/upload" label="Upload" />
-          <StyledTab value="weedcoco" href="/weedcoco" label="WeedCOCO" />
-          <StyledTab value="about" href="/about" label="About" />
-          <Typography variant='p' className={classes.logo}><span style={{color: '#f0983a'}}>Weed</span>AI</Typography>
-        </StyledTabs>
+    <main className={classes.root}>
+      <AppBar position="fixed" style={{
+        backgroundImage: "url(/weedai-background-trunc.png)",
+        backgroundRepeat: "no-repeat",
+        backgroundPosition: "right center",
+        backgroundSize: "15rem",
+      }}>
+        { mobileView ?
+          <MobileNavbar selectedTab={selectedTab} classes={classes} handleChange={handleChange} /> :
+          <DesktopNavbar selectedTab={selectedTab} classes={classes} handleChange={handleChange} /> }
       </AppBar>
       <div className={classes.container}>
       {
@@ -98,7 +199,29 @@ export default function NavbarComponent(props) {
       {
         selectedTab === "about" && <AboutComponent />
       }
+      {
+        selectedTab === "privacy" && <PrivacyComponent />
+      }
       </div>
-    </div>
+      <footer className={classes.root}>
+        <Box pt={4}>
+          <footer className={classes.footer}>
+            <Typography variant='caption'>
+              <p>Site Copyright &copy; 2021 The University of Sydney. <a href="https://github.com/Sydney-Informatics-Hub/Weed-ID-Interchange/">Contribute on GitHub</a> (MIT Licensed). See our <a href="/privacy">Privacy Policy</a>.</p>
+              <p>Images and annotations are licensed under <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>. See <a href="/datasets">Dataset</a> pages for attribution.</p>
+            </Typography>
+          </footer>
+        </Box>
+      </footer>
+      <CookieConsent
+        location="bottom"
+        cookieName="consentCookie"
+        expires={150}
+        style={{ background: "#2B373B" }}
+        contentClasses={classes.cookieConsent}
+      >
+        This website uses cookies to manage your login to the web site for uploading, and optionally for site analytics. See our <a href="/privacy">Privacy Policy</a>.
+      </CookieConsent>
+    </main>
   );
 }

@@ -76,7 +76,7 @@ def get_image_average_hash(path, hash_size=8):
 
 
 def check_if_approved_image_extension(image_name):
-    return image_name.lower().endswith((".png", ".jpg", ".jpeg", ".tiff"))
+    return image_name.lower().endswith((".png", ".jpg", ".jpeg", ".tif", ".tiff"))
 
 
 def check_if_approved_image_format(image_ext):

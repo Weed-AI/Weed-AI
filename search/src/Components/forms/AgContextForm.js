@@ -45,10 +45,6 @@ const uischema = {
           "elements": [
             {
               "type": "Control",
-              "scope": "#/properties/location_datum"
-            },
-            {
-              "type": "Control",
               "scope": "#/properties/location_lat"
             },
             {
@@ -144,10 +140,13 @@ class AgContextForm extends Component {
               renderers={renderers}
               cells={materialCells}
               onChange={e => {
+                  if (this.props.handleValidation){
+                    this.props.handleValidation('agcontexts', e.errors.length === 0);
+                  }
                   this.setState({formData: e.data});
                   if (this.props.onChange) {
-					  e.formData = e.data;
-					  e.formData["id"] = 0;
+                      e.formData = e.data;
+                      e.formData["id"] = 0;
                       this.props.onChange(e);
                   }
               }}

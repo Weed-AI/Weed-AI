@@ -13,7 +13,6 @@ import MetadataForm from '../forms/MetadataForm';
 import axios from 'axios';
 import Cookies from 'js-cookie';
 
-const csrftoken = Cookies.get('csrftoken');
 const baseURL = new URL(window.location.origin);
 
 const useStyles = (theme) => ({
@@ -37,7 +36,7 @@ function getSteps(upload_type) {
          ['Upload Coco', 'Add Agcontext', 'Add Metadata', 'Upload Images']
 }
 
-function getStepContent(step, upload_type, upload_id, images, agcontextsFormData, metadataFormData, handleUploadId, handleImages, handleAgContextsFormData, handleMetadataFormData, handleErrorMessage) {
+function getStepContent(step, upload_type, upload_id, images, agcontextsFormData, metadataFormData, handleUploadId, handleImages, handleAgContextsFormData, handleMetadataFormData, handleErrorMessage, handleValidation) {
     if (upload_type === 'coco') {
         switch (step) {
             case 0:
@@ -45,7 +44,7 @@ function getStepContent(step, upload_type, upload_id, images, agcontextsFormData
             case 1:
               return (
                 <React.Fragment>
-                    <AgContextForm formData={agcontextsFormData} onChange={e => {
+                    <AgContextForm formData={agcontextsFormData} handleValidation={handleValidation} onChange={e => {
                         handleAgContextsFormData(e.formData)
                         handleErrorMessage("init")
                     }} />
@@ -55,7 +54,7 @@ function getStepContent(step, upload_type, upload_id, images, agcontextsFormData
             case 2:
               return (
                 <React.Fragment>
-                    <MetadataForm formData={metadataFormData} onChange={e => {
+                    <MetadataForm formData={metadataFormData} handleValidation={handleValidation} onChange={e => {
                         handleMetadataFormData(e.formData)
                         handleErrorMessage("init")
                     }} />
@@ -105,6 +104,7 @@ class UploadStepper extends React.Component {
             images: [],
             ag_context: {},
             metadata: {},
+            coco_form_validation: {'agcontexts': false, 'metadata': false},
             error_message: "init"
         }
         this.isStepOptional = this.isStepOptional.bind(this);
@@ -121,7 +121,8 @@ class UploadStepper extends React.Component {
         this.handleUploadAgcontexts = this.handleUploadAgcontexts.bind(this);
         this.handleUploadMetadata = this.handleUploadMetadata.bind(this)
         this.handleSubmit = this.handleSubmit.bind(this);
-        this.handleExempt = this.handleExempt.bind(this);
+        this.isNextEnabled = this.isNextEnabled.bind(this);
+        this.handleValidation = this.handleValidation.bind(this);
     }
 
     isStepOptional(step, upload_type) {
@@ -202,7 +203,7 @@ class UploadStepper extends React.Component {
                 "upload_id": this.state.upload_id,
                 "ag_contexts": this.state.ag_context
             },
-            headers: {'X-CSRFToken': csrftoken }
+            headers: {'X-CSRFToken': Cookies.get('csrftoken') }
         }).then(res => {
             console.log(res)
             this.handleErrorMessage("")
@@ -222,7 +223,7 @@ class UploadStepper extends React.Component {
                 "upload_id": this.state.upload_id,
                 "metadata": this.state.metadata
             },
-            headers: {'X-CSRFToken': csrftoken }
+            headers: {'X-CSRFToken': Cookies.get('csrftoken') }
         }).then(res => {
             console.log(res)
             this.handleErrorMessage("")
@@ -242,15 +243,23 @@ class UploadStepper extends React.Component {
             method: 'post',
             url: baseURL + "api/submit_deposit/",
             data: body,
-            headers: {'Content-Type': 'multipart/form-data', 'X-CSRFToken': csrftoken }
+            headers: {'Content-Type': 'multipart/form-data', 'X-CSRFToken': Cookies.get('csrftoken') }
         })
     }
 
-    handleExempt(){
+    handleValidation(formKey, status){
+        this.setState(prevState => {
+            const newState = {coco_form_validation: {...prevState.coco_form_validation}}
+            newState.coco_form_validation[formKey] = status
+            return newState
+        })
+    }
+
+    isNextEnabled(){
         if (this.state.activeStep === 1) {
-            return this.props.upload_type === 'coco' && 'agcontexts'
+            return this.props.upload_type === 'coco' && this.state.coco_form_validation['agcontexts'] && 'agcontexts'
         } else if (this.state.activeStep === 2) {
-            return this.props.upload_type === 'coco' && 'metadata'
+            return this.props.upload_type === 'coco' && this.state.coco_form_validation['metadata'] && 'metadata'
         } else {
             return false
         }
@@ -279,7 +288,7 @@ class UploadStepper extends React.Component {
             </Stepper>
             <div>
                 <Typography className={classes.instructions}>
-                    {getStepContent(this.state.activeStep, this.props.upload_type, this.state.upload_id, this.state.images, this.state.ag_context, this.state.metadata, this.handleUploadId, this.handleImages, this.handleAgContextsFormData, this.handleMetadataFormData, this.handleErrorMessage)}
+                    {getStepContent(this.state.activeStep, this.props.upload_type, this.state.upload_id, this.state.images, this.state.ag_context, this.state.metadata, this.handleUploadId, this.handleImages, this.handleAgContextsFormData, this.handleMetadataFormData, this.handleErrorMessage, this.handleValidation)}
                 </Typography>
                 {this.state.error_message.length > 0 && this.state.error_message !== 'init' ? <p style={{color: 'red', float: 'right', marginTop: '0.5em'}}>{this.state.error_message}</p> : ""}
                 <div>
@@ -302,9 +311,9 @@ class UploadStepper extends React.Component {
                     <Button
                         variant="contained"
                         color="primary"
-                        onClick={this.handleExempt() === 'agcontexts' ? this.handleUploadAgcontexts : this.handleExempt() === 'metadata' ? this.handleUploadMetadata : this.handleNext}
+                        onClick={this.isNextEnabled() === 'agcontexts' ? this.handleUploadAgcontexts : this.isNextEnabled() === 'metadata' ? this.handleUploadMetadata : this.handleNext}
                         className={classes.button}
-                        disabled={this.state.error_message.length > 0 && this.state.activeStep !== this.state.steps.length - 1 && !this.handleExempt()}
+                        disabled={this.state.error_message.length > 0 && this.state.activeStep !== this.state.steps.length - 1 && !this.isNextEnabled()}
                     >
                         {this.state.activeStep === this.state.steps.length - 1 ? 'Submit' : 'Next'}
                     </Button>

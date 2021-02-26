@@ -1,5 +1,6 @@
 from __future__ import absolute_import, unicode_literals
 import json
+import traceback
 from celery import shared_task
 from weedcoco.repo.deposit import deposit
 from weedcoco.index.indexing import ElasticSearchIndexer
@@ -33,6 +34,7 @@ def submit_upload_task(weedcoco_path, image_dir, upload_id):
             upload_id,
         )
     except Exception as e:
+        traceback.print_exc()
         upload_entity.status = "F"
         upload_entity.status_details = str(e)
         upload_entity.save()
@@ -61,8 +63,8 @@ def update_index_and_thumbnails(
         )
         es_index.post_index_entries()
     except Exception as e:
+        traceback.print_exc()
         upload_entity.status = "F"
-        print(e)
         upload_entity.status_details = str(e)
     else:
         upload_entity.status = "C"

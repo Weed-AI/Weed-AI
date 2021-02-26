@@ -2,6 +2,7 @@ from django.http import HttpResponse
 import requests
 import os
 import json
+import traceback
 from core.settings import UPLOAD_DIR, REPOSITORY_DIR
 from weedid.tasks import submit_upload_task, update_index_and_thumbnails
 from weedid.utils import (
@@ -15,10 +16,16 @@ from weedid.utils import (
     add_metadata,
 )
 from weedid.models import Dataset, WeedidUser
-from weedcoco.validation import validate, ValidationError
+from weedcoco.validation import validate
 from django.contrib.auth import login, logout
 from django.contrib.auth.hashers import check_password
 from django.http import HttpResponseForbidden, HttpResponseNotAllowed
+from django.views.decorators.csrf import ensure_csrf_cookie
+
+
+@ensure_csrf_cookie
+def set_csrf(request):
+    return HttpResponse("Success")
 
 
 def elasticsearch_query(request):
@@ -41,16 +48,15 @@ def upload(request):
         images = []
         file_weedcoco = request.FILES["weedcoco"]
         weedcoco_json = json.load(file_weedcoco)
-        validate(weedcoco_json)
+        validate(weedcoco_json, schema="compatible-coco")
         for image_reference in weedcoco_json["images"]:
             images.append(image_reference["file_name"].split("/")[-1])
         upload_dir, upload_id = setup_upload_dir(os.path.join(UPLOAD_DIR, str(user.id)))
         weedcoco_path = store_tmp_weedcoco(file_weedcoco, upload_dir)
         create_upload_entity(weedcoco_path, upload_id, user.id)
-    except ValidationError as e:
+    except Exception as e:
+        traceback.print_exc()
         return HttpResponseForbidden(str(e))
-    except Exception:
-        return HttpResponseForbidden("There is something wrong with the file")
     else:
         return HttpResponse(json.dumps({"upload_id": upload_id, "images": images}))
 
@@ -161,22 +167,22 @@ def upload_info(request):
 
 
 def upload_list(request):
-    upload_list = map(
-        retrieve_listing_info,
-        Dataset.objects.filter(status="C"),
-    )
-    return HttpResponse(json.dumps(list(upload_list)))
+    upload_list = [
+        retrieve_listing_info(dataset, awaiting_review=False)
+        for dataset in Dataset.objects.filter(status="C")
+    ]
+    return HttpResponse(json.dumps(upload_list))
 
 
 def awaiting_list(request):
     user = request.user
     if not (user and user.is_authenticated and user.is_staff):
         return HttpResponseForbidden("You dont have access to proceed")
-    awaiting_list = map(
-        retrieve_listing_info,
-        Dataset.objects.filter(status="AR"),
-    )
-    return HttpResponse(json.dumps(list(awaiting_list)))
+    awaiting_list = [
+        retrieve_listing_info(dataset, awaiting_review=True)
+        for dataset in Dataset.objects.filter(status="AR")
+    ]
+    return HttpResponse(json.dumps(awaiting_list))
 
 
 def dataset_approve(request, dataset_id):

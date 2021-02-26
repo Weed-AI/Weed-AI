@@ -77,7 +77,8 @@ class ElasticSearchIndexer:
             if "bbch_growth_range" not in agcontext:
                 growth_stage_texts = ["na"]
             else:
-                lo, hi = agcontext["bbch_growth_range"]
+                lo = agcontext["bbch_growth_range"]["min"]
+                hi = agcontext["bbch_growth_range"]["max"]
                 growth_stage_texts = set()
                 for i in range(lo, hi + 1):
                     growth_stage_texts.add(

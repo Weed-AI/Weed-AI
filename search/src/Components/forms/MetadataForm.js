@@ -104,6 +104,9 @@ class MetadataForm extends Component {
               renderers={renderers}
               cells={materialCells}
               onChange={e => {
+                  if (this.props.handleValidation){
+                    this.props.handleValidation('metadata', e.errors.length === 0);
+                  }
                   this.setState({formData: e.data});
                   if (this.props.onChange) {
                       e.formData = e.data;

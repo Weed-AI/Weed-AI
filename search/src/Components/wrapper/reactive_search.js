@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import Tooltip from '@material-ui/core/Tooltip';
 import {
     ReactiveBase,
     RangeSlider,
@@ -10,8 +11,6 @@ import {
 import Cookies from 'js-cookie';
 import axios from 'axios';
 
-
-const csrftoken = Cookies.get('csrftoken');
 
 const theme = {
     typography: {
@@ -50,7 +49,7 @@ const WeedAIResultCard = (props) => {
                 // TODO: make this more idiomatically React
                 Array.from(new Set(item.annotation__category__name)).map((annotName) => {
                     const annot = annotName.match(/^[^:]*/)
-                    return annot.length > 0 ? (<li className={annot[0]}>{annot[0]}</li>) : ""
+                    return annot.length > 0 ? (<Tooltip title={annotName}><li className={annot[0]}>{annot[0]}</li></Tooltip>) : ""
                 })
             }
             </ul>
@@ -67,7 +66,7 @@ export const TestWeedAIResultCard = () => {
         app="weedid"
         url={"https://localhost/elasticsearch/"}
         theme={theme}
-        headers={{'X-CSRFToken': csrftoken}}
+        headers={{'X-CSRFToken': Cookies.get('csrftoken')}}
     >
       <WeedAIResultCard item={ {
         "id": 20,
@@ -561,7 +560,7 @@ class ReactiveSearchComponent extends Component {
                 app="weedid"
                 url={baseURL + "elasticsearch/"}
                 theme={theme}
-                headers={{'X-CSRFToken': csrftoken}}
+                headers={{'X-CSRFToken': Cookies.get('csrftoken')}}
             >
                 <div style={{ position: "fixed", width: "20rem", overflow: "scroll", height: "90%", left: 0, padding: '0 1rem' }}>
                     <MultiList
@@ -635,7 +634,7 @@ class ReactiveSearchComponent extends Component {
                     />
                 </div>
                 <div style={{ position: "absolute", left: "20rem", paddingRight: "1rem" }}>
-                    <SelectedFilters />
+                    <SelectedFilters clearAllLabel="Clear filters" />
                     <ReactiveList
                         componentId="result"
                         dataField="results"

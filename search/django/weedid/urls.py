@@ -24,6 +24,7 @@ api_urlpatterns = [
     path("logout/", views.user_logout, name="user_logout"),
     path("login_status/", views.user_login_status, name="user_login_status"),
     path("login_google/", views.login_google, name="login_google"),
+    path("set_csrf/", views.set_csrf),
 ]
 
 urlpatterns = [

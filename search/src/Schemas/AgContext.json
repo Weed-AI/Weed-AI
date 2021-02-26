@@ -11,7 +11,6 @@
     "weather_description",
     "location_lat",
     "location_long",
-    "location_datum",
     "camera_make",
     "camera_lens",
     "camera_lens_focallength",
@@ -57,15 +56,26 @@
     "bbch_growth_range": {
       "oneOf": [
         {
-          "type": "array",
+          "type": "object",
           "title": "BBCH Range",
-          "minItems": 2,
-          "maxItems": 2,
-          "items": {
-            "type": "integer",
-            "minimum": 0,
-            "maximum": 99,
-            "description": "Minimum and maximum BBCH growth stages (00-99) in the dataset"
+          "required": [
+            "min",
+            "max"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "min": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 99,
+              "description": "Minimum BBCH growth stage (00-99) in the dataset"
+            },
+            "max": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 99,
+              "description": "Maximum BBCH growth stage (00-99) in the dataset"
+            }
           }
         },
         {
@@ -127,20 +137,13 @@
       "type": "number",
       "minimum": -90,
       "maximum": 90,
-      "description": "Latitude in decimal degrees.\nApproximate latitude location of the AgContext, in decimal degrees."
+      "description": "Latitude in decimal degrees.\nApproximate latitude location of the AgContext, in decimal degrees (WGS84)."
     },
     "location_long": {
       "type": "number",
       "minimum": 0,
       "maximum": 180,
-      "description": "Longitude in decimal degrees.\nApproximate longitude location of the AgContext, in decimal degrees."
-    },
-    "location_datum": {
-      "type": "number",
-      "enum": [
-        4326
-      ],
-      "description": "EPSG code of spatial coordinates.\nEuropean Petroleum Survey Group code that identifies the projection used for the spatial coordinates."
+      "description": "Longitude in decimal degrees.\nApproximate longitude location of the AgContext, in decimal degrees (WGS84)."
     },
     "camera_make": {
       "type": "string",
