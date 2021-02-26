@@ -53,7 +53,9 @@ def update_index_and_thumbnails(
 ):
     upload_entity = Dataset.objects.get(upload_id=upload_id)
     try:
-        thumbnailing(Path(thumbnails_dir), Path(repository_dir), weedcoco_path)
+        thumbnailing(
+            Path(thumbnails_dir), Path(repository_dir) / upload_id, weedcoco_path
+        )
         es_index = ElasticSearchIndexer(
             Path(weedcoco_path),
             Path(thumbnails_dir),
