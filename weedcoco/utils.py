@@ -147,6 +147,3 @@ def denormalise_weedcoco(weedcoco):
     for image in weedcoco["images"]:
         if "agcontext_id" in image:
             image["agcontext"] = id_lookup["agcontexts", image["agcontext_id"]]
-        if "license" in image:
-            image["license_id"] = image["license"]
-            image["license"] = id_lookup.get(("licenses", image["license_id"]))
