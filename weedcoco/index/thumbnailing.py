@@ -35,10 +35,10 @@ def thumbnail_one(coco_image, image_path, thumbnails_dir, thumbnail_size):
         if "bbox" not in annotation:
             continue
         bx, by, bw, bh = annotation["bbox"]
-        bx = bx * orig_width / thumb_width
-        bw = bw * orig_width / thumb_width
-        by = by * orig_height / thumb_height
-        bh = bh * orig_height / thumb_height
+        bx = bx / orig_width * thumb_width
+        bw = bw / orig_width * thumb_width
+        by = by / orig_height * thumb_height
+        bh = bh / orig_height * thumb_height
         if annotation["category"]["name"].startswith("weed"):
             color = "#dc3545"
         elif annotation["category"]["name"].startswith("crop"):
