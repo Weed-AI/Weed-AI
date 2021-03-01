@@ -30,12 +30,12 @@ const uischema = {
                 },
                 {
                     "type": "Control",
-                    "scope": "#/properties/creator"
+                    "scope": "#/properties/description",
+                    "options": {"multi": true}
                 },
                 {
                     "type": "Control",
-                    "scope": "#/properties/description",
-                    "options": {"multi": true}
+                    "scope": "#/properties/license"
                 },
                 {
                     "type": "Control",
@@ -43,7 +43,8 @@ const uischema = {
                 },
                 {
                     "type": "Control",
-                    "scope": "#/properties/license"
+                    "scope": "#/properties/creator",
+                    "label": "Authors/Creators",
                 },
             ]
         },

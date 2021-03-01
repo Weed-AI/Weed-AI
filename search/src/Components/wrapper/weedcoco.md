@@ -63,7 +63,7 @@ We provide tools which may help convert your data to WeedCOCO. These can be
 found in the `weedcoco` Python library which can be installed with:
 
 ```sh
-$ pip install git+https://github.com/Sydney-Informatics-Hub/
+$ pip install git+https://github.com/Sydney-Informatics-Hub/Weed-ID-Interchange
 ```
 
 Please see modules under the `weedcoco.importers` subpackage for conversion

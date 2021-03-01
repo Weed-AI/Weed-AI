@@ -3,7 +3,7 @@ import requests
 import os
 import json
 import traceback
-from core.settings import UPLOAD_DIR, REPOSITORY_DIR
+from core.settings import UPLOAD_DIR, REPOSITORY_DIR, MAX_IMAGE_SIZE
 from weedid.tasks import submit_upload_task, update_index_and_thumbnails
 from weedid.utils import (
     store_tmp_weedcoco,
@@ -29,7 +29,14 @@ def set_csrf(request):
 
 
 def elasticsearch_query(request):
-    elasticsearch_url = "/".join(request.path.split("/")[3:])
+    try:
+        elasticsearch_url = "/".join(request.path.split("/")[2:])
+    except Exception:
+        return HttpResponseForbidden("Invalid query format")
+    if not elasticsearch_url.startswith("weedid/_msearch"):
+        return HttpResponseForbidden("Only _msearch queries are currently forwarded")
+    if request.method not in ["POST", "GET"]:
+        return HttpResponseNotAllowed(request.method)
     elasticsearch_response = requests.post(
         url=f"http://elasticsearch:9200/{elasticsearch_url}",
         data=request.body,
@@ -69,6 +76,8 @@ def upload_image(request):
         return HttpResponseForbidden("You dont have access to proceed")
     upload_id = request.POST["upload_id"]
     upload_image = request.FILES["upload_image"]
+    if upload_image.size > MAX_IMAGE_SIZE:
+        return HttpResponseForbidden("This image has exceeded the size limit!")
     upload_dir = os.path.join(UPLOAD_DIR, str(user.id), upload_id, "images")
     store_tmp_image(upload_image, upload_dir)
     return HttpResponse(f"Uploaded {upload_image.name} to {upload_dir}")

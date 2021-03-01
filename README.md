@@ -3,6 +3,8 @@
 Weed-AI provides is an open source, searchable, weeds image platform designed to facilitate the research and development of machine learning algorithms for weed recognition in cropping systems.
 It brings together existing datasets, enables users to contribute their own data and pulls together custom datasets for straightforward download. 
 
+See our Weed Explorer at https://weed-ai.sydney.edu.au
+
 # Background 
 
 Large numbers of high quality, annotated weed images are essential for the development of weed recognition algorithms that are accurate and reliable in complex biological systems.
