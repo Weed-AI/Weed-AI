@@ -35,6 +35,9 @@ const WeedAIResultCard = (props) => {
       return item.agcontext__growth_stage_min_text;
     return item.agcontext__growth_stage_min_text + " to " + item.agcontext__growth_stage_max_text;
   }
+  const formatTaskType = (taskTypes) => (
+    taskTypes.includes("segmentation") ? "segment" : (taskTypes.includes("bounding box") ? "bounding box" : "labels"));
+  const pluralise = (text, n) => n == 1 ? text : (text.match(/[zsx]$/) ? text + "es" : text + "s");
   return (
     <ResultCard>
         <ResultCard.Image
@@ -50,7 +53,7 @@ const WeedAIResultCard = (props) => {
                 })
             }
             </ul>
-            {" in " + formatCropType(item.agcontext__crop_type) + (item.agcontext__growth_stage_min_text ? " (" + formatGrowthRange(item) + ")" : "") + "."}
+            {" " + pluralise(formatTaskType(item.task_type), item.annotations.length) + " in " + formatCropType(item.agcontext__crop_type) + (item.agcontext__bbch_growth_range ? " (" + formatGrowthRange(item) + ")") : "") + "."}
           <div><a title={item.upload_id in datasetNames ? datasetNames[item.upload_id] : ""} href={`${baseURL}datasets/${item.upload_id}`}>See Dataset</a></div>
         </ResultCard.Description>
     </ResultCard>

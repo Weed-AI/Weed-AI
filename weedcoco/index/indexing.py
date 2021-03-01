@@ -140,6 +140,7 @@ class ElasticSearchIndexer:
                 blobs.append(
                     {
                         "_index": self.es_index_name,
+                        "_id": os.path.basename(image["file_name"]),
                         "_type": self.es_type_name,
                         "_source": image,
                     }
