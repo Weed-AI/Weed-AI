@@ -2,7 +2,8 @@ from django.http import HttpResponse
 import requests
 import os
 import json
-from core.settings import UPLOAD_DIR, REPOSITORY_DIR
+import traceback
+from core.settings import UPLOAD_DIR, REPOSITORY_DIR, MAX_IMAGE_SIZE
 from weedid.tasks import submit_upload_task, update_index_and_thumbnails
 from weedid.utils import (
     store_tmp_weedcoco,
@@ -15,14 +16,27 @@ from weedid.utils import (
     add_metadata,
 )
 from weedid.models import Dataset, WeedidUser
-from weedcoco.validation import validate, ValidationError
+from weedcoco.validation import validate
 from django.contrib.auth import login, logout
 from django.contrib.auth.hashers import check_password
 from django.http import HttpResponseForbidden, HttpResponseNotAllowed
+from django.views.decorators.csrf import ensure_csrf_cookie
+
+
+@ensure_csrf_cookie
+def set_csrf(request):
+    return HttpResponse("Success")
 
 
 def elasticsearch_query(request):
-    elasticsearch_url = "/".join(request.path.split("/")[3:])
+    try:
+        elasticsearch_url = "/".join(request.path.split("/")[2:])
+    except Exception:
+        return HttpResponseForbidden("Invalid query format")
+    if not elasticsearch_url.startswith("weedid/_msearch"):
+        return HttpResponseForbidden("Only _msearch queries are currently forwarded")
+    if request.method not in ["POST", "GET"]:
+        return HttpResponseNotAllowed(request.method)
     elasticsearch_response = requests.post(
         url=f"http://elasticsearch:9200/{elasticsearch_url}",
         data=request.body,
@@ -47,10 +61,9 @@ def upload(request):
         upload_dir, upload_id = setup_upload_dir(os.path.join(UPLOAD_DIR, str(user.id)))
         weedcoco_path = store_tmp_weedcoco(file_weedcoco, upload_dir)
         create_upload_entity(weedcoco_path, upload_id, user.id)
-    except ValidationError as e:
+    except Exception as e:
+        traceback.print_exc()
         return HttpResponseForbidden(str(e))
-    except Exception:
-        return HttpResponseForbidden("There is something wrong with the file")
     else:
         return HttpResponse(json.dumps({"upload_id": upload_id, "images": images}))
 
@@ -63,6 +76,8 @@ def upload_image(request):
         return HttpResponseForbidden("You dont have access to proceed")
     upload_id = request.POST["upload_id"]
     upload_image = request.FILES["upload_image"]
+    if upload_image.size > MAX_IMAGE_SIZE:
+        return HttpResponseForbidden("This image has exceeded the size limit!")
     upload_dir = os.path.join(UPLOAD_DIR, str(user.id), upload_id, "images")
     store_tmp_image(upload_image, upload_dir)
     return HttpResponse(f"Uploaded {upload_image.name} to {upload_dir}")

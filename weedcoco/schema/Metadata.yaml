@@ -25,6 +25,12 @@ definitions:
         format: uri
         title: ORCID ID (optional)
         description: ORCID ID (see https://orcid.org)
+      email:
+        type: string
+        format: email
+        title: Email Address (optional)
+      affiliation:
+        $ref: "#/definitions/Organization"
     title: Person
   Organization:
     type: object
@@ -38,6 +44,9 @@ definitions:
         format: uri
         title: Research Organization Registry (ROR) ID
         description: ROR ID (see https://ror.org)
+      address:
+        type: string
+        description: Physical address
     title: Organization
 properties:
   name:

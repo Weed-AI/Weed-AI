@@ -17,7 +17,7 @@ const UploaderImages = props => {
             withPreview={true}
             onChange={onDrop}
             imgExtension={[".jpg", ".gif", ".png", ".jpeg", ".tif", ".tiff"]}
-            maxFileSize={5242880}
+            maxFileSize={10485760}
             uploadURL={baseURL + 'api/upload_image/'}
         />
   );

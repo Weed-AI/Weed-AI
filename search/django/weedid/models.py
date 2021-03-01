@@ -26,7 +26,7 @@ class Dataset(models.Model):
         null=True,
     )
     status = models.CharField(max_length=2, choices=STATUS_CHOICES, default="N")
-    status_details = models.CharField(max_length=50, null=True, blank=True, default="")
+    status_details = models.TextField(null=True, blank=True)
     annotation_format = models.CharField(max_length=20, default="WeedCOCO")
 
 

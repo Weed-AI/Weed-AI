@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import Tooltip from '@material-ui/core/Tooltip';
 import {
     ReactiveBase,
     RangeSlider,
@@ -10,8 +11,6 @@ import {
 import Cookies from 'js-cookie';
 import axios from 'axios';
 
-
-const csrftoken = Cookies.get('csrftoken');
 
 const theme = {
     typography: {
@@ -36,6 +35,9 @@ const WeedAIResultCard = (props) => {
       return item.agcontext__growth_stage_min_text;
     return item.agcontext__growth_stage_min_text + " to " + item.agcontext__growth_stage_max_text;
   }
+  const formatTaskType = (taskTypes) => (
+    taskTypes.includes("segmentation") ? "segment" : (taskTypes.includes("bounding box") ? "bounding box" : "labels"));
+  const pluralise = (text, n) => n == 1 ? text : (text.match(/[zsx]$/) ? text + "es" : text + "s");
   return (
     <ResultCard>
         <ResultCard.Image
@@ -47,11 +49,11 @@ const WeedAIResultCard = (props) => {
                 // TODO: make this more idiomatically React
                 Array.from(new Set(item.annotation__category__name)).map((annotName) => {
                     const annot = annotName.match(/^[^:]*/)
-                    return annot.length > 0 ? (<li className={annot[0]}>{annot[0]}</li>) : ""
+                    return annot.length > 0 ? (<Tooltip title={annotName}><li className={annot[0]}>{annot[0]}</li></Tooltip>) : ""
                 })
             }
             </ul>
-            {" in " + formatCropType(item.agcontext__crop_type) + (item.agcontext__bbch_growth_range == "na" ? "" : " (" + formatGrowthRange(item) + ")") + "."}
+            {" " + pluralise(formatTaskType(item.task_type), item.annotations.length) + " in " + formatCropType(item.agcontext__crop_type) + (item.agcontext__bbch_growth_range == "na" ? "" : " (" + formatGrowthRange(item) + ")") + "."}
           <div><a title={item.upload_id in datasetNames ? datasetNames[item.upload_id] : ""} href={`${baseURL}datasets/${item.upload_id}`}>See Dataset</a></div>
         </ResultCard.Description>
     </ResultCard>
@@ -64,7 +66,7 @@ export const TestWeedAIResultCard = () => {
         app="weedid"
         url={"https://localhost/elasticsearch/"}
         theme={theme}
-        headers={{'X-CSRFToken': csrftoken}}
+        headers={{'X-CSRFToken': Cookies.get('csrftoken')}}
     >
       <WeedAIResultCard item={ {
         "id": 20,
@@ -558,7 +560,7 @@ class ReactiveSearchComponent extends Component {
                 app="weedid"
                 url={baseURL + "elasticsearch/"}
                 theme={theme}
-                headers={{'X-CSRFToken': csrftoken}}
+                headers={{'X-CSRFToken': Cookies.get('csrftoken')}}
             >
                 <div style={{ position: "fixed", width: "20rem", overflow: "scroll", height: "90%", left: 0, padding: '0 1rem' }}>
                     <MultiList

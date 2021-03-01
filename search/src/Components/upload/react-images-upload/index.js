@@ -6,8 +6,6 @@ import axios from 'axios';
 import Cookies from 'js-cookie'
 
 
-const csrftoken = Cookies.get('csrftoken');
-
 const styles = {
   display: "flex",
   alignItems: "center",
@@ -125,7 +123,7 @@ class ReactImageUploadComponent extends React.Component {
             method: 'post',
             url: this.props.uploadURL,
             data: body,
-            headers: {'Content-Type': 'multipart/form-data', 'X-CSRFToken': csrftoken }
+            headers: {'Content-Type': 'multipart/form-data', 'X-CSRFToken': Cookies.get('csrftoken') }
         }).then(res => {
             if(res.status === 200){
                 dataURLs.push(newFileData.dataURL);
@@ -278,7 +276,7 @@ ReactImageUploadComponent.defaultProps = {
   buttonText: "Choose images",
   buttonType: "button",
   withLabel: true,
-  label: "Max file size: 5mb, accepted: jpg|gif|png",
+  label: "Max file size: 5 MB | File types accepted: .jpg, .gif, .png, .tif",
   labelStyles: {},
   labelClass: "",
   imgExtension: ['.jpg', '.jpeg', '.gif', '.png'],

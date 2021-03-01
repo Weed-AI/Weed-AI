@@ -18,6 +18,8 @@ import UploadComponent from './upload';
 import DatasetComponent from './datasets';
 import WeedCOCOComponent from './weedcoco';
 import AboutComponent from './about';
+import axios from 'axios';
+import Cookies from 'js-cookie';
 import PrivacyComponent from './privacy';
 
 const useStyles = makeStyles((theme) => ({
@@ -136,6 +138,14 @@ const DesktopNavbar = (props) => {
   );
 }
 
+const manageCsrf = () => {
+  const csrftoken = Cookies.get('csrftoken');
+  if (!csrftoken) {
+    // Reloading the page to set up csrf token is a hack
+    axios.get('/api/set_csrf/').then(() => window.location.reload());
+  }
+}
+
 export default function NavbarComponent(props) {
 
   const classes = useStyles();
@@ -147,6 +157,7 @@ export default function NavbarComponent(props) {
   const [mobileView, setMobileView] = React.useState(false);
 
   useEffect(() => {
+    manageCsrf();
     const setResponsiveness = () => {
       return window.innerWidth < 1000
         ? setMobileView(true)

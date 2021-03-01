@@ -9,8 +9,6 @@ import axios from 'axios';
 import Cookies from 'js-cookie';
 
 
-const csrftoken = Cookies.get('csrftoken');
-
 const useStyles = (theme) => ({
     paper: {
         display: 'flex',
@@ -50,7 +48,7 @@ class LoginComponent extends React.Component {
             url: baseURL + 'api/login/',
             mode: 'same-origin',
             data: bodyFormData,
-            headers: {'Content-Type': 'multipart/form-data', 'X-CSRFToken': csrftoken }
+            headers: {'Content-Type': 'multipart/form-data', 'X-CSRFToken': Cookies.get('csrftoken') }
         })
         .then((response) => {
             console.log(response);
