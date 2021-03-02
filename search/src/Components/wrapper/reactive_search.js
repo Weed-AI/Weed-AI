@@ -633,6 +633,7 @@ class ReactiveSearchComponent extends Component {
                             </ReactiveList.ResultCardsWrapper>
                         )}
                     />
+                    {this.props.footer}
                 </div>
             </ReactiveBase>
         );
