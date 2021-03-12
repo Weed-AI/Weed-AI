@@ -53,6 +53,9 @@ def update_index_and_thumbnails(
 ):
     upload_entity = Dataset.objects.get(upload_id=upload_id)
     try:
+        thumbnailing(
+            Path(thumbnails_dir), Path(repository_dir) / upload_id, weedcoco_path
+        )
         es_index = ElasticSearchIndexer(
             Path(weedcoco_path),
             Path(thumbnails_dir),
@@ -61,7 +64,6 @@ def update_index_and_thumbnails(
             upload_id=upload_id,
         )
         es_index.post_index_entries()
-        thumbnailing(Path(thumbnails_dir), Path(repository_dir))
     except Exception as e:
         traceback.print_exc()
         upload_entity.status = "F"

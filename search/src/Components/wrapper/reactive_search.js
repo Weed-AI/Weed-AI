@@ -41,7 +41,7 @@ const WeedAIResultCard = (props) => {
   return (
     <ResultCard>
         <ResultCard.Image
-            src={item.thumbnail}
+            src={item.thumbnail_bbox || item.thumbnail}
         />
         <ResultCard.Description>
             <ul className="annotations">
