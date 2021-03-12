@@ -44,7 +44,7 @@ const useStyles = makeStyles((theme) => ({
   footer: {
     backgroundColor: theme.palette.primary.main,
     textAlign: "center",
-    padding: '.2em',
+    padding: '.2em 1em',
   },
   cookieConsent: {
     "& a": {
@@ -171,6 +171,15 @@ export default function NavbarComponent(props) {
     window.location.assign(`/${newValue}`);
   };
 
+  const footer = (
+    <Box pt={4}>
+      <footer className={classes.footer}>
+        <Typography variant='caption' paragraph={true}>Site Copyright &copy; 2021 The University of Sydney. <a href="https://github.com/Sydney-Informatics-Hub/Weed-ID-Interchange/">Contribute on GitHub</a> (MIT Licensed). See our <a href="/privacy">Privacy Policy</a>.</Typography>
+        <Typography variant='caption' paragraph={true}>Images and annotations are licensed under <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>. See <a href="/datasets">Dataset</a> pages for attribution.</Typography>
+      </footer>
+    </Box>
+  );
+
   return (
     <main className={classes.root}>
       <AppBar position="fixed" style={{
@@ -185,7 +194,7 @@ export default function NavbarComponent(props) {
       </AppBar>
       <div className={classes.container}>
       {
-        selectedTab === "explore" && <ReactiveSearchComponent />
+        selectedTab === "explore" && <ReactiveSearchComponent footer={footer} />
       }
       {
         selectedTab === "datasets" && <DatasetComponent upload_id={dataset_id}/>
@@ -203,16 +212,7 @@ export default function NavbarComponent(props) {
         selectedTab === "privacy" && <PrivacyComponent />
       }
       </div>
-      <footer className={classes.root}>
-        <Box pt={4}>
-          <footer className={classes.footer}>
-            <Typography variant='caption'>
-              <p>Site Copyright &copy; 2021 The University of Sydney. <a href="https://github.com/Sydney-Informatics-Hub/Weed-ID-Interchange/">Contribute on GitHub</a> (MIT Licensed). See our <a href="/privacy">Privacy Policy</a>.</p>
-              <p>Images and annotations are licensed under <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>. See <a href="/datasets">Dataset</a> pages for attribution.</p>
-            </Typography>
-          </footer>
-        </Box>
-      </footer>
+	  {(selectedTab != "explore") ? footer : []}
       <CookieConsent
         location="bottom"
         cookieName="consentCookie"

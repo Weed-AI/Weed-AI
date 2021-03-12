@@ -120,6 +120,11 @@ const AgContextDetails = (props) => {
 
 export const DatasetSummary = (props) => {
     const {metadata, agcontexts, classes, rootURL, upload_id} = props;
+    const linkedEntity = (ent) => {
+      if (ent.sameAs)
+        return (<a href={ent.sameAs}>{ent.name}</a>);
+      return ent.name;
+    }
     return (
       <React.Fragment>
         <script type="application/ld+json">
@@ -150,11 +155,25 @@ export const DatasetSummary = (props) => {
                 <dt>Creators:</dt>
                 <dd>
                   <ul>
-                  {metadata.creator.map((creator, i) => (<li key={i}>{creator.sameAs ? (<a href={creator.sameAs}>{creator.name}</a>) : creator.name}</li>))}
+                  {metadata.creator.map((creator, i) => (
+                    <li key={i}>
+                      {linkedEntity(creator)}{creator.affiliation ? (<span>, {linkedEntity(creator.affiliation)}</span>) : []}
+                    </li>
+                  ))}
                   </ul>
                 </dd>
                 <dt>Licence:</dt>
                 <dd>{<a href={metadata.license}>{metadata.license}</a>}</dd>
+                {metadata.funder ?
+                    <React.Fragment>
+                    <dt>Funders:</dt>
+                    <dd>
+                      <ul>
+                        {metadata.funder.map(ent => <li key={ent.name}>{linkedEntity(ent)}</li>)}
+                      </ul>
+                    </dd>
+                    </React.Fragment>
+                : []}
               </dl>
               { /* TODO: link to Explore searching for just this dataset */ }
             </div>
@@ -223,8 +242,9 @@ export const TestDatasetSummary = () => {
         "metadata": {
             "creator": [
                 {"name": "Sebastian Haug"},
-                {"name": "J\u00f6rn Ostermann", "sameAs": "https://orcid.org/0000-0002-6743-3324"}
+                {"name": "J\u00f6rn Ostermann", "sameAs": "https://orcid.org/0000-0002-6743-3324", "affiliation": {"name": "Leibniz Universität Hannover", "sameAs": "https://ror.org/0304hq317", "@type": "Organization"}}
             ],
+            "funder": [{"name": "some funder"}],
             "name": "A Crop/Weed Field Image Dataset for the Evaluation of Computer Vision Based Precision Agriculture Tasks",
             "datePublished": "2015-03-19",
             "identifier": ["doi:10.1007/978-3-319-16220-1_8"],
