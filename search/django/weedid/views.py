@@ -201,7 +201,8 @@ def dataset_approve(request, dataset_id):
     upload_entity = Dataset.objects.get(upload_id=dataset_id, status="AR")
     if upload_entity:
         weedcoco_path = os.path.join(REPOSITORY_DIR, str(dataset_id), "weedcoco.json")
-        update_index_and_thumbnails(weedcoco_path, dataset_id)
+        dataset_name = "" or upload_entity.metadata["name"]
+        update_index_and_thumbnails(weedcoco_path, dataset_id, dataset_name)
         return HttpResponse("It has been approved")
     else:
         return HttpResponseNotAllowed("Dataset to be reviewed doesn't exist")

@@ -563,6 +563,16 @@ class ReactiveSearchComponent extends Component {
             >
                 <div style={{ position: "fixed", width: "20rem", overflow: "scroll", height: "90%", left: 0, padding: '0 1rem' }}>
                     <MultiList
+                        componentId="dataset_name_filter"
+                        title="Dataset Name"
+                        dataField="dataset_name.keyword"
+                        sortBy="asc"
+                        selectAllLabel="All datasets"
+                        placeholder="Search datasets"
+                        filterLabel="Datasets"
+                        {...makeProps("dataset_name_filter", true)}
+                    />
+                    <MultiList
                         componentId="crop_type_filter"
                         title="Crop Type"
                         dataField="agcontext__crop_type.keyword"
