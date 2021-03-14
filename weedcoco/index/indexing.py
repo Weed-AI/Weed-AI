@@ -124,10 +124,9 @@ class ElasticSearchIndexer:
                     image.setdefault(f"annotation__{k}", []).append(annotation[k])
 
             image["task_type"] = sorted(get_task_types(image["annotations"]))
-            image["location"] = {
-                "lat": image["agcontext"]["location_lat"],
-                "lng": image["agcontext"]["location_long"],
-            }
+            image[
+                "location"
+            ] = f'{image["agcontext"]["location_lat"]}, {image["agcontext"]["location_long"]}'
             yield image
 
     def generate_batches(self):
