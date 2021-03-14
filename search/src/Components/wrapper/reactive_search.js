@@ -533,6 +533,7 @@ class ReactiveSearchComponent extends Component {
                         "grains_text_filter",
                         "task_type_filter",
                         "lighting_filter",
+                        "dataset_name_filter",
                     ]
                 },
                 ...multilistFacetProps
