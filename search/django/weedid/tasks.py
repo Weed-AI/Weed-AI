@@ -48,7 +48,6 @@ def submit_upload_task(weedcoco_path, image_dir, upload_id):
 def update_index_and_thumbnails(
     weedcoco_path,
     upload_id,
-    dataset_name,
     thumbnails_dir=THUMBNAILS_DIR,
     repository_dir=REPOSITORY_DIR,
 ):
@@ -60,7 +59,6 @@ def update_index_and_thumbnails(
         es_index = ElasticSearchIndexer(
             Path(weedcoco_path),
             Path(thumbnails_dir),
-            dataset_name=dataset_name,
             es_host="elasticsearch",
             es_port=9200,
             upload_id=upload_id,

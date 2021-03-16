@@ -30,7 +30,6 @@ class ElasticSearchIndexer:
         self,
         weedcoco_path,
         thumbnail_dir,
-        dataset_name="",
         es_index_name="weedid",
         es_type_name="image",
         batch_size=30,
@@ -42,7 +41,6 @@ class ElasticSearchIndexer:
     ):
         self.weedcoco_path = pathlib.Path(weedcoco_path)
         self.thumbnail_dir = pathlib.Path(thumbnail_dir)
-        self.dataset_name = dataset_name
         self.es_index_name = es_index_name
         self.es_type_name = es_type_name
         self.batch_size = batch_size
@@ -126,7 +124,7 @@ class ElasticSearchIndexer:
                     image.setdefault(f"annotation__{k}", []).append(annotation[k])
 
             image["task_type"] = sorted(get_task_types(image["annotations"]))
-            image["dataset_name"] = self.dataset_name
+            image["dataset_name"] = coco["info"]["metadata"]["name"]
             yield image
 
     def generate_batches(self):
