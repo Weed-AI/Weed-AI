@@ -8,7 +8,7 @@ import {
     ReactiveList,
     SelectedFilters
 } from '@appbaseio/reactivesearch';
-import { ReactiveGoogleMap, GeoDistanceSlider } from "@appbaseio/reactivemaps";
+import { GeoDistanceSlider } from "@appbaseio/reactivemaps";
 import Cookies from 'js-cookie';
 import axios from 'axios';
 
@@ -546,33 +546,6 @@ class ReactiveSearchComponent extends Component {
             return (facetProps)
         }
 
-        const mapProps = {
-          componentId: "map_filter",
-          dataField: "location",
-          defaultMapStyle: "Light Monochrome",
-          title: "Google map",
-          size: 1000,
-          autoCenter: true,
-          showSearchAsMove: false,
-          searchAsMove: true,
-          defaultZoom: 5,
-          defaultCenter: {lat: 24.15, lng: 133.25},
-          react: {
-            and: [
-                "crop_type_filter",
-                "category_filter",
-                "grains_text_filter",
-                "task_type_filter",
-                "lighting_filter",
-                "gds_filter"
-            ],
-          },
-          showMapStyles: true,
-          renderData: result => {
-            return ({ icon: 'https://i.imgur.com/NHR2tYL.png'})
-          }
-        };
-
         const baseURL = new URL(window.location.origin);
 
         const datasetNames = {};
@@ -620,7 +593,6 @@ class ReactiveSearchComponent extends Component {
                         distance: 100,
                       }}
                     />
-                    <ReactiveGoogleMap {...mapProps} style={{ height: "30vh"}}/>
                     <MultiList
                         componentId="crop_type_filter"
                         title="Crop Type"
