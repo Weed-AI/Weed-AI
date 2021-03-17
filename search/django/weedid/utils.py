@@ -2,6 +2,7 @@ import os
 from shutil import rmtree
 import json
 from uuid import uuid4
+from PIL import Image
 from weedcoco.repo.deposit import mkdir_safely
 from weedcoco.utils import set_info, set_licenses
 from weedcoco.stats import WeedCOCOStats
@@ -11,8 +12,12 @@ from core.settings import UPLOAD_DIR, REPOSITORY_DIR, DOWNLOAD_DIR
 
 
 def store_tmp_image(image, image_dir):
-    fs = FileSystemStorage()
-    fs.save(os.path.join(image_dir, image.name), image)
+    if not os.path.exists(image_dir):
+        mkdir_safely(image_dir)
+    image_original = Image.open(image)
+    image_without_exif = Image.new(image_original.mode, image_original.size)
+    image_without_exif.putdata(image_original.getdata())
+    image_without_exif.save(os.path.join(image_dir, image.name))
 
 
 def store_tmp_weedcoco(weedcoco, upload_dir):
