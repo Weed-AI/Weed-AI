@@ -1,4 +1,8 @@
 import React, { Component } from 'react';
+import Paper from '@material-ui/core/Paper';
+import IconButton from '@material-ui/core/IconButton';
+import Typography from '@material-ui/core/Typography';
+import CloseIcon from '@material-ui/icons/Close'
 import Tooltip from '@material-ui/core/Tooltip';
 import {
     ReactiveBase,
@@ -501,6 +505,23 @@ export const TestWeedAIResultCard = () => {
   </ReactiveBase>
 };
 
+
+const IntroText = () => {
+  const [show, setShow] = React.useState((localStorage.getItem("showIntro") === "false") ? false : true);
+  const onClose = () => { localStorage.setItem("showIntro", "false"); setShow(false) }
+  return show ? (
+    <Paper style={{ marginTop: "15px", padding: "1em" }}>
+      <div style={{float: "right"}}><IconButton style={{ padding: 0 }} onClick={ onClose } aria-label="Close this introductory text"><CloseIcon /></IconButton></div>
+      <Typography variant="h6">Welcome to Weed-AI</Typography>
+      <Typography>
+        Find and download <a href="/datasets">datasets</a> of annotated weed imagery.
+        Search by crop and weed species, crop growth stage, location, photography attributes, annotation task type and more.
+        Collect and <a href="/upload">upload</a> your own!
+      </Typography>
+    </Paper>
+  ) : [];
+}
+
 class ReactiveSearchComponent extends Component {
 
     render() {
@@ -562,6 +583,7 @@ class ReactiveSearchComponent extends Component {
                 headers={{'X-CSRFToken': Cookies.get('csrftoken')}}
             >
                 <div style={{ position: "fixed", width: "20rem", overflow: "scroll", height: "90%", left: 0, padding: '0 1rem' }}>
+                    <IntroText />
                     <MultiList
                         componentId="crop_type_filter"
                         title="Crop Type"
