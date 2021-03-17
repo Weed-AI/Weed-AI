@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Helmet } from "react-helmet";
 import { makeStyles } from '@material-ui/core/styles';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
@@ -73,6 +74,10 @@ export default function DatasetList(props) {
 
   return (
     <div className={classes.root}>
+      <Helmet>
+        <title>Datasets in Weed-AI: a repository of weed imagery in crops</title>
+        <meta name="description" content="Listing of all datasets in Weed-AI with images and metadata for download." />
+      </Helmet>
       <h2>{props.title}</h2>
       <TableContainer component={Paper}>
         <Table className={classes.table} aria-label="simple table">
