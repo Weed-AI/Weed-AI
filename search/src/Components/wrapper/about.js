@@ -2,12 +2,7 @@ import React, {Component} from 'react';
 import { withStyles } from '@material-ui/core/styles';
 import ReactMarkdown from "react-markdown";
 import content from './about.md'
-
-const useStyles = (theme) => ({
-    page: {
-        margin: theme.spacing(15)
-    },
-})
+import { useArticleStyles } from '../../styles/common'
 
 
 class AboutComponent extends Component {
@@ -32,4 +27,4 @@ class AboutComponent extends Component {
   }
 }
 
-export default withStyles(useStyles)(AboutComponent);
+export default withStyles(useArticleStyles)(AboutComponent);
