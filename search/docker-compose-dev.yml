@@ -124,8 +124,6 @@ services:
     volumes:
        - ./:/code # for development, unused in production
        - /code/node_modules # an exception from the above volume
-    ports:
-      - "8080:80"
     environment:
       - NODE_ENV=development
     networks:
@@ -141,8 +139,6 @@ services:
       context: ./nginx/thumbnails
     volumes:
       - thumbnails_dir:/tmp/thumbnails
-    ports:
-      - "8081:80"
     networks:
       - elastic
     stdin_open: true
@@ -154,8 +150,6 @@ services:
       context: ./nginx/download
     volumes:
       - download_dir:/tmp/download
-    ports:
-      - "8082:80"
     networks:
       - elastic
     stdin_open: true
