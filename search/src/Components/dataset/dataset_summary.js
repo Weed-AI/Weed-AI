@@ -1,4 +1,5 @@
 import React, {Component} from 'react';
+import { Helmet } from "react-helmet";
 import { withStyles } from '@material-ui/core/styles';
 import Accordion from '@material-ui/core/Accordion';
 import AccordionSummary from '@material-ui/core/AccordionSummary';
@@ -125,8 +126,13 @@ export const DatasetSummary = (props) => {
         return (<a href={ent.sameAs}>{ent.name}</a>);
       return ent.name;
     }
+    const getFirstLine = (s) => (s.match(/[^\n.]*/)[0]);
     return (
       <React.Fragment>
+        <Helmet>
+          <title>"{metadata.name}" Dataset in Weed-AI: a repository of weed imagery in crops</title>
+          <meta name="description" content={getFirstLine(metadata.description) + " by " + metadata.creator.map((creator) => creator.name).join(', ') + "."} />
+        </Helmet>
         <script type="application/ld+json">
         {
           JSON.stringify({
