@@ -8,6 +8,7 @@ import {
   materialCells,
   materialRenderers,
 } from '@jsonforms/material-renderers';
+import { createAjv } from '@jsonforms/core';
 import { JsonForms } from '@jsonforms/react';
 import { fixedItemsTester, FixedItemsRenderer } from '../formRenderers/FixedItemsRenderer';
 import { constTester, ConstRenderer } from '../formRenderers/ConstRenderer';
@@ -140,6 +141,7 @@ class AgContextForm extends Component {
               data={this.props.formData}
               renderers={renderers}
               cells={materialCells}
+              ajv = {createAjv({useDefaults: true})}
               onChange={e => {
                   if (this.props.handleValidation){
                     this.props.handleValidation('agcontexts', e.errors.length === 0);
