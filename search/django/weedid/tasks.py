@@ -9,6 +9,8 @@ from weedid.models import Dataset
 from weedid.utils import make_upload_entity_fields
 from core.settings import THUMBNAILS_DIR, REPOSITORY_DIR, DOWNLOAD_DIR
 from pathlib import Path
+import os
+import shutils
 
 
 @shared_task
@@ -66,6 +68,9 @@ def update_index_and_thumbnails(
         es_index.post_index_entries()
     except Exception as e:
         traceback.print_exc()
+        failed_repo_dir = os.path.join(repository_dir, upload_id)
+        if failed_repo_dir and os.path.isdir(failed_repo_dir):
+            shutils.rmtree(failed_repo_dir)
         upload_entity.status = "F"
         upload_entity.status_details = str(e)
     else:
