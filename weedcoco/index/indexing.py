@@ -124,6 +124,7 @@ class ElasticSearchIndexer:
                     image.setdefault(f"annotation__{k}", []).append(annotation[k])
 
             image["task_type"] = sorted(get_task_types(image["annotations"]))
+            image["dataset_name"] = coco["info"]["metadata"]["name"]
             yield image
 
     def generate_batches(self):

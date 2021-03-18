@@ -533,6 +533,7 @@ class ReactiveSearchComponent extends Component {
                         "grains_text_filter",
                         "task_type_filter",
                         "lighting_filter",
+                        "dataset_name_filter",
                     ]
                 },
                 ...multilistFacetProps
@@ -562,6 +563,16 @@ class ReactiveSearchComponent extends Component {
                 headers={{'X-CSRFToken': Cookies.get('csrftoken')}}
             >
                 <div style={{ position: "fixed", width: "20rem", overflow: "scroll", height: "90%", left: 0, padding: '0 1rem' }}>
+                    <MultiList
+                        componentId="dataset_name_filter"
+                        title="Dataset Name"
+                        dataField="dataset_name.keyword"
+                        sortBy="asc"
+                        selectAllLabel="All datasets"
+                        placeholder="Search datasets"
+                        filterLabel="Datasets"
+                        {...makeProps("dataset_name_filter", true)}
+                    />
                     <MultiList
                         componentId="crop_type_filter"
                         title="Crop Type"
