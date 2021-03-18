@@ -38,6 +38,7 @@ def submit_upload_task(weedcoco_path, image_dir, upload_id):
         upload_entity.status = "F"
         upload_entity.status_details = str(e)
         upload_entity.save()
+        # TODO: raise alert
     else:
         upload_entity.status = "AR"
         upload_entity.status_details = "It is currently under review."
@@ -51,6 +52,7 @@ def update_index_and_thumbnails(
     process_thumbnails=True,
     thumbnails_dir=THUMBNAILS_DIR,
     repository_dir=REPOSITORY_DIR,
+    new_upload=True,
 ):
     upload_entity = Dataset.objects.get(upload_id=upload_id)
     try:
@@ -68,10 +70,14 @@ def update_index_and_thumbnails(
         )
         es_index.post_index_entries()
     except Exception as e:
+        if not new_upload:
+            raise
         traceback.print_exc()
         upload_entity.status = "F"
         upload_entity.status_details = str(e)
     else:
+        if not new_upload:
+            return
         upload_entity.status = "C"
         upload_entity.status_details = "It has been successfully submitted."
     finally:
@@ -105,4 +111,5 @@ def reindex_dataset(
         process_thumbnails=process_thumbnails,
         thumbnails_dir=str(thumbnails_dir),
         repository_dir=str(repository_dir),
+        new_upload=False,
     )
