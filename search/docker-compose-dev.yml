@@ -25,6 +25,8 @@ services:
     build:
       context: ./django
       dockerfile:  Dockerfile-dev
+      args:
+        - WEEDCOCO_VERSION=${WEEDCOCO_VERSION:-master}
     environment:
       - DJANGO_SECRET_KEY=${DJANGO_SECRET_KEY}
       - CELERY_BROKER=redis://redis:6379/0
@@ -43,11 +45,8 @@ services:
       - elastic
 
   celery:
-    image: celery
+    image: django
     container_name: celery
-    build:
-      context: ./django
-      dockerfile:  Dockerfile-dev
     command: celery -A core worker -l INFO
     environment:
       - DJANGO_SECRET_KEY=${DJANGO_SECRET_KEY}
