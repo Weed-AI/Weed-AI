@@ -35,10 +35,13 @@ const WeedAIResultCard = (props) => {
       return item.agcontext__growth_stage_min_text;
     return item.agcontext__growth_stage_min_text + " to " + item.agcontext__growth_stage_max_text;
   }
+  const formatTaskType = (taskTypes) => (
+    taskTypes.includes("segmentation") ? "segment" : (taskTypes.includes("bounding box") ? "bounding box" : "labels"));
+  const pluralise = (text, n) => n == 1 ? text : (text.match(/[zsx]$/) ? text + "es" : text + "s");
   return (
     <ResultCard>
         <ResultCard.Image
-            src={item.thumbnail}
+            src={item.thumbnail_bbox || item.thumbnail}
         />
         <ResultCard.Description>
             <ul className="annotations">
@@ -50,7 +53,7 @@ const WeedAIResultCard = (props) => {
                 })
             }
             </ul>
-            {" in " + formatCropType(item.agcontext__crop_type) + (item.agcontext__bbch_growth_range == "na" ? "" : " (" + formatGrowthRange(item) + ")") + "."}
+            {" " + pluralise(formatTaskType(item.task_type), item.annotations.length) + " in " + formatCropType(item.agcontext__crop_type) + (item.agcontext__bbch_growth_range == "na" ? "" : " (" + formatGrowthRange(item) + ")") + "."}
           <div><a title={item.upload_id in datasetNames ? datasetNames[item.upload_id] : ""} href={`${baseURL}datasets/${item.upload_id}`}>See Dataset</a></div>
         </ResultCard.Description>
     </ResultCard>
@@ -530,7 +533,7 @@ class ReactiveSearchComponent extends Component {
                         "grains_text_filter",
                         "task_type_filter",
                         "lighting_filter",
-                        "resslider",
+                        "dataset_name_filter",
                     ]
                 },
                 ...multilistFacetProps
@@ -560,6 +563,16 @@ class ReactiveSearchComponent extends Component {
                 headers={{'X-CSRFToken': Cookies.get('csrftoken')}}
             >
                 <div style={{ position: "fixed", width: "20rem", overflow: "scroll", height: "90%", left: 0, padding: '0 1rem' }}>
+                    <MultiList
+                        componentId="dataset_name_filter"
+                        title="Dataset Name"
+                        dataField="dataset_name.keyword"
+                        sortBy="asc"
+                        selectAllLabel="All datasets"
+                        placeholder="Search datasets"
+                        filterLabel="Datasets"
+                        {...makeProps("dataset_name_filter", true)}
+                    />
                     <MultiList
                         componentId="crop_type_filter"
                         title="Crop Type"
@@ -611,24 +624,6 @@ class ReactiveSearchComponent extends Component {
                         filterLabel="Lighting"
                         {...makeProps("lighting_filter", true)}
                     />
-                    <RangeSlider
-                        componentId="resslider"
-                        dataField="resolution"
-                        title="Image Resolution (pixels)"
-                        range={{
-                            "start": 0,
-                            "end": 1500000
-                        }}
-                        rangeLabels={{
-                            "start": "Start",
-                            "end": "End"
-                        }}
-                        stepValue={10000}
-                        showHistogram={true}
-                        showFilter={true}
-                        interval={15000}
-                        {...makeProps("resslider", false)}
-                    />
                 </div>
                 <div style={{ position: "absolute", left: "20rem", paddingRight: "1rem" }}>
                     <SelectedFilters clearAllLabel="Clear filters" />
@@ -649,6 +644,7 @@ class ReactiveSearchComponent extends Component {
                             </ReactiveList.ResultCardsWrapper>
                         )}
                     />
+                    {this.props.footer}
                 </div>
             </ReactiveBase>
         );

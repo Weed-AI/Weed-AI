@@ -4,7 +4,11 @@ import pathlib
 import json
 import sys
 from elasticsearch import Elasticsearch, helpers
-from weedcoco.utils import lookup_growth_stage_name, get_task_types
+from weedcoco.utils import (
+    denormalise_weedcoco,
+    lookup_growth_stage_name,
+    get_task_types,
+)
 
 
 class ElasticSearchIndexer:
@@ -59,13 +63,8 @@ class ElasticSearchIndexer:
 
         with open(self.weedcoco_path) as f:
             coco = json.load(f)
-        if "info" in coco:
-            del coco["info"]
 
-        id_lookup = {}
-        for key, objs in coco.items():
-            for obj in objs:
-                id_lookup[key, obj["id"]] = obj
+        denormalise_weedcoco(coco)
 
         variable_to_null_fields = ["camera_fov", "camera_lens_focallength"]
 
@@ -94,24 +93,27 @@ class ElasticSearchIndexer:
             )
 
         for annotation in coco["annotations"]:
-            image = id_lookup["images", annotation["image_id"]]
-            image.setdefault("annotations", []).append(annotation)
-            annotation["category"] = id_lookup["categories", annotation["category_id"]]
-            # todo: add data from info, license?
             _flatten(annotation["category"], annotation, "category")
+
+        for image in coco["images"]:
+            # todo: add data from info, license?
+
             image["thumbnail"] = str(
                 self.thumbnail_dir
                 / os.path.basename(image["file_name"])[:2]
                 / os.path.basename(image["file_name"])
             )
+            image["thumbnail_bbox"] = str(
+                self.thumbnail_dir
+                / ("bbox-" + os.path.basename(image["file_name"])[:2])
+                / os.path.basename(image["file_name"])
+            )
             image["upload_id"] = f"{self.upload_id}"
 
-        for image in coco["images"]:
             try:
                 image["resolution"] = image["width"] * image["height"]
             except KeyError:
                 pass
-            image["agcontext"] = id_lookup["agcontexts", image["agcontext_id"]]
             image["sortKey"] = hash(
                 image["file_name"]
             )  # for deterministic random order
@@ -122,6 +124,7 @@ class ElasticSearchIndexer:
                     image.setdefault(f"annotation__{k}", []).append(annotation[k])
 
             image["task_type"] = sorted(get_task_types(image["annotations"]))
+            image["dataset_name"] = coco["info"]["metadata"]["name"]
             yield image
 
     def generate_batches(self):
@@ -136,6 +139,7 @@ class ElasticSearchIndexer:
                 blobs.append(
                     {
                         "_index": self.es_index_name,
+                        "_id": os.path.basename(image["file_name"]),
                         "_type": self.es_type_name,
                         "_source": image,
                     }

@@ -55,9 +55,10 @@ def update_index_and_thumbnails(
     upload_entity = Dataset.objects.get(upload_id=upload_id)
     try:
         if process_thumbnails:
-            # The thumbnails need to be there before indexing
-            thumbnailing(Path(thumbnails_dir), Path(repository_dir))
-
+            # The thumbnails need to be present before indexing
+            thumbnailing(
+                Path(thumbnails_dir), Path(repository_dir) / upload_id, weedcoco_path
+            )
         es_index = ElasticSearchIndexer(
             Path(weedcoco_path),
             Path(thumbnails_dir),

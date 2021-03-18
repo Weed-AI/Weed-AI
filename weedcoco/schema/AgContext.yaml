@@ -213,6 +213,7 @@ properties:
 
   cropped_to_plant:
     type: boolean
+    default: false
     description: |-
       Has the image been cropped to the plant?
       A boolean indicating if the image has been cropped to the plant.

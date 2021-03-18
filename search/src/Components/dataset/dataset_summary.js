@@ -1,4 +1,5 @@
 import React, {Component} from 'react';
+import { Helmet } from "react-helmet";
 import { withStyles } from '@material-ui/core/styles';
 import Accordion from '@material-ui/core/Accordion';
 import AccordionSummary from '@material-ui/core/AccordionSummary';
@@ -49,6 +50,10 @@ const baseURL = new URL(window.location.origin);
 
 const AgContextFieldList = (props) => {
     const {title, agcontext, fields, classes, ...accordionProps} = props;
+    const formatters = {
+      bbch_growth_range: (val) => (val["min"] ? val["min"] + " to " + val["max"] : val),
+    }
+    const format = (key, val) => (formatters.hasOwnProperty(key) ? formatters[key](val) : val);
     return (
       <Accordion {...accordionProps}>
         <AccordionSummary
@@ -62,7 +67,7 @@ const AgContextFieldList = (props) => {
         <AccordionDetails>
           <ul>
             {fields.map(key =>
-            (agcontext[key] ? <li key={key}><Typography variant='body2'>{snakeToText(key)}:&nbsp;{agcontext[key]}</Typography></li> : ""))
+            (agcontext[key] ? <li key={key}><Typography variant='body2'>{snakeToText(key)}:&nbsp;{format(key, agcontext[key])}</Typography></li> : ""))
             }
           </ul>
         </AccordionDetails>
@@ -116,8 +121,18 @@ const AgContextDetails = (props) => {
 
 export const DatasetSummary = (props) => {
     const {metadata, agcontexts, classes, rootURL, upload_id} = props;
+    const linkedEntity = (ent) => {
+      if (ent.sameAs)
+        return (<a href={ent.sameAs}>{ent.name}</a>);
+      return ent.name;
+    }
+    const getFirstLine = (s) => (s.match(/[^\n.]*/)[0]);
     return (
       <React.Fragment>
+        <Helmet>
+          <title>"{metadata.name}" Dataset in Weed-AI: a repository of weed imagery in crops</title>
+          <meta name="description" content={getFirstLine(metadata.description) + " by " + metadata.creator.map((creator) => creator.name).join(', ') + "."} />
+        </Helmet>
         <script type="application/ld+json">
         {
           JSON.stringify({
@@ -146,11 +161,25 @@ export const DatasetSummary = (props) => {
                 <dt>Creators:</dt>
                 <dd>
                   <ul>
-                  {metadata.creator.map((creator, i) => (<li key={i}>{creator.sameAs ? (<a href={creator.sameAs}>{creator.name}</a>) : creator.name}</li>))}
+                  {metadata.creator.map((creator, i) => (
+                    <li key={i}>
+                      {linkedEntity(creator)}{creator.affiliation ? (<span>, {linkedEntity(creator.affiliation)}</span>) : []}
+                    </li>
+                  ))}
                   </ul>
                 </dd>
                 <dt>Licence:</dt>
                 <dd>{<a href={metadata.license}>{metadata.license}</a>}</dd>
+                {metadata.funder ?
+                    <React.Fragment>
+                    <dt>Funders:</dt>
+                    <dd>
+                      <ul>
+                        {metadata.funder.map(ent => <li key={ent.name}>{linkedEntity(ent)}</li>)}
+                      </ul>
+                    </dd>
+                    </React.Fragment>
+                : []}
               </dl>
               { /* TODO: link to Explore searching for just this dataset */ }
             </div>
@@ -219,8 +248,9 @@ export const TestDatasetSummary = () => {
         "metadata": {
             "creator": [
                 {"name": "Sebastian Haug"},
-                {"name": "J\u00f6rn Ostermann", "sameAs": "https://orcid.org/0000-0002-6743-3324"}
+                {"name": "J\u00f6rn Ostermann", "sameAs": "https://orcid.org/0000-0002-6743-3324", "affiliation": {"name": "Leibniz Universität Hannover", "sameAs": "https://ror.org/0304hq317", "@type": "Organization"}}
             ],
+            "funder": [{"name": "some funder"}],
             "name": "A Crop/Weed Field Image Dataset for the Evaluation of Computer Vision Based Precision Agriculture Tasks",
             "datePublished": "2015-03-19",
             "identifier": ["doi:10.1007/978-3-319-16220-1_8"],

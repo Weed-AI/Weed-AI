@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Helmet } from "react-helmet";
 import { makeStyles } from '@material-ui/core/styles';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
@@ -73,16 +74,16 @@ export default function DatasetList(props) {
 
   return (
     <div className={classes.root}>
+      <Helmet>
+        <title>Datasets in Weed-AI: a repository of weed imagery in crops</title>
+        <meta name="description" content="Listing of all datasets in Weed-AI with images and metadata for download." />
+      </Helmet>
       <h2>{props.title}</h2>
       <TableContainer component={Paper}>
         <Table className={classes.table} aria-label="simple table">
           <TableHead>
             <TableRow>
               <TableCell className={classes.tableHeader}>Dataset Title</TableCell>
-              <TableCell className={classes.tableHeader}>Task Type</TableCell>
-              <TableCell className={classes.tableHeader}>Crop</TableCell>
-              <TableCell className={classes.tableHeader}>Weed Species</TableCell>
-              <TableCell className={classes.tableHeader}>Contributor</TableCell>
               {inReview ? <TableCell className={classes.tableHeader}>Contact</TableCell> : ""}
               <TableCell className={classes.tableHeader}>Upload Date</TableCell>
               {inReview ? <TableCell className={classes.tableHeader}>Command</TableCell> : ""}
@@ -96,10 +97,6 @@ export default function DatasetList(props) {
                   {row.name}
                 </Link>
                 </TableCell>
-                <TableCell>Classification</TableCell>
-                <TableCell>Pasture</TableCell>
-                <TableCell></TableCell>
-                <TableCell>{row.contributor}</TableCell>
                 {inReview ? <TableCell><a href="mailto:{row.contributor_email}">{row.contributor_email}</a></TableCell> : ""}
                 <TableCell>{row.upload_date}</TableCell>
                 {inReview

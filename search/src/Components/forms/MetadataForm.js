@@ -1,4 +1,5 @@
 import React, { Component } from 'react'
+import { Helmet } from "react-helmet";
 import { withRouter } from 'react-router-dom';
 import schema from '../../Schemas/Metadata.json'
 import Container from '@material-ui/core/Container';
@@ -24,12 +25,12 @@ const uischema = {
                 },
                 {
                     "type": "Control",
-                    "scope": "#/properties/creator"
+                    "scope": "#/properties/description",
+                    "options": {"multi": true}
                 },
                 {
                     "type": "Control",
-                    "scope": "#/properties/description",
-                    "options": {"multi": true}
+                    "scope": "#/properties/license"
                 },
                 {
                     "type": "Control",
@@ -37,7 +38,8 @@ const uischema = {
                 },
                 {
                     "type": "Control",
-                    "scope": "#/properties/license"
+                    "scope": "#/properties/creator",
+                    "label": "Authors/Creators",
                 },
             ]
         },
@@ -127,6 +129,10 @@ class StandaloneEditor extends Component {
     render() {
         return (
             <Container maxWidth="sm">
+                <Helmet>
+                    <title>Metadata Editor – Weed-AI</title>
+                    <meta name="description" content="Edit and save metadata about an annotated weed imagery collection." />
+                </Helmet>
                 <h2>Dataset Metadata</h2>
                 <Box boxShadow={3} px={2} py={1} my={2}>
                     <MetadataForm formData={this.state.formData} onChange={e => this.setState({formData: e.formData})} />
