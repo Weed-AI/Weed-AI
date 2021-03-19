@@ -17,6 +17,7 @@ reindex.short_description = "Re-index selected datasets"
 class DatasetAdmin(admin.ModelAdmin):
 
     list_display = ["upload_id", "name", "status", "date"]
+    search_fields = ["status"]
     ordering = ["status", "date"]
     actions = [reindex]
 
