@@ -68,7 +68,7 @@ def make_upload_entity_fields(weedcoco):
         )
 
         # Should produce something like:
-        # {"crop: daugus carota": {"image_count": 1, "annotation_count": 1, "bounding_box_count": 1, "segmentation_count": 1}}
+        # {"crop: daucus carota": {"image_count": 1, "annotation_count": 1, "bounding_box_count": 1, "segmentation_count": 1}}
         # XXX: we use json.loads and to_json instead of to_dict, since to_dict
         #      was returning numpy.int64 numbers that could not be serialised.
         agcontext["category_statistics"] = json.loads(

@@ -100,17 +100,17 @@ export const TestWeedAIResultCard = () => {
             ],
             "iscrowd": 0,
             "category": {
-              "name": "crop: daugus carota",
+              "name": "crop: daucus carota",
               "common_name": "carrot",
-              "species": "daugus carota",
+              "species": "daucus carota",
               "eppo_taxon_code": "DAUCS",
               "eppo_nontaxon_code": "3UMRC",
               "role": "crop",
               "id": 0
             },
-            "category__name": "crop: daugus carota",
+            "category__name": "crop: daucus carota",
             "category__common_name": "carrot",
-            "category__species": "daugus carota",
+            "category__species": "daucus carota",
             "category__eppo_taxon_code": "DAUCS",
             "category__eppo_nontaxon_code": "3UMRC",
             "category__role": "crop",
@@ -142,17 +142,17 @@ export const TestWeedAIResultCard = () => {
             ],
             "iscrowd": 0,
             "category": {
-              "name": "crop: daugus carota",
+              "name": "crop: daucus carota",
               "common_name": "carrot",
-              "species": "daugus carota",
+              "species": "daucus carota",
               "eppo_taxon_code": "DAUCS",
               "eppo_nontaxon_code": "3UMRC",
               "role": "crop",
               "id": 0
             },
-            "category__name": "crop: daugus carota",
+            "category__name": "crop: daucus carota",
             "category__common_name": "carrot",
-            "category__species": "daugus carota",
+            "category__species": "daucus carota",
             "category__eppo_taxon_code": "DAUCS",
             "category__eppo_nontaxon_code": "3UMRC",
             "category__role": "crop",
@@ -224,17 +224,17 @@ export const TestWeedAIResultCard = () => {
             ],
             "iscrowd": 0,
             "category": {
-              "name": "crop: daugus carota",
+              "name": "crop: daucus carota",
               "common_name": "carrot",
-              "species": "daugus carota",
+              "species": "daucus carota",
               "eppo_taxon_code": "DAUCS",
               "eppo_nontaxon_code": "3UMRC",
               "role": "crop",
               "id": 0
             },
-            "category__name": "crop: daugus carota",
+            "category__name": "crop: daucus carota",
             "category__common_name": "carrot",
-            "category__species": "daugus carota",
+            "category__species": "daucus carota",
             "category__eppo_taxon_code": "DAUCS",
             "category__eppo_nontaxon_code": "3UMRC",
             "category__role": "crop",
@@ -247,7 +247,7 @@ export const TestWeedAIResultCard = () => {
         "agcontext": {
           "id": 0,
           "agcontext_name": "cwfid",
-          "crop_type": "other",
+          "crop_type": "daucus carota",
           "bbch_growth_range": [
             10,
             20
@@ -280,7 +280,7 @@ export const TestWeedAIResultCard = () => {
         "sortKey": 2797745463957061359,
         "agcontext__id": 0,
         "agcontext__agcontext_name": "cwfid",
-        "agcontext__crop_type": "other",
+        "agcontext__crop_type": "daucus carota",
         "agcontext__bbch_growth_range": [
           10,
           20
@@ -419,18 +419,18 @@ export const TestWeedAIResultCard = () => {
         ],
         "annotation__category": [
           {
-            "name": "crop: daugus carota",
+            "name": "crop: daucus carota",
             "common_name": "carrot",
-            "species": "daugus carota",
+            "species": "daucus carota",
             "eppo_taxon_code": "DAUCS",
             "eppo_nontaxon_code": "3UMRC",
             "role": "crop",
             "id": 0
           },
           {
-            "name": "crop: daugus carota",
+            "name": "crop: daucus carota",
             "common_name": "carrot",
-            "species": "daugus carota",
+            "species": "daucus carota",
             "eppo_taxon_code": "DAUCS",
             "eppo_nontaxon_code": "3UMRC",
             "role": "crop",
@@ -443,9 +443,9 @@ export const TestWeedAIResultCard = () => {
             "id": 1
           },
           {
-            "name": "crop: daugus carota",
+            "name": "crop: daucus carota",
             "common_name": "carrot",
-            "species": "daugus carota",
+            "species": "daucus carota",
             "eppo_taxon_code": "DAUCS",
             "eppo_nontaxon_code": "3UMRC",
             "role": "crop",
@@ -453,10 +453,10 @@ export const TestWeedAIResultCard = () => {
           }
         ],
         "annotation__category__name": [
-          "crop: daugus carota",
-          "crop: daugus carota",
+          "crop: daucus carota",
+          "crop: daucus carota",
           "weed: UNSPECIFIED",
-          "crop: daugus carota"
+          "crop: daucus carota"
         ],
         "annotation__category__common_name": [
           "carrot",
@@ -464,10 +464,10 @@ export const TestWeedAIResultCard = () => {
           "carrot"
         ],
         "annotation__category__species": [
-          "daugus carota",
-          "daugus carota",
+          "daucus carota",
+          "daucus carota",
           "UNSPECIFIED",
-          "daugus carota"
+          "daucus carota"
         ],
         "annotation__category__eppo_taxon_code": [
           "DAUCS",

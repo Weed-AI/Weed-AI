@@ -27,9 +27,9 @@ args = ap.parse_args()
 CATEGORY_MAP = {
     # TODO: we need a spec for species unspecified, and we need a spec for species specified
     "crop": {
-        "name": "crop: daugus carota",
+        "name": "crop: daucus carota",
         "common_name": "carrot",
-        "species": "daugus carota",
+        "species": "daucus carota",
         "eppo_taxon_code": "DAUCS",
         "eppo_nontaxon_code": "3UMRC",
         "role": "crop",
@@ -94,7 +94,7 @@ agcontext = [
     {
         "id": 0,
         "agcontext_name": "cwfid",
-        "crop_type": "other",
+        "crop_type": "daucus carota",
         "bbch_growth_range": {"min": 10, "max": 20},
         "soil_colour": "grey",
         "surface_cover": "none",
