@@ -9,6 +9,7 @@ import axios from 'axios';
 import Button from '@material-ui/core/Button';
 import ReactMarkdown from "react-markdown";
 import content from './upload.md'
+import { Helmet } from "react-helmet";
 
 
 const useStyles = (theme) => ({
@@ -112,6 +113,10 @@ class UploadComponent extends Component {
         const {classes} = this.props;
         return (
             <div className={classes.upload_container}>
+                <Helmet>
+                    <title>Upload - Weed-AI</title>
+                    <meta name="description" content="Upload datasets of crop images annotated with weeds." />
+                </Helmet>
                 <h1>Sign In and Upload</h1>
                 <p>We welcome new contributions of datasets of images with weeds already annotated.</p>
                 { this.state.isLoggedIn

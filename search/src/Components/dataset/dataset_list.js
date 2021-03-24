@@ -75,8 +75,8 @@ export default function DatasetList(props) {
   return (
     <div className={classes.root}>
       <Helmet>
-        <title>Datasets in Weed-AI: a repository of weed imagery in crops</title>
-        <meta name="description" content="Listing of all datasets in Weed-AI with images and metadata for download." />
+        <title>Datasets - Weed-AI</title>
+        <meta name="description" content="All datasets in Weed-AI with annotated images and metadata for download." />
       </Helmet>
       <h2>{props.title}</h2>
       <TableContainer component={Paper}>
