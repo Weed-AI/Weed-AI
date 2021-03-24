@@ -113,7 +113,7 @@ const AgContextDetails = (props) => {
           </AccordionDetails>
         </Accordion>
         <AgContextFieldList defaultExpanded="true" classes={classes} agcontext={agcontext} title="The Crop" fields={["crop_type", "bbch_growth_range", "soil_colour", "surface_cover", "surface_coverage", "location_lat", "location_long"]} />
-        <AgContextFieldList classes={classes} agcontext={agcontext} title="The Photography" fields={["camera_make", "camera_lens", "camera_lens_focallength", "camera_height", "camera_angle", "camera_fov", "lighting", "photography_description"]} />
+        <AgContextFieldList classes={classes} agcontext={agcontext} title="The Photography" fields={["camera_make", "camera_lens", "camera_lens_focallength", "camera_height", "camera_angle", "camera_fov", "ground_speed", "lighting", "photography_description"]} />
         <AgContextFieldList classes={classes} agcontext={agcontext} title="Other Details" fields={["cropped_to_plant", "emr_channels", "weather_description"]} />
       </article>
     );
