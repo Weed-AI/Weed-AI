@@ -562,7 +562,7 @@ class ReactiveSearchComponent extends Component {
                 theme={theme}
                 headers={{'X-CSRFToken': Cookies.get('csrftoken')}}
             >
-                <title>Explore - Weed-AI</title>
+                <title>Explore a repository of weed imagery in crops - Weed-AI</title>
                 <meta
                   name="description"
                   content="Find and download datasets of annotated weed imagery. Search by crop and weed species, crop growth stage, location, photography attributes, annotation task type and more. Collect and upload your own!"
