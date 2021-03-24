@@ -224,6 +224,7 @@ agcontext = [
         "camera_angle": 90,
         "camera_fov": 28,
         "photography_description": "Mounted on tripod",
+        "ground_speed": 0,
         "lighting": "natural",
         "cropped_to_plant": False,
         "url": "https://github.com/AlexOlsen/DeepWeeds",

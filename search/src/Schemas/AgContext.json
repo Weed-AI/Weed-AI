@@ -17,6 +17,7 @@
     "camera_height",
     "camera_angle",
     "camera_fov",
+    "ground_speed",
     "photography_description",
     "lighting",
     "cropped_to_plant"
@@ -180,8 +181,13 @@
           "title": "Variable within AgContext",
           "const": "variable"
         }
-      ],
-      "description": "Field of view for camera.\nA number representing the angle captured by the camera across the diagonal of an image, measured in degrees.\nIf this is not fixed within the AgContext, use value \"variable\"."
+      ]
+    },
+    "ground_speed": {
+      "type": "number",
+      "title": "Ground Speed (m/s)",
+      "minimum": 0,
+      "description": "The usual speed (in metres per second) of the moving camera relative to ground when taking the images. Use \"0\" for stationary."
     },
     "photography_description": {
       "type": "string",

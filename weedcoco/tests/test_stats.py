@@ -122,6 +122,7 @@ SMALL_WEEDCOCO = {
             "camera_angle": 90,
             "camera_fov": 22.6,
             "photography_description": "Mounted on boom",
+            "ground_speed": 0,
             "lighting": "natural",
             "cropped_to_plant": False,
         },
