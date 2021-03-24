@@ -616,8 +616,7 @@ class ReactiveSearchComponent extends Component {
                         {...makeProps("lighting_filter", true)}
                     />
                 </div>
-                <div style={{ position: "absolute", left: "20rem", paddingRight: "1rem" }}>
-                    <SelectedFilters clearAllLabel="Clear filters" />
+                <div style={{ position: "absolute", left: "20rem", paddingRight: "1rem", marginTop: "1rem" }}>
                     <MultiDropdownList
                         componentId="dataset_name_filter"
                         dataField="dataset_name.keyword"
@@ -627,6 +626,7 @@ class ReactiveSearchComponent extends Component {
                         filterLabel="Datasets"
                         {...makeProps("dataset_name_filter", true)}
                     />
+                    <SelectedFilters clearAllLabel="Clear filters" />
                     <ReactiveList
                         componentId="result"
                         dataField="results"
@@ -636,6 +636,13 @@ class ReactiveSearchComponent extends Component {
                         size={20}
                         {...makeProps("result", false)}
                         infiniteScroll={true}
+                        renderResultStats={
+                            function(stats){
+                                return (
+                                    <p style={{position: 'absolute', left: 0, fontSize: '0.8em'}}>{stats.numberOfResults} annotated images found</p>
+                                )
+                            }
+                        }
                         render={({ data }) => (
                             <ReactiveList.ResultCardsWrapper>
                               {
