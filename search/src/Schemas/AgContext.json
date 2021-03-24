@@ -183,8 +183,7 @@
           "title": "Variable FOV",
           "const": "variable"
         }
-      ],
-      "description": "Field of view for camera.\nA number representing the angle captured by the camera across the diagonal of an image, measured in degrees.\nIf this is not fixed within the AgContext, use value \"variable\"."
+      ]
     },
     "photography_description": {
       "type": "string",
