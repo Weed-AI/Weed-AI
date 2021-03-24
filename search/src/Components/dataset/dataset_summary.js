@@ -20,6 +20,8 @@ import IconButton from '@material-ui/core/IconButton';
 import Cookies from 'js-cookie'
 
 
+const DESCRIPTION_BOILERPLATE = "\n\nEvery dataset in Weed-AI includes imagery of crops or pasture with weeds annotated, and is available in an MS-COCO derived format with standardised agricultural metadata."
+
 const useStyles = (theme) => ({
   root: {
     flexGrow: 1,
@@ -127,6 +129,7 @@ export const DatasetSummary = (props) => {
       return ent.name;
     }
     const getFirstLine = (s) => (s.match(/[^\n.]*/)[0]);
+    metadata["description"] += DESCRIPTION_BOILERPLATE;
     return (
       <React.Fragment>
         <Helmet>
