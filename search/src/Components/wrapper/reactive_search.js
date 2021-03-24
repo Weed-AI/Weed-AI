@@ -562,6 +562,11 @@ class ReactiveSearchComponent extends Component {
                 theme={theme}
                 headers={{'X-CSRFToken': Cookies.get('csrftoken')}}
             >
+                <title>Explore - Weed-AI</title>
+                <meta
+                  name="description"
+                  content="Find and download datasets of annotated weed imagery. Search by crop and weed species, crop growth stage, location, photography attributes, annotation task type and more. Collect and upload your own!"
+                />
                 <div style={{ position: "fixed", width: "20rem", overflow: "scroll", height: "90%", left: 0, padding: '0 1rem' }}>
                     <MultiList
                         componentId="dataset_name_filter"
