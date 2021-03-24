@@ -6,7 +6,8 @@ import {
     ResultCard,
     MultiList,
     ReactiveList,
-    SelectedFilters
+    SelectedFilters,
+    MultiDropdownList
 } from '@appbaseio/reactivesearch';
 import Cookies from 'js-cookie';
 import axios from 'axios';
@@ -562,17 +563,7 @@ class ReactiveSearchComponent extends Component {
                 theme={theme}
                 headers={{'X-CSRFToken': Cookies.get('csrftoken')}}
             >
-                <div style={{ position: "fixed", width: "20rem", overflow: "scroll", height: "90%", left: 0, padding: '0 1rem' }}>
-                    <MultiList
-                        componentId="dataset_name_filter"
-                        title="Dataset Name"
-                        dataField="dataset_name.keyword"
-                        sortBy="asc"
-                        selectAllLabel="All datasets"
-                        placeholder="Search datasets"
-                        filterLabel="Datasets"
-                        {...makeProps("dataset_name_filter", true)}
-                    />
+                <div style={{ position: "fixed", width: "20rem", overflow: "scroll", height: "90%", left: 0, padding: '1rem' }}>
                     <MultiList
                         componentId="crop_type_filter"
                         title="Crop Type"
@@ -625,7 +616,16 @@ class ReactiveSearchComponent extends Component {
                         {...makeProps("lighting_filter", true)}
                     />
                 </div>
-                <div style={{ position: "absolute", left: "20rem", paddingRight: "1rem" }}>
+                <div style={{ position: "absolute", left: "20rem", paddingRight: "1rem", marginTop: "1rem" }}>
+                    <MultiDropdownList
+                        componentId="dataset_name_filter"
+                        dataField="dataset_name.keyword"
+                        title="Dataset Name"
+                        placeholder="Search datasets"
+                        sortBy="asc"
+                        filterLabel="Datasets"
+                        {...makeProps("dataset_name_filter", true)}
+                    />
                     <SelectedFilters clearAllLabel="Clear filters" />
                     <ReactiveList
                         componentId="result"
@@ -636,6 +636,13 @@ class ReactiveSearchComponent extends Component {
                         size={20}
                         {...makeProps("result", false)}
                         infiniteScroll={true}
+                        renderResultStats={
+                            function(stats){
+                                return (
+                                    <p style={{position: 'absolute', left: 0, fontSize: '0.8em'}}>{stats.numberOfResults} annotated images found</p>
+                                )
+                            }
+                        }
                         render={({ data }) => (
                             <ReactiveList.ResultCardsWrapper>
                               {
