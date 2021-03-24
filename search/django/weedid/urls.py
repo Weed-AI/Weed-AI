@@ -30,4 +30,5 @@ api_urlpatterns = [
 urlpatterns = [
     path("api/", include(api_urlpatterns)),
     re_path(r"^elasticsearch", views.elasticsearch_query, name="elasticsearch_query"),
+    path("sitemap.xml", views.sitemap_xml),
 ]
