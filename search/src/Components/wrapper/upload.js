@@ -114,7 +114,7 @@ class UploadComponent extends Component {
         return (
             <div className={classes.upload_container}>
                 <Helmet>
-                    <title>Upload - Weed-AI</title>
+                    <title>Upload a dataset of weed imagery in crops - Weed-AI</title>
                     <meta name="description" content="Upload datasets of crop images annotated with weeds." />
                 </Helmet>
                 <h1>Sign In and Upload</h1>
