@@ -6,7 +6,8 @@ import {
     ResultCard,
     MultiList,
     ReactiveList,
-    SelectedFilters
+    SelectedFilters,
+    MultiDropdownList
 } from '@appbaseio/reactivesearch';
 import Cookies from 'js-cookie';
 import axios from 'axios';
@@ -100,17 +101,17 @@ export const TestWeedAIResultCard = () => {
             ],
             "iscrowd": 0,
             "category": {
-              "name": "crop: daugus carota",
+              "name": "crop: daucus carota",
               "common_name": "carrot",
-              "species": "daugus carota",
+              "species": "daucus carota",
               "eppo_taxon_code": "DAUCS",
               "eppo_nontaxon_code": "3UMRC",
               "role": "crop",
               "id": 0
             },
-            "category__name": "crop: daugus carota",
+            "category__name": "crop: daucus carota",
             "category__common_name": "carrot",
-            "category__species": "daugus carota",
+            "category__species": "daucus carota",
             "category__eppo_taxon_code": "DAUCS",
             "category__eppo_nontaxon_code": "3UMRC",
             "category__role": "crop",
@@ -142,17 +143,17 @@ export const TestWeedAIResultCard = () => {
             ],
             "iscrowd": 0,
             "category": {
-              "name": "crop: daugus carota",
+              "name": "crop: daucus carota",
               "common_name": "carrot",
-              "species": "daugus carota",
+              "species": "daucus carota",
               "eppo_taxon_code": "DAUCS",
               "eppo_nontaxon_code": "3UMRC",
               "role": "crop",
               "id": 0
             },
-            "category__name": "crop: daugus carota",
+            "category__name": "crop: daucus carota",
             "category__common_name": "carrot",
-            "category__species": "daugus carota",
+            "category__species": "daucus carota",
             "category__eppo_taxon_code": "DAUCS",
             "category__eppo_nontaxon_code": "3UMRC",
             "category__role": "crop",
@@ -224,17 +225,17 @@ export const TestWeedAIResultCard = () => {
             ],
             "iscrowd": 0,
             "category": {
-              "name": "crop: daugus carota",
+              "name": "crop: daucus carota",
               "common_name": "carrot",
-              "species": "daugus carota",
+              "species": "daucus carota",
               "eppo_taxon_code": "DAUCS",
               "eppo_nontaxon_code": "3UMRC",
               "role": "crop",
               "id": 0
             },
-            "category__name": "crop: daugus carota",
+            "category__name": "crop: daucus carota",
             "category__common_name": "carrot",
-            "category__species": "daugus carota",
+            "category__species": "daucus carota",
             "category__eppo_taxon_code": "DAUCS",
             "category__eppo_nontaxon_code": "3UMRC",
             "category__role": "crop",
@@ -247,7 +248,7 @@ export const TestWeedAIResultCard = () => {
         "agcontext": {
           "id": 0,
           "agcontext_name": "cwfid",
-          "crop_type": "other",
+          "crop_type": "daucus carota",
           "bbch_growth_range": [
             10,
             20
@@ -280,7 +281,7 @@ export const TestWeedAIResultCard = () => {
         "sortKey": 2797745463957061359,
         "agcontext__id": 0,
         "agcontext__agcontext_name": "cwfid",
-        "agcontext__crop_type": "other",
+        "agcontext__crop_type": "daucus carota",
         "agcontext__bbch_growth_range": [
           10,
           20
@@ -419,18 +420,18 @@ export const TestWeedAIResultCard = () => {
         ],
         "annotation__category": [
           {
-            "name": "crop: daugus carota",
+            "name": "crop: daucus carota",
             "common_name": "carrot",
-            "species": "daugus carota",
+            "species": "daucus carota",
             "eppo_taxon_code": "DAUCS",
             "eppo_nontaxon_code": "3UMRC",
             "role": "crop",
             "id": 0
           },
           {
-            "name": "crop: daugus carota",
+            "name": "crop: daucus carota",
             "common_name": "carrot",
-            "species": "daugus carota",
+            "species": "daucus carota",
             "eppo_taxon_code": "DAUCS",
             "eppo_nontaxon_code": "3UMRC",
             "role": "crop",
@@ -443,9 +444,9 @@ export const TestWeedAIResultCard = () => {
             "id": 1
           },
           {
-            "name": "crop: daugus carota",
+            "name": "crop: daucus carota",
             "common_name": "carrot",
-            "species": "daugus carota",
+            "species": "daucus carota",
             "eppo_taxon_code": "DAUCS",
             "eppo_nontaxon_code": "3UMRC",
             "role": "crop",
@@ -453,10 +454,10 @@ export const TestWeedAIResultCard = () => {
           }
         ],
         "annotation__category__name": [
-          "crop: daugus carota",
-          "crop: daugus carota",
+          "crop: daucus carota",
+          "crop: daucus carota",
           "weed: UNSPECIFIED",
-          "crop: daugus carota"
+          "crop: daucus carota"
         ],
         "annotation__category__common_name": [
           "carrot",
@@ -464,10 +465,10 @@ export const TestWeedAIResultCard = () => {
           "carrot"
         ],
         "annotation__category__species": [
-          "daugus carota",
-          "daugus carota",
+          "daucus carota",
+          "daucus carota",
           "UNSPECIFIED",
-          "daugus carota"
+          "daucus carota"
         ],
         "annotation__category__eppo_taxon_code": [
           "DAUCS",
@@ -562,17 +563,7 @@ class ReactiveSearchComponent extends Component {
                 theme={theme}
                 headers={{'X-CSRFToken': Cookies.get('csrftoken')}}
             >
-                <div style={{ position: "fixed", width: "20rem", overflow: "scroll", height: "90%", left: 0, padding: '0 1rem' }}>
-                    <MultiList
-                        componentId="dataset_name_filter"
-                        title="Dataset Name"
-                        dataField="dataset_name.keyword"
-                        sortBy="asc"
-                        selectAllLabel="All datasets"
-                        placeholder="Search datasets"
-                        filterLabel="Datasets"
-                        {...makeProps("dataset_name_filter", true)}
-                    />
+                <div style={{ position: "fixed", width: "20rem", overflow: "scroll", height: "90%", left: 0, padding: '1rem' }}>
                     <MultiList
                         componentId="crop_type_filter"
                         title="Crop Type"
@@ -625,7 +616,16 @@ class ReactiveSearchComponent extends Component {
                         {...makeProps("lighting_filter", true)}
                     />
                 </div>
-                <div style={{ position: "absolute", left: "20rem", paddingRight: "1rem" }}>
+                <div style={{ position: "absolute", left: "20rem", paddingRight: "1rem", marginTop: "1rem" }}>
+                    <MultiDropdownList
+                        componentId="dataset_name_filter"
+                        dataField="dataset_name.keyword"
+                        title="Dataset Name"
+                        placeholder="Search datasets"
+                        sortBy="asc"
+                        filterLabel="Datasets"
+                        {...makeProps("dataset_name_filter", true)}
+                    />
                     <SelectedFilters clearAllLabel="Clear filters" />
                     <ReactiveList
                         componentId="result"
@@ -636,6 +636,13 @@ class ReactiveSearchComponent extends Component {
                         size={20}
                         {...makeProps("result", false)}
                         infiniteScroll={true}
+                        renderResultStats={
+                            function(stats){
+                                return (
+                                    <p style={{position: 'absolute', left: 0, fontSize: '0.8em'}}>{stats.numberOfResults} annotated images found</p>
+                                )
+                            }
+                        }
                         render={({ data }) => (
                             <ReactiveList.ResultCardsWrapper>
                               {

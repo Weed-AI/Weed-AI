@@ -87,6 +87,10 @@ const uischema = {
         },
         {
           "type": "Control",
+          "scope": "#/properties/ground_speed"
+        },
+        {
+          "type": "Control",
           "scope": "#/properties/lighting"
         },
         {
