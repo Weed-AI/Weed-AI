@@ -2,12 +2,22 @@ import os
 from shutil import rmtree
 import json
 from uuid import uuid4
+import smtplib
+from email.message import EmailMessage
 from weedcoco.repo.deposit import mkdir_safely
 from weedcoco.utils import set_info, set_licenses
 from weedcoco.stats import WeedCOCOStats
 from django.core.files.storage import FileSystemStorage
 from weedid.models import Dataset, WeedidUser
-from core.settings import UPLOAD_DIR, REPOSITORY_DIR, DOWNLOAD_DIR
+from core.settings import (
+    UPLOAD_DIR,
+    REPOSITORY_DIR,
+    DOWNLOAD_DIR,
+    SMTP_HOST,
+    SMTP_PORT,
+    SERVER_ADDR,
+    SITE_BASE_URL,
+)
 
 
 def store_tmp_image(image, image_dir):
@@ -118,3 +128,40 @@ def retrieve_listing_info(query_entity, awaiting_review):
         "contributor": query_entity.user.username,
         "contributor_email": query_entity.user.email if awaiting_review else "",
     }
+
+
+def send_email(subject, body, recipients):
+    with smtplib.SMTP(SMTP_HOST, SMTP_PORT) as smtp:
+        for recipient in recipients:
+            msg = EmailMessage()
+            msg["Subject"], msg["From"], msg["To"] = subject, SERVER_ADDR, recipient
+            msg.set_content(body)
+            smtp.send_message(msg)
+
+
+def upload_notification(upload_id):
+    upload_entity = Dataset.objects.get(upload_id=upload_id)
+    uploader = upload_entity.user
+    email_body = f"""\
+    User {uploader.username} <{uploader.email}> has uploaded a dataset {upload_entity.metadata['name']} to review.
+    """
+    staff_recipients = [
+        staff.email for staff in WeedidUser.objects.filter(is_staff=True)
+    ]
+    send_email(
+        f"New upload ({upload_entity.metadata['name']})", email_body, staff_recipients
+    )
+
+
+def review_notification(message, upload_id):
+    upload_entity = Dataset.objects.get(upload_id=upload_id)
+    uploader = upload_entity.user
+    email_body = f"""\
+    Your dataset upload {upload_entity.metadata['name']} has been {message} after review
+    {'You can check it from ' + SITE_BASE_URL + '/datasets/' + upload_id if message == 'approved' else 'Feel free to contact our admin'}
+    """
+    send_email(
+        f"Your upload ({upload_entity.metadata['name']}) has been {message}",
+        email_body,
+        [uploader.email],
+    )
