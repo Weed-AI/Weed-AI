@@ -67,9 +67,10 @@ properties:
           Non-grain agricultural land.
 
   bbch_growth_range:
+    title: BBCH Growth Stage Range
     oneOf:
       - type: object
-        title: BBCH Range
+        title: Specify Range
         required:
           - min
           - max
@@ -79,17 +80,21 @@ properties:
             type: integer
             minimum: 0
             maximum: 99
-            description: Minimum BBCH growth stage (00-99) in the dataset
+            description: |-
+              Minimum BBCH growth stage (00-99) in the dataset.
+              This pair of BBCH Growth Stage codes (00-99) represent the minimum and maximum crop growth stage in the images.
+              If this AgContext is not in a cropping environment, or is in fallow, use "Not Applicable"
+            title: Minimum Growth Stage
           max: 
             type: integer
             minimum: 0
             maximum: 99
             description: Maximum BBCH growth stage (00-99) in the dataset
+            title: Maximum Growth Stage
       - type: string
         title: Not Applicable
         const: na
     description: |-
-      BBCH Growth Stage range
       A pair of BBCH Growth Stage codes (00-99) representing the minimum and maximum crop growth stage in the images.
       If this AgContext is not in a cropping environment, or is in fallow, use value "na".
 
@@ -194,9 +199,10 @@ properties:
       A camera facing straight down would be 90. A camera facing forward would be 0.
 
   camera_fov:
+    title: Camera Field of View
     oneOf:
       - type: number
-        title: Specific
+        title: Specific FOV
         minimum: 1
         maximum: 180
       - type: string
