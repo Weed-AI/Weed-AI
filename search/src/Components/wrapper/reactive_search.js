@@ -534,7 +534,7 @@ class ReactiveSearchComponent extends Component {
                         "grains_text_filter",
                         "task_type_filter",
                         "lighting_filter",
-                        "gds_filter",
+                        "geo_distance_filter",
                         "dataset_name_filter",
                     ]
                 },
@@ -568,12 +568,12 @@ class ReactiveSearchComponent extends Component {
                 <div style={{ position: "fixed", width: "20rem", overflow: "scroll", height: "90%", left: 0, padding: '1rem' }}>
                     <GeoDistanceSlider
                       title="Location"
-                      componentId="gds_filter"
+                      componentId="geo_distance_filter"
                       placeholder="Search Location"
                       dataField="location"
                       unit="km"
                       URLParams
-                      showFilter={false}
+                      showFilter={true}
                       react={{
                         and: [
                           "crop_type_filter",
@@ -586,11 +586,14 @@ class ReactiveSearchComponent extends Component {
                       }}
                       range={{
                         start: 10,
-                        end: 1000
+                        end: 10000
+                      }}
+                      defaultValue={{
+                        distance: 10000
                       }}
                       rangeLabels={{
                         start: '10km',
-                        end: '1000km',
+                        end: '10000km',
                       }}
                     />
                     <MultiList
