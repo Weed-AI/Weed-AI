@@ -620,8 +620,8 @@ class ReactiveSearchComponent extends Component {
                     <MultiDropdownList
                         componentId="dataset_name_filter"
                         dataField="dataset_name.keyword"
-                        title="Dataset Name"
-                        placeholder="Search datasets"
+                        title="Datasets"
+                        placeholder="Select datasets"
                         sortBy="asc"
                         filterLabel="Datasets"
                         {...makeProps("dataset_name_filter", true)}
