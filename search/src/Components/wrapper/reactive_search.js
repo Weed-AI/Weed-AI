@@ -586,14 +586,14 @@ class ReactiveSearchComponent extends Component {
                       }}
                       range={{
                         start: 10,
-                        end: 10000
+                        end: 1000
                       }}
                       defaultValue={{
-                        distance: 10000
+                        distance: 1000
                       }}
                       rangeLabels={{
                         start: '10km',
-                        end: '10000km',
+                        end: '1000km',
                       }}
                     />
                     <MultiList
