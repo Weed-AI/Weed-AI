@@ -29,6 +29,7 @@
     },
     "crop_type": {
       "title": "Crop Type",
+      "description": "The crop grown in the images.",
       "oneOf": [
         {
           "type": "string",
@@ -52,8 +53,7 @@
             "linseed",
             "safflower",
             "cotton"
-          ],
-          "description": "Crop type.\nThe crop grown in the image."
+          ]
         },
         {
           "type": "string",
@@ -85,7 +85,7 @@
               "type": "integer",
               "minimum": 0,
               "maximum": 99,
-              "description": "Minimum BBCH growth stage (00-99) in the dataset.\nThis pair of BBCH Growth Stage codes (00-99) represent the minimum and maximum crop growth stage in the images.\nIf this AgContext is not in a cropping environment, or is in fallow, use \"Not Applicable\"",
+              "description": "Minimum BBCH growth stage (00-99) in the dataset.",
               "title": "Minimum Growth Stage"
             },
             "max": {
@@ -103,7 +103,7 @@
           "const": "na"
         }
       ],
-      "description": "A pair of BBCH Growth Stage codes (00-99) representing the minimum and maximum crop growth stage in the images.\nIf this AgContext is not in a cropping environment, or is in fallow, use value \"na\"."
+      "description": "A pair of BBCH Growth Stage codes (00-99) representing the minimum and maximum crop growth stage in the images.\nIf this AgContext is not in a cropping environment, or is in fallow, use N/A (\"na\" in WeedCOCO)."
     },
     "soil_colour": {
       "type": "string",
@@ -188,6 +188,7 @@
     },
     "camera_fov": {
       "title": "Camera Field of View",
+      "description": "Field of view for camera.\nA number representing the angle captured by the camera across the diagonal of an image, measured in degrees.\nIf this is not fixed within the AgContext (for example, because images have been cropped), use value \"variable\".",
       "oneOf": [
         {
           "type": "number",
