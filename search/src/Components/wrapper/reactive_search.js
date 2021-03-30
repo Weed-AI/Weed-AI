@@ -574,6 +574,7 @@ class ReactiveSearchComponent extends Component {
                       unit="km"
                       URLParams
                       showFilter={true}
+                      autoLocation={false}
                       react={{
                         and: [
                           "crop_type_filter",
