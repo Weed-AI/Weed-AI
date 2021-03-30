@@ -558,7 +558,7 @@ class ReactiveSearchComponent extends Component {
         return (
             <ReactiveBase
                 app="weedid"
-                mapKey=""
+                mapKey="AIzaSyDDiJ4QoRW9_DJEV94ehO3z8zfCHRuHfxk"
                 url={baseURL + "elasticsearch/"}
                 theme={theme}
                 headers={{'X-CSRFToken': Cookies.get('csrftoken')}}
@@ -571,6 +571,7 @@ class ReactiveSearchComponent extends Component {
                       dataField="location"
                       unit="km"
                       URLParams
+                      showFilter={false}
                       react={{
                         and: [
                           "crop_type_filter",
@@ -587,10 +588,6 @@ class ReactiveSearchComponent extends Component {
                       rangeLabels={{
                         start: '10km',
                         end: '1000km',
-                      }}
-                      defaultValue={{
-                        location: 'Sydney, Australia',
-                        distance: 100,
                       }}
                     />
                     <MultiList
