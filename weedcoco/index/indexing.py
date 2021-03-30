@@ -124,6 +124,7 @@ class ElasticSearchIndexer:
             image[
                 "location"
             ] = f'{image["agcontext"]["location_lat"]}, {image["agcontext"]["location_long"]}'
+            image["dataset_name"] = coco["info"]["metadata"]["name"]
             yield image
 
     def generate_batches(self):

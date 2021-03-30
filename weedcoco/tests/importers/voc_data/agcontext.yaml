@@ -4,6 +4,7 @@ soil_colour: grey
 surface_cover: none
 surface_coverage: 0-25
 weather_description: Nothing to note
+ground_speed: 0
 lighting: artificial
 location_lat: 90
 location_long: 90
