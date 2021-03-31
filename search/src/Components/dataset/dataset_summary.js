@@ -19,6 +19,11 @@ import ListIcon from '@material-ui/icons/List';
 import IconButton from '@material-ui/core/IconButton';
 import Cookies from 'js-cookie'
 import ReactMarkdown from "react-markdown";
+import {
+    ReactiveComponent,
+} from '@appbaseio/reactivesearch';
+import SearchBase from '../search/SearchBase';
+import ResultsList from '../search/ResultsList';
 
 
 const DESCRIPTION_BOILERPLATE = "\n\nEvery dataset in Weed-AI includes imagery of crops or pasture with weeds annotated, and is available in an MS-COCO derived format with standardised agricultural metadata."
@@ -52,21 +57,14 @@ const useStyles = (theme) => ({
 const baseURL = new URL(window.location.origin);
 
 const AgContextFieldList = (props) => {
-    const {title, agcontext, fields, classes, ...accordionProps} = props;
+    const {title, agcontext, fields, MyAccordionSummary, ...accordionProps} = props;
     const formatters = {
       bbch_growth_range: (val) => (val["min"] ? val["min"] + " to " + val["max"] : val),
     }
     const format = (key, val) => (formatters.hasOwnProperty(key) ? formatters[key](val) : val);
     return (
       <Accordion {...accordionProps}>
-        <AccordionSummary
-          expandIcon={<ExpandMoreIcon />}
-          aria-controls="panel1a-content"
-          id="panel1a-header"
-          className={classes.header}
-        >
-          <Typography className={classes.heading}>{title}</Typography>
-        </AccordionSummary>
+        <MyAccordionSummary>{title}</MyAccordionSummary>
         <AccordionDetails>
           <ul>
             {fields.map(key =>
@@ -79,22 +77,45 @@ const AgContextFieldList = (props) => {
 }
 
 const AgContextDetails = (props) => {
-    const {agcontext, ordinal, nContexts, classes} = props;
+    const {metadata, agcontext, ordinal, nContexts, MyAccordionSummary} = props;
     const tableFields = {"image_count": "# Images", "segmentation_count": "# Segments", "bounding_box_count": "# Bounding Boxes"}
     return (
       <article>
         {nContexts > 1 ? <h2>Agricultural Context {ordinal} of {nContexts}</h2> : ""}
-        <Accordion defaultExpanded='true'>
-          <AccordionSummary
-            expandIcon={<ExpandMoreIcon />}
-            aria-controls="panel1a-content"
-            id="panel1a-header"
-            className={classes.header}
-          >
-            <Typography className={classes.heading}>Annotation Statistics</Typography>
-          </AccordionSummary>
+        <Accordion defaultExpanded="true">
+          <MyAccordionSummary>Sample of {agcontext.n_images} Images</MyAccordionSummary>
           <AccordionDetails>
-            <p>Total number of images: {agcontext.n_images}</p>
+            <SearchBase>
+              <ReactiveComponent
+                componentId="dataset_filter"
+                customQuery={props => ({
+                  query: {
+                    term: {
+                      "dataset_name.keyword": metadata.name,
+                    }
+                  }
+                })}
+              />
+              <ResultsList
+                  listProps={{
+                    pagination: false,
+                    infiniteScroll: false,
+                    size: 4,
+                    react: {and: ["dataset_filter"]},
+                    showResultStats: false,
+                    sortOptions: null,
+                  }}
+                  cardProps={{
+                    linkToDataset: false,
+                  }}
+                  setOGImage={true}
+              />
+            </SearchBase>
+          </AccordionDetails>
+        </Accordion>
+        <Accordion defaultExpanded='true'>
+          <MyAccordionSummary>Annotation Statistics</MyAccordionSummary>
+          <AccordionDetails>
             <TableContainer>
               <Table>
                 <TableHead>
@@ -115,9 +136,9 @@ const AgContextDetails = (props) => {
             </TableContainer>
           </AccordionDetails>
         </Accordion>
-        <AgContextFieldList defaultExpanded="true" classes={classes} agcontext={agcontext} title="The Crop" fields={["crop_type", "bbch_growth_range", "soil_colour", "surface_cover", "surface_coverage", "location_lat", "location_long"]} />
-        <AgContextFieldList classes={classes} agcontext={agcontext} title="The Photography" fields={["camera_make", "camera_lens", "camera_lens_focallength", "camera_height", "camera_angle", "camera_fov", "ground_speed", "lighting", "photography_description"]} />
-        <AgContextFieldList classes={classes} agcontext={agcontext} title="Other Details" fields={["cropped_to_plant", "emr_channels", "weather_description"]} />
+        <AgContextFieldList MyAccordionSummary={MyAccordionSummary} defaultExpanded="true" agcontext={agcontext} title="The Crop" fields={["crop_type", "bbch_growth_range", "soil_colour", "surface_cover", "surface_coverage", "location_lat", "location_long"]} />
+        <AgContextFieldList MyAccordionSummary={MyAccordionSummary} agcontext={agcontext} title="The Photography" fields={["camera_make", "camera_lens", "camera_lens_focallength", "camera_height", "camera_angle", "camera_fov", "ground_speed", "lighting", "photography_description"]} />
+        <AgContextFieldList MyAccordionSummary={MyAccordionSummary} agcontext={agcontext} title="Other Details" fields={["cropped_to_plant", "emr_channels", "weather_description"]} />
       </article>
     );
 }
@@ -129,6 +150,18 @@ export const DatasetSummary = (props) => {
         return (<a href={ent.sameAs}>{ent.name}</a>);
       return ent.name;
     }
+
+    const MyAccordionSummary = ({ children }) => (
+      <AccordionSummary
+        expandIcon={<ExpandMoreIcon />}
+        aria-controls="panel1a-content"
+        id="panel1a-header"
+        className={classes.header}
+      >
+        <Typography className={classes.heading}>{children}</Typography>
+      </AccordionSummary>
+    );
+
     const getFirstLine = (s) => (s.match(/[^\n.]*/)[0]);
     metadata["description"] = (metadata["description"] ?? "") + DESCRIPTION_BOILERPLATE;
     return (
@@ -195,7 +228,7 @@ export const DatasetSummary = (props) => {
           </Grid>
         </Grid>
         {agcontexts.map((agcontext, idx) =>
-          <AgContextDetails agcontext={agcontext} key={idx} ordinal={idx + 1} nContexts={agcontexts.length} classes={classes} />
+          <AgContextDetails MyAccordionSummary={MyAccordionSummary} metadata={metadata} agcontext={agcontext} key={idx} ordinal={idx + 1} nContexts={agcontexts.length} classes={classes} />
         )}
       </React.Fragment>
     );
