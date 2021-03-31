@@ -63,9 +63,12 @@
         },
         {
           "type": "string",
-          "title": "Pasture",
-          "const": "pasture",
-          "description": "Non-grain agricultural land."
+          "title": "Not in Crop",
+          "enum": [
+            "pasture",
+            "fallow"
+          ],
+          "description": "Non-crop agricultural land or crop land in fallow."
         }
       ]
     },
