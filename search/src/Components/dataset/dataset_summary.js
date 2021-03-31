@@ -1,4 +1,5 @@
 import React, {Component} from 'react';
+import { Helmet } from "react-helmet";
 import { withStyles } from '@material-ui/core/styles';
 import Accordion from '@material-ui/core/Accordion';
 import AccordionSummary from '@material-ui/core/AccordionSummary';
@@ -17,7 +18,10 @@ import axios from 'axios';
 import ListIcon from '@material-ui/icons/List';
 import IconButton from '@material-ui/core/IconButton';
 import Cookies from 'js-cookie'
+import ReactMarkdown from "react-markdown";
 
+
+const DESCRIPTION_BOILERPLATE = "\n\nEvery dataset in Weed-AI includes imagery of crops or pasture with weeds annotated, and is available in an MS-COCO derived format with standardised agricultural metadata."
 
 const useStyles = (theme) => ({
   root: {
@@ -112,7 +116,7 @@ const AgContextDetails = (props) => {
           </AccordionDetails>
         </Accordion>
         <AgContextFieldList defaultExpanded="true" classes={classes} agcontext={agcontext} title="The Crop" fields={["crop_type", "bbch_growth_range", "soil_colour", "surface_cover", "surface_coverage", "location_lat", "location_long"]} />
-        <AgContextFieldList classes={classes} agcontext={agcontext} title="The Photography" fields={["camera_make", "camera_lens", "camera_lens_focallength", "camera_height", "camera_angle", "camera_fov", "lighting", "photography_description"]} />
+        <AgContextFieldList classes={classes} agcontext={agcontext} title="The Photography" fields={["camera_make", "camera_lens", "camera_lens_focallength", "camera_height", "camera_angle", "camera_fov", "ground_speed", "lighting", "photography_description"]} />
         <AgContextFieldList classes={classes} agcontext={agcontext} title="Other Details" fields={["cropped_to_plant", "emr_channels", "weather_description"]} />
       </article>
     );
@@ -125,8 +129,15 @@ export const DatasetSummary = (props) => {
         return (<a href={ent.sameAs}>{ent.name}</a>);
       return ent.name;
     }
+    const getFirstLine = (s) => (s.match(/[^\n.]*/)[0]);
+    const displayMeta = {...metadata}
+    displayMeta["description"] = (metadata["description"] ?? "") + DESCRIPTION_BOILERPLATE;
     return (
       <React.Fragment>
+        <Helmet>
+          <title>"{displayMeta.name}" Dataset in Weed-AI: a repository of weed imagery in crops</title>
+          <meta name="description" content={getFirstLine(displayMeta.description) + " by " + displayMeta.creator.map((creator) => creator.name).join(', ') + "."} />
+        </Helmet>
         <script type="application/ld+json">
         {
           JSON.stringify({
@@ -135,7 +146,7 @@ export const DatasetSummary = (props) => {
               "@type": "Dataset",
               "url": window.location.href
             },
-            ...metadata
+            ...displayMeta
           })
         }
         </script>
@@ -146,16 +157,16 @@ export const DatasetSummary = (props) => {
                 <IconButton aria-label="back to list" color="secondary" onClick={() => window.location.assign(rootURL + 'datasets')}>
                   <ListIcon />
                 </IconButton>
-                <Typography variant='h4' style={{fontWeight: 600}}>{metadata.name}</Typography>
+                <Typography variant='h4' style={{fontWeight: 600}}>{displayMeta.name}</Typography>
               </div>
-              <p>
-                {metadata.description /* TODO: perhaps render as markdown */}
-              </p>
+              <div style={{fontSize: "1.2em" }}>
+              <ReactMarkdown source={displayMeta.description}  />
+              </div>
               <dl>
                 <dt>Creators:</dt>
                 <dd>
                   <ul>
-                  {metadata.creator.map((creator, i) => (
+                  {displayMeta.creator.map((creator, i) => (
                     <li key={i}>
                       {linkedEntity(creator)}{creator.affiliation ? (<span>, {linkedEntity(creator.affiliation)}</span>) : []}
                     </li>
@@ -163,13 +174,13 @@ export const DatasetSummary = (props) => {
                   </ul>
                 </dd>
                 <dt>Licence:</dt>
-                <dd>{<a href={metadata.license}>{metadata.license}</a>}</dd>
-                {metadata.funder ?
+                <dd>{<a href={displayMeta.license}>{displayMeta.license}</a>}</dd>
+                {displayMeta.funder ?
                     <React.Fragment>
                     <dt>Funders:</dt>
                     <dd>
                       <ul>
-                        {metadata.funder.map(ent => <li key={ent.name}>{linkedEntity(ent)}</li>)}
+                        {displayMeta.funder.map(ent => <li key={ent.name}>{linkedEntity(ent)}</li>)}
                       </ul>
                     </dd>
                     </React.Fragment>
@@ -249,6 +260,7 @@ export const TestDatasetSummary = () => {
             "datePublished": "2015-03-19",
             "identifier": ["doi:10.1007/978-3-319-16220-1_8"],
             "license": "https://github.com/cwfid/dataset",
+            "description": "Foobar",
             "citation": "Sebastian Haug, Jörn Ostermann: A Crop/Weed Field Image Dataset for the Evaluation of Computer Vision Based Precision Agriculture Tasks, CVPPP 2014 Workshop, ECCV 2014"
         },
         "agcontexts": [
@@ -258,7 +270,7 @@ export const TestDatasetSummary = () => {
         "weed: blah": {"annotation_count": 1, "image_count": 1, "segmentation_count": 0, "bounding_box_count": 0}},
                 "id": 77, "lighting": "natural", "bbch_code": "na", "crop_type": "sorghum", "camera_fov": "variable", "camera_lens": "Telephoto", "camera_make": "Canon", "soil_colour": "dark_brown", "camera_angle": 45, "emr_channels": "visual", "location_lat": 80, "camera_height": 500, "location_long": 80, "surface_cover": "oilseed", "cropped_to_plant": true, "surface_coverage": "0-25", "weather_description": "rainy", "bbch_descriptive_text": "stem elongation", "camera_lens_focallength": 180, "grains_descriptive_text": "emergence", "photography_description": "poor lighting"}]}
     const Out = withStyles(useStyles)(DatasetSummary);
-    return (<Out {...props} />);
+    return (<div style={{ margin: "3em" }}><Out {...props} /></div>);
 }
 
 export default withStyles(useStyles)(DatasetSummaryPage);

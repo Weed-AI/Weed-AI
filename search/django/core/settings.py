@@ -1,5 +1,7 @@
 import os
 
+SITE_BASE_URL = "https://weed-ai.sydney.edu.au"
+
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 UPLOAD_DIR = os.path.join(BASE_DIR, "upload")
@@ -80,9 +82,9 @@ WSGI_APPLICATION = "core.wsgi.application"
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql_psycopg2",
-        "NAME": "reactivesearch",
-        "USER": "postgres",
-        "PASSWORD": "postgres",
+        "NAME": os.environ.get("POSTGRES_DB", "reactivesearch"),
+        "USER": os.environ.get("POSTGRES_USER", "postgres"),
+        "PASSWORD": os.environ.get("POSTGRES_PASSWORD", "postgres"),
         "HOST": "db",
         "PORT": "5432",
     }

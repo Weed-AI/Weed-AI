@@ -25,10 +25,15 @@ services:
     build:
       context: ./django
       dockerfile:  Dockerfile-dev
+      args:
+        - WEEDCOCO_VERSION=${WEEDCOCO_VERSION:-master}
     environment:
       - DJANGO_SECRET_KEY=${DJANGO_SECRET_KEY}
       - CELERY_BROKER=redis://redis:6379/0
       - CELERY_BACKEND=redis://redis:6379/0
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
     command: python manage.py runserver 0.0.0.0:8000
     entrypoint: /entrypoint.sh
     volumes:
@@ -43,16 +48,16 @@ services:
       - elastic
 
   celery:
-    image: celery
+    image: django
     container_name: celery
-    build:
-      context: ./django
-      dockerfile:  Dockerfile-dev
     command: celery -A core worker -l INFO
     environment:
       - DJANGO_SECRET_KEY=${DJANGO_SECRET_KEY}
       - CELERY_BROKER=redis://redis:6379/0
       - CELERY_BACKEND=redis://redis:6379/0
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
     volumes:
       - ./django/:/code
       - thumbnails_dir:/code/thumbnails

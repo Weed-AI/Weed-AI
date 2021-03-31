@@ -19,6 +19,7 @@ AGCONTEXT = {
     "crop_type": "wheat",
     "cropped_to_plant": False,
     "id": 0,
+    "ground_speed": 0,
     "lighting": "artificial",
     "location_lat": 90,
     "location_long": 90,

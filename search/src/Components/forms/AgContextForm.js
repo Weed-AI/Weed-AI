@@ -1,4 +1,5 @@
 import React, { Component } from 'react'
+import { Helmet } from "react-helmet";
 import { withRouter } from 'react-router-dom';
 import agcontextSchema from '../../Schemas/AgContext.json'
 import Container from '@material-ui/core/Container';
@@ -7,6 +8,7 @@ import {
   materialCells,
   materialRenderers,
 } from '@jsonforms/material-renderers';
+import { createAjv } from '@jsonforms/core';
 import { JsonForms } from '@jsonforms/react';
 import { fixedItemsTester, FixedItemsRenderer } from '../formRenderers/FixedItemsRenderer';
 import { constTester, ConstRenderer } from '../formRenderers/ConstRenderer';
@@ -85,6 +87,10 @@ const uischema = {
         },
         {
           "type": "Control",
+          "scope": "#/properties/ground_speed"
+        },
+        {
+          "type": "Control",
           "scope": "#/properties/lighting"
         },
         {
@@ -139,6 +145,7 @@ class AgContextForm extends Component {
               data={this.props.formData}
               renderers={renderers}
               cells={materialCells}
+              ajv = {createAjv({useDefaults: true})}
               onChange={e => {
                   if (this.props.handleValidation){
                     this.props.handleValidation('agcontexts', e.errors.length === 0);
@@ -164,6 +171,10 @@ class StandaloneEditor extends Component {
     render() {
         return (
             <Container maxWidth="sm">
+                <Helmet>
+                    <title>AgContext Editor – Weed-AI</title>
+                    <meta name="description" content="Edit and save the agricultural and photographic context of your annotated image collection." />
+                </Helmet>
                 <h2>AgContext Editor</h2>
                 <Box boxShadow={3} px={2} py={1} my={2}>
                     <AgContextForm formData={this.state.formData} onChange={e => this.setState({formData: e.formData})} />

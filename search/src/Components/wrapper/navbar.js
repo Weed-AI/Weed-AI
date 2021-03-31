@@ -87,6 +87,8 @@ const sections = [
   {value: "explore", href: "/explore", label: "Explore"},
   {value: "datasets", href: "/datasets", label: "Datasets"},
   {value: "upload", href: "/upload", label: "Upload"},
+  {value: "editor", href: "/editor", label: "AgContext Editor", mobileOnly: true},
+  {value: "metaeditor", href: "/meta-editor", label: "Metadata Editor", mobileOnly: true},
   {value: "weedcoco", href: "/weedcoco", label: "WeedCOCO"},
   {value: "about", href: "/about", label: "About"},
 ]
@@ -132,7 +134,7 @@ const DesktopNavbar = (props) => {
   const {handleChange, selectedTab, classes} = props;
   return (
     <StyledTabs onChange={handleChange} value={selectedTab}>
-      { sections.map((section) => <StyledTab value={section.value} href={section.href} label={section.label} />) }
+      { sections.filter(section => section.mobileOnly !== true).map(section => <StyledTab value={section.value} href={section.href} label={section.label} />) }
       <Logo classes={classes} />
     </StyledTabs>
   );
