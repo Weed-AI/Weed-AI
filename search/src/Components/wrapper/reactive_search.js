@@ -9,6 +9,7 @@ import {
     SelectedFilters,
     MultiDropdownList
 } from '@appbaseio/reactivesearch';
+import { GeoDistanceSlider } from "@appbaseio/reactivemaps";
 import Cookies from 'js-cookie';
 import axios from 'axios';
 
@@ -528,12 +529,12 @@ class ReactiveSearchComponent extends Component {
                 URLParams: false,
                 react: {
                     and: [
-                        "searchbox",
                         "crop_type_filter",
                         "category_filter",
                         "grains_text_filter",
                         "task_type_filter",
                         "lighting_filter",
+                        "geo_distance_filter",
                         "dataset_name_filter",
                     ]
                 },
@@ -559,11 +560,33 @@ class ReactiveSearchComponent extends Component {
         return (
             <ReactiveBase
                 app="weedid"
+                mapKey="AIzaSyDDiJ4QoRW9_DJEV94ehO3z8zfCHRuHfxk"
                 url={baseURL + "elasticsearch/"}
                 theme={theme}
                 headers={{'X-CSRFToken': Cookies.get('csrftoken')}}
             >
                 <div style={{ position: "fixed", width: "20rem", overflow: "scroll", height: "90%", left: 0, padding: '1rem' }}>
+                    <GeoDistanceSlider
+                      title="Location"
+                      componentId="geo_distance_filter"
+                      placeholder="Search Location"
+                      dataField="location"
+                      unit="km"
+                      showFilter={true}
+                      autoLocation={false}
+                      range={{
+                        start: 10,
+                        end: 1000
+                      }}
+                      defaultValue={{
+                        distance: 1000
+                      }}
+                      rangeLabels={{
+                        start: '10km',
+                        end: '1000km',
+                      }}
+                      {...makeProps("geo_distance_filter", false)}
+                    />
                     <MultiList
                         componentId="crop_type_filter"
                         title="Crop Type"
