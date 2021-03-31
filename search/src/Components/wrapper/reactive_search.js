@@ -572,19 +572,8 @@ class ReactiveSearchComponent extends Component {
                       placeholder="Search Location"
                       dataField="location"
                       unit="km"
-                      URLParams
                       showFilter={true}
                       autoLocation={false}
-                      react={{
-                        and: [
-                          "crop_type_filter",
-                          "category_filter",
-                          "grains_text_filter",
-                          "task_type_filter",
-                          "lighting_filter",
-                          "dataset_name_filter",
-                        ],
-                      }}
                       range={{
                         start: 10,
                         end: 1000
@@ -596,6 +585,7 @@ class ReactiveSearchComponent extends Component {
                         start: '10km',
                         end: '1000km',
                       }}
+                      {...makeProps("geo_distance_filter", false)}
                     />
                     <MultiList
                         componentId="crop_type_filter"
