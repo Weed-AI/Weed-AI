@@ -1,13 +1,35 @@
 import React, { Component } from 'react';
+import Paper from '@material-ui/core/Paper';
+import IconButton from '@material-ui/core/IconButton';
+import Typography from '@material-ui/core/Typography';
+import CloseIcon from '@material-ui/icons/Close'
+import Tooltip from '@material-ui/core/Tooltip';
 import {
     RangeSlider,
     MultiList,
     SelectedFilters,
     MultiDropdownList
 } from '@appbaseio/reactivesearch';
+import { GeoDistanceSlider } from "@appbaseio/reactivemaps";
 import SearchBase from '../search/SearchBase';
 import ResultsList from '../search/ResultsList';
 
+
+const IntroText = () => {
+  const [show, setShow] = React.useState((localStorage.getItem("showIntro") === "false") ? false : true);
+  const onClose = () => { localStorage.setItem("showIntro", "false"); setShow(false) }
+  return show ? (
+    <Paper style={{ marginTop: "15px", padding: "1em" }}>
+      <div style={{float: "right"}}><IconButton style={{ padding: 0 }} onClick={ onClose } aria-label="Close this introductory text"><CloseIcon /></IconButton></div>
+      <Typography variant="h6">Welcome to Weed-AI</Typography>
+      <Typography>
+        Find and download <a href="/datasets">datasets</a> of annotated weed imagery.
+        Search by crop and weed species, crop growth stage, location, photography attributes, annotation task type and more.
+        Collect and <a href="/upload">upload</a> your own!
+      </Typography>
+    </Paper>
+  ) : [];
+}
 
 class ReactiveSearchComponent extends Component {
 
@@ -35,12 +57,12 @@ class ReactiveSearchComponent extends Component {
                 URLParams: false,
                 react: {
                     and: [
-                        "searchbox",
                         "crop_type_filter",
                         "category_filter",
                         "grains_text_filter",
                         "task_type_filter",
                         "lighting_filter",
+                        "geo_distance_filter",
                         "dataset_name_filter",
                     ]
                 },
@@ -57,6 +79,28 @@ class ReactiveSearchComponent extends Component {
         return (
             <SearchBase>
                 <div style={{ position: "fixed", width: "20rem", overflow: "scroll", height: "90%", left: 0, padding: '1rem' }}>
+                    <IntroText />
+                    <GeoDistanceSlider
+                      title="Location"
+                      componentId="geo_distance_filter"
+                      placeholder="Search Location"
+                      dataField="location"
+                      unit="km"
+                      showFilter={true}
+                      autoLocation={false}
+                      range={{
+                        start: 10,
+                        end: 1000
+                      }}
+                      defaultValue={{
+                        distance: 1000
+                      }}
+                      rangeLabels={{
+                        start: '10km',
+                        end: '1000km',
+                      }}
+                      {...makeProps("geo_distance_filter", false)}
+                    />
                     <MultiList
                         componentId="crop_type_filter"
                         title="Crop Type"

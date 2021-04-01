@@ -163,12 +163,13 @@ export const DatasetSummary = (props) => {
     );
 
     const getFirstLine = (s) => (s.match(/[^\n.]*/)[0]);
-    metadata["description"] = (metadata["description"] ?? "") + DESCRIPTION_BOILERPLATE;
+    const displayMeta = {...metadata}
+    displayMeta["description"] = (metadata["description"] ?? "") + DESCRIPTION_BOILERPLATE;
     return (
       <React.Fragment>
         <Helmet>
-          <title>"{metadata.name}" Dataset in Weed-AI: a repository of weed imagery in crops</title>
-          <meta name="description" content={getFirstLine(metadata.description) + " by " + metadata.creator.map((creator) => creator.name).join(', ') + "."} />
+          <title>"{displayMeta.name}" Dataset in Weed-AI: a repository of weed imagery in crops</title>
+          <meta name="description" content={getFirstLine(displayMeta.description) + " by " + displayMeta.creator.map((creator) => creator.name).join(', ') + "."} />
         </Helmet>
         <script type="application/ld+json">
         {
@@ -178,7 +179,7 @@ export const DatasetSummary = (props) => {
               "@type": "Dataset",
               "url": window.location.href
             },
-            ...metadata
+            ...displayMeta
           })
         }
         </script>
@@ -189,16 +190,16 @@ export const DatasetSummary = (props) => {
                 <IconButton aria-label="back to list" color="secondary" onClick={() => window.location.assign(rootURL + 'datasets')}>
                   <ListIcon />
                 </IconButton>
-                <Typography variant='h4' style={{fontWeight: 600}}>{metadata.name}</Typography>
+                <Typography variant='h4' style={{fontWeight: 600}}>{displayMeta.name}</Typography>
               </div>
               <div style={{fontSize: "1.2em" }}>
-              <ReactMarkdown source={metadata.description}  />
+              <ReactMarkdown source={displayMeta.description}  />
               </div>
               <dl>
                 <dt>Creators:</dt>
                 <dd>
                   <ul>
-                  {metadata.creator.map((creator, i) => (
+                  {displayMeta.creator.map((creator, i) => (
                     <li key={i}>
                       {linkedEntity(creator)}{creator.affiliation ? (<span>, {linkedEntity(creator.affiliation)}</span>) : []}
                     </li>
@@ -206,13 +207,13 @@ export const DatasetSummary = (props) => {
                   </ul>
                 </dd>
                 <dt>Licence:</dt>
-                <dd>{<a href={metadata.license}>{metadata.license}</a>}</dd>
-                {metadata.funder ?
+                <dd>{<a href={displayMeta.license}>{displayMeta.license}</a>}</dd>
+                {displayMeta.funder ?
                     <React.Fragment>
                     <dt>Funders:</dt>
                     <dd>
                       <ul>
-                        {metadata.funder.map(ent => <li key={ent.name}>{linkedEntity(ent)}</li>)}
+                        {displayMeta.funder.map(ent => <li key={ent.name}>{linkedEntity(ent)}</li>)}
                       </ul>
                     </dd>
                     </React.Fragment>

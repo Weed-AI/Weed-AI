@@ -61,10 +61,12 @@ properties:
         description: |-
           Specify the crop's scientific name.
       - type: string
-        title: Pasture
-        const: pasture
+        title: Not in Crop
+        enum:
+          - pasture
+          - fallow
         description: |-
-          Non-grain agricultural land.
+          Non-crop agricultural land or crop land in fallow.
 
   bbch_growth_range:
     oneOf:
