@@ -28,8 +28,8 @@ const WeedAIResultCard = (props) => {
             {
                 // TODO: make this more idiomatically React
                 Array.from(new Set(item.annotation__category__name)).map((annotName) => {
-                    const annot = annotName.match(/^[^:]*/)
-                    return annot.length > 0 ? (<Tooltip title={annotName}><li className={annot[0]}>{annot[0]}</li></Tooltip>) : ""
+                    const annot = annotName.match(/^([^:]*): (.*)/)
+                    return annot.length > 0 ? (<Tooltip title={annotName}><li className={annot[1]}>{annot[2]}</li></Tooltip>) : ""
                 })
             }
             </ul>
