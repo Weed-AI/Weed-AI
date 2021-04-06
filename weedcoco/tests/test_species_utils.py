@@ -48,6 +48,7 @@ def test_lookup_preferred_name_error(name, species_only, match, eppo):
         ("annual rye-grass", True, "LOLRI"),
         ("Annual Rye-grass", True, "LOLRI"),
         ("stiff darnel", True, "LOLRI"),
+        ("wymmera ryegrass", True, "LOLRI"),
         ("carrot", False, "DAUCS"),  # test handling of isactive
         ("grasses", False, "1GRAF"),
     ],
@@ -62,7 +63,7 @@ def test_lookup_unique_name(name, species_only, code, eppo):
     [
         ("grasses", True, "'grasses' is not a species"),
         ("ivraie rigide", False, "'ivraie rigide'"),
-        ("carrot", False, "'carrot' is not unique"),
+        # TODO: find non-unique name...
     ],
 )
 def test_lookup_unique_name_error(name, species_only, match, eppo):
@@ -80,7 +81,7 @@ def test_lookup_unique_name_error(name, species_only, match, eppo):
     ],
 )
 def test_lookup_name(name, species_only, codes, eppo):
-    entries = eppo.lookup_unique_name("en", name, species_only=species_only)
+    entries = eppo.lookup_name("en", name, species_only=species_only)
     assert sorted(codes) == sorted(entry["code"] for entry in entries)
 
 
@@ -113,10 +114,6 @@ def test_entries(eppo):
         "parent_code",
         "ancestors",
     }
-
-
-def test_local_names_included(eppo):
-    assert "wymmera ryegrass" in eppo["LOLRI"]["en_names"]
 
 
 # TODO: test alternative langs/types

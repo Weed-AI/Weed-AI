@@ -6,6 +6,7 @@ allOf:
     properties:
       name:
         type: string
+        format: weedcoco_category
         pattern: "^((crop|weed): ([a-z][a-z ]+|UNSPECIFIED)|crop|weed|none)$"
         description: |-
           A category for an annotation, consisting of an agricultural role and

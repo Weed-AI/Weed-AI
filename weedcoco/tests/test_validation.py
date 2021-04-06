@@ -102,7 +102,7 @@ SMALL_WEEDCOCO = {
             "id": 0,
         },
         {
-            "name": "weed: unspecified",
+            "name": "weed: UNSPECIFIED",
             "species": "UNSPECIFIED",
             "role": "weed",
             "id": 1,
@@ -152,7 +152,6 @@ SMALL_WEEDCOCO = {
 
 def _set_category_name(coco, name):
     coco = copy.deepcopy(coco)
-    print(coco)
     coco["categories"][0]["name"] = name
     return coco
 
@@ -188,12 +187,40 @@ def test_okay(func):
 
 
 @pytest.mark.parametrize("func", [validate, validate_json])
-@pytest.mark.parametrize("bad_name", ["foobar", "weed 1"])
+@pytest.mark.parametrize(
+    "bad_name",
+    [
+        "foobar",
+        "weed 1",
+        "crop: UNSPECIFIED",
+        "crop: daugus carotta",
+        "weed: lollium rigidum",
+        "weed: Triticum Aestivum",
+    ],
+)
 def test_bad_category_name(func, bad_name):
     weedcoco = copy.deepcopy(SMALL_WEEDCOCO)
     weedcoco = _set_category_name(weedcoco, bad_name)
     with pytest.raises(ValidationError):
         func(weedcoco)
+
+
+@pytest.mark.parametrize("func", [validate_json])
+@pytest.mark.parametrize(
+    "name",
+    [
+        "weed",
+        "crop",
+        "none",
+        "weed: UNSPECIFIED",
+        "crop: triticum aestivum",
+        "weed: triticum aestivum",
+    ],
+)
+def test_category_name(func, name):
+    weedcoco = copy.deepcopy(SMALL_WEEDCOCO)
+    weedcoco = _set_category_name(weedcoco, name)
+    func(weedcoco)
 
 
 def _make_duplicate_id(weedcoco, key, idx, insert_at=-1):

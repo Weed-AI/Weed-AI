@@ -82,7 +82,7 @@ properties:
     description: Identifies academic articles that are recommended by the data provider be cited in addition to the dataset itself.
   datePublished:
     type: string
-    format: date
+    format: date_missing_parts
     description: Date of first publication
   funder:
     type: array

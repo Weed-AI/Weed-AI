@@ -157,7 +157,7 @@ class EppoTaxonomy:
     def lookup_name(self, lang, name, species_only=False):
         out = self._by_lang_name[lang, name.lower()]
         if species_only:
-            out = [entry for entry in out if out["level"] == "species"]
+            out = [entry for entry in out if entry["level"] == "species"]
         return out
 
 
