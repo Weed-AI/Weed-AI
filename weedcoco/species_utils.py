@@ -1,31 +1,76 @@
 import zipfile
 from collections import defaultdict
+import datetime
 import requests
+import io
+import os
 from xml.etree import ElementTree
+
+# This uses data from https://data.eppo.int/ in accordance with
+# the EPPO Codes Open Data Licence (https://data.eppo.int/media/Open_Licence.pdf)
+
+# TODO: get non-taxonomic group membership for a list of all crop species (3CRGK), for instance
+
+
+SOURCE_URL = "https://data.eppo.int/files/xmlfull.zip"
+DEFAULT_LANGUAGES = ("en",)
+DEFAULT_TYPES = ("PFL", "SPT")
 
 
 class EppoTaxonomy:
-    def __init__(self, path=None, languages=("en",), types=("SPT", "PFL")):
-        taxonomy = self._parse_xml(path)
+    def __init__(
+        self,
+        path=None,
+        cache=False,
+        languages=DEFAULT_LANGUAGES,
+        types=DEFAULT_TYPES,
+    ):
+        taxonomy = self._parse_xml(path, cache)
+        self.version_date = datetime.datetime.strptime(
+            taxonomy.getroot().attrib["dateexport"], "%Y-%m-%dT%H:%M:%S%z"
+        )
         self.entries = self._extract_entries(taxonomy, languages=languages, types=types)
         children = self._extract_children(self.entries)
-        for parent, children in children.items():
-            self.entries[parent]["children"] = children
+        self.root_codes = []
+        for parent, child_codes in children.items():
+            try:
+                self.entries[parent]["children"] = child_codes
+            except KeyError:
+                # TODO: log a warning? Can happen if parent is inactive, i.e. data glitch
+                pass
+
+        for root_code in children[None]:
+            self._set_ancestors(root_code, [])
 
         self._by_preferred_name = {
-            entry["preferred_name"]: entry for entry in self.entries.values()
+            entry["preferred_name"].lower(): entry for entry in self.entries.values()
         }
         self._by_lang_name = defaultdict(list)
         for entry in self.entries.values():
             for lang in languages:
                 for name in entry.get(lang + "_names", ()):
-                    self._by_lang_name[lang, name].append(entry)
+                    self._by_lang_name[lang, name.lower()].append(entry)
         self._by_lang_name.default_factory = None
 
     @staticmethod
-    def _parse_xml(path):
+    def _parse_xml(path, cache=False):
+        # TODO: invalidate cache if URL is updated, or after specified period
+        if cache:
+            if path is None:
+                raise ValueError("Path must be given if cache is enabled")
+            if not os.path.isfile(path):
+                cache_path = path
+                path = None
+
         if path is None:
-            path = requests.get("https://data.eppo.int/files/xmlfull.zip").content
+            resp = requests.get(SOURCE_URL)
+            resp.raise_for_status()
+            if cache:
+                path = cache_path
+                with open(path, "wb") as cache_file:
+                    cache_file.write(resp.content)
+            else:
+                path = io.BytesIO(resp.content)
         if hasattr(path, "endswith") and path.endswith(".xml"):
             file = open(path)
         else:
@@ -53,7 +98,7 @@ class EppoTaxonomy:
             )
 
             name_elems = code_elem.findall(
-                ".//name"
+                ".//name[@isactive='true']"
             )  # XXX: can't get xpath filter on [//lang/*[text() = "en"]] working
             if preferred_name_elem is None:
                 preferred_name = f"EPPO:{code} [no preferred name]"
@@ -84,29 +129,47 @@ class EppoTaxonomy:
         children.default_factory = None
         return children
 
-    def _set_ancestry(self, code, ancestry):
+    def _set_ancestors(self, code, ancestors):
         entry = self.entries[code]
-        entry["ancestry"] = ancestry
-        path = [code] + ancestry
-        for child_code in self.children[code]:
-            self._set_ancestry(child_code, path)
+        entry["ancestors"] = ancestors
+        path = [code] + ancestors
+        entry = self.entries[code]
+        if "children" not in entry:
+            return
+        for child_code in entry["children"]:
+            self._set_ancestors(child_code, path)
 
     def lookup_preferred_name(self, name, species_only=False):
-        out = self._by_preferred_name[name]
+        out = self._by_preferred_name[name.lower()]
         if species_only and out["level"] != "species":
-            raise KeyError(f"{name} is not a species")
+            raise KeyError(f"{repr(name)} is not a species")
         return out
 
     def lookup_unique_name(self, lang, name, species_only=False):
-        out = self._by_lang_name[lang, name]
+        out = self._by_lang_name[lang, name.lower()]
         if len(out) != 1:
-            raise KeyError(f"{name} is not unique")
+            raise KeyError(f"{repr(name)} is not unique")
         out = out[0]
         if species_only and out["level"] != "species":
-            raise KeyError(f"{name} is not a species")
+            raise KeyError(f"{repr(name)} is not a species")
+        return out
+
+    def lookup_name(self, lang, name, species_only=False):
+        out = self._by_lang_name[lang, name.lower()]
+        if species_only:
+            out = [entry for entry in out if out["level"] == "species"]
         return out
 
 
-# in utils.py?
-def get_eppo_singleton():
-    pass
+_EPPO_SINGLETON = {}
+
+
+def get_eppo_singleton(
+    path=None, cache=True, languages=DEFAULT_LANGUAGES, types=DEFAULT_TYPES
+):
+    # Note: languages and types should be sorted tuples
+    if (languages, types) not in _EPPO_SINGLETON:
+        _EPPO_SINGLETON[languages, types] = EppoTaxonomy(
+            path=path, cache=cache, languages=languages, types=types
+        )
+    return _EPPO_SINGLETON[languages, types]
