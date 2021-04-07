@@ -6,6 +6,8 @@ import AccordionSummary from '@material-ui/core/AccordionSummary';
 import AccordionDetails from '@material-ui/core/AccordionDetails';
 import Typography from '@material-ui/core/Typography';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
+import LinkIcon from '@material-ui/icons/Link';
+import { Chip } from '@material-ui/core';
 import { Button } from '@material-ui/core';
 import Grid from '@material-ui/core/Grid';
 import Table from '@material-ui/core/Table';
@@ -51,6 +53,17 @@ const useStyles = (theme) => ({
     fontWeight: 900,
     backgroundColor: 'orange',
     color: 'white',
+  },
+  attribution: {
+    width: "100%",
+    "& dl": {
+    },
+    "& dl > dd": {
+      margin: ".5em 0 1em 2em",
+    },
+  },
+  topMatter: {
+    marginBottom: "1em",
   }
 });
 
@@ -136,12 +149,14 @@ const AgContextDetails = (props) => {
             </TableContainer>
           </AccordionDetails>
         </Accordion>
-        <AgContextFieldList MyAccordionSummary={MyAccordionSummary} defaultExpanded="true" agcontext={agcontext} title="The Crop" fields={["crop_type", "bbch_growth_range", "soil_colour", "surface_cover", "surface_coverage", "location_lat", "location_long"]} />
+        <AgContextFieldList MyAccordionSummary={MyAccordionSummary} agcontext={agcontext} title="The Crop" fields={["crop_type", "bbch_growth_range", "soil_colour", "surface_cover", "surface_coverage", "location_lat", "location_long"]} />
         <AgContextFieldList MyAccordionSummary={MyAccordionSummary} agcontext={agcontext} title="The Photography" fields={["camera_make", "camera_lens", "camera_lens_focallength", "camera_height", "camera_angle", "camera_fov", "ground_speed", "lighting", "photography_description"]} />
         <AgContextFieldList MyAccordionSummary={MyAccordionSummary} agcontext={agcontext} title="Other Details" fields={["cropped_to_plant", "emr_channels", "weather_description"]} />
       </article>
     );
 }
+
+const listToWords = l => l.map((x, i) => [i == 0 ? "" : i == l.length - 1 ? (i > 1 ? "," : "") + " and " : ", ", x]);
 
 export const DatasetSummary = (props) => {
     const {metadata, agcontexts, classes, rootURL, upload_id} = props;
@@ -183,7 +198,7 @@ export const DatasetSummary = (props) => {
           })
         }
         </script>
-        <Grid container spacing={3}>
+        <Grid container spacing={3} className={classes.topMatter}>
           <Grid item xs={10}>
             <div className={classes.summary}>
               <div style={{display: 'flex'}}>
@@ -195,31 +210,14 @@ export const DatasetSummary = (props) => {
               <div style={{fontSize: "1.2em" }}>
               <ReactMarkdown source={displayMeta.description}  />
               </div>
-              <dl>
-                <dt>Creators:</dt>
-                <dd>
-                  <ul>
-                  {displayMeta.creator.map((creator, i) => (
-                    <li key={i}>
-                      {linkedEntity(creator)}{creator.affiliation ? (<span>, {linkedEntity(creator.affiliation)}</span>) : []}
-                    </li>
-                  ))}
-                  </ul>
-                </dd>
-                <dt>Licence:</dt>
-                <dd>{<a href={displayMeta.license}>{displayMeta.license}</a>}</dd>
-                {displayMeta.funder ?
-                    <React.Fragment>
-                    <dt>Funders:</dt>
-                    <dd>
-                      <ul>
-                        {displayMeta.funder.map(ent => <li key={ent.name}>{linkedEntity(ent)}</li>)}
-                      </ul>
-                    </dd>
-                    </React.Fragment>
-                : []}
-              </dl>
-              { /* TODO: link to Explore searching for just this dataset */ }
+              <Typography>
+                Published in {displayMeta.datePublished.substr(0, 4)} by {listToWords(displayMeta.creator.map((creator, i) => (
+                    [linkedEntity(creator), creator.affiliation ? (<span> ({linkedEntity(creator.affiliation)})</span>) : []]
+                  )))}.
+              </Typography>
+              {displayMeta.identifier.map(uri =>
+                <Chip icon={<LinkIcon/>} label={uri} variant="outlined" />
+              )}
             </div>
           </Grid>
           <Grid item xs={2}>
@@ -228,6 +226,27 @@ export const DatasetSummary = (props) => {
             </div>
           </Grid>
         </Grid>
+        <Accordion className={classes.attribution}>
+          <MyAccordionSummary>Citation and Licensing</MyAccordionSummary>
+          <AccordionDetails>
+          <dl>
+            {displayMeta.citation ?
+              [<dt>Citation:</dt>, <dd>{displayMeta.citation}</dd>] :
+              []
+            }
+            <dt>Licence:</dt>
+            <dd>{<a href={displayMeta.license}>{displayMeta.license}</a>}</dd>
+            {displayMeta.funder ?
+                <React.Fragment>
+                <dt>Funders:</dt>
+                <dd>
+                {listToWords(displayMeta.funder.map(ent => linkedEntity(ent)))}
+                </dd>
+                </React.Fragment>
+            : []}
+          </dl>
+          </AccordionDetails>
+        </Accordion>
         {agcontexts.map((agcontext, idx) =>
           <AgContextDetails MyAccordionSummary={MyAccordionSummary} metadata={metadata} agcontext={agcontext} key={idx} ordinal={idx + 1} nContexts={agcontexts.length} classes={classes} />
         )}
