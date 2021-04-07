@@ -213,7 +213,7 @@ def test_bad_category_name(func, bad_name):
         "oats",
         "pasture",
         "fallow",
-        "daugus carota",
+        "daucus carota",
         "brassica oleracea var. alboglabra",
     ],
 )
