@@ -64,7 +64,24 @@ const useStyles = (theme) => ({
   },
   topMatter: {
     marginBottom: "1em",
-  }
+  },
+  identifierList: {
+    display: 'flex',
+    flexWrap: 'wrap',
+    listStyle: 'none',
+    padding: 0,
+    paddingTop: theme.spacing(0.5),
+    margin: 0,
+  },
+  identifierChip: {
+    margin: theme.spacing(0.5),
+    marginLeft: 0,
+    overflow: "ellipsis",
+    maxWidth: "30em",
+    "&:hover": {
+      maxWidth: "none",
+    },
+  },
 });
 
 const baseURL = new URL(window.location.origin);
@@ -179,7 +196,9 @@ export const DatasetSummary = (props) => {
 
     const getFirstLine = (s) => (s.match(/[^\n.]*/)[0]);
     const displayMeta = {...metadata}
+    const yearPublished = (displayMeta.datePublished || "????").substr(0, 4);
     displayMeta["description"] = (metadata["description"] ?? "") + DESCRIPTION_BOILERPLATE;
+    displayMeta["identifier"] = [...displayMeta.identifier || [], "https://weed-ai.sydney.edu.au/datasets/" + upload_id];
     return (
       <React.Fragment>
         <Helmet>
@@ -211,13 +230,15 @@ export const DatasetSummary = (props) => {
               <ReactMarkdown source={displayMeta.description}  />
               </div>
               <Typography>
-                Published in {displayMeta.datePublished.substr(0, 4)} by {listToWords(displayMeta.creator.map((creator, i) => (
+                Published {displayMeta.datePublished ? ["in ", yearPublished] : []} by {listToWords(displayMeta.creator.map((creator, i) => (
                     [linkedEntity(creator), creator.affiliation ? (<span> ({linkedEntity(creator.affiliation)})</span>) : []]
                   )))}.
               </Typography>
-              {displayMeta.identifier.map(uri =>
-                <Chip icon={<LinkIcon/>} label={uri} variant="outlined" />
-              )}
+              <ul className={classes.identifierList}>
+                {displayMeta.identifier.map(uri =>
+                  <li key={uri}><Chip className={classes.identifierChip} icon={<LinkIcon/>} label={uri} variant="outlined" /></li>
+                )}
+              </ul>
             </div>
           </Grid>
           <Grid item xs={2}>
@@ -232,7 +253,7 @@ export const DatasetSummary = (props) => {
           <dl>
             {displayMeta.citation ?
               [<dt>Citation:</dt>, <dd>{displayMeta.citation}</dd>] :
-              []
+              [<dt>Citation:</dt>, <dd>{listToWords(displayMeta.creator.map(creator => creator.name))} ({yearPublished}). "{displayMeta.name}." In <cite>Weed-AI</cite>. {displayMeta.identifier[0]}. Accessed {new Date().toISOString().substr(0, 10)}.</dd>]
             }
             <dt>Licence:</dt>
             <dd>{<a href={displayMeta.license}>{displayMeta.license}</a>}</dd>
@@ -302,6 +323,7 @@ class DatasetSummaryPage extends Component {
 
 export const TestDatasetSummary = () => {
     const props = {
+        "upload_id": "foobar",
         "metadata": {
             "creator": [
                 {"name": "Sebastian Haug"},
