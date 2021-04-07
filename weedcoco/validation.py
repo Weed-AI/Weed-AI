@@ -26,7 +26,7 @@ EPPO_CACHE_PATH = pathlib.Path(tempfile.gettempdir()) / "eppo-codes.zip"
 
 
 @FORMAT_CHECKER.checks("date")
-def check_date_missing_parts(value):
+def check_date_missing_parts_format(value):
     if value[-1:] == "X":
         try:
             return datetime.datetime.strptime(value, "%Y-%m-XX")
@@ -39,8 +39,19 @@ def check_date_missing_parts(value):
     return datetime.datetime.strptime(value, "%Y-%m-%d")
 
 
+@FORMAT_CHECKER.checks("plant_species")
+def check_plant_species_format(value):
+    if not value.islower():
+        return False
+    eppo = get_eppo_singleton(EPPO_CACHE_PATH)
+    try:
+        return eppo.lookup_preferred_name(value, species_only=False)
+    except KeyError:
+        return False
+
+
 @FORMAT_CHECKER.checks("weedcoco_category")
-def check_weedcoco_category(value):
+def check_weedcoco_category_format(value):
     prefix, colon, species = value.partition(": ")
     if not colon:
         # Category must begin with weed, crop or none
@@ -55,14 +66,7 @@ def check_weedcoco_category(value):
         return prefix == "weed"
 
     # Species name should be lowercase in category
-    if not species.islower():
-        return False
-
-    eppo = get_eppo_singleton(EPPO_CACHE_PATH)
-    try:
-        return eppo.lookup_preferred_name(species, species_only=False)
-    except KeyError:
-        return False
+    return check_plant_species_format(species)
 
 
 class ValidationError(Exception):
