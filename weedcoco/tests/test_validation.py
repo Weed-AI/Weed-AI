@@ -205,6 +205,39 @@ def test_bad_category_name(func, bad_name):
         func(weedcoco)
 
 
+@pytest.mark.parametrize("func", [validate, validate_json])
+@pytest.mark.parametrize(
+    "bad_name",
+    [
+        "wheat",
+        "oats",
+        "pasture",
+        "fallow",
+        "daugus carota",
+        "brassica oleracea var. alboglabra",
+    ],
+)
+def test_crop_type(func, bad_name):
+    weedcoco = copy.deepcopy(SMALL_WEEDCOCO)
+    weedcoco["agcontexts"][0]["crop_type"] = bad_name
+    func(weedcoco)
+
+
+@pytest.mark.parametrize("func", [validate, validate_json])
+@pytest.mark.parametrize(
+    "bad_name",
+    [
+        "weet",
+        "daugus carota",
+    ],
+)
+def test_bad_crop_type(func, bad_name):
+    weedcoco = copy.deepcopy(SMALL_WEEDCOCO)
+    weedcoco["agcontexts"][0]["crop_type"] = bad_name
+    with pytest.raises(ValidationError):
+        func(weedcoco)
+
+
 @pytest.mark.parametrize("func", [validate_json])
 @pytest.mark.parametrize(
     "name",
