@@ -1,9 +1,4 @@
 version: "3"
-
-x-logging: 
-  &default-logging
-  driver: "json-file"
-
 services:
   # nginx reverse proxy
   reverse-proxy:
@@ -19,7 +14,8 @@ services:
     networks:
       - elastic
     restart: always
-    logging: *default-logging
+    logging:
+      driver: "json-file"
 
   # django backend
   django:
@@ -53,7 +49,8 @@ services:
     networks:
       - elastic
     restart: always
-    logging: *default-logging
+    logging:
+      driver: "json-file"
 
   celery:
     image: django
@@ -77,14 +74,16 @@ services:
     networks:
       - elastic
     restart: always
-    logging: *default-logging
+    logging:
+      driver: "json-file"
 
   redis:
     image: redis:alpine
     networks:
       - elastic
     restart: always
-    logging: *default-logging
+    logging:
+      driver: "json-file"
 
   db:
     image: postgres:12.0-alpine
@@ -100,7 +99,8 @@ services:
     networks:
       - elastic
     restart: always
-    logging: *default-logging
+    logging:
+      driver: "json-file"
 
   # search engine
   elasticsearch:
@@ -133,7 +133,8 @@ services:
       timeout: 30s
       retries: 3
     restart: always
-    logging: *default-logging
+    logging:
+      driver: "json-file"
 
   reactivesearch:
     image: my-reactivesearch
@@ -151,7 +152,8 @@ services:
     depends_on:
       - elasticsearch
     restart: always
-    logging: *default-logging
+    logging:
+      driver: "json-file"
 
   thumbnails:
     image: thumbnails
@@ -166,7 +168,8 @@ services:
       - elastic
     stdin_open: true
     restart: always
-    logging: *default-logging
+    logging:
+      driver: "json-file"
 
   download:
     image: download
@@ -181,7 +184,8 @@ services:
       - elastic
     stdin_open: true
     restart: always
-    logging: *default-logging
+    logging:
+      driver: "json-file"
 
   fluentd:
     container_name: fluentd
