@@ -196,7 +196,7 @@ services:
       - ./fluent.conf:/fluentd/etc/fluent.conf
       - /data/logs:/output/
     logging:
-      driver: "local"
+      driver: "json-file"
 
 networks:
   elastic:
