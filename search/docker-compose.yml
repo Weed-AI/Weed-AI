@@ -1,4 +1,9 @@
 version: "3"
+
+x-logging: 
+  &default-logging
+  driver: "json-file"
+
 services:
   # nginx reverse proxy
   reverse-proxy:
@@ -14,6 +19,7 @@ services:
     networks:
       - elastic
     restart: always
+    logging: *default-logging
 
   # django backend
   django:
@@ -47,6 +53,7 @@ services:
     networks:
       - elastic
     restart: always
+    logging: *default-logging
 
   celery:
     image: django
@@ -70,12 +77,14 @@ services:
     networks:
       - elastic
     restart: always
+    logging: *default-logging
 
   redis:
     image: redis:alpine
     networks:
       - elastic
     restart: always
+    logging: *default-logging
 
   db:
     image: postgres:12.0-alpine
@@ -91,6 +100,7 @@ services:
     networks:
       - elastic
     restart: always
+    logging: *default-logging
 
   # search engine
   elasticsearch:
@@ -123,6 +133,7 @@ services:
       timeout: 30s
       retries: 3
     restart: always
+    logging: *default-logging
 
   reactivesearch:
     image: my-reactivesearch
@@ -140,6 +151,7 @@ services:
     depends_on:
       - elasticsearch
     restart: always
+    logging: *default-logging
 
   thumbnails:
     image: thumbnails
@@ -154,6 +166,7 @@ services:
       - elastic
     stdin_open: true
     restart: always
+    logging: *default-logging
 
   download:
     image: download
@@ -168,6 +181,18 @@ services:
       - elastic
     stdin_open: true
     restart: always
+    logging: *default-logging
+
+  fluentd:
+    container_name: fluentd
+    user: root
+    image: fluent/fluentd:v1.11-debian
+    volumes:
+      - /var/lib/docker/containers:/fluentd/log/containers
+      - ./fluent.conf:/fluentd/etc/fluent.conf
+      - /data/logs:/output/
+    logging:
+      driver: "local"
 
 networks:
   elastic:
