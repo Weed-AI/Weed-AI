@@ -1,4 +1,4 @@
-django==2.2.13
+django==2.2.20
 psycopg2
 requests
 django-cors-headers
