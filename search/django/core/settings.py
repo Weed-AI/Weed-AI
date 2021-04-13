@@ -34,7 +34,7 @@ FILE_UPLOAD_MAX_MEMORY_SIZE = MAX_IMAGE_SIZE
 # SMTP config
 SMTP_HOST = os.environ.get("SMTP_HOST")
 SMTP_PORT = os.environ.get("SMTP_PORT")
-SERVER_ADDR = os.environ.get("SERVER_ADDR")
+FROM_EMAIL = os.environ.get("FROM_EMAIL")
 
 INSTALLED_APPS = [
     "django.contrib.admin",

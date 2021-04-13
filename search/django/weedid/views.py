@@ -15,8 +15,8 @@ from weedid.utils import (
     remove_entity_local_record,
     add_agcontexts,
     add_metadata,
-    review_notification,
 )
+from weedid.notification import review_notification
 from weedid.models import Dataset, WeedidUser
 from weedcoco.validation import validate
 from django.contrib.auth import login, logout

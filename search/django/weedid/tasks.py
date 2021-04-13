@@ -6,7 +6,8 @@ from weedcoco.repo.deposit import deposit, compress_to_download
 from weedcoco.index.indexing import ElasticSearchIndexer
 from weedcoco.index.thumbnailing import thumbnailing
 from weedid.models import Dataset
-from weedid.utils import make_upload_entity_fields, upload_notification
+from weedid.utils import make_upload_entity_fields
+from weedid.notification import upload_notification
 from core.settings import THUMBNAILS_DIR, REPOSITORY_DIR, DOWNLOAD_DIR
 from pathlib import Path
 
