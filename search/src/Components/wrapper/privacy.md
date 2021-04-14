@@ -32,7 +32,7 @@ Web App data is stored securely and backed up on servers in Sydney, Australia.
  
 ### Your rights of access and correction
  
-You have the right to access and correct your personal information held by the University. Should you wish to access, amend or delete your information in the web app, please contact [m.j.walsh@sydney.edu.au](mailto:m.j.walsh@sydney.edu.au).
+You have the right to access and correct your personal information held by the University. Should you wish to access, amend or delete your information in the web app, please contact [weed-ai.app@sydney.edu.au](mailto:weed-ai.app@sydney.edu.au).
  
 This privacy statement should be read in conjunction with the University’s [Privacy Policy](https://www.sydney.edu.au/policies/showdoc.aspx?recnum=PDOC2011/81&RendNum=0) which describes how the University handles personal information.
 

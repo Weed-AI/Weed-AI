@@ -117,7 +117,7 @@ def get_task_types(annotations):
         annotations = [annotations]
     out = {"classification"}
     for annotation in annotations:
-        if "segmentation" in annotation:
+        if annotation.get("segmentation"):  # empty segmentation should not be counted
             out.add("segmentation")
             # FIXME: should we be assuming that one should turn segmentation into bbox?
             out.add("bounding box")

@@ -6,6 +6,8 @@ import AccordionSummary from '@material-ui/core/AccordionSummary';
 import AccordionDetails from '@material-ui/core/AccordionDetails';
 import Typography from '@material-ui/core/Typography';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
+import LinkIcon from '@material-ui/icons/Link';
+import { Chip } from '@material-ui/core';
 import { Button } from '@material-ui/core';
 import Grid from '@material-ui/core/Grid';
 import Table from '@material-ui/core/Table';
@@ -21,6 +23,11 @@ import DownloadIcon from '@material-ui/icons/CloudDownload';
 import IconButton from '@material-ui/core/IconButton';
 import Cookies from 'js-cookie'
 import ReactMarkdown from "react-markdown";
+import {
+    ReactiveComponent,
+} from '@appbaseio/reactivesearch';
+import SearchBase from '../search/SearchBase';
+import ResultsList from '../search/ResultsList';
 
 
 const DESCRIPTION_BOILERPLATE = "\n\nEvery dataset in Weed-AI includes imagery of crops or pasture with weeds annotated, and is available in an MS-COCO derived format with standardised agricultural metadata."
@@ -48,27 +55,48 @@ const useStyles = (theme) => ({
     marginBottom: "1rem",
     paddingTop: "1rem",
     paddingBottom: "1rem",
-  }
+  },
+  attribution: {
+    width: "100%",
+    "& dl": {
+    },
+    "& dl > dd": {
+      margin: ".5em 0 1em 2em",
+    },
+  },
+  topMatter: {
+    marginBottom: "1em",
+  },
+  identifierList: {
+    display: 'flex',
+    flexWrap: 'wrap',
+    listStyle: 'none',
+    padding: 0,
+    paddingTop: theme.spacing(0.5),
+    margin: 0,
+  },
+  identifierChip: {
+    margin: theme.spacing(0.5),
+    marginLeft: 0,
+    overflow: "ellipsis",
+    maxWidth: "30em",
+    "&:hover": {
+      maxWidth: "none",
+    },
+  },
 });
 
 const baseURL = new URL(window.location.origin);
 
 const AgContextFieldList = (props) => {
-    const {title, agcontext, fields, classes, ...accordionProps} = props;
+    const {title, agcontext, fields, MyAccordionSummary, ...accordionProps} = props;
     const formatters = {
-      bbch_growth_range: (val) => (val["min"] ? val["min"] + " to " + val["max"] : val),
+      bbch_growth_range: (val) => (val["min"] !== undefined ? val["min"] + " to " + val["max"] : val),
     }
     const format = (key, val) => (formatters.hasOwnProperty(key) ? formatters[key](val) : val);
     return (
       <Accordion {...accordionProps}>
-        <AccordionSummary
-          expandIcon={<ExpandMoreIcon />}
-          aria-controls="panel1a-content"
-          id="panel1a-header"
-          className={classes.header}
-        >
-          <Typography className={classes.heading}>{title}</Typography>
-        </AccordionSummary>
+        <MyAccordionSummary>{title}</MyAccordionSummary>
         <AccordionDetails>
           <ul>
             {fields.map(key =>
@@ -81,22 +109,45 @@ const AgContextFieldList = (props) => {
 }
 
 const AgContextDetails = (props) => {
-    const {agcontext, ordinal, nContexts, classes} = props;
+    const {metadata, agcontext, ordinal, nContexts, MyAccordionSummary} = props;
     const tableFields = {"image_count": "# Images", "segmentation_count": "# Segments", "bounding_box_count": "# Bounding Boxes"}
     return (
       <article>
         {nContexts > 1 ? <h2>Agricultural Context {ordinal} of {nContexts}</h2> : ""}
-        <Accordion defaultExpanded='true'>
-          <AccordionSummary
-            expandIcon={<ExpandMoreIcon />}
-            aria-controls="panel1a-content"
-            id="panel1a-header"
-            className={classes.header}
-          >
-            <Typography className={classes.heading}>Annotation Statistics</Typography>
-          </AccordionSummary>
+        <Accordion defaultExpanded="true">
+          <MyAccordionSummary>Sample of {agcontext.n_images} Images</MyAccordionSummary>
           <AccordionDetails>
-            <p>Total number of images: {agcontext.n_images}</p>
+            <SearchBase>
+              <ReactiveComponent
+                componentId="dataset_filter"
+                customQuery={props => ({
+                  query: {
+                    term: {
+                      "dataset_name.keyword": metadata.name,
+                    }
+                  }
+                })}
+              />
+              <ResultsList
+                  listProps={{
+                    pagination: false,
+                    infiniteScroll: false,
+                    size: 4,
+                    react: {and: ["dataset_filter"]},
+                    showResultStats: false,
+                    sortOptions: null,
+                  }}
+                  cardProps={{
+                    linkToDataset: false,
+                  }}
+                  setOGImage={true}
+              />
+            </SearchBase>
+          </AccordionDetails>
+        </Accordion>
+        <Accordion defaultExpanded='true'>
+          <MyAccordionSummary>Annotation Statistics</MyAccordionSummary>
+          <AccordionDetails>
             <TableContainer>
               <Table>
                 <TableHead>
@@ -117,12 +168,14 @@ const AgContextDetails = (props) => {
             </TableContainer>
           </AccordionDetails>
         </Accordion>
-        <AgContextFieldList defaultExpanded="true" classes={classes} agcontext={agcontext} title="The Crop" fields={["crop_type", "bbch_growth_range", "soil_colour", "surface_cover", "surface_coverage", "location_lat", "location_long"]} />
-        <AgContextFieldList classes={classes} agcontext={agcontext} title="The Photography" fields={["camera_make", "camera_lens", "camera_lens_focallength", "camera_height", "camera_angle", "camera_fov", "ground_speed", "lighting", "photography_description"]} />
-        <AgContextFieldList classes={classes} agcontext={agcontext} title="Other Details" fields={["cropped_to_plant", "emr_channels", "weather_description"]} />
+        <AgContextFieldList MyAccordionSummary={MyAccordionSummary} agcontext={agcontext} title="The Crop" fields={["crop_type", "bbch_growth_range", "soil_colour", "surface_cover", "surface_coverage", "location_lat", "location_long"]} />
+        <AgContextFieldList MyAccordionSummary={MyAccordionSummary} agcontext={agcontext} title="The Photography" fields={["camera_make", "camera_lens", "camera_lens_focallength", "camera_height", "camera_angle", "camera_fov", "ground_speed", "lighting", "photography_description"]} />
+        <AgContextFieldList MyAccordionSummary={MyAccordionSummary} agcontext={agcontext} title="Other Details" fields={["cropped_to_plant", "emr_channels", "weather_description"]} />
       </article>
     );
 }
+
+const listToWords = l => l.map((x, i) => [i == 0 ? "" : i == l.length - 1 ? (i > 1 ? "," : "") + " and " : ", ", x]);
 
 export const DatasetSummary = (props) => {
     const {metadata, agcontexts, classes, rootURL, upload_id} = props;
@@ -131,13 +184,28 @@ export const DatasetSummary = (props) => {
         return (<a href={ent.sameAs}>{ent.name}</a>);
       return ent.name;
     }
+
+    const MyAccordionSummary = ({ children }) => (
+      <AccordionSummary
+        expandIcon={<ExpandMoreIcon />}
+        aria-controls="panel1a-content"
+        id="panel1a-header"
+        className={classes.header}
+      >
+        <Typography className={classes.heading}>{children}</Typography>
+      </AccordionSummary>
+    );
+
     const getFirstLine = (s) => (s.match(/[^\n.]*/)[0]);
-    metadata["description"] = (metadata["description"] ?? "") + DESCRIPTION_BOILERPLATE;
+    const displayMeta = {...metadata}
+    const yearPublished = (displayMeta.datePublished || "????").substr(0, 4);
+    displayMeta["description"] = (metadata["description"] ?? "") + DESCRIPTION_BOILERPLATE;
+    displayMeta["identifier"] = [...displayMeta.identifier || [], "https://weed-ai.sydney.edu.au/datasets/" + upload_id];
     return (
       <React.Fragment>
         <Helmet>
-          <title>"{metadata.name}" Dataset in Weed-AI: a repository of weed imagery in crops</title>
-          <meta name="description" content={getFirstLine(metadata.description) + " by " + metadata.creator.map((creator) => creator.name).join(', ') + "."} />
+          <title>"{displayMeta.name}" Dataset in Weed-AI: a repository of weed imagery in crops</title>
+          <meta name="description" content={getFirstLine(displayMeta.description) + " by " + displayMeta.creator.map((creator) => creator.name).join(', ') + "."} />
         </Helmet>
         <script type="application/ld+json">
         {
@@ -147,46 +215,32 @@ export const DatasetSummary = (props) => {
               "@type": "Dataset",
               "url": window.location.href
             },
-            ...metadata
+            ...displayMeta
           })
         }
         </script>
-        <Grid container spacing={3}>
+        <Grid container spacing={3} className={classes.topMatter}>
           <Grid item xs={10}>
             <div className={classes.summary}>
               <div style={{display: 'flex'}}>
                 <IconButton aria-label="back to list" color="secondary" onClick={() => window.location.assign(rootURL + 'datasets')}>
                   <ListIcon />
                 </IconButton>
-                <Typography variant='h4' style={{fontWeight: 600}}>{metadata.name}</Typography>
+                <Typography variant='h4' style={{fontWeight: 600}}>{displayMeta.name}</Typography>
               </div>
               <div style={{fontSize: "1.2em" }}>
-              <ReactMarkdown source={metadata.description}  />
+              <ReactMarkdown source={displayMeta.description}  />
               </div>
-              <dl>
-                <dt>Creators:</dt>
-                <dd>
-                  <ul>
-                  {metadata.creator.map((creator, i) => (
-                    <li key={i}>
-                      {linkedEntity(creator)}{creator.affiliation ? (<span>, {linkedEntity(creator.affiliation)}</span>) : []}
-                    </li>
-                  ))}
-                  </ul>
-                </dd>
-                <dt>Licence:</dt>
-                <dd>{<a href={metadata.license}>{metadata.license}</a>}</dd>
-                {metadata.funder ?
-                    <React.Fragment>
-                    <dt>Funders:</dt>
-                    <dd>
-                      <ul>
-                        {metadata.funder.map(ent => <li key={ent.name}>{linkedEntity(ent)}</li>)}
-                      </ul>
-                    </dd>
-                    </React.Fragment>
-                : []}
-              </dl>
+              <Typography>
+                Published {displayMeta.datePublished ? ["in ", yearPublished] : []} by {listToWords(displayMeta.creator.map((creator, i) => (
+                    [linkedEntity(creator), creator.affiliation ? (<span> ({linkedEntity(creator.affiliation)})</span>) : []]
+                  )))}.
+              </Typography>
+              <ul className={classes.identifierList}>
+                {displayMeta.identifier.map(uri =>
+                  <li key={uri}><Chip className={classes.identifierChip} icon={<LinkIcon/>} label={uri} variant="outlined" /></li>
+                )}
+              </ul>
             </div>
           </Grid>
           <Grid item xs={2}>
@@ -196,8 +250,29 @@ export const DatasetSummary = (props) => {
             </div>
           </Grid>
         </Grid>
+        <Accordion className={classes.attribution}>
+          <MyAccordionSummary>Citation and Licensing</MyAccordionSummary>
+          <AccordionDetails>
+          <dl>
+            {displayMeta.citation ?
+              [<dt>Citation:</dt>, <dd>{displayMeta.citation}</dd>] :
+              [<dt>Citation:</dt>, <dd>{listToWords(displayMeta.creator.map(creator => creator.name))} ({yearPublished}). "{displayMeta.name}." In <cite>Weed-AI</cite>. {displayMeta.identifier[0]}. Accessed {new Date().toISOString().substr(0, 10)}.</dd>]
+            }
+            <dt>Licence:</dt>
+            <dd>{<a href={displayMeta.license}>{displayMeta.license}</a>}</dd>
+            {displayMeta.funder ?
+                <React.Fragment>
+                <dt>Funders:</dt>
+                <dd>
+                {listToWords(displayMeta.funder.map(ent => linkedEntity(ent)))}
+                </dd>
+                </React.Fragment>
+            : []}
+          </dl>
+          </AccordionDetails>
+        </Accordion>
         {agcontexts.map((agcontext, idx) =>
-          <AgContextDetails agcontext={agcontext} key={idx} ordinal={idx + 1} nContexts={agcontexts.length} classes={classes} />
+          <AgContextDetails MyAccordionSummary={MyAccordionSummary} metadata={metadata} agcontext={agcontext} key={idx} ordinal={idx + 1} nContexts={agcontexts.length} classes={classes} />
         )}
       </React.Fragment>
     );
@@ -220,14 +295,10 @@ class DatasetSummaryPage extends Component {
   }
 
   componentDidMount (){
-    const body = new FormData()
-    body.append('upload_id', this.props.upload_id)
     axios({
-        method: 'post',
-        url: baseURL + "api/upload_info/",
+        method: 'get',
+        url: baseURL + "api/upload_info/" + this.props.upload_id,
         mode: 'same-origin',
-        data: body,
-        headers: {'Content-Type': 'multipart/form-data', 'X-CSRFToken': Cookies.get('csrftoken') }
     })
     .then(res => res.data)
     .then(json => {
@@ -251,6 +322,7 @@ class DatasetSummaryPage extends Component {
 
 export const TestDatasetSummary = () => {
     const props = {
+        "upload_id": "foobar",
         "metadata": {
             "creator": [
                 {"name": "Sebastian Haug"},
