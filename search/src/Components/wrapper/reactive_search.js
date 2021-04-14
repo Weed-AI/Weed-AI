@@ -55,7 +55,7 @@ class ReactiveSearchComponent extends Component {
                     checkbox: "filter-checkbox"
                 },
                 queryFormat: "or",
-                URLParams: false,
+                URLParams: true,
                 react: {
                     and: [
                         "crop_type_filter",
@@ -158,8 +158,9 @@ class ReactiveSearchComponent extends Component {
                     <MultiDropdownList
                         componentId="dataset_name_filter"
                         dataField="dataset_name.keyword"
-                        title="Datasets"
-                        placeholder="Select datasets"
+                        URLParams={true}
+                        title="Dataset Name"
+                        placeholder="Search datasets"
                         sortBy="asc"
                         filterLabel="Datasets"
                         {...makeProps("dataset_name_filter", true)}

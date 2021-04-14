@@ -18,6 +18,8 @@ import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import axios from 'axios';
 import ListIcon from '@material-ui/icons/List';
+import PhotoIcon from '@material-ui/icons/Photo';
+import DownloadIcon from '@material-ui/icons/CloudDownload';
 import IconButton from '@material-ui/core/IconButton';
 import Cookies from 'js-cookie'
 import ReactMarkdown from "react-markdown";
@@ -47,12 +49,12 @@ const useStyles = (theme) => ({
   summary: {
   },
   download: {
-    padding: '1.5em 0',
-    width: '100%',
     fontSize: '1.2rem',
-    fontWeight: 900,
     backgroundColor: 'orange',
-    color: 'white',
+    color: 'black',
+    marginBottom: "1rem",
+    paddingTop: "1rem",
+    paddingBottom: "1rem",
   },
   attribution: {
     width: "100%",
@@ -243,7 +245,8 @@ export const DatasetSummary = (props) => {
           </Grid>
           <Grid item xs={2}>
             <div className={classes.summary}>
-                <Button className={classes.download} onClick={() => window.open(`${rootURL}/code/download/${upload_id}.zip`)}>Download in WeedCOCO format</Button>
+                <Button component="a" variant="contained" className={classes.download} startIcon={<DownloadIcon />} onClick={() => window.open(`${rootURL}/code/download/${upload_id}.zip`)}>Download in WeedCOCO format</Button>
+				<Button variant="outlined" startIcon={<PhotoIcon/>} href={"/explore?dataset_name_filter=%5B%22" + metadata.name + "%22%5D"}>Explore the Images</Button>
             </div>
           </Grid>
         </Grid>
