@@ -33,7 +33,16 @@ const WeedAIResultCard = (props) => {
                 })
             }
             </ul>
-            {" " + pluralise(formatTaskType(item.task_type), item.annotations.length) + " in " + formatCropType(item.agcontext__crop_type) + (item.agcontext__bbch_growth_range === "na" ? "" : " (" + formatGrowthRange(item) + ")") + "."}
+            {
+              " " +
+              pluralise(formatTaskType(item.task_type), item.annotations.length) +
+              " in " +
+              formatCropType(item.agcontext__crop_type) +
+              (item.agcontext__bbch_growth_range
+                ? " (" + formatGrowthRange(item) + ")"
+                : "") +
+              "."
+            }
             {linkToDataset === false ? [] : <div><Tooltip title={item.dataset_name}><a title={item.dataset_name} href={`${baseURL}datasets/${item.upload_id}`}>See Dataset</a></Tooltip></div>}
         </ResultCard.Description>
     </ResultCard>
