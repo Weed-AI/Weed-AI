@@ -26,10 +26,15 @@ services:
     build:
       context: ./django
       dockerfile:  Dockerfile
+      args:
+        - WEEDCOCO_VERSION=${WEEDCOCO_VERSION:-master}
     environment:
       - DJANGO_SECRET_KEY=${DJANGO_SECRET_KEY}
       - CELERY_BROKER=redis://redis:6379/0
       - CELERY_BACKEND=redis://redis:6379/0
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
     volumes:
       - thumbnails_dir:/code/thumbnails
       - repository_dir:/code/repository
@@ -44,16 +49,16 @@ services:
     restart: always
 
   celery:
-    image: celery
+    image: django
     container_name: celery
-    build:
-      context: ./django
-      dockerfile:  Dockerfile
     command: celery -A core worker -l INFO
     environment:
       - DJANGO_SECRET_KEY=${DJANGO_SECRET_KEY}
       - CELERY_BROKER=redis://redis:6379/0
       - CELERY_BACKEND=redis://redis:6379/0
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
     volumes:
       - thumbnails_dir:/code/thumbnails
       - repository_dir:/code/repository

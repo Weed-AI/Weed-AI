@@ -1,9 +1,10 @@
 from django.http import HttpResponse
+from django.shortcuts import render
 import requests
 import os
 import json
 import traceback
-from core.settings import UPLOAD_DIR, REPOSITORY_DIR, MAX_IMAGE_SIZE
+from core.settings import UPLOAD_DIR, REPOSITORY_DIR, MAX_IMAGE_SIZE, SITE_BASE_URL
 from weedid.tasks import submit_upload_task, update_index_and_thumbnails
 from weedid.utils import (
     store_tmp_weedcoco,
@@ -160,17 +161,13 @@ def upload_status(request):
     )
 
 
-def upload_info(request):
-    if not request.method == "POST":
+def upload_info(request, dataset_id):
+    if request.method != "GET":
         return HttpResponseNotAllowed(request.method)
-    upload_id = request.POST["upload_id"]
-    upload_entity = Dataset.objects.get(upload_id=upload_id)
+    upload_entity = Dataset.objects.get(upload_id=dataset_id)
     return HttpResponse(
         json.dumps(
-            {
-                "metadata": upload_entity.metadata,
-                "agcontexts": upload_entity.agcontext,
-            }
+            {"metadata": upload_entity.metadata, "agcontexts": upload_entity.agcontext}
         )
     )
 
@@ -280,3 +277,22 @@ def login_google(request):
         user.save()
         login(request, user)
         return HttpResponse("The account has been created and logged in")
+
+
+def sitemap_xml(request):
+    # roughly in order of SEO importance
+    PATHS = [
+        "/explore",
+        "/datasets",
+        "/editor",
+        "/upload",
+        "/about",
+        "/weedcoco",
+        "/meta-editor",
+    ]
+    urls = [{"loc": SITE_BASE_URL + path} for path in PATHS]
+    for dataset in Dataset.objects.filter(status="C"):
+        urls.append({"loc": SITE_BASE_URL + "/datasets/" + dataset.upload_id})
+    return render(
+        request, "sitemap.xml", context={"urls": urls}, content_type="text/xml"
+    )

@@ -16,6 +16,7 @@ required:
   - camera_height
   - camera_angle
   - camera_fov
+  - ground_speed
   - photography_description
   - lighting
   #  - emr_channels
@@ -28,32 +29,44 @@ properties:
       A number identifying the AgContext.
 
   crop_type:
-    type: string
-    enum:
-      - wheat
-      - barley
-      - oats
-      - triticale
-      - sorghum
-      - rice
-      - lupins
-      - chickpeas
-      - lentils
-      - field_peas
-      - faba_beans
-      - mung_beans
-      - canola
-      - mustard
-      - flax
-      - linseed
-      - safflower
-      - cotton
-      - carrots
-      - weed_only
-      - other
-    description: |-
-      Crop type.
-      One of several strings describing the crop grown in the image.
+    title: Crop Type
+    oneOf:
+      - type: string
+        title: Grain Crop
+        enum:
+          - wheat
+          - barley
+          - oats
+          - triticale
+          - sorghum
+          - rice
+          - lupins
+          - chickpeas
+          - lentils
+          - field_peas
+          - faba_beans
+          - mung_beans
+          - canola
+          - mustard
+          - flax
+          - linseed
+          - safflower
+          - cotton
+        description: |-
+          Crop type.
+          The crop grown in the image.
+      - type: string
+        title: Other Crop
+        pattern: "[A-Za-z][^ ]* [A-Za-z].*"
+        description: |-
+          Specify the crop's scientific name.
+      - type: string
+        title: Not in Crop
+        enum:
+          - pasture
+          - fallow
+        description: |-
+          Non-crop agricultural land or crop land in fallow.
 
   bbch_growth_range:
     oneOf:
@@ -191,10 +204,12 @@ properties:
       - type: string
         title: Variable within AgContext
         const: variable
-    description: |-
-      Field of view for camera.
-      A number representing the angle captured by the camera across the diagonal of an image, measured in degrees.
-      If this is not fixed within the AgContext, use value "variable".
+
+  ground_speed:
+    type: number
+    title: Ground Speed (m/s)
+    minimum: 0
+    description: The usual speed (in metres per second) of the moving camera relative to ground when taking the images. Use "0" for stationary.
 
   photography_description:
     type: string
@@ -213,6 +228,7 @@ properties:
 
   cropped_to_plant:
     type: boolean
+    default: false
     description: |-
       Has the image been cropped to the plant?
       A boolean indicating if the image has been cropped to the plant.
