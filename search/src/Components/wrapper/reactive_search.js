@@ -31,6 +31,7 @@ const IntroText = () => {
   ) : [];
 }
 
+
 class ReactiveSearchComponent extends Component {
 
     render() {
