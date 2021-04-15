@@ -31,6 +31,7 @@ const IntroText = () => {
   ) : [];
 }
 
+
 class ReactiveSearchComponent extends Component {
 
     render() {
@@ -54,7 +55,7 @@ class ReactiveSearchComponent extends Component {
                     checkbox: "filter-checkbox"
                 },
                 queryFormat: "or",
-                URLParams: false,
+                URLParams: true,
                 react: {
                     and: [
                         "crop_type_filter",
@@ -80,27 +81,6 @@ class ReactiveSearchComponent extends Component {
             <SearchBase>
                 <div style={{ position: "fixed", width: "20rem", overflow: "scroll", height: "90%", left: 0, padding: '1rem' }}>
                     <IntroText />
-                    <GeoDistanceSlider
-                      title="Location"
-                      componentId="geo_distance_filter"
-                      placeholder="Search Location"
-                      dataField="location"
-                      unit="km"
-                      showFilter={true}
-                      autoLocation={false}
-                      range={{
-                        start: 10,
-                        end: 1000
-                      }}
-                      defaultValue={{
-                        distance: 1000
-                      }}
-                      rangeLabels={{
-                        start: '10km',
-                        end: '1000km',
-                      }}
-                      {...makeProps("geo_distance_filter", false)}
-                    />
                     <MultiList
                         componentId="crop_type_filter"
                         title="Crop Type"
@@ -132,6 +112,27 @@ class ReactiveSearchComponent extends Component {
                         filterLabel="Growth stage"
                         {...makeProps("grainstextfilter", true)}
                     />
+                    <GeoDistanceSlider
+                      title="Location"
+                      componentId="geo_distance_filter"
+                      placeholder="Search Location"
+                      dataField="location"
+                      unit="km"
+                      showFilter={true}
+                      autoLocation={false}
+                      range={{
+                        start: 10,
+                        end: 1000
+                      }}
+                      defaultValue={{
+                        distance: 1000
+                      }}
+                      rangeLabels={{
+                        start: '10km',
+                        end: '1000km',
+                      }}
+                      {...makeProps("geo_distance_filter", false)}
+                    />
                     <MultiList
                         componentId="task_type_filter"
                         title="Computer Vision Task"
@@ -157,8 +158,9 @@ class ReactiveSearchComponent extends Component {
                     <MultiDropdownList
                         componentId="dataset_name_filter"
                         dataField="dataset_name.keyword"
-                        title="Datasets"
-                        placeholder="Select datasets"
+                        URLParams={true}
+                        title="Dataset Name"
+                        placeholder="Search datasets"
                         sortBy="asc"
                         filterLabel="Datasets"
                         {...makeProps("dataset_name_filter", true)}
