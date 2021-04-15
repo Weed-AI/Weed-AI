@@ -37,7 +37,7 @@ services:
       - POSTGRES_DB=${POSTGRES_DB}
       - SMTP_HOST=${SMTP_HOST}
       - SMTP_PORT=${SMTP_PORT}
-      - SERVER_ADDR=${SERVER_ADDR}
+      - FROM_EMAIL=${FROM_EMAIL}
     volumes:
       - thumbnails_dir:/code/thumbnails
       - repository_dir:/code/repository
@@ -64,7 +64,7 @@ services:
       - POSTGRES_DB=${POSTGRES_DB}
       - SMTP_HOST=${SMTP_HOST}
       - SMTP_PORT=${SMTP_PORT}
-      - SERVER_ADDR=${SERVER_ADDR}
+      - FROM_EMAIL=${FROM_EMAIL}
     volumes:
       - thumbnails_dir:/code/thumbnails
       - repository_dir:/code/repository

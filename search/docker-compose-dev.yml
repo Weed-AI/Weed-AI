@@ -36,7 +36,7 @@ services:
       - POSTGRES_DB=${POSTGRES_DB}
       - SMTP_HOST=${SMTP_HOST}
       - SMTP_PORT=${SMTP_PORT}
-      - SERVER_ADDR=${SERVER_ADDR}
+      - FROM_EMAIL=${FROM_EMAIL}
     command: python manage.py runserver 0.0.0.0:8000
     entrypoint: /entrypoint.sh
     volumes:
@@ -63,7 +63,7 @@ services:
       - POSTGRES_DB=${POSTGRES_DB}
       - SMTP_HOST=${SMTP_HOST}
       - SMTP_PORT=${SMTP_PORT}
-      - SERVER_ADDR=${SERVER_ADDR}
+      - FROM_EMAIL=${FROM_EMAIL}
     volumes:
       - ./django/:/code
       - thumbnails_dir:/code/thumbnails
