@@ -64,10 +64,12 @@ def upload(request):
         create_upload_entity(weedcoco_path, upload_id, user.id)
     except JsonValidationError as e:
         traceback.print_exc()
-        errors = e.error_path_message()
         return HttpResponseForbidden(
-            "\n".join(
-                full_message for full_message in (": ".join(error) for error in errors)
+            "; ".join(
+                full_message
+                for full_message in (
+                    ": ".join(error) for error in e.error_path_message()
+                )
             )
         )
     except Exception as e:
