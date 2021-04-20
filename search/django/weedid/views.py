@@ -73,14 +73,7 @@ def upload(request):
         create_upload_entity(weedcoco_path, upload_id, user.id)
     except JsonValidationError as e:
         traceback.print_exc()
-        return HttpResponseBadRequest(
-            "; ".join(
-                full_message
-                for full_message in (
-                    ": ".join(error) for error in e.get_error_details()
-                )
-            )
-        )
+        return HttpResponseBadRequest(json.dumps(e.get_error_details()))
     except Exception as e:
         traceback.print_exc()
         return HttpResponseBadRequest(str(e))

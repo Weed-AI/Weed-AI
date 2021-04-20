@@ -25,10 +25,20 @@ class JsonValidationError(ValidationError):
         self.jsonschema_errors = jsonschema_errors
 
     def get_error_details(self):
-        return [
-            (f"Error in {' / '.join(str(p) for p in error.path)}", error.message)
+        error_details = [
+            {
+                "path": list(error.path),
+                "value": error.instance,
+                "message": error.message,
+                "schema": error.schema,
+            }
             for error in self.jsonschema_errors
         ]
+        return {
+            "error_type": "jsonschema",
+            "n_errors_found": str(len(error_details)),
+            "error_details": error_details,
+        }
 
 
 def validate_json(weedcoco, schema="weedcoco", schema_dir=SCHEMA_DIR):
