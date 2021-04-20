@@ -17,7 +17,7 @@ from weedid.utils import (
     add_metadata,
 )
 from weedid.models import Dataset, WeedidUser
-from weedcoco.validation import validate
+from weedcoco.validation import validate, JsonValidationError
 from django.contrib.auth import login, logout
 from django.contrib.auth.hashers import check_password
 from django.http import HttpResponseForbidden, HttpResponseNotAllowed
@@ -62,6 +62,14 @@ def upload(request):
         upload_dir, upload_id = setup_upload_dir(os.path.join(UPLOAD_DIR, str(user.id)))
         weedcoco_path = store_tmp_weedcoco(file_weedcoco, upload_dir)
         create_upload_entity(weedcoco_path, upload_id, user.id)
+    except JsonValidationError as e:
+        traceback.print_exc()
+        errors = e.error_path_message()
+        return HttpResponseForbidden(
+            "\n".join(
+                full_message for full_message in (": ".join(error) for error in errors)
+            )
+        )
     except Exception as e:
         traceback.print_exc()
         return HttpResponseForbidden(str(e))

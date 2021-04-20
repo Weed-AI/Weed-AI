@@ -5,8 +5,7 @@ import argparse
 import sys
 import json
 
-import jsonschema
-import jsonschema.exceptions
+from jsonschema.validators import Draft7Validator, RefResolver
 import yaml
 
 SCHEMA_DIR = pathlib.Path(__file__).parent / "schema"
@@ -20,6 +19,18 @@ class ValidationError(Exception):
     pass
 
 
+class JsonValidationError(ValidationError):
+    def __init__(self, message, jsonschema_errors=None):
+        super().__init__(message)
+        self.jsonschema_errors = jsonschema_errors
+
+    def error_path_message(self):
+        return [
+            (f"Error in {' / '.join(str(p) for p in error.path)}", error.message)
+            for error in self.jsonschema_errors
+        ]
+
+
 def validate_json(weedcoco, schema="weedcoco", schema_dir=SCHEMA_DIR):
     """Check that the weedcoco matches its JSON schema"""
     if schema not in MAIN_SCHEMAS:
@@ -29,20 +40,20 @@ def validate_json(weedcoco, schema="weedcoco", schema_dir=SCHEMA_DIR):
         ref_store = validate_json.ref_store
     except AttributeError:
         schema_objects = [
-            yaml.safe_load(path.open()) for path in SCHEMA_DIR.glob("*.yaml")
+            yaml.safe_load(path.open()) for path in schema_dir.glob("*.yaml")
         ]
         validate_json.ref_store = {obj["$id"]: obj for obj in schema_objects}
         ref_store = validate_json.ref_store
     schema_uri = MAIN_SCHEMAS[schema]
     main_schema = ref_store[schema_uri]
-    try:
-        jsonschema.validate(
-            weedcoco,
-            schema=main_schema,
-            resolver=jsonschema.RefResolver(schema_uri, main_schema, store=ref_store),
+    validator = Draft7Validator(main_schema)
+    validator.resolver = RefResolver(schema_uri, main_schema, store=ref_store)
+    errors = [error for error in validator.iter_errors(weedcoco)]
+    if len(errors):
+        raise JsonValidationError(
+            f"{len(errors)} violations found: {' '.join(err.message for err in errors)}",
+            errors,
         )
-    except jsonschema.ValidationError as e:
-        raise ValidationError(str(e)) from e
 
 
 def validate_references(
