@@ -73,7 +73,7 @@ def upload(request):
             "; ".join(
                 full_message
                 for full_message in (
-                    ": ".join(error) for error in e.error_path_message()
+                    ": ".join(error) for error in e.get_error_details()
                 )
             )
         )

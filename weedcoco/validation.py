@@ -24,7 +24,7 @@ class JsonValidationError(ValidationError):
         super().__init__(message)
         self.jsonschema_errors = jsonschema_errors
 
-    def error_path_message(self):
+    def get_error_details(self):
         return [
             (f"Error in {' / '.join(str(p) for p in error.path)}", error.message)
             for error in self.jsonschema_errors
