@@ -3,13 +3,7 @@ import { Helmet } from "react-helmet";
 import { withStyles } from '@material-ui/core/styles';
 import ReactMarkdown from "react-markdown";
 import content from './weedcoco.md'
-
-const useStyles = (theme) => ({
-    page: {
-        margin: theme.spacing(15)
-    },
-})
-
+import { useArticleStyles } from '../../styles/common'
 
 class WeedCOCOComponent extends Component {
   constructor(props) {
@@ -36,4 +30,4 @@ class WeedCOCOComponent extends Component {
   }
 }
 
-export default withStyles(useStyles)(WeedCOCOComponent);
+export default withStyles(useArticleStyles)(WeedCOCOComponent);
