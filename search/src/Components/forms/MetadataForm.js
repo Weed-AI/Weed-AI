@@ -4,12 +4,10 @@ import { withRouter } from 'react-router-dom';
 import schema from '../../Schemas/Metadata.json'
 import Container from '@material-ui/core/Container';
 import Box from '@material-ui/core/Box';
-import {
-  materialCells,
-  materialRenderers,
-} from '@jsonforms/material-renderers';
+import renderers from '../formRenderers/default_renderers';
 import { JsonForms } from '@jsonforms/react';
 import UploadJsonButton from './UploadJsonButton';
+import { materialCells } from '@jsonforms/material-renderers';
 
 
 const uischema = {
@@ -74,10 +72,6 @@ const uischema = {
         }
     ]
 };
-
-const renderers = [
-  ...materialRenderers
-];
 
 // TODO: refactor boilerplate wrt AgContextForm code
 export const toJSON = (payload) => JSON.stringify(payload, null, 2);
