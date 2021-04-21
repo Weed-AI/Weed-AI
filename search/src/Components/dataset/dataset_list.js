@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Helmet } from "react-helmet";
 import { makeStyles } from '@material-ui/core/styles';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
@@ -9,6 +10,8 @@ import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
 import Link from '@material-ui/core/Link';
 import CircularProgress from '@material-ui/core/CircularProgress';
+import PhotoIcon from '@material-ui/icons/Photo';
+import IconButton from '@material-ui/core/IconButton';
 import axios from 'axios';
 
 
@@ -73,18 +76,19 @@ export default function DatasetList(props) {
 
   return (
     <div className={classes.root}>
+      <Helmet>
+        <title>Datasets in Weed-AI: a repository of weed imagery in crops</title>
+        <meta name="description" content="Listing of all datasets in Weed-AI with images and metadata for download." />
+      </Helmet>
       <h2>{props.title}</h2>
       <TableContainer component={Paper}>
         <Table className={classes.table} aria-label="simple table">
           <TableHead>
             <TableRow>
               <TableCell className={classes.tableHeader}>Dataset Title</TableCell>
-              <TableCell className={classes.tableHeader}>Task Type</TableCell>
-              <TableCell className={classes.tableHeader}>Crop</TableCell>
-              <TableCell className={classes.tableHeader}>Weed Species</TableCell>
-              <TableCell className={classes.tableHeader}>Contributor</TableCell>
               {inReview ? <TableCell className={classes.tableHeader}>Contact</TableCell> : ""}
               <TableCell className={classes.tableHeader}>Upload Date</TableCell>
+              <TableCell className={classes.tableHeader}>Explore</TableCell>
               {inReview ? <TableCell className={classes.tableHeader}>Command</TableCell> : ""}
             </TableRow>
           </TableHead>
@@ -96,12 +100,9 @@ export default function DatasetList(props) {
                   {row.name}
                 </Link>
                 </TableCell>
-                <TableCell>Classification</TableCell>
-                <TableCell>Pasture</TableCell>
-                <TableCell></TableCell>
-                <TableCell>{row.contributor}</TableCell>
                 {inReview ? <TableCell><a href="mailto:{row.contributor_email}">{row.contributor_email}</a></TableCell> : ""}
                 <TableCell>{row.upload_date}</TableCell>
+                <TableCell><IconButton href={"/explore?dataset_name_filter=%5B%22" + row.name + "%22%5D"}><PhotoIcon /></IconButton></TableCell>
                 {inReview
                   ?<TableCell className={classes.commandCol}>
                     <button className={`${classes.command} ${classes.approval}`} onClick={() => handleApprove(row.upload_id)}>Approve</button>

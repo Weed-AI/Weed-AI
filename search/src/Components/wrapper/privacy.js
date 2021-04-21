@@ -2,13 +2,7 @@ import React, {Component} from 'react';
 import { withStyles } from '@material-ui/core/styles';
 import ReactMarkdown from "react-markdown";
 import content from './privacy.md'
-
-const useStyles = (theme) => ({
-    page: {
-        margin: theme.spacing(15)
-    },
-})
-
+import { useArticleStyles } from '../../styles/common'
 
 class PrivacyComponent extends Component {
   constructor(props) {
@@ -31,4 +25,4 @@ class PrivacyComponent extends Component {
   }
 }
 
-export default withStyles(useStyles)(PrivacyComponent);
+export default withStyles(useArticleStyles)(PrivacyComponent);

@@ -1,16 +1,15 @@
 import React, { Component } from 'react'
+import { Helmet } from "react-helmet";
 import { withRouter } from 'react-router-dom';
 import schema from '../../Schemas/Metadata.json'
 import Container from '@material-ui/core/Container';
 import Box from '@material-ui/core/Box';
-import {
-  materialCells,
-  materialRenderers,
-} from '@jsonforms/material-renderers';
 import { createAjv } from '@jsonforms/core';
+import renderers from '../formRenderers/default_renderers';
 import { JsonForms } from '@jsonforms/react';
 import { constTester, ConstRenderer } from '../formRenderers/ConstRenderer';
 import UploadJsonButton from './UploadJsonButton';
+import { materialCells } from '@jsonforms/material-renderers';
 
 
 const uischema = {
@@ -80,11 +79,6 @@ const uischema = {
     ]
 };
 
-const renderers = [
-  ...materialRenderers,
-  { tester: constTester, renderer: ConstRenderer },
-];
-
 // TODO: refactor boilerplate wrt AgContextForm code
 export const toJSON = (payload) => JSON.stringify(payload, null, 2);
 export const handleSaveToPC = (payload) => {
@@ -136,6 +130,10 @@ class StandaloneEditor extends Component {
     render() {
         return (
             <Container maxWidth="sm">
+                <Helmet>
+                    <title>Metadata Editor – Weed-AI</title>
+                    <meta name="description" content="Edit and save metadata about an annotated weed imagery collection." />
+                </Helmet>
                 <h2>Dataset Metadata</h2>
                 <Box boxShadow={3} px={2} py={1} my={2}>
                     <MetadataForm formData={this.state.formData} onChange={e => this.setState({formData: e.formData})} />

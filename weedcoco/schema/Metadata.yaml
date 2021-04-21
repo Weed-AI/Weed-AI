@@ -18,6 +18,7 @@ definitions:
         type: string
         const: Person
       name:
+        title: Person's Name
         type: string
       givenName:
         type: string
@@ -47,6 +48,7 @@ definitions:
         type: string
         const: Organization
       name:
+        title: Organization Name
         type: string
       sameAs:
         type: string
@@ -63,6 +65,7 @@ properties:
     const: Dataset
   name:
     type: string
+    title: Dataset Name
     description: A name for this dataset, or its publication title
   creator:
     type: array

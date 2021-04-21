@@ -117,10 +117,33 @@ def get_task_types(annotations):
         annotations = [annotations]
     out = {"classification"}
     for annotation in annotations:
-        if "segmentation" in annotation:
+        if annotation.get("segmentation"):  # empty segmentation should not be counted
             out.add("segmentation")
             # FIXME: should we be assuming that one should turn segmentation into bbox?
             out.add("bounding box")
         if "bbox" in annotation:
             out.add("bounding box")
     return out
+
+
+def denormalise_weedcoco(weedcoco):
+    """Puts objects into images from ID references
+
+    E.g. "annotations" added to images and "category" to annotations
+
+    Operates in-place.
+    """
+    id_lookup = {}
+    for key, objs in weedcoco.items():
+        for obj in objs:
+            if "id" in obj:
+                id_lookup[key, obj["id"]] = obj
+
+    for annotation in weedcoco["annotations"]:
+        image = id_lookup["images", annotation["image_id"]]
+        image.setdefault("annotations", []).append(annotation)
+        annotation["category"] = id_lookup["categories", annotation["category_id"]]
+
+    for image in weedcoco["images"]:
+        if "agcontext_id" in image:
+            image["agcontext"] = id_lookup["agcontexts", image["agcontext_id"]]

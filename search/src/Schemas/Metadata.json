@@ -21,6 +21,7 @@
           "const": "Person"
         },
         "name": {
+          "title": "Person's Name",
           "type": "string"
         },
         "givenName": {
@@ -60,6 +61,7 @@
           "const": "Organization"
         },
         "name": {
+          "title": "Organization Name",
           "type": "string"
         },
         "sameAs": {
@@ -83,6 +85,7 @@
     },
     "name": {
       "type": "string",
+      "title": "Dataset Name",
       "description": "A name for this dataset, or its publication title"
     },
     "creator": {

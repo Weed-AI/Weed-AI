@@ -9,12 +9,11 @@ import axios from 'axios';
 import Button from '@material-ui/core/Button';
 import ReactMarkdown from "react-markdown";
 import content from './upload.md'
+import { useArticleStyles } from '../../styles/common'
 
 
 const useStyles = (theme) => ({
-    upload_container: {
-        margin: theme.spacing(10)
-    },
+	...useArticleStyles(theme),
     formControl: {
         margin: theme.spacing(2),
         minWidth: 200,
@@ -111,7 +110,7 @@ class UploadComponent extends Component {
     render() {
         const {classes} = this.props;
         return (
-            <div className={classes.upload_container}>
+            <article className={classes.page}>
                 <h1>Sign In and Upload</h1>
                 <p>We welcome new contributions of datasets of images with weeds already annotated.</p>
                 { this.state.isLoggedIn
@@ -147,7 +146,7 @@ class UploadComponent extends Component {
                 <AuthPrompt handleLogin={this.handleLogin} handleLogout={this.handleLogout}/> }
 
                 <ReactMarkdown source={this.state.markdownContent} />
-            </div>
+            </article>
         )
     }
 }
