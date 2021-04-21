@@ -7,6 +7,7 @@ import Button from '@material-ui/core/Button';
 import Typography from '@material-ui/core/Typography';
 import UploaderSingle from './uploader_single';
 import UploaderImages from './uploader_images';
+import ErrorMessage from '../error/display';
 import AgContextForm from '../forms/AgContextForm';
 import UploadJsonButton from '../forms/UploadJsonButton';
 import MetadataForm from '../forms/MetadataForm';
@@ -105,7 +106,8 @@ class UploadStepper extends React.Component {
             ag_context: {},
             metadata: {},
             coco_form_validation: {'agcontexts': false, 'metadata': false},
-            error_message: "init"
+            error_message: "init",
+            error_message_details: "",
         }
         this.isStepOptional = this.isStepOptional.bind(this);
         this.isStepSkipped = this.isStepSkipped.bind(this);
@@ -149,8 +151,8 @@ class UploadStepper extends React.Component {
         this.setState({metadata: formData});
     }
 
-    handleErrorMessage(message) {
-        this.setState({error_message: message});
+    handleErrorMessage(message, details="") {
+        this.setState({error_message: message, error_message_details: details});
     }
 
     handleNext() {
@@ -290,7 +292,7 @@ class UploadStepper extends React.Component {
                 <Typography className={classes.instructions}>
                     {getStepContent(this.state.activeStep, this.props.upload_type, this.state.upload_id, this.state.images, this.state.ag_context, this.state.metadata, this.handleUploadId, this.handleImages, this.handleAgContextsFormData, this.handleMetadataFormData, this.handleErrorMessage, this.handleValidation)}
                 </Typography>
-                {this.state.error_message.length > 0 && this.state.error_message !== 'init' ? <p style={{color: 'red', float: 'right', marginTop: '0.5em'}}>{this.state.error_message}</p> : ""}
+                <ErrorMessage error={this.state.error_message} details={this.state.error_message_details}/>
                 <div>
                     <Button disabled={this.state.activeStep === 0} onClick={this.handleBack} className={classes.button}>
                         Back
