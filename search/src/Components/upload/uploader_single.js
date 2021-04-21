@@ -9,6 +9,7 @@ const UploaderSingle  = (props) => {
     const getUploadParams = ({ file, meta }) => {
         const body = new FormData()
         body.append('weedcoco', file)
+        body.append('schema', props.schema)
         return { url: baseURL + 'api/upload/',
                  mode: 'same-origin',
                  headers: {'X-CSRFToken': Cookies.get('csrftoken')},

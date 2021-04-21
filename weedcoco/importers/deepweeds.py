@@ -208,7 +208,7 @@ agcontext = [
     {
         "id": 0,
         "agcontext_name": "deepweeds",
-        "crop_type": "weed_only",
+        "crop_type": "pasture",
         "bbch_growth_range": "na",
         "soil_colour": "variable",
         "surface_cover": "none",
@@ -224,6 +224,7 @@ agcontext = [
         "camera_angle": 90,
         "camera_fov": 28,
         "photography_description": "Mounted on tripod",
+        "ground_speed": 0,
         "lighting": "natural",
         "cropped_to_plant": False,
         "url": "https://github.com/AlexOlsen/DeepWeeds",

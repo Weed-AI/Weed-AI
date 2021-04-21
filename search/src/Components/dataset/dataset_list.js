@@ -10,6 +10,8 @@ import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
 import Link from '@material-ui/core/Link';
 import CircularProgress from '@material-ui/core/CircularProgress';
+import PhotoIcon from '@material-ui/icons/Photo';
+import IconButton from '@material-ui/core/IconButton';
 import axios from 'axios';
 
 
@@ -86,6 +88,7 @@ export default function DatasetList(props) {
               <TableCell className={classes.tableHeader}>Dataset Title</TableCell>
               {inReview ? <TableCell className={classes.tableHeader}>Contact</TableCell> : ""}
               <TableCell className={classes.tableHeader}>Upload Date</TableCell>
+              <TableCell className={classes.tableHeader}>Explore</TableCell>
               {inReview ? <TableCell className={classes.tableHeader}>Command</TableCell> : ""}
             </TableRow>
           </TableHead>
@@ -99,6 +102,7 @@ export default function DatasetList(props) {
                 </TableCell>
                 {inReview ? <TableCell><a href="mailto:{row.contributor_email}">{row.contributor_email}</a></TableCell> : ""}
                 <TableCell>{row.upload_date}</TableCell>
+                <TableCell><IconButton href={"/explore?dataset_name_filter=%5B%22" + row.name + "%22%5D"}><PhotoIcon /></IconButton></TableCell>
                 {inReview
                   ?<TableCell className={classes.commandCol}>
                     <button className={`${classes.command} ${classes.approval}`} onClick={() => handleApprove(row.upload_id)}>Approve</button>

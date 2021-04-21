@@ -4,15 +4,11 @@ import { withRouter } from 'react-router-dom';
 import agcontextSchema from '../../Schemas/AgContext.json'
 import Container from '@material-ui/core/Container';
 import Box from '@material-ui/core/Box';
-import {
-  materialCells,
-  materialRenderers,
-} from '@jsonforms/material-renderers';
+import renderers from '../formRenderers/default_renderers';
 import { createAjv } from '@jsonforms/core';
 import { JsonForms } from '@jsonforms/react';
-import { fixedItemsTester, FixedItemsRenderer } from '../formRenderers/FixedItemsRenderer';
-import { constTester, ConstRenderer } from '../formRenderers/ConstRenderer';
 import UploadJsonButton from './UploadJsonButton';
+import { materialCells } from '@jsonforms/material-renderers';
 
 const uischema = {
   "type": "Categorization",
@@ -87,6 +83,10 @@ const uischema = {
         },
         {
           "type": "Control",
+          "scope": "#/properties/ground_speed"
+        },
+        {
+          "type": "Control",
           "scope": "#/properties/lighting"
         },
         {
@@ -117,13 +117,6 @@ const uischema = {
     }
   ]
 };
-
-const renderers = [
-  ...materialRenderers,
-  { tester: constTester, renderer: ConstRenderer },
-  { tester: fixedItemsTester, renderer: FixedItemsRenderer },
-];
-
 
 class AgContextForm extends Component {
     constructor(props) {

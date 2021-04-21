@@ -40,7 +40,7 @@ function getStepContent(step, upload_type, upload_id, images, agcontextsFormData
     if (upload_type === 'coco') {
         switch (step) {
             case 0:
-              return <UploaderSingle upload_id={upload_id} images={images} handleUploadId={handleUploadId} handleImages={handleImages} handleErrorMessage={handleErrorMessage}/>;
+              return <UploaderSingle upload_id={upload_id} images={images} handleUploadId={handleUploadId} handleImages={handleImages} handleErrorMessage={handleErrorMessage} schema={'compatible-coco'}/>;
             case 1:
               return (
                 <React.Fragment>
@@ -69,7 +69,7 @@ function getStepContent(step, upload_type, upload_id, images, agcontextsFormData
     } else if (upload_type === 'weedcoco') {
         switch (step) {
             case 0:
-              return <UploaderSingle upload_id={upload_id} images={images} handleUploadId={handleUploadId} handleImages={handleImages} handleErrorMessage={handleErrorMessage}/>;
+              return <UploaderSingle upload_id={upload_id} images={images} handleUploadId={handleUploadId} handleImages={handleImages} handleErrorMessage={handleErrorMessage} schema={'weedcoco'}/>;
             case 1:
               return <UploaderImages upload_id={upload_id} images={images}/>;
             default:

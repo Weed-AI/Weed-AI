@@ -56,7 +56,12 @@ def upload(request):
         images = []
         file_weedcoco = request.FILES["weedcoco"]
         weedcoco_json = json.load(file_weedcoco)
-        validate(weedcoco_json, schema="compatible-coco")
+        validate(
+            weedcoco_json,
+            schema=request.POST["schema"]
+            if request.POST["schema"]
+            else "compatible-coco",
+        )
         for image_reference in weedcoco_json["images"]:
             images.append(image_reference["file_name"].split("/")[-1])
         upload_dir, upload_id = setup_upload_dir(os.path.join(UPLOAD_DIR, str(user.id)))
@@ -161,11 +166,10 @@ def upload_status(request):
     )
 
 
-def upload_info(request):
-    if not request.method == "POST":
+def upload_info(request, dataset_id):
+    if request.method != "GET":
         return HttpResponseNotAllowed(request.method)
-    upload_id = request.POST["upload_id"]
-    upload_entity = Dataset.objects.get(upload_id=upload_id)
+    upload_entity = Dataset.objects.get(upload_id=dataset_id)
     return HttpResponse(
         json.dumps(
             {"metadata": upload_entity.metadata, "agcontexts": upload_entity.agcontext}

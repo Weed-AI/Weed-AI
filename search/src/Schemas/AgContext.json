@@ -17,6 +17,7 @@
     "camera_height",
     "camera_angle",
     "camera_fov",
+    "ground_speed",
     "photography_description",
     "lighting",
     "cropped_to_plant"
@@ -27,37 +28,56 @@
       "description": "A number identifying the AgContext."
     },
     "crop_type": {
-      "type": "string",
-      "enum": [
-        "wheat",
-        "barley",
-        "oats",
-        "triticale",
-        "sorghum",
-        "rice",
-        "lupins",
-        "chickpeas",
-        "lentils",
-        "field_peas",
-        "faba_beans",
-        "mung_beans",
-        "canola",
-        "mustard",
-        "flax",
-        "linseed",
-        "safflower",
-        "cotton",
-        "carrots",
-        "weed_only",
-        "other"
-      ],
-      "description": "Crop type.\nOne of several strings describing the crop grown in the image."
+      "title": "Crop Type",
+      "description": "The crop grown in the images.",
+      "oneOf": [
+        {
+          "type": "string",
+          "title": "Grain Crop",
+          "enum": [
+            "wheat",
+            "barley",
+            "oats",
+            "triticale",
+            "sorghum",
+            "rice",
+            "lupins",
+            "chickpeas",
+            "lentils",
+            "field_peas",
+            "faba_beans",
+            "mung_beans",
+            "canola",
+            "mustard",
+            "flax",
+            "linseed",
+            "safflower",
+            "cotton"
+          ]
+        },
+        {
+          "type": "string",
+          "title": "Other Crop",
+          "pattern": "[A-Za-z][^ ]* [A-Za-z].*",
+          "description": "Specify the crop's scientific name."
+        },
+        {
+          "type": "string",
+          "title": "Not in Crop",
+          "enum": [
+            "pasture",
+            "fallow"
+          ],
+          "description": "Non-crop agricultural land or crop land in fallow."
+        }
+      ]
     },
     "bbch_growth_range": {
+      "title": "BBCH Growth Stage Range",
       "oneOf": [
         {
           "type": "object",
-          "title": "BBCH Range",
+          "title": "Specify Range",
           "required": [
             "min",
             "max"
@@ -68,13 +88,15 @@
               "type": "integer",
               "minimum": 0,
               "maximum": 99,
-              "description": "Minimum BBCH growth stage (00-99) in the dataset"
+              "description": "Minimum BBCH growth stage (00-99) in the dataset.",
+              "title": "Minimum Growth Stage"
             },
             "max": {
               "type": "integer",
               "minimum": 0,
               "maximum": 99,
-              "description": "Maximum BBCH growth stage (00-99) in the dataset"
+              "description": "Maximum BBCH growth stage (00-99) in the dataset",
+              "title": "Maximum Growth Stage"
             }
           }
         },
@@ -84,7 +106,7 @@
           "const": "na"
         }
       ],
-      "description": "BBCH Growth Stage range\nA pair of BBCH Growth Stage codes (00-99) representing the minimum and maximum crop growth stage in the images.\nIf this AgContext is not in a cropping environment, or is in fallow, use value \"na\"."
+      "description": "A pair of BBCH Growth Stage codes (00-99) representing the minimum and maximum crop growth stage in the images.\nIf this AgContext is not in a cropping environment, or is in fallow, use N/A (\"na\" in WeedCOCO)."
     },
     "soil_colour": {
       "type": "string",
@@ -168,10 +190,12 @@
       "description": "Angle of camera. A number representing the angle at which the camera is positioned, in degrees. A camera facing straight down would be 90. A camera facing forward would be 0."
     },
     "camera_fov": {
+      "title": "Camera Field of View",
+      "description": "Field of view for camera.\nA number representing the angle captured by the camera across the diagonal of an image, measured in degrees.\nIf this is not fixed within the AgContext (for example, because images have been cropped), use value \"variable\".",
       "oneOf": [
         {
           "type": "number",
-          "title": "Specific",
+          "title": "Specific FOV",
           "minimum": 1,
           "maximum": 180
         },
@@ -180,8 +204,13 @@
           "title": "Variable within AgContext",
           "const": "variable"
         }
-      ],
-      "description": "Field of view for camera.\nA number representing the angle captured by the camera across the diagonal of an image, measured in degrees.\nIf this is not fixed within the AgContext, use value \"variable\"."
+      ]
+    },
+    "ground_speed": {
+      "type": "number",
+      "title": "Ground Speed (m/s)",
+      "minimum": 0,
+      "description": "The usual speed (in metres per second) of the moving camera relative to ground when taking the images. Use \"0\" for stationary."
     },
     "photography_description": {
       "type": "string",
