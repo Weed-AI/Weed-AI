@@ -44,8 +44,7 @@ If you found Weed-AI useful in your research or project, please cite the databas
 
 _Weed-AI: A repository of Weed Images in Crops._ Precision Weed Control Group and Sydney Informatics Hub, the University of Sydney. https://weed-ai.sydney.edu.au/, accessed YYYY-MM-DD.
 
-
-An academic is TBA by mid 2021
+An academic  citation is TBA. 
 
 ## Specific Datasets
 
