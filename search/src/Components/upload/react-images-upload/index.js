@@ -212,7 +212,7 @@ class ReactImageUploadComponent extends React.Component {
       return (
         <div key={index} className="uploadPictureContainer">
           <div className="deleteImage" onClick={() => this.removeImage(picture)}>X</div>
-          <div style={{display: 'flex', flexDirection: 'column'}}>
+          <div style={{display: 'flex', flexDirection: 'column', width: '100%', overflowWrap: 'anywhere'}}>
             <img src={picture} className="uploadPicture" alt="preview"/>
             <p>{this.state.files[index].name}</p>
           </div>
