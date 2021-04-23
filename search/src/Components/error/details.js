@@ -1,5 +1,6 @@
 import React from 'react';
 import {jsonSchemaTransform} from './utils';
+import ReactMarkdown from "react-markdown";
 
 
 const JsonSchemaDetails = (props) => {
@@ -9,9 +10,13 @@ const JsonSchemaDetails = (props) => {
         return (
             <div>
                 <p>{tfError[path].instances.length} {tfError[path].instances.length > 1 ? "errors": "error"} in the {path}</p>
-                {tfError[path].instances.map((error) => <p>{error.message} @ {error.path}</p>)}
-                <p>Description:</p>
-                <p>{tfError[path].description}</p>
+                <ol>
+                    {tfError[path].instances.map(error =>
+                        <li key={error.path}>In {error.path}: {error.message}</li>
+                    )}
+                </ol>
+                {tfError[path].description ? <p>Description of this field:</p> : ""}
+                <ReactMarkdown source={tfError[path].description} />
                 <br/>
             </div>
         )
