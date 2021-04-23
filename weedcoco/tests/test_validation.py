@@ -33,6 +33,12 @@ def _set_category_name(coco, name):
     return coco
 
 
+def _remove_schema_from_error(error):
+    for error_detail in error["error_details"]:
+        error_detail.pop("schema", None)
+    return error
+
+
 @pytest.mark.parametrize(
     "func,bad_weedcoco,expected",
     zip(
@@ -48,7 +54,7 @@ def _set_category_name(coco, name):
 def test_missing_required_at_root(func, bad_weedcoco, expected):
     with pytest.raises(JsonValidationError, match="is a required property") as e:
         func(bad_weedcoco)
-    assert e.value.get_error_details() == expected
+    assert _remove_schema_from_error(e.value.get_error_details()) == expected
 
 
 @pytest.mark.parametrize(
@@ -76,7 +82,7 @@ def test_bad_category_name(func, bad_name, expected):
     weedcoco = _set_category_name(weedcoco, bad_name)
     with pytest.raises(JsonValidationError, match="does not match") as e:
         func(weedcoco)
-    assert e.value.get_error_details() == expected
+    assert _remove_schema_from_error(e.value.get_error_details()) == expected
 
 
 def _make_duplicate_id(weedcoco, key, idx, insert_at=-1):

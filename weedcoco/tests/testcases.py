@@ -137,11 +137,6 @@ test_bad_category_name_expected = [
                 "path": ["categories", 0, "name"],
                 "value": "foobar",
                 "message": "'foobar' does not match '^((crop|weed): ([a-z][a-z ]+|UNSPECIFIED)|crop|weed|none)$'",
-                "schema": {
-                    "type": "string",
-                    "pattern": "^((crop|weed): ([a-z][a-z ]+|UNSPECIFIED)|crop|weed|none)$",
-                    "description": 'A category for an annotation, consisting of an agricultural role and\noptionally a biological name, separated by ": ". Currently allowed\nagricultural roles are "weed" and "crop".  The "none" category may be\nused to indicate that no weed or crop is identified in the image.\n\nAnnotations should be labelled with the most specific category possible,\nusually "weed: <species name>", but super categories may be more general.\nBiological names should be lowercase.\nFor an unspecified species of weed, "weed: UNSPECIFIED" may be used.\n\nFor example, to label an oat crop in an image, the category name would be\n"crop: avena sativa". Its super categories may include "crop: grasses"\nand "crop". Oats as a volunteer crop would be "weed: avena sativa".',
-                },
             }
         ],
     },
@@ -153,11 +148,6 @@ test_bad_category_name_expected = [
                 "path": ["categories", 0, "name"],
                 "value": "weed: 1",
                 "message": "'weed: 1' does not match '^((crop|weed): ([a-z][a-z ]+|UNSPECIFIED)|crop|weed|none)$'",
-                "schema": {
-                    "type": "string",
-                    "pattern": "^((crop|weed): ([a-z][a-z ]+|UNSPECIFIED)|crop|weed|none)$",
-                    "description": 'A category for an annotation, consisting of an agricultural role and\noptionally a biological name, separated by ": ". Currently allowed\nagricultural roles are "weed" and "crop".  The "none" category may be\nused to indicate that no weed or crop is identified in the image.\n\nAnnotations should be labelled with the most specific category possible,\nusually "weed: <species name>", but super categories may be more general.\nBiological names should be lowercase.\nFor an unspecified species of weed, "weed: UNSPECIFIED" may be used.\n\nFor example, to label an oat crop in an image, the category name would be\n"crop: avena sativa". Its super categories may include "crop: grasses"\nand "crop". Oats as a volunteer crop would be "weed: avena sativa".',
-                },
             }
         ],
     },
@@ -172,311 +162,26 @@ test_missing_required_at_root_expected = [
                 "path": [],
                 "value": {},
                 "message": "'agcontexts' is a required property",
-                "schema": {
-                    "$schema": "http://json-schema.org/draft-07/schema#",
-                    "$id": "https://weedid.sydney.edu.au/schema/main.json",
-                    "description": "Weed-COCO\nAn extension of MS COCO for Weed Identification in grain crops.\nMay also be applicable to related agricultural purposes.\n",
-                    "type": "object",
-                    "required": [
-                        "agcontexts",
-                        "annotations",
-                        "categories",
-                        "info",
-                        "images",
-                    ],
-                    "properties": {
-                        "images": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "https://weedid.sydney.edu.au/schema/Image.json#/"
-                            },
-                        },
-                        "annotations": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "https://weedid.sydney.edu.au/schema/Annotation.json#/"
-                            },
-                        },
-                        "categories": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "https://weedid.sydney.edu.au/schema/Category.json#/"
-                            },
-                        },
-                        "agcontexts": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "https://weedid.sydney.edu.au/schema/AgContext.json#/"
-                            },
-                        },
-                        "info": {
-                            "type": "object",
-                            "required": ["description", "metadata"],
-                            "properties": {
-                                "description": {"type": "string"},
-                                "contributor": {"type": "string"},
-                                "url": {"type": "string"},
-                                "version": {"type": "string"},
-                                "date_created": {
-                                    "type": "string",
-                                    "format": "date-time",
-                                },
-                                "year": {"url": "string"},
-                                "metadata": {
-                                    "$ref": "https://weedid.sydney.edu.au/schema/Metadata.json#/"
-                                },
-                            },
-                        },
-                    },
-                },
             },
             {
                 "path": [],
                 "value": {},
                 "message": "'annotations' is a required property",
-                "schema": {
-                    "$schema": "http://json-schema.org/draft-07/schema#",
-                    "$id": "https://weedid.sydney.edu.au/schema/main.json",
-                    "description": "Weed-COCO\nAn extension of MS COCO for Weed Identification in grain crops.\nMay also be applicable to related agricultural purposes.\n",
-                    "type": "object",
-                    "required": [
-                        "agcontexts",
-                        "annotations",
-                        "categories",
-                        "info",
-                        "images",
-                    ],
-                    "properties": {
-                        "images": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "https://weedid.sydney.edu.au/schema/Image.json#/"
-                            },
-                        },
-                        "annotations": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "https://weedid.sydney.edu.au/schema/Annotation.json#/"
-                            },
-                        },
-                        "categories": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "https://weedid.sydney.edu.au/schema/Category.json#/"
-                            },
-                        },
-                        "agcontexts": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "https://weedid.sydney.edu.au/schema/AgContext.json#/"
-                            },
-                        },
-                        "info": {
-                            "type": "object",
-                            "required": ["description", "metadata"],
-                            "properties": {
-                                "description": {"type": "string"},
-                                "contributor": {"type": "string"},
-                                "url": {"type": "string"},
-                                "version": {"type": "string"},
-                                "date_created": {
-                                    "type": "string",
-                                    "format": "date-time",
-                                },
-                                "year": {"url": "string"},
-                                "metadata": {
-                                    "$ref": "https://weedid.sydney.edu.au/schema/Metadata.json#/"
-                                },
-                            },
-                        },
-                    },
-                },
             },
             {
                 "path": [],
                 "value": {},
                 "message": "'categories' is a required property",
-                "schema": {
-                    "$schema": "http://json-schema.org/draft-07/schema#",
-                    "$id": "https://weedid.sydney.edu.au/schema/main.json",
-                    "description": "Weed-COCO\nAn extension of MS COCO for Weed Identification in grain crops.\nMay also be applicable to related agricultural purposes.\n",
-                    "type": "object",
-                    "required": [
-                        "agcontexts",
-                        "annotations",
-                        "categories",
-                        "info",
-                        "images",
-                    ],
-                    "properties": {
-                        "images": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "https://weedid.sydney.edu.au/schema/Image.json#/"
-                            },
-                        },
-                        "annotations": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "https://weedid.sydney.edu.au/schema/Annotation.json#/"
-                            },
-                        },
-                        "categories": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "https://weedid.sydney.edu.au/schema/Category.json#/"
-                            },
-                        },
-                        "agcontexts": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "https://weedid.sydney.edu.au/schema/AgContext.json#/"
-                            },
-                        },
-                        "info": {
-                            "type": "object",
-                            "required": ["description", "metadata"],
-                            "properties": {
-                                "description": {"type": "string"},
-                                "contributor": {"type": "string"},
-                                "url": {"type": "string"},
-                                "version": {"type": "string"},
-                                "date_created": {
-                                    "type": "string",
-                                    "format": "date-time",
-                                },
-                                "year": {"url": "string"},
-                                "metadata": {
-                                    "$ref": "https://weedid.sydney.edu.au/schema/Metadata.json#/"
-                                },
-                            },
-                        },
-                    },
-                },
             },
             {
                 "path": [],
                 "value": {},
                 "message": "'info' is a required property",
-                "schema": {
-                    "$schema": "http://json-schema.org/draft-07/schema#",
-                    "$id": "https://weedid.sydney.edu.au/schema/main.json",
-                    "description": "Weed-COCO\nAn extension of MS COCO for Weed Identification in grain crops.\nMay also be applicable to related agricultural purposes.\n",
-                    "type": "object",
-                    "required": [
-                        "agcontexts",
-                        "annotations",
-                        "categories",
-                        "info",
-                        "images",
-                    ],
-                    "properties": {
-                        "images": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "https://weedid.sydney.edu.au/schema/Image.json#/"
-                            },
-                        },
-                        "annotations": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "https://weedid.sydney.edu.au/schema/Annotation.json#/"
-                            },
-                        },
-                        "categories": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "https://weedid.sydney.edu.au/schema/Category.json#/"
-                            },
-                        },
-                        "agcontexts": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "https://weedid.sydney.edu.au/schema/AgContext.json#/"
-                            },
-                        },
-                        "info": {
-                            "type": "object",
-                            "required": ["description", "metadata"],
-                            "properties": {
-                                "description": {"type": "string"},
-                                "contributor": {"type": "string"},
-                                "url": {"type": "string"},
-                                "version": {"type": "string"},
-                                "date_created": {
-                                    "type": "string",
-                                    "format": "date-time",
-                                },
-                                "year": {"url": "string"},
-                                "metadata": {
-                                    "$ref": "https://weedid.sydney.edu.au/schema/Metadata.json#/"
-                                },
-                            },
-                        },
-                    },
-                },
             },
             {
                 "path": [],
                 "value": {},
                 "message": "'images' is a required property",
-                "schema": {
-                    "$schema": "http://json-schema.org/draft-07/schema#",
-                    "$id": "https://weedid.sydney.edu.au/schema/main.json",
-                    "description": "Weed-COCO\nAn extension of MS COCO for Weed Identification in grain crops.\nMay also be applicable to related agricultural purposes.\n",
-                    "type": "object",
-                    "required": [
-                        "agcontexts",
-                        "annotations",
-                        "categories",
-                        "info",
-                        "images",
-                    ],
-                    "properties": {
-                        "images": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "https://weedid.sydney.edu.au/schema/Image.json#/"
-                            },
-                        },
-                        "annotations": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "https://weedid.sydney.edu.au/schema/Annotation.json#/"
-                            },
-                        },
-                        "categories": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "https://weedid.sydney.edu.au/schema/Category.json#/"
-                            },
-                        },
-                        "agcontexts": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "https://weedid.sydney.edu.au/schema/AgContext.json#/"
-                            },
-                        },
-                        "info": {
-                            "type": "object",
-                            "required": ["description", "metadata"],
-                            "properties": {
-                                "description": {"type": "string"},
-                                "contributor": {"type": "string"},
-                                "url": {"type": "string"},
-                                "version": {"type": "string"},
-                                "date_created": {
-                                    "type": "string",
-                                    "format": "date-time",
-                                },
-                                "year": {"url": "string"},
-                                "metadata": {
-                                    "$ref": "https://weedid.sydney.edu.au/schema/Metadata.json#/"
-                                },
-                            },
-                        },
-                    },
-                },
             },
         ],
     },
@@ -488,187 +193,16 @@ test_missing_required_at_root_expected = [
                 "path": [],
                 "value": {"images": [], "annotations": []},
                 "message": "'agcontexts' is a required property",
-                "schema": {
-                    "$schema": "http://json-schema.org/draft-07/schema#",
-                    "$id": "https://weedid.sydney.edu.au/schema/main.json",
-                    "description": "Weed-COCO\nAn extension of MS COCO for Weed Identification in grain crops.\nMay also be applicable to related agricultural purposes.\n",
-                    "type": "object",
-                    "required": [
-                        "agcontexts",
-                        "annotations",
-                        "categories",
-                        "info",
-                        "images",
-                    ],
-                    "properties": {
-                        "images": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "https://weedid.sydney.edu.au/schema/Image.json#/"
-                            },
-                        },
-                        "annotations": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "https://weedid.sydney.edu.au/schema/Annotation.json#/"
-                            },
-                        },
-                        "categories": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "https://weedid.sydney.edu.au/schema/Category.json#/"
-                            },
-                        },
-                        "agcontexts": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "https://weedid.sydney.edu.au/schema/AgContext.json#/"
-                            },
-                        },
-                        "info": {
-                            "type": "object",
-                            "required": ["description", "metadata"],
-                            "properties": {
-                                "description": {"type": "string"},
-                                "contributor": {"type": "string"},
-                                "url": {"type": "string"},
-                                "version": {"type": "string"},
-                                "date_created": {
-                                    "type": "string",
-                                    "format": "date-time",
-                                },
-                                "year": {"url": "string"},
-                                "metadata": {
-                                    "$ref": "https://weedid.sydney.edu.au/schema/Metadata.json#/"
-                                },
-                            },
-                        },
-                    },
-                },
             },
             {
                 "path": [],
                 "value": {"images": [], "annotations": []},
                 "message": "'categories' is a required property",
-                "schema": {
-                    "$schema": "http://json-schema.org/draft-07/schema#",
-                    "$id": "https://weedid.sydney.edu.au/schema/main.json",
-                    "description": "Weed-COCO\nAn extension of MS COCO for Weed Identification in grain crops.\nMay also be applicable to related agricultural purposes.\n",
-                    "type": "object",
-                    "required": [
-                        "agcontexts",
-                        "annotations",
-                        "categories",
-                        "info",
-                        "images",
-                    ],
-                    "properties": {
-                        "images": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "https://weedid.sydney.edu.au/schema/Image.json#/"
-                            },
-                        },
-                        "annotations": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "https://weedid.sydney.edu.au/schema/Annotation.json#/"
-                            },
-                        },
-                        "categories": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "https://weedid.sydney.edu.au/schema/Category.json#/"
-                            },
-                        },
-                        "agcontexts": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "https://weedid.sydney.edu.au/schema/AgContext.json#/"
-                            },
-                        },
-                        "info": {
-                            "type": "object",
-                            "required": ["description", "metadata"],
-                            "properties": {
-                                "description": {"type": "string"},
-                                "contributor": {"type": "string"},
-                                "url": {"type": "string"},
-                                "version": {"type": "string"},
-                                "date_created": {
-                                    "type": "string",
-                                    "format": "date-time",
-                                },
-                                "year": {"url": "string"},
-                                "metadata": {
-                                    "$ref": "https://weedid.sydney.edu.au/schema/Metadata.json#/"
-                                },
-                            },
-                        },
-                    },
-                },
             },
             {
                 "path": [],
                 "value": {"images": [], "annotations": []},
                 "message": "'info' is a required property",
-                "schema": {
-                    "$schema": "http://json-schema.org/draft-07/schema#",
-                    "$id": "https://weedid.sydney.edu.au/schema/main.json",
-                    "description": "Weed-COCO\nAn extension of MS COCO for Weed Identification in grain crops.\nMay also be applicable to related agricultural purposes.\n",
-                    "type": "object",
-                    "required": [
-                        "agcontexts",
-                        "annotations",
-                        "categories",
-                        "info",
-                        "images",
-                    ],
-                    "properties": {
-                        "images": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "https://weedid.sydney.edu.au/schema/Image.json#/"
-                            },
-                        },
-                        "annotations": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "https://weedid.sydney.edu.au/schema/Annotation.json#/"
-                            },
-                        },
-                        "categories": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "https://weedid.sydney.edu.au/schema/Category.json#/"
-                            },
-                        },
-                        "agcontexts": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "https://weedid.sydney.edu.au/schema/AgContext.json#/"
-                            },
-                        },
-                        "info": {
-                            "type": "object",
-                            "required": ["description", "metadata"],
-                            "properties": {
-                                "description": {"type": "string"},
-                                "contributor": {"type": "string"},
-                                "url": {"type": "string"},
-                                "version": {"type": "string"},
-                                "date_created": {
-                                    "type": "string",
-                                    "format": "date-time",
-                                },
-                                "year": {"url": "string"},
-                                "metadata": {
-                                    "$ref": "https://weedid.sydney.edu.au/schema/Metadata.json#/"
-                                },
-                            },
-                        },
-                    },
-                },
             },
         ],
     },
@@ -680,125 +214,11 @@ test_missing_required_at_root_expected = [
                 "path": [],
                 "value": {"images": [], "annotations": [], "categories": []},
                 "message": "'agcontexts' is a required property",
-                "schema": {
-                    "$schema": "http://json-schema.org/draft-07/schema#",
-                    "$id": "https://weedid.sydney.edu.au/schema/main.json",
-                    "description": "Weed-COCO\nAn extension of MS COCO for Weed Identification in grain crops.\nMay also be applicable to related agricultural purposes.\n",
-                    "type": "object",
-                    "required": [
-                        "agcontexts",
-                        "annotations",
-                        "categories",
-                        "info",
-                        "images",
-                    ],
-                    "properties": {
-                        "images": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "https://weedid.sydney.edu.au/schema/Image.json#/"
-                            },
-                        },
-                        "annotations": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "https://weedid.sydney.edu.au/schema/Annotation.json#/"
-                            },
-                        },
-                        "categories": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "https://weedid.sydney.edu.au/schema/Category.json#/"
-                            },
-                        },
-                        "agcontexts": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "https://weedid.sydney.edu.au/schema/AgContext.json#/"
-                            },
-                        },
-                        "info": {
-                            "type": "object",
-                            "required": ["description", "metadata"],
-                            "properties": {
-                                "description": {"type": "string"},
-                                "contributor": {"type": "string"},
-                                "url": {"type": "string"},
-                                "version": {"type": "string"},
-                                "date_created": {
-                                    "type": "string",
-                                    "format": "date-time",
-                                },
-                                "year": {"url": "string"},
-                                "metadata": {
-                                    "$ref": "https://weedid.sydney.edu.au/schema/Metadata.json#/"
-                                },
-                            },
-                        },
-                    },
-                },
             },
             {
                 "path": [],
                 "value": {"images": [], "annotations": [], "categories": []},
                 "message": "'info' is a required property",
-                "schema": {
-                    "$schema": "http://json-schema.org/draft-07/schema#",
-                    "$id": "https://weedid.sydney.edu.au/schema/main.json",
-                    "description": "Weed-COCO\nAn extension of MS COCO for Weed Identification in grain crops.\nMay also be applicable to related agricultural purposes.\n",
-                    "type": "object",
-                    "required": [
-                        "agcontexts",
-                        "annotations",
-                        "categories",
-                        "info",
-                        "images",
-                    ],
-                    "properties": {
-                        "images": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "https://weedid.sydney.edu.au/schema/Image.json#/"
-                            },
-                        },
-                        "annotations": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "https://weedid.sydney.edu.au/schema/Annotation.json#/"
-                            },
-                        },
-                        "categories": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "https://weedid.sydney.edu.au/schema/Category.json#/"
-                            },
-                        },
-                        "agcontexts": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "https://weedid.sydney.edu.au/schema/AgContext.json#/"
-                            },
-                        },
-                        "info": {
-                            "type": "object",
-                            "required": ["description", "metadata"],
-                            "properties": {
-                                "description": {"type": "string"},
-                                "contributor": {"type": "string"},
-                                "url": {"type": "string"},
-                                "version": {"type": "string"},
-                                "date_created": {
-                                    "type": "string",
-                                    "format": "date-time",
-                                },
-                                "year": {"url": "string"},
-                                "metadata": {
-                                    "$ref": "https://weedid.sydney.edu.au/schema/Metadata.json#/"
-                                },
-                            },
-                        },
-                    },
-                },
             },
         ],
     },
