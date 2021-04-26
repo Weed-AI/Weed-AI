@@ -1,0 +1,11 @@
+name: Javascript tests
+on: push
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Install modules
+      run: cd search && yarn
+    - name: Run tests
+      run: cd search && yarn test
