@@ -24,15 +24,24 @@ const JsonSchemaDetails = (props) => {
     return tfDisplay
 }
 
+
+const MissingImageDetails = (props) => {
+    const {details} = props
+    const listOfMissingImages = details.missingImages.map((image) => <li>{image}</li>)
+    return <ul>{listOfMissingImages}</ul>
+}
+
+
 const ErrorDetails = (props) => {
     const {details} = props;
     return (
-            details.error_type === "jsonschema"
-            ?
+            details.error_type === "jsonschema"?
             <JsonSchemaDetails details={details}/>
             :
-            typeof details === typeof ""
-            ?
+            details.error_type === "image"?
+            <MissingImageDetails details={details}/>
+            :
+            typeof details === typeof ""?
             details
             :
             ""

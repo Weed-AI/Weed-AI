@@ -113,7 +113,7 @@ class ReactImageUploadComponent extends React.Component {
    */
   uploadFileToServer(dataURLs, files, newFileData) {
     const filesName = files.map(file => file.name);
-    if (filesName.includes(newFileData.file.name)){
+    if (!this.props.images.includes(newFileData.file.name) || filesName.includes(newFileData.file.name)){
         return
     }
     else {
@@ -131,11 +131,21 @@ class ReactImageUploadComponent extends React.Component {
                 files.push(newFileData.file);
                 this.setState({pictures: dataURLs, files: files});
                 const updatedFilesName = files.map(file => file.name);
-                if (this.props.images.length === updatedFilesName.length && new Set([...this.props.images].filter(image => !updatedFilesName.includes(image))).size === 0) {
-                    this.props.handleImageReady(true);
-                }
+                this.syncImageErrorMessage(updatedFilesName);
             }
         })
+    }
+  }
+
+  syncImageErrorMessage(updatedFilesName) {
+    const missingImagesAmount = this.props.images.length - updatedFilesName.length;
+    const missingImages = [...this.props.images].filter(image => !updatedFilesName.includes(image));
+    if (missingImagesAmount == 0 && new Set(missingImages).size === 0) {
+        this.props.handleImageReady(true);
+        this.props.handleErrorMessage("");
+    } else {
+        this.props.handleImageReady(false);
+        this.props.handleErrorMessage(`${missingImagesAmount} ${missingImagesAmount > 1 ? "images" : "image"} missing`, {error_type: "image", missingImages: missingImages});
     }
   }
 
@@ -174,7 +184,7 @@ class ReactImageUploadComponent extends React.Component {
     this.setState({pictures: filteredPictures, files: filteredFiles}, () => {
       this.props.onChange(this.state.files, this.state.pictures);
     });
-    this.props.handleImageReady(false);
+    this.syncImageErrorMessage(filteredFiles);
   }
 
   /*

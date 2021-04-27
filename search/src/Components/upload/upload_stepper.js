@@ -63,7 +63,7 @@ function getStepContent(step, upload_type, upload_id, images, agcontextsFormData
                 </React.Fragment>
               );
             case 3:
-              return <UploaderImages upload_id={upload_id} images={images} handleImageReady={handleImageReady}/>;
+              return <UploaderImages upload_id={upload_id} images={images} handleImageReady={handleImageReady} handleErrorMessage={handleErrorMessage}/>;
             default:
               return 'Unknown step';
         }
@@ -72,7 +72,7 @@ function getStepContent(step, upload_type, upload_id, images, agcontextsFormData
             case 0:
               return <UploaderSingle upload_id={upload_id} images={images} handleUploadId={handleUploadId} handleImages={handleImages} handleErrorMessage={handleErrorMessage} schema={'weedcoco'}/>;
             case 1:
-              return <UploaderImages upload_id={upload_id} images={images} handleImageReady={handleImageReady}/>;
+              return <UploaderImages upload_id={upload_id} images={images} handleImageReady={handleImageReady} handleErrorMessage={handleErrorMessage}/>;
             default:
               return 'Unknown step';
         }
@@ -85,7 +85,7 @@ function getStepContent(step, upload_type, upload_id, images, agcontextsFormData
             case 2:
               return <MetadataForm formData={metadataFormData} onChange={e => handleMetadataFormData(e.formData)} />;
             case 3:
-              return <UploaderImages upload_id={upload_id} images={images} handleImageReady={handleImageReady}/>;
+              return <UploaderImages upload_id={upload_id} images={images} handleImageReady={handleImageReady} handleErrorMessage={handleErrorMessage}/>;
             default:
               return 'Unknown step';
         }
