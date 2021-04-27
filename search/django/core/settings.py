@@ -17,7 +17,7 @@ DOWNLOAD_DIR = os.path.join(BASE_DIR, "download")
 SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY", "")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.environ.get("ENV", "DEV") == "PROD"
+DEBUG = os.environ.get("ENV", "PROD") == "DEV"
 
 ALLOWED_HOSTS = ["*"]
 CORS_ORIGIN_ALLOW_ALL = True
