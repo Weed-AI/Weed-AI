@@ -238,9 +238,9 @@ def user_register(request):
     username = request.POST["username"]
     email = request.POST["email"]
     password = request.POST["password"]
-    if len(WeedidUser.objects.filter(username=username)) > 0:
+    if WeedidUser.objects.filter(username=username).count():
         return HttpResponseBadRequest("Username already exists")
-    if len(WeedidUser.objects.filter(email=email)) > 0:
+    if WeedidUser.objects.filter(email=email).count():
         return HttpResponseBadRequest("Email already exists")
     if not validate_email_format(email):
         return HttpResponseBadRequest("Invalid email format")
@@ -257,7 +257,7 @@ def user_login(request):
         return HttpResponseNotAllowed(request.method)
     username = request.POST["username"]
     password = request.POST["password"]
-    if len(WeedidUser.objects.filter(username=username)) == 0:
+    if not WeedidUser.objects.filter(username=username).count():
         return HttpResponseBadRequest("Username doesn't exist")
     user = WeedidUser.objects.get(username=username)
     if user is not None and not (
