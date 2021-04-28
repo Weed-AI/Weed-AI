@@ -54,7 +54,7 @@ export default function ErrorDialog(props) {
   };
 
   return (
-    <div>
+    <React.Fragment>
       <Button style={{marginLeft: '1em'}} variant="outlined" color="primary" onClick={handleClickOpen}>
         details
       </Button>
@@ -68,6 +68,6 @@ export default function ErrorDialog(props) {
           </Typography>
         </DialogContent>
       </Dialog>
-    </div>
+    </React.Fragment>
   );
 }
