@@ -29,7 +29,10 @@ const JsonSchemaDetails = (props) => {
             <div className={classes.root}>
                 <Accordion>
                     <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                        <Typography className={classes.heading}>{tfError[path].instances.length} {tfError[path].instances.length > 1 ? "errors": "error"} in the {path}
+                        <Typography className={classes.heading}>
+                            {tfError[path].instances.length}
+                            <span> </span>
+                            {tfError[path].instances.length > 1 ? "errors": "error"} in the {path}
                         </Typography>
                     </AccordionSummary>
                     <AccordionDetails style={{display: 'block'}}>
