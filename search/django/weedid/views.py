@@ -17,10 +17,14 @@ from weedid.utils import (
     add_metadata,
 )
 from weedid.models import Dataset, WeedidUser
-from weedcoco.validation import validate
+from weedcoco.validation import validate, JsonValidationError
 from django.contrib.auth import login, logout
 from django.contrib.auth.hashers import check_password
-from django.http import HttpResponseForbidden, HttpResponseNotAllowed
+from django.http import (
+    HttpResponseForbidden,
+    HttpResponseNotAllowed,
+    HttpResponseBadRequest,
+)
 from django.views.decorators.csrf import ensure_csrf_cookie
 
 
@@ -33,9 +37,9 @@ def elasticsearch_query(request):
     try:
         elasticsearch_url = "/".join(request.path.split("/")[2:])
     except Exception:
-        return HttpResponseForbidden("Invalid query format")
+        return HttpResponseBadRequest("Invalid query format")
     if not elasticsearch_url.startswith("weedid/_msearch"):
-        return HttpResponseForbidden("Only _msearch queries are currently forwarded")
+        return HttpResponseBadRequest("Only _msearch queries are currently forwarded")
     if request.method not in ["POST", "GET"]:
         return HttpResponseNotAllowed(request.method)
     elasticsearch_response = requests.post(
@@ -67,9 +71,12 @@ def upload(request):
         upload_dir, upload_id = setup_upload_dir(os.path.join(UPLOAD_DIR, str(user.id)))
         weedcoco_path = store_tmp_weedcoco(file_weedcoco, upload_dir)
         create_upload_entity(weedcoco_path, upload_id, user.id)
+    except JsonValidationError as e:
+        traceback.print_exc()
+        return HttpResponseBadRequest(json.dumps(e.get_error_details()))
     except Exception as e:
         traceback.print_exc()
-        return HttpResponseForbidden(str(e))
+        return HttpResponseBadRequest(str(e))
     else:
         return HttpResponse(json.dumps({"upload_id": upload_id, "images": images}))
 
@@ -83,7 +90,7 @@ def upload_image(request):
     upload_id = request.POST["upload_id"]
     upload_image = request.FILES["upload_image"]
     if upload_image.size > MAX_IMAGE_SIZE:
-        return HttpResponseForbidden("This image has exceeded the size limit!")
+        return HttpResponseBadRequest("This image has exceeded the size limit!")
     upload_dir = os.path.join(UPLOAD_DIR, str(user.id), upload_id, "images")
     store_tmp_image(upload_image, upload_dir)
     return HttpResponse(f"Uploaded {upload_image.name} to {upload_dir}")
