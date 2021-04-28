@@ -37,7 +37,7 @@ class RegisterComponent extends React.Component {
     constructor() {
         super();
         this.state = {
-            error: ""
+            error: null
         }
         this.handleSubmit = this.handleSubmit.bind(this);
     }
@@ -74,7 +74,7 @@ class RegisterComponent extends React.Component {
                 <Typography component="h1" variant="h5">
                 Sign up
                 </Typography>
-                <form className={classes.form} noValidate onSubmit={this.handleSubmit} id="register-form"  onChange={() => {this.setState({error: ""})}}>
+                <form className={classes.form} noValidate onSubmit={this.handleSubmit} id="register-form"  onChange={() => {this.setState({error: null})}}>
                 <Grid container spacing={2} className={classes.field}>
                     <Grid item xs={12} sm={12}>
                     <TextField

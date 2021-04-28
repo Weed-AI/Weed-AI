@@ -36,7 +36,7 @@ class LoginComponent extends React.Component {
     constructor() {
         super();
         this.state = {
-            error: ""
+            error: null
         }
         this.handleSubmit = this.handleSubmit.bind(this);
     }
@@ -74,7 +74,7 @@ class LoginComponent extends React.Component {
                     <Typography component="h1" variant="h5">
                         Sign in
                     </Typography>
-                    <form className={classes.form} noValidate onSubmit={this.handleSubmit} onChange={() => {this.setState({error: ""})}}>
+                    <form className={classes.form} noValidate onSubmit={this.handleSubmit} onChange={() => {this.setState({error: null})}}>
                         <TextField
                             variant="outlined"
                             margin="normal"
