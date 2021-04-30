@@ -29,17 +29,17 @@ const useStyles = (theme) => ({
   },
 });
 
-function getSteps(upload_type) {
-  return upload_type === 'coco'?
-         ['Upload Coco', 'Add Agcontext', 'Add Metadata', 'Upload Images']:
-         upload_type === 'weedcoco'?
-         ['Upload Weedcoco', 'Upload Images']:
-         ['Upload Coco', 'Add Agcontext', 'Add Metadata', 'Upload Images']
-}
-
 const stepsByType = {
-    "coco": ["coco-upload", "agcontext", "metadata", "images"],
-    "weedcoco": ["weedcoco-upload", "images"],
+    "coco": [
+        {title: "Upload Coco", type: "coco-upload"},
+        {title: "Add Agcontext", type: "agcontext"},
+        {title: "Add Metadata", type: "metadata"},
+        {title: "Upload Images", type: "images"}
+    ],
+    "weedcoco": [
+        {title: "Upload Weedcoco", type: "weedcoco-upload"},
+        {title: "Upload Images", type: "images"}
+    ]
 }
 
 class UploadStepper extends React.Component {
@@ -50,7 +50,7 @@ class UploadStepper extends React.Component {
             activeStep: 0,
             skip_mapping: {'weedcoco': -1, 'coco': -1},
             skipped: new Set(),
-            steps: getSteps(this.props.upload_type),
+            steps: stepsByType[this.props.upload_type].map(step => step.title),
             upload_id: 0,
             images: [],
             imageReady: false,
@@ -225,7 +225,7 @@ class UploadStepper extends React.Component {
     }
 
     getStepContent() {
-        const step = stepsByType[this.props.upload_type][this.state.activeStep]
+        const step = stepsByType[this.props.upload_type][this.state.activeStep].type
         switch (step) {
             case "coco-upload":
             case "weedcoco-upload":
