@@ -19,8 +19,8 @@ WORKDIR /rendertron
 
 RUN npm install && npm run build
 
-# If you aren't using a custom config.json file you must remove the following line
-ADD config.json .
+ARG CONFIGFILE=config.json
+COPY $CONFIGFILE ./config.json
 
 EXPOSE 3000
 
