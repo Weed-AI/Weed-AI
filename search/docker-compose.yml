@@ -169,6 +169,13 @@ services:
     stdin_open: true
     restart: always
 
+  rendertron:
+    image: rendertron
+    build:
+      context: ./nginx/rendertron
+    networks:
+      - elastic
+
 networks:
   elastic:
     driver: bridge
