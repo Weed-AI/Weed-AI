@@ -2,6 +2,7 @@ import os
 from shutil import rmtree
 import json
 from uuid import uuid4
+import re
 from weedcoco.repo.deposit import mkdir_safely
 from weedcoco.utils import set_info, set_licenses
 from weedcoco.stats import WeedCOCOStats
@@ -29,6 +30,34 @@ def setup_upload_dir(upload_userid_dir):
     upload_dir = upload_userid_dir + f"/{upload_id}"
     mkdir_safely(upload_dir)
     return upload_dir, upload_id
+
+
+def set_categories(weedcoco_path, categories):
+    with open(weedcoco_path, "r") as jsonFile:
+        data = json.load(jsonFile)
+    new_categories = []
+    for category in categories:
+        if category["scitific_name"]:
+            new_categories.append(
+                {
+                    "id": category["id"],
+                    "name": ": ".join(
+                        (category["category"], category["scitific_name"])
+                    ),
+                }
+            )
+        elif category["name"] != category["category"]:
+            new_categories.append(
+                {
+                    "id": category["id"],
+                    "name": ": ".join((category["category"], category["name"])),
+                }
+            )
+        else:
+            new_categories.append({"id": category["id"], "name": category["name"]})
+    data["categories"] = new_categories
+    with open(weedcoco_path, "w") as jsonFile:
+        json.dump(data, jsonFile)
 
 
 def add_agcontexts(weedcoco_path, ag_contexts):
@@ -118,3 +147,20 @@ def retrieve_listing_info(query_entity, awaiting_review):
         "contributor": query_entity.user.username,
         "contributor_email": query_entity.user.email if awaiting_review else "",
     }
+
+
+def retrieve_category_name(category):
+    if re.fullmatch(r"(crop|weed): ([a-z][a-z ]+|UNSPECIFIED)", category["name"]):
+        return {
+            "id": category["id"],
+            "category": category["name"].split(": ")[0],
+            "name": category["name"].split(": ")[1],
+            "scitific_name": "",
+        }
+    else:
+        return {
+            "id": category["id"],
+            "category": "",
+            "name": category["name"],
+            "scitific_name": "",
+        }
