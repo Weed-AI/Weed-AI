@@ -208,7 +208,7 @@ agcontext = [
     {
         "id": 0,
         "agcontext_name": "deepweeds",
-        "crop_type": "weed_only",
+        "crop_type": "pasture",
         "bbch_growth_range": "na",
         "soil_colour": "variable",
         "surface_cover": "none",
