@@ -13,6 +13,7 @@ definitions:
       - name
     properties:
       name:
+        title: Person's Name
         type: string
       givenName:
         type: string
@@ -38,6 +39,7 @@ definitions:
       - name
     properties:
       name:
+        title: Organization Name
         type: string
       sameAs:
         type: string
@@ -51,6 +53,7 @@ definitions:
 properties:
   name:
     type: string
+    title: Dataset Name
     description: A name for this dataset, or its publication title
   creator:
     type: array

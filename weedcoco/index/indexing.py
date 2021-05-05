@@ -18,7 +18,6 @@ class ElasticSearchIndexer:
         weedcoco_path (pathlib.PosixPath): weedcoco local path for indexing
         thumbnail_dir (pathlib.PosixPath): thumbnail folder local path to be integrated into the json file for indexing
         es_index_name (string): index name for ElasticSearch
-        es_type_name (string): type name for ElasticSearch
         batch_size (int): split json file for indexing into batches to reduce the payload of each request
         es_host (string): ElasticSearch server host to send request
         es_port (int): ElasticSearch server port to send request
@@ -31,7 +30,6 @@ class ElasticSearchIndexer:
         weedcoco_path,
         thumbnail_dir,
         es_index_name="weedid",
-        es_type_name="image",
         batch_size=30,
         es_host="localhost",
         es_port=9200,
@@ -42,7 +40,6 @@ class ElasticSearchIndexer:
         self.weedcoco_path = pathlib.Path(weedcoco_path)
         self.thumbnail_dir = pathlib.Path(thumbnail_dir)
         self.es_index_name = es_index_name
-        self.es_type_name = es_type_name
         self.batch_size = batch_size
         hosts = [{"host": es_host, "port": es_port}]
         if dry_run:
@@ -67,11 +64,15 @@ class ElasticSearchIndexer:
         denormalise_weedcoco(coco)
 
         variable_to_null_fields = ["camera_fov", "camera_lens_focallength"]
+        na_to_null_fields = ["bbch_growth_range"]
 
         for agcontext in coco["agcontexts"]:
             # massage for ES
             for field in variable_to_null_fields:
                 if agcontext.get(field) == "variable":
+                    del agcontext[field]
+            for field in na_to_null_fields:
+                if agcontext.get(field) == "na":
                     del agcontext[field]
             # textual label for growth stage
             if "bbch_growth_range" not in agcontext:
@@ -84,13 +85,13 @@ class ElasticSearchIndexer:
                     growth_stage_texts.add(
                         lookup_growth_stage_name(i, scheme="grain_ranges")
                     )
+                agcontext["growth_stage_min_text"] = lookup_growth_stage_name(
+                    lo, scheme="grain_ranges"
+                )
+                agcontext["growth_stage_max_text"] = lookup_growth_stage_name(
+                    hi, scheme="grain_ranges"
+                )
             agcontext["growth_stage_texts"] = sorted(growth_stage_texts)
-            agcontext["growth_stage_min_text"] = lookup_growth_stage_name(
-                lo, scheme="grain_ranges"
-            )
-            agcontext["growth_stage_max_text"] = lookup_growth_stage_name(
-                hi, scheme="grain_ranges"
-            )
 
         for annotation in coco["annotations"]:
             _flatten(annotation["category"], annotation, "category")
@@ -124,6 +125,9 @@ class ElasticSearchIndexer:
                     image.setdefault(f"annotation__{k}", []).append(annotation[k])
 
             image["task_type"] = sorted(get_task_types(image["annotations"]))
+            image[
+                "location"
+            ] = f'{image["agcontext"]["location_lat"]}, {image["agcontext"]["location_long"]}'
             image["dataset_name"] = coco["info"]["metadata"]["name"]
             yield image
 
@@ -140,7 +144,6 @@ class ElasticSearchIndexer:
                     {
                         "_index": self.es_index_name,
                         "_id": os.path.basename(image["file_name"]),
-                        "_type": self.es_type_name,
                         "_source": image,
                     }
                 )

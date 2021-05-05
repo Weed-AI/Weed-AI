@@ -13,141 +13,17 @@ from weedcoco.validation import (
     validate_coordinates,
     validate_image_sizes,
     ValidationError,
+    JsonValidationError,
+)
+from .testcases import (
+    MINIMAL_WEEDCOCO,
+    SMALL_WEEDCOCO,
+    test_bad_category_name_expected,
+    test_missing_required_at_root_expected,
 )
 
 validate_image_sizes_null = functools.partial(validate_image_sizes, images_root=None)
 validate_image_sizes_cwd = functools.partial(validate_image_sizes, images_root=".")
-
-
-MINIMAL_WEEDCOCO = {
-    "images": [],
-    "annotations": [],
-    "categories": [],
-    "agcontexts": [],
-    "info": {
-        "description": "Something",
-        "metadata": {
-            "name": "Something",
-            "creator": [{"name": "Someone"}],
-            "datePublished": "XXXX-XX-XX",
-            "license": "https://creativecommons.org/licenses/by/4.0/",
-        },
-    },
-}
-
-SMALL_WEEDCOCO = {
-    "images": [
-        {
-            "id": 46,
-            "file_name": "cwfid_images/046_image.png",
-            "license": 0,
-            "agcontext_id": 0,
-            "width": 1296,
-            "height": 966,
-        },
-        {
-            "id": 1,
-            "file_name": "cwfid_images/001_image.png",
-            "license": 0,
-            "agcontext_id": 0,
-            "width": 1296,
-            "height": 966,
-        },
-    ],
-    "annotations": [
-        {
-            "id": 0,
-            "image_id": 46,
-            "category_id": 0,
-            "segmentation": [[596, 207, 521]],
-            "iscrowd": 0,
-        },
-        {
-            "id": 1,
-            "image_id": 46,
-            "category_id": 0,
-            "segmentation": [[689, 787, 589, 745]],
-            "iscrowd": 0,
-        },
-        {
-            "id": 2,
-            "image_id": 46,
-            "category_id": 1,
-            "segmentation": [[486, 335, 399]],
-            "iscrowd": 0,
-        },
-        {
-            "id": 3,
-            "image_id": 1,
-            "category_id": 1,
-            "segmentation": [[810, 225, 841, 234]],
-            "iscrowd": 0,
-        },
-        {
-            "id": 4,
-            "image_id": 1,
-            "category_id": 1,
-            "segmentation": [[1070, 626, 1055, 722]],
-            "iscrowd": 0,
-        },
-    ],
-    "categories": [
-        {
-            "name": "crop: daugus carota",
-            "common_name": "carrot",
-            "species": "daugus carota",
-            "eppo_taxon_code": "DAUCS",
-            "eppo_nontaxon_code": "3UMRC",
-            "role": "crop",
-            "id": 0,
-        },
-        {
-            "name": "weed: unspecified",
-            "species": "UNSPECIFIED",
-            "role": "weed",
-            "id": 1,
-        },
-    ],
-    "info": {
-        "description": "Cwfid annotations converted into WeedCOCO",
-        "metadata": {
-            "name": "Cwfid annotations converted into WeedCOCO",
-            "creator": [{"name": "Sebastian Haug"}],
-            "datePublished": "2015-XX-XX",
-            "license": "https://github.com/cwfid/dataset",
-        },
-    },
-    "license": [
-        {
-            "id": 0,
-            "url": "https://github.com/cwfid/dataset",
-        }
-    ],
-    "agcontexts": [
-        {
-            "id": 0,
-            "agcontext_name": "cwfid",
-            "crop_type": "other",
-            "bbch_growth_range": {"min": 10, "max": 20},
-            "soil_colour": "grey",
-            "surface_cover": "none",
-            "surface_coverage": "0-25",
-            "weather_description": "sunny",
-            "location_lat": 53,
-            "location_long": 11,
-            "camera_make": "JAI AD-130GE",
-            "camera_lens": "Fujinon TF15-DA-8",
-            "camera_lens_focallength": 15,
-            "camera_height": 450,
-            "camera_angle": 90,
-            "camera_fov": 22.6,
-            "photography_description": "Mounted on boom",
-            "ground_speed": 0,
-            "lighting": "natural",
-            "cropped_to_plant": False,
-        }
-    ],
-}
 
 
 def _set_category_name(coco, name):
@@ -157,18 +33,28 @@ def _set_category_name(coco, name):
     return coco
 
 
-@pytest.mark.parametrize("func", [validate, validate_json])
+def _remove_schema_from_error(error):
+    for error_detail in error["error_details"]:
+        error_detail.pop("schema", None)
+    return error
+
+
 @pytest.mark.parametrize(
-    "bad_weedcoco",
-    [
-        {},
-        {"images": [], "annotations": []},
-        {"images": [], "annotations": [], "categories": []},
-    ],
+    "func,bad_weedcoco,expected",
+    zip(
+        [validate_json] * 3,
+        [
+            {},
+            {"images": [], "annotations": []},
+            {"images": [], "annotations": [], "categories": []},
+        ],
+        test_missing_required_at_root_expected,
+    ),
 )
-def test_missing_required_at_root(func, bad_weedcoco):
-    with pytest.raises(ValidationError, match="is a required property"):
+def test_missing_required_at_root(func, bad_weedcoco, expected):
+    with pytest.raises(JsonValidationError, match="is a required property") as e:
         func(bad_weedcoco)
+    assert _remove_schema_from_error(e.value.get_error_details()) == expected
 
 
 @pytest.mark.parametrize(
@@ -187,13 +73,16 @@ def test_okay(func):
     func(SMALL_WEEDCOCO)
 
 
-@pytest.mark.parametrize("func", [validate, validate_json])
-@pytest.mark.parametrize("bad_name", ["foobar", "weed 1"])
-def test_bad_category_name(func, bad_name):
+@pytest.mark.parametrize(
+    "func,bad_name,expected",
+    zip([validate_json] * 2, ["foobar", "weed: 1"], test_bad_category_name_expected),
+)
+def test_bad_category_name(func, bad_name, expected):
     weedcoco = copy.deepcopy(SMALL_WEEDCOCO)
     weedcoco = _set_category_name(weedcoco, bad_name)
-    with pytest.raises(ValidationError):
+    with pytest.raises(JsonValidationError, match="does not match") as e:
         func(weedcoco)
+    assert _remove_schema_from_error(e.value.get_error_details()) == expected
 
 
 def _make_duplicate_id(weedcoco, key, idx, insert_at=-1):
@@ -215,7 +104,7 @@ def _make_duplicate_id(weedcoco, key, idx, insert_at=-1):
 def test_missing_section(func, removed_section):
     bad_weedcoco = copy.deepcopy(SMALL_WEEDCOCO)
     del bad_weedcoco[removed_section]
-    with pytest.raises(ValidationError):
+    with pytest.raises(JsonValidationError):
         func(bad_weedcoco)
 
 
@@ -314,5 +203,5 @@ def test_coco_compatible_good(func, coco):
     ],
 )
 def test_coco_compatible_bad(func, bad_coco):
-    with pytest.raises(ValidationError):
+    with pytest.raises(JsonValidationError):
         func(bad_coco, schema="compatible-coco")

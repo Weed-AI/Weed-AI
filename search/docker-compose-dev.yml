@@ -1,4 +1,9 @@
 version: "3"
+
+x-logging: 
+  &default-logging
+  driver: "json-file"
+
 services:
   # nginx reverse proxy
   reverse-proxy:
@@ -13,6 +18,7 @@ services:
       - "80:80"
     networks:
       - elastic
+    logging: *default-logging
 
   # django backend
   django:
@@ -37,6 +43,7 @@ services:
       - SMTP_HOST=${SMTP_HOST}
       - SMTP_PORT=${SMTP_PORT}
       - FROM_EMAIL=${FROM_EMAIL}
+      - ENV=DEV
     command: python manage.py runserver 0.0.0.0:8000
     entrypoint: /entrypoint.sh
     volumes:
@@ -49,6 +56,7 @@ services:
       - "8000:8000"
     networks:
       - elastic
+    logging: *default-logging
 
   celery:
     image: django
@@ -64,6 +72,7 @@ services:
       - SMTP_HOST=${SMTP_HOST}
       - SMTP_PORT=${SMTP_PORT}
       - FROM_EMAIL=${FROM_EMAIL}
+      - ENV=DEV
     volumes:
       - ./django/:/code
       - thumbnails_dir:/code/thumbnails
@@ -75,11 +84,13 @@ services:
       - redis
     networks:
       - elastic
+    logging: *default-logging
 
   redis:
     image: redis:alpine
     networks:
       - elastic
+    logging: *default-logging
 
   db:
     image: postgres:12.0-alpine
@@ -94,6 +105,7 @@ services:
       - "5432:5432"
     networks:
       - elastic
+    logging: *default-logging
 
   # search engine
   elasticsearch:
@@ -125,6 +137,7 @@ services:
       interval: 30s
       timeout: 30s
       retries: 3
+    logging: *default-logging
 
   reactivesearch:
     image: my-reactivesearch
@@ -144,6 +157,7 @@ services:
     stdin_open: true
     depends_on:
       - elasticsearch
+    logging: *default-logging
 
   thumbnails:
     image: thumbnails
@@ -157,6 +171,7 @@ services:
     networks:
       - elastic
     stdin_open: true
+    logging: *default-logging
 
   download:
     image: download
@@ -170,6 +185,7 @@ services:
     networks:
       - elastic
     stdin_open: true
+    logging: *default-logging
 
 networks:
   elastic:

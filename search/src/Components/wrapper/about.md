@@ -42,7 +42,9 @@ WeedCOCO is our format for representing weed identification annotations.
 
 If you found Weed-AI useful in your research or project, please cite the database as:
 
-CITATION TBA by mid 2021
+_Weed-AI: A repository of Weed Images in Crops._ Precision Weed Control Group and Sydney Informatics Hub, the University of Sydney. https://weed-ai.sydney.edu.au/, accessed YYYY-MM-DD.
+
+An academic  citation is TBA. 
 
 ## Specific Datasets
 
@@ -51,7 +53,7 @@ Each set of imagery used within the database should also be cited with the corre
 # Acknowledgements
 The development of Weed-AI has been funded by the [Grains Research and Development Corporation (GRDC)](https://grdc.com.au) PROC-9175960 grant. The platform was developed by the [Sydney Informatics Hub](https://www.sydney.edu.au/research/facilities/sydney-informatics-hub.html), a core research facility of the University of Sydney, as part of a research collaboration with the [Australian Centre for Field Robotics](https://www.sydney.edu.au/engineering/our-research/robotics-and-intelligent-systems/australian-centre-for-field-robotics.html) and the [Precision Weed Control Group](https://www.sydney.edu.au/science/our-research/research-areas/life-and-environmental-sciences/precision-weed-control-group.html) at the University of Sydney.
 
-The software is open source and open to contribution on [GitHub](https://github.com/Sydney-Informatics-Hub/Weed-ID-Interchange). If you have any issues, suggestions or would like to contribute to the project please do so through Github or by emailing [m.j.walsh@sydney.edu.au](mailto:m.j.walsh@sydney.edu.au).
+The software is open source and open to contribution on [GitHub](https://github.com/Sydney-Informatics-Hub/Weed-ID-Interchange). If you have any issues, suggestions or would like to contribute to the project please do so through Github or by emailing [weed-ai.app@sydney.edu.au](mailto:weed-ai.app@sydney.edu.au).
 
 [![The University of Sydney logo](/usyd-logo.png "The University of Sydney")](https://sydney.edu.au)
 

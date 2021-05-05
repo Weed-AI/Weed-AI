@@ -1,7 +1,8 @@
 import React from 'react';
 import 'react-dropzone-uploader/dist/styles.css';
 import Dropzone from 'react-dropzone-uploader';
-import Cookies from 'js-cookie'
+import Cookies from 'js-cookie';
+import {jsonSchemaTitle} from '../error/utils';
 
 
 const UploaderSingle  = (props) => {
@@ -9,6 +10,7 @@ const UploaderSingle  = (props) => {
     const getUploadParams = ({ file, meta }) => {
         const body = new FormData()
         body.append('weedcoco', file)
+        body.append('schema', props.schema)
         return { url: baseURL + 'api/upload/',
                  mode: 'same-origin',
                  headers: {'X-CSRFToken': Cookies.get('csrftoken')},
@@ -24,7 +26,7 @@ const UploaderSingle  = (props) => {
             props.handleErrorMessage("")
         }
         else if (status === 'error_upload'){
-            xhr.addEventListener('loadend', (e) => {props.handleErrorMessage(e.target.responseText)});
+            xhr.addEventListener('loadend', (e) => {const res = JSON.parse(e.target.responseText); props.handleErrorMessage(jsonSchemaTitle(res), res)});
         }
         else if (status === 'error_file_size') {
             props.handleErrorMessage("The file size exceeds the limitation")
