@@ -32,9 +32,9 @@ FILE_UPLOAD_MAX_MEMORY_SIZE = MAX_IMAGE_SIZE
 # Application definition
 
 # SMTP config
-SMTP_HOST = os.environ.get("SMTP_HOST")
-SMTP_PORT = os.environ.get("SMTP_PORT")
-FROM_EMAIL = os.environ.get("FROM_EMAIL")
+SMTP_HOST = os.environ.get("SMTP_HOST", "smtp.sydney.edu.au")
+SMTP_PORT = os.environ.get("SMTP_PORT", 25)
+FROM_EMAIL = os.environ.get("FROM_EMAIL", "WeedAI <weed-ai.app@sydney.edu.au>")
 
 INSTALLED_APPS = [
     "django.contrib.admin",
