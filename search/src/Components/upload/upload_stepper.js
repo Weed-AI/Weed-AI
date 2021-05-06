@@ -7,6 +7,7 @@ import Button from '@material-ui/core/Button';
 import Typography from '@material-ui/core/Typography';
 import UploaderSingle from './uploader_single';
 import UploaderImages from './uploader_images';
+import ErrorMessage from '../error/display';
 import AgContextForm from '../forms/AgContextForm';
 import UploadJsonButton from '../forms/UploadJsonButton';
 import MetadataForm from '../forms/MetadataForm';
@@ -36,61 +37,6 @@ function getSteps(upload_type) {
          ['Upload Coco', 'Add Agcontext', 'Add Metadata', 'Upload Images']
 }
 
-function getStepContent(step, upload_type, upload_id, images, agcontextsFormData, metadataFormData, handleUploadId, handleImages, handleAgContextsFormData, handleMetadataFormData, handleErrorMessage, handleValidation) {
-    if (upload_type === 'coco') {
-        switch (step) {
-            case 0:
-              return <UploaderSingle upload_id={upload_id} images={images} handleUploadId={handleUploadId} handleImages={handleImages} handleErrorMessage={handleErrorMessage} schema={'compatible-coco'}/>;
-            case 1:
-              return (
-                <React.Fragment>
-                    <AgContextForm formData={agcontextsFormData} handleValidation={handleValidation} onChange={e => {
-                        handleAgContextsFormData(e.formData)
-                        handleErrorMessage("init")
-                    }} />
-                    <UploadJsonButton initialValue={agcontextsFormData} downloadName="agcontext" onClose={(value) => {handleAgContextsFormData(value)}} />
-                </React.Fragment>
-              );
-            case 2:
-              return (
-                <React.Fragment>
-                    <MetadataForm formData={metadataFormData} handleValidation={handleValidation} onChange={e => {
-                        handleMetadataFormData(e.formData)
-                        handleErrorMessage("init")
-                    }} />
-                    <UploadJsonButton initialValue={metadataFormData} downloadName="dataset-meta" onClose={(value) => {handleMetadataFormData(value)}} />
-                </React.Fragment>
-              );
-            case 3:
-              return <UploaderImages upload_id={upload_id} images={images}/>;
-            default:
-              return 'Unknown step';
-        }
-    } else if (upload_type === 'weedcoco') {
-        switch (step) {
-            case 0:
-              return <UploaderSingle upload_id={upload_id} images={images} handleUploadId={handleUploadId} handleImages={handleImages} handleErrorMessage={handleErrorMessage} schema={'weedcoco'}/>;
-            case 1:
-              return <UploaderImages upload_id={upload_id} images={images}/>;
-            default:
-              return 'Unknown step';
-        }
-    } else {
-        switch (step) {
-            case 0:
-              return <UploaderSingle upload_id={upload_id} images={images} handleUploadId={handleUploadId} handleImages={handleImages} handleErrorMessage={handleErrorMessage}/>;
-            case 1:
-              return <AgContextForm formData={agcontextsFormData} onChange={e => handleAgContextsFormData(e.formData)} />;
-            case 2:
-              return <MetadataForm formData={metadataFormData} onChange={e => handleMetadataFormData(e.formData)} />;
-            case 3:
-              return <UploaderImages upload_id={upload_id} images={images}/>;
-            default:
-              return 'Unknown step';
-        }
-    }
-}
-
 class UploadStepper extends React.Component {
 
     constructor(props) {
@@ -102,15 +48,18 @@ class UploadStepper extends React.Component {
             steps: getSteps(this.props.upload_type),
             upload_id: 0,
             images: [],
+            imageReady: false,
             ag_context: {},
             metadata: {},
             coco_form_validation: {'agcontexts': false, 'metadata': false},
-            error_message: "init"
+            error_message: "init",
+            error_message_details: "",
         }
         this.isStepOptional = this.isStepOptional.bind(this);
         this.isStepSkipped = this.isStepSkipped.bind(this);
         this.handleUploadId = this.handleUploadId.bind(this);
         this.handleImages = this.handleImages.bind(this);
+        this.handleImageReady = this.handleImageReady.bind(this);
         this.handleAgContextsFormData = this.handleAgContextsFormData.bind(this);
         this.handleMetadataFormData = this.handleMetadataFormData.bind(this);
         this.handleErrorMessage = this.handleErrorMessage.bind(this);
@@ -123,6 +72,7 @@ class UploadStepper extends React.Component {
         this.handleSubmit = this.handleSubmit.bind(this);
         this.isNextEnabled = this.isNextEnabled.bind(this);
         this.handleValidation = this.handleValidation.bind(this);
+        this.getStepContent = this.getStepContent.bind(this);
     }
 
     isStepOptional(step, upload_type) {
@@ -141,6 +91,10 @@ class UploadStepper extends React.Component {
         this.setState({images: images});
     }
 
+    handleImageReady(imageReady) {
+        this.setState({imageReady: imageReady});
+    }
+
     handleAgContextsFormData(formData) {
         this.setState({ag_context: formData});
     }
@@ -149,8 +103,8 @@ class UploadStepper extends React.Component {
         this.setState({metadata: formData});
     }
 
-    handleErrorMessage(message) {
-        this.setState({error_message: message});
+    handleErrorMessage(message, details="") {
+        this.setState({error_message: message, error_message_details: details});
     }
 
     handleNext() {
@@ -265,6 +219,61 @@ class UploadStepper extends React.Component {
         }
     }
 
+    getStepContent(){
+        if (this.props.upload_type === 'coco') {
+            switch (this.state.activeStep) {
+                case 0:
+                  return <UploaderSingle upload_id={this.state.upload_id} images={this.state.images} handleUploadId={this.handleUploadId} handleImages={this.handleImages} handleErrorMessage={this.handleErrorMessage} schema={'compatible-coco'}/>;
+                case 1:
+                  return (
+                    <React.Fragment>
+                        <AgContextForm formData={this.state.ag_context} handleValidation={this.handleValidation} onChange={e => {
+                            this.handleAgContextsFormData(e.formData)
+                            this.handleErrorMessage("init")
+                        }} />
+                        <UploadJsonButton initialValue={this.state.ag_context} downloadName="agcontext" onClose={(value) => {this.handleAgContextsFormData(value)}} />
+                    </React.Fragment>
+                  );
+                case 2:
+                  return (
+                    <React.Fragment>
+                        <MetadataForm formData={this.state.metadataFormData} handleValidation={this.handleValidation} onChange={e => {
+                            this.handleMetadataFormData(e.formData)
+                            this.handleErrorMessage("init")
+                        }} />
+                        <UploadJsonButton initialValue={this.state.metadata} downloadName="dataset-meta" onClose={(value) => {this.handleMetadataFormData(value)}} />
+                    </React.Fragment>
+                  );
+                case 3:
+                  return <UploaderImages upload_id={this.state.upload_id} images={this.state.images} handleImageReady={this.handleImageReady} handleErrorMessage={this.handleErrorMessage}/>;
+                default:
+                  return 'Unknown step';
+            }
+        } else if (this.props.upload_type === 'weedcoco') {
+            switch (this.state.activeStep) {
+                case 0:
+                  return <UploaderSingle upload_id={this.state.upload_id} images={this.state.images} handleUploadId={this.handleUploadId} handleImages={this.handleImages} handleErrorMessage={this.handleErrorMessage} schema={'weedcoco'}/>;
+                case 1:
+                  return <UploaderImages upload_id={this.state.upload_id} images={this.state.images} handleImageReady={this.handleImageReady} handleErrorMessage={this.handleErrorMessage}/>;
+                default:
+                  return 'Unknown step';
+            }
+        } else {
+            switch (this.state.activeStep) {
+                case 0:
+                  return <UploaderSingle upload_id={this.state.upload_id} images={this.state.images} handleUploadId={this.handleUploadId} handleImages={this.handleImages} handleErrorMessage={this.handleErrorMessage}/>;
+                case 1:
+                  return <AgContextForm formData={this.state.ag_context} onChange={e => this.handleAgContextsFormData(e.formData)} />;
+                case 2:
+                  return <MetadataForm formData={this.state.metadata} onChange={e => this.handleMetadataFormData(e.formData)} />;
+                case 3:
+                  return <UploaderImages upload_id={this.state.upload_id} images={this.state.images} handleImageReady={this.handleImageReady} handleErrorMessage={this.handleErrorMessage}/>;
+                default:
+                  return 'Unknown step';
+            }
+        }
+    }
+
     render(){
         const { classes } = this.props;
         return (
@@ -288,9 +297,9 @@ class UploadStepper extends React.Component {
             </Stepper>
             <div>
                 <Typography className={classes.instructions}>
-                    {getStepContent(this.state.activeStep, this.props.upload_type, this.state.upload_id, this.state.images, this.state.ag_context, this.state.metadata, this.handleUploadId, this.handleImages, this.handleAgContextsFormData, this.handleMetadataFormData, this.handleErrorMessage, this.handleValidation)}
+                    {this.getStepContent()}
                 </Typography>
-                {this.state.error_message.length > 0 && this.state.error_message !== 'init' ? <p style={{color: 'red', float: 'right', marginTop: '0.5em'}}>{this.state.error_message}</p> : ""}
+                <ErrorMessage error={this.state.error_message} details={this.state.error_message_details}/>
                 <div>
                     <Button disabled={this.state.activeStep === 0} onClick={this.handleBack} className={classes.button}>
                         Back
@@ -313,7 +322,10 @@ class UploadStepper extends React.Component {
                         color="primary"
                         onClick={this.isNextEnabled() === 'agcontexts' ? this.handleUploadAgcontexts : this.isNextEnabled() === 'metadata' ? this.handleUploadMetadata : this.handleNext}
                         className={classes.button}
-                        disabled={this.state.error_message.length > 0 && this.state.activeStep !== this.state.steps.length - 1 && !this.isNextEnabled()}
+                        disabled={this.state.error_message.length > 0 &&
+                                  (this.state.activeStep !== this.state.steps.length - 1 ||
+                                  this.state.activeStep === this.state.steps.length - 1 && !this.state.imageReady) &&
+                                  !this.isNextEnabled()}
                     >
                         {this.state.activeStep === this.state.steps.length - 1 ? 'Submit' : 'Next'}
                     </Button>

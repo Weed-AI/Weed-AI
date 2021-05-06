@@ -37,6 +37,10 @@ services:
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
       - POSTGRES_DB=${POSTGRES_DB}
+      - SMTP_HOST=${SMTP_HOST}
+      - SMTP_PORT=${SMTP_PORT}
+      - FROM_EMAIL=${FROM_EMAIL}
+      - ENV=PROD
     volumes:
       - thumbnails_dir:/code/thumbnails
       - repository_dir:/code/repository
@@ -63,6 +67,10 @@ services:
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
       - POSTGRES_DB=${POSTGRES_DB}
+      - SMTP_HOST=${SMTP_HOST}
+      - SMTP_PORT=${SMTP_PORT}
+      - FROM_EMAIL=${FROM_EMAIL}
+      - ENV=PROD
     volumes:
       - thumbnails_dir:/code/thumbnails
       - repository_dir:/code/repository

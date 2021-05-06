@@ -15,12 +15,19 @@ from weedid.utils import (
     remove_entity_local_record,
     add_agcontexts,
     add_metadata,
+    validate_email_format,
 )
+from weedid.notification import review_notification
 from weedid.models import Dataset, WeedidUser
-from weedcoco.validation import validate
+from weedcoco.validation import validate, JsonValidationError
 from django.contrib.auth import login, logout
 from django.contrib.auth.hashers import check_password
-from django.http import HttpResponseForbidden, HttpResponseNotAllowed
+from django.http import (
+    HttpResponseForbidden,
+    HttpResponseNotAllowed,
+    HttpResponseBadRequest,
+    HttpResponseServerError,
+)
 from django.views.decorators.csrf import ensure_csrf_cookie
 
 
@@ -33,9 +40,9 @@ def elasticsearch_query(request):
     try:
         elasticsearch_url = "/".join(request.path.split("/")[2:])
     except Exception:
-        return HttpResponseForbidden("Invalid query format")
+        return HttpResponseBadRequest("Invalid query format")
     if not elasticsearch_url.startswith("weedid/_msearch"):
-        return HttpResponseForbidden("Only _msearch queries are currently forwarded")
+        return HttpResponseBadRequest("Only _msearch queries are currently forwarded")
     if request.method not in ["POST", "GET"]:
         return HttpResponseNotAllowed(request.method)
     elasticsearch_response = requests.post(
@@ -67,9 +74,12 @@ def upload(request):
         upload_dir, upload_id = setup_upload_dir(os.path.join(UPLOAD_DIR, str(user.id)))
         weedcoco_path = store_tmp_weedcoco(file_weedcoco, upload_dir)
         create_upload_entity(weedcoco_path, upload_id, user.id)
+    except JsonValidationError as e:
+        traceback.print_exc()
+        return HttpResponseBadRequest(json.dumps(e.get_error_details()))
     except Exception as e:
         traceback.print_exc()
-        return HttpResponseForbidden(str(e))
+        return HttpResponseBadRequest(str(e))
     else:
         return HttpResponse(json.dumps({"upload_id": upload_id, "images": images}))
 
@@ -83,7 +93,7 @@ def upload_image(request):
     upload_id = request.POST["upload_id"]
     upload_image = request.FILES["upload_image"]
     if upload_image.size > MAX_IMAGE_SIZE:
-        return HttpResponseForbidden("This image has exceeded the size limit!")
+        return HttpResponseBadRequest("This image has exceeded the size limit!")
     upload_dir = os.path.join(UPLOAD_DIR, str(user.id), upload_id, "images")
     store_tmp_image(upload_image, upload_dir)
     return HttpResponse(f"Uploaded {upload_image.name} to {upload_dir}")
@@ -204,6 +214,7 @@ def dataset_approve(request, dataset_id):
     if upload_entity:
         weedcoco_path = os.path.join(REPOSITORY_DIR, str(dataset_id), "weedcoco.json")
         update_index_and_thumbnails(weedcoco_path, dataset_id)
+        review_notification("approved", dataset_id)
         return HttpResponse("It has been approved")
     else:
         return HttpResponseNotAllowed("Dataset to be reviewed doesn't exist")
@@ -221,6 +232,7 @@ def dataset_reject(request, dataset_id):
             upload_entity.status = "F"
             upload_entity.status_details = "It failed to proceed after review."
             upload_entity.save()
+            review_notification("rejected", dataset_id)
         return HttpResponse("The dataset has been rejected and removed")
     else:
         return HttpResponseNotAllowed("Dataset to be rejected doesn't exist")
@@ -232,12 +244,18 @@ def user_register(request):
     username = request.POST["username"]
     email = request.POST["email"]
     password = request.POST["password"]
+    if WeedidUser.objects.filter(username=username).count():
+        return HttpResponseBadRequest("Username already exists")
+    if WeedidUser.objects.filter(email=email).count():
+        return HttpResponseBadRequest("Email already exists")
+    if not validate_email_format(email):
+        return HttpResponseBadRequest("Invalid email format")
     try:
         user = WeedidUser.objects.create_user(username, email, password)
         user.save()
         return HttpResponse("The account has been created")
     except Exception:
-        return HttpResponseForbidden("You dont have access to proceed")
+        return HttpResponseServerError("Server error")
 
 
 def user_login(request):
@@ -245,15 +263,19 @@ def user_login(request):
         return HttpResponseNotAllowed(request.method)
     username = request.POST["username"]
     password = request.POST["password"]
+    if not WeedidUser.objects.filter(username=username).count():
+        return HttpResponseBadRequest("Username doesn't exist")
     user = WeedidUser.objects.get(username=username)
-
-    if user is not None and (
+    if user is not None and not (
         user.password == password or check_password(password, user.password)
     ):
-        login(request, user)
-        return HttpResponse("You have been logged in")
+        return HttpResponseBadRequest("Incorrect credentials")
     else:
-        return HttpResponseForbidden("Wrong login credentials")
+        try:
+            login(request, user)
+            return HttpResponse("You have been logged in")
+        except Exception:
+            return HttpResponseServerError("Server error")
 
 
 def user_logout(request):
