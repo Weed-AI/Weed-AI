@@ -1,6 +1,7 @@
 import os
 from shutil import rmtree
 import json
+import re
 from uuid import uuid4
 import smtplib
 from email.message import EmailMessage
@@ -127,6 +128,11 @@ def retrieve_listing_info(query_entity, awaiting_review):
         "contributor": query_entity.user.username,
         "contributor_email": query_entity.user.email if awaiting_review else "",
     }
+
+
+def validate_email_format(email):
+    regex = "^(\\w|\\.|\\_|\\-)+[@](\\w|\\_|\\-|\\.)+[.]\\w{2,3}$"
+    return re.fullmatch(regex, email)
 
 
 def send_email(subject, body, recipients):

@@ -7,7 +7,8 @@ import Typography from '@material-ui/core/Typography';
 import { withStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
 import axios from 'axios';
-import Cookies from 'js-cookie'
+import Cookies from 'js-cookie';
+import AuthError from './auth_error';
 
 
 const useStyles = (theme) => ({
@@ -20,8 +21,12 @@ const useStyles = (theme) => ({
       width: '100%',
       marginTop: theme.spacing(3),
     },
+    field: {
+      marginBottom: theme.spacing(1),
+    },
     submit: {
       margin: theme.spacing(3, 0, 2),
+      marginTop: 0
     },
   });
 
@@ -32,7 +37,7 @@ class RegisterComponent extends React.Component {
     constructor() {
         super();
         this.state = {
-            duplicate_username: false
+            error: null
         }
         this.handleSubmit = this.handleSubmit.bind(this);
     }
@@ -56,8 +61,7 @@ class RegisterComponent extends React.Component {
             this.props.handleClose();
         })
         .catch((error) => {
-            this.setState({duplicate_username: true})
-            console.log(error);
+            this.setState({error: error.response.data})
         });
     }
 
@@ -70,9 +74,8 @@ class RegisterComponent extends React.Component {
                 <Typography component="h1" variant="h5">
                 Sign up
                 </Typography>
-                {this.state.duplicate_username ? <p style={{color: 'red'}}>This username already exists</p> : ""}
-                <form className={classes.form} noValidate onSubmit={this.handleSubmit} id="register-form">
-                <Grid container spacing={2}>
+                <form className={classes.form} noValidate onSubmit={this.handleSubmit} id="register-form"  onChange={() => {this.setState({error: null})}}>
+                <Grid container spacing={2} className={classes.field}>
                     <Grid item xs={12} sm={12}>
                     <TextField
                         name="username"
@@ -109,6 +112,7 @@ class RegisterComponent extends React.Component {
                     />
                     </Grid>
                 </Grid>
+                <AuthError error={this.state.error}/>
                 <Button
                     type="submit"
                     fullWidth

@@ -15,6 +15,7 @@ from weedid.utils import (
     remove_entity_local_record,
     add_agcontexts,
     add_metadata,
+    validate_email_format,
 )
 from weedid.notification import review_notification
 from weedid.models import Dataset, WeedidUser
@@ -25,6 +26,7 @@ from django.http import (
     HttpResponseForbidden,
     HttpResponseNotAllowed,
     HttpResponseBadRequest,
+    HttpResponseServerError,
 )
 from django.views.decorators.csrf import ensure_csrf_cookie
 
@@ -242,12 +244,18 @@ def user_register(request):
     username = request.POST["username"]
     email = request.POST["email"]
     password = request.POST["password"]
+    if WeedidUser.objects.filter(username=username).count():
+        return HttpResponseBadRequest("Username already exists")
+    if WeedidUser.objects.filter(email=email).count():
+        return HttpResponseBadRequest("Email already exists")
+    if not validate_email_format(email):
+        return HttpResponseBadRequest("Invalid email format")
     try:
         user = WeedidUser.objects.create_user(username, email, password)
         user.save()
         return HttpResponse("The account has been created")
     except Exception:
-        return HttpResponseForbidden("You dont have access to proceed")
+        return HttpResponseServerError("Server error")
 
 
 def user_login(request):
@@ -255,15 +263,19 @@ def user_login(request):
         return HttpResponseNotAllowed(request.method)
     username = request.POST["username"]
     password = request.POST["password"]
+    if not WeedidUser.objects.filter(username=username).count():
+        return HttpResponseBadRequest("Username doesn't exist")
     user = WeedidUser.objects.get(username=username)
-
-    if user is not None and (
+    if user is not None and not (
         user.password == password or check_password(password, user.password)
     ):
-        login(request, user)
-        return HttpResponse("You have been logged in")
+        return HttpResponseBadRequest("Incorrect credentials")
     else:
-        return HttpResponseForbidden("Wrong login credentials")
+        try:
+            login(request, user)
+            return HttpResponse("You have been logged in")
+        except Exception:
+            return HttpResponseServerError("Server error")
 
 
 def user_logout(request):
