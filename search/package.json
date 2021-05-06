@@ -5,6 +5,7 @@
   "dependencies": {
     "@appbaseio/reactivemaps": "^3.0.0-beta.11",
     "@appbaseio/reactivesearch": "^3.12.2",
+    "@emotion/css": "^11",
     "@jsonforms/core": "^2.5.0",
     "@jsonforms/material-renderers": "^2.5.0",
     "@jsonforms/react": "^2.5.0",
