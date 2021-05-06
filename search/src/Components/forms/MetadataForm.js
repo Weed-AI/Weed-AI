@@ -4,8 +4,10 @@ import { withRouter } from 'react-router-dom';
 import schema from '../../Schemas/Metadata.json'
 import Container from '@material-ui/core/Container';
 import Box from '@material-ui/core/Box';
+import { createAjv } from '@jsonforms/core';
 import renderers from '../formRenderers/default_renderers';
 import { JsonForms } from '@jsonforms/react';
+import { constTester, ConstRenderer } from '../formRenderers/ConstRenderer';
 import UploadJsonButton from './UploadJsonButton';
 import { materialCells } from '@jsonforms/material-renderers';
 
@@ -17,6 +19,10 @@ const uischema = {
             "type": "Category",
             "label": "Basics",
             "elements": [
+                {
+                    "type": "Control",
+                    "scope": "#/properties/@type"
+                },
                 {
                     "type": "Control",
                     "scope": "#/properties/name"
@@ -99,6 +105,7 @@ class MetadataForm extends Component {
               data={this.props.formData}
               renderers={renderers}
               cells={materialCells}
+              ajv = {createAjv({useDefaults: true})}
               onChange={e => {
                   if (this.props.handleValidation){
                     this.props.handleValidation('metadata', e.errors.length === 0);

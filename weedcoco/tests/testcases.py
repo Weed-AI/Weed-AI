@@ -7,7 +7,8 @@ MINIMAL_WEEDCOCO = {
         "description": "Something",
         "metadata": {
             "name": "Something",
-            "creator": [{"name": "Someone"}],
+            "description": "Images of weeds",
+            "creator": [{"@type": "Person", "name": "Someone"}],
             "datePublished": "XXXX-XX-XX",
             "license": "https://creativecommons.org/licenses/by/4.0/",
         },
@@ -91,7 +92,8 @@ SMALL_WEEDCOCO = {
         "description": "Cwfid annotations converted into WeedCOCO",
         "metadata": {
             "name": "Cwfid annotations converted into WeedCOCO",
-            "creator": [{"name": "Sebastian Haug"}],
+            "description": "Carrots. All the carrots (and weeds).",
+            "creator": [{"@type": "Person", "name": "Sebastian Haug"}],
             "datePublished": "2015-XX-XX",
             "license": "https://github.com/cwfid/dataset",
         },

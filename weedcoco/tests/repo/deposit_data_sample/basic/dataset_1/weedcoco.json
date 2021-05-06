@@ -669,9 +669,11 @@
         "description": "Cwfid annotations converted into WeedCOCO",
         "metadata": {
             "name": "Cwfid annotations converted into WeedCOCO",
+            "description": "Weeds annotated in carrot crop.",
             "creator": [
                 {
-                    "name": "Sebastian Haug"
+                    "name": "Sebastian Haug",
+                    "@type": "Person"
                 }
             ],
             "datePublished": "2015-XX-XX",

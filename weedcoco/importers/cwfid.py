@@ -146,10 +146,11 @@ for ann_path in progress:
 
 metadata = {
     "creator": [
-        {"name": "Sebastian Haug"},
-        {"name": "J\u00f6rn Ostermann"},
+        {"name": "Sebastian Haug", "@type": "Person"},
+        {"name": "J\u00f6rn Ostermann", "@type": "Person"},
     ],
     "name": "A Crop/Weed Field Image Dataset for the Evaluation of Computer Vision Based Precision Agriculture Tasks",
+    "description": "Weeds annotated in carrot crop.",
     "datePublished": "2015-03-15",
     "identifier": ["doi:10.1007/978-3-319-16220-1_8"],
     "license": "https://github.com/cwfid/dataset",

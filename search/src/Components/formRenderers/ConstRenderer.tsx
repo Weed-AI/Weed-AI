@@ -3,7 +3,7 @@ import { withJsonFormsControlProps } from '@jsonforms/react';
 import { schemaMatches, rankWith } from '@jsonforms/core';
 
 export const ConstRenderer = withJsonFormsControlProps(({schema, handleChange, path}) => {
-  setTimeout((() => handleChange(path, schema['const'])), 10);
+  setTimeout(() => handleChange(path, schema['const']), 10);
   return (<React.Fragment></React.Fragment>);
 });
 
