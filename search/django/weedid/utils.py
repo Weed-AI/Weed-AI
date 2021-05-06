@@ -2,12 +2,21 @@ import os
 from shutil import rmtree
 import json
 from uuid import uuid4
+import smtplib
+from email.message import EmailMessage
 from weedcoco.repo.deposit import mkdir_safely
 from weedcoco.utils import set_info, set_licenses
 from weedcoco.stats import WeedCOCOStats
 from django.core.files.storage import FileSystemStorage
 from weedid.models import Dataset, WeedidUser
-from core.settings import UPLOAD_DIR, REPOSITORY_DIR, DOWNLOAD_DIR
+from core.settings import (
+    UPLOAD_DIR,
+    REPOSITORY_DIR,
+    DOWNLOAD_DIR,
+    SMTP_HOST,
+    SMTP_PORT,
+    FROM_EMAIL,
+)
 
 
 def store_tmp_image(image, image_dir):
@@ -118,3 +127,12 @@ def retrieve_listing_info(query_entity, awaiting_review):
         "contributor": query_entity.user.username,
         "contributor_email": query_entity.user.email if awaiting_review else "",
     }
+
+
+def send_email(subject, body, recipients):
+    with smtplib.SMTP(SMTP_HOST, SMTP_PORT) as smtp:
+        for recipient in recipients:
+            msg = EmailMessage()
+            msg["Subject"], msg["From"], msg["To"] = subject, FROM_EMAIL, recipient
+            msg.set_content(body)
+            smtp.send_message(msg)
