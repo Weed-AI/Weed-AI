@@ -1,4 +1,4 @@
-django==2.2.13
+django==2.2.20
 psycopg2
 requests
 django-cors-headers
@@ -6,4 +6,3 @@ celery==4.4.7
 django-celery-results
 django-celery-beat
 redis
-https://github.com/Sydney-Informatics-Hub/Weed-ID-Interchange/archive/ingestion.zip

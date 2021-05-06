@@ -1,10 +1,31 @@
 import json
+import pathlib
 import os
 import warnings
 
 import PIL.Image
 import yaml
 import imagehash
+
+
+def set_info(coco, metadata):
+    info = coco.get("info", {}).copy()
+    info["metadata"] = metadata
+    info["description"] = metadata["name"]
+    try:
+        info["year"] = int(metadata["datePublished"][:4])
+    except Exception:
+        pass
+    coco["info"] = info
+
+
+def set_licenses(coco, metadata=None):
+    """Set the license for each image to be that from the metadata"""
+    if metadata is None:
+        metadata = coco["info"]["metadata"]
+    coco["licenses"] = [{"id": 0, "url": metadata["license"]}]
+    for image in coco["images"]:
+        image["license"] = 0
 
 
 def get_image_dimensions(path):
@@ -41,16 +62,11 @@ def add_agcontext_from_file(coco, agcontext_path):
     return coco
 
 
-def add_collection_from_file(coco, collection_path):
-    """Make all annotations members of one collection loaded from YAML or JSON"""
-    collection = load_json_or_yaml(collection_path)
-    if "id" not in collection:
-        collection["id"] = 0
-    coco["collections"] = [collection]
-    coco["collection_memberships"] = [
-        {"annotation_id": annotation["id"], "collection_id": collection["id"]}
-        for annotation in coco["annotations"]
-    ]
+def add_metadata_from_file(coco, metadata_path):
+    """Load metadata from YAML or JSON to set info and licenses"""
+    metadata = load_json_or_yaml(metadata_path)
+    set_info(coco, metadata)
+    set_licenses(coco)
     return coco
 
 
@@ -60,8 +76,74 @@ def get_image_average_hash(path, hash_size=8):
 
 
 def check_if_approved_image_extension(image_name):
-    return image_name.lower().endswith((".png", ".jpg", ".jpeg", ".tiff"))
+    return image_name.lower().endswith((".png", ".jpg", ".jpeg", ".tif", ".tiff"))
 
 
 def check_if_approved_image_format(image_ext):
     return image_ext in ("PNG", "JPG", "JPEG", "TIFF")
+
+
+def _get_growth_stage_names():
+    global __GROWTH_STAGE_NAMES
+    try:
+        return __GROWTH_STAGE_NAMES
+    except NameError:
+        pass
+    data_path = pathlib.Path(__file__).parent / "growth_stage_labels.json"
+    data = json.load(open(data_path))
+    out = {}
+    # JSON requires string keys
+    out["fine"] = {int(k): v for k, v in data.pop("fine").items()}
+    for scheme, ranges in data.items():
+        out[scheme] = {}
+        for range_ in ranges:
+            for i in range(range_["lo"], range_["hi"] + 1):
+                out[scheme][i] = range_["label"]
+    __GROWTH_STAGE_NAMES = out
+    return out
+
+
+def lookup_growth_stage_name(idx, scheme):
+    valid = ["fine", "bbch_ranges", "grain_ranges"]
+    if scheme not in valid:
+        raise ValueError(f"scheme must be one of {valid}. Got {scheme}")
+    return _get_growth_stage_names()[scheme][idx]
+
+
+def get_task_types(annotations):
+    if not annotations:
+        return set()
+    if hasattr(annotations, "items"):
+        annotations = [annotations]
+    out = {"classification"}
+    for annotation in annotations:
+        if annotation.get("segmentation"):  # empty segmentation should not be counted
+            out.add("segmentation")
+            # FIXME: should we be assuming that one should turn segmentation into bbox?
+            out.add("bounding box")
+        if "bbox" in annotation:
+            out.add("bounding box")
+    return out
+
+
+def denormalise_weedcoco(weedcoco):
+    """Puts objects into images from ID references
+
+    E.g. "annotations" added to images and "category" to annotations
+
+    Operates in-place.
+    """
+    id_lookup = {}
+    for key, objs in weedcoco.items():
+        for obj in objs:
+            if "id" in obj:
+                id_lookup[key, obj["id"]] = obj
+
+    for annotation in weedcoco["annotations"]:
+        image = id_lookup["images", annotation["image_id"]]
+        image.setdefault("annotations", []).append(annotation)
+        annotation["category"] = id_lookup["categories", annotation["category_id"]]
+
+    for image in weedcoco["images"]:
+        if "agcontext_id" in image:
+            image["agcontext"] = id_lookup["agcontexts", image["agcontext_id"]]

@@ -13,7 +13,7 @@ from weedcoco.validation import validate
 from weedcoco.utils import load_json_or_yaml
 from weedcoco.utils import get_image_dimensions
 from weedcoco.utils import add_agcontext_from_file
-from weedcoco.utils import add_collection_from_file
+from weedcoco.utils import add_metadata_from_file
 
 
 def generate_segmentations(mask_path, color_map, colors_not_found):
@@ -59,6 +59,7 @@ def masks_to_coco(
     mask_dir: Path,
     color_to_category_map: Mapping[str, str],
     image_to_mask_pattern=None,
+    on_missing_mask: str = "error",
 ):
     """Converts images and masks to MS COCO images and annotations
 
@@ -74,6 +75,9 @@ def masks_to_coco(
         A regular expression that will match a substring of an image filename.
         The matched portion will have ".png" added and will be sought in
         mask_dir.
+    on_missing_mask : one of {"error", "skip", "warn"}
+        If there is no mask available for a given image file, by default an
+        error will be raised.  This allows it to instead be skipped.
 
     Returns
     -------
@@ -114,9 +118,15 @@ def masks_to_coco(
             continue
         mask_path = mask_dir / (_image_name_to_mask(path.name))
         if not mask_path.exists():
-            raise FileNotFoundError(
-                f"No mask found at {mask_path} for image named {path.name}."
-            )
+            if on_missing_mask == "error":
+                raise FileNotFoundError(
+                    f"No mask found at {mask_path} for image named {path.name}."
+                )
+            elif on_missing_mask == "warn":
+                warnings.warn(
+                    f"No mask found at {mask_path} for image named {path.name}."
+                )
+            continue
         dims = get_image_dimensions(mask_path)
         if get_image_dimensions(path) != dims:
             raise ValueError(
@@ -197,9 +207,10 @@ def main(args=None):
         ),
     )
     ap.add_argument("--agcontext-path", type=Path)
-    ap.add_argument("--collection-path", type=Path)
+    ap.add_argument("--metadata-path", type=Path)
     ap.add_argument("--validate", action="store_true", default=False)
     ap.add_argument("-o", "--out-path", default="coco_from_mask.json", type=Path)
+    ap.add_argument("--on-missing-mask", choices={"skip", "warn", "error"})
     args = ap.parse_args(args)
 
     color_to_category_map = load_json_or_yaml(args.category_map)
@@ -208,12 +219,13 @@ def main(args=None):
         args.mask_dir,
         color_to_category_map,
         image_to_mask_pattern=args.path_to_mask_pattern,
+        on_missing_mask=args.on_missing_mask,
     )
 
     if args.agcontext_path:
         add_agcontext_from_file(coco, args.agcontext_path)
-    if args.collection_path:
-        add_collection_from_file(coco, args.collection_path)
+    if args.metadata_path:
+        add_metadata_from_file(coco, args.metadata_path)
 
     if args.validate:
         validate(coco)

@@ -16,7 +16,7 @@ from tqdm import tqdm
 import humanfriendly
 import os
 
-from weedcoco.utils import get_image_dimensions
+from weedcoco.utils import get_image_dimensions, set_info, set_licenses
 
 """Constants and environment"""
 
@@ -174,7 +174,7 @@ if missingFiles:
 info = [
     {
         "year": 2019,
-        "version": 1,
+        "version": "1",
         "description": "CSV annotations and JPEG images converted into WeedCOCO",
         "secondary_contributor": "Converted to WeedCOCO by Henry Lydecker",
         "contributor": "Alex Olsen",
@@ -194,49 +194,29 @@ license = [
     }
 ]
 
-"""
-Create collection object
-"""
-collections = [
-    {
-        "author": "Olsen, Alex",
-        "title": "DeepWeeds: A Multiclass Weed Species Image Dataset for Deep Learning",
-        "year": 2019,
-        "identifier": "doi:10.1038/s41598-018-38343-3",
-        "rights": "Apache License 2.0",
-        "accrual_policy": "closed",
-        "id": 0,
-    }
-]
+metadata = {
+    "creator": [{"name": "Alex Olsen", "@type": "Person"}],
+    "name": "DeepWeeds: A Multiclass Weed Species Image Dataset for Deep Learning",
+    "description": "Photos of pasture classified for weed species.",
+    "datePublished": "2019-02-14",
+    "sameAs": ["https://github.com/AlexOlsen/DeepWeeds"],
+    "identifier": ["doi:10.1038/s41598-018-38343-3"],
+    "license": "https://creativecommons.org/licenses/by/4.0/",
+    "citation": "A. Olsen, D. A. Konovalov, B. Philippa, P. Ridd, J. C. Wood, J. Johns, W. Banks, B. Girgenti, O. Kenny, J. Whinney, B. Calvert, M. Rahimi Azghadi, and R. D. White, “DeepWeeds: A Multiclass Weed Species Image Dataset for Deep Learning,” Scientific Reports, vol. 9, no. 2058, 2 2019. [Online]. Available: doi.org/10.1038/s41598-018-38343-3",
+}
 
-# TODO: Create subset memberships from multiple csv files...
-collection_memberships = [
-    {"annotation_id": ann["id"], "collection_id": 0} for ann in annotations
-]
-
-"""
-Create agcontext object.
-
-A list of information necessary to provide appropriate agricultural context.
-This information is invariant across a dataset upon upload.
-
-Datasets can be concatenated to include images from multiple different agcontexts.
-"""
 agcontext = [
     {
         "id": 0,
         "agcontext_name": "deepweeds",
-        "crop_type": "weed_only",
-        "bbch_descriptive_text": "na",
-        "bbch_code": "na",
-        "grains_descriptive_text": "na",
+        "crop_type": "pasture",
+        "bbch_growth_range": "na",
         "soil_colour": "variable",
         "surface_cover": "none",
         "surface_coverage": "na",
         "weather_description": "variable",
         "location_lat": -26,
         "location_long": 150,
-        "location_datum": 4326,
         "upload_time": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
         "camera_make": "FLIR Blackfly 23S6C",
         "camera_lens": "Fujinon CF25HA-1",
@@ -245,25 +225,27 @@ agcontext = [
         "camera_angle": 90,
         "camera_fov": 28,
         "photography_description": "Mounted on tripod",
+        "ground_speed": 0,
         "lighting": "natural",
         "cropped_to_plant": False,
         "url": "https://github.com/AlexOlsen/DeepWeeds",
     }
 ]
 
+coco = {
+    "images": images,
+    "annotations": annotations,
+    "categories": categories,
+    "agcontexts": agcontext,
+}
+
+set_info(coco, metadata)
+set_licenses(coco)
+
 """Write output"""
 with args.out_path.open("w") as fout:
     json.dump(
-        {
-            "images": images,
-            "annotations": annotations,
-            "categories": categories,
-            "info": info,
-            "license": license,
-            "agcontexts": agcontext,
-            "collections": collections,
-            "collection_memberships": collection_memberships,
-        },
+        coco,
         fout,
         indent=4,
     )

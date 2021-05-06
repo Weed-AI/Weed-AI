@@ -6,8 +6,6 @@ import axios from 'axios';
 import Cookies from 'js-cookie'
 
 
-const csrftoken = Cookies.get('csrftoken');
-
 const styles = {
   display: "flex",
   alignItems: "center",
@@ -115,9 +113,10 @@ class ReactImageUploadComponent extends React.Component {
    */
   uploadFileToServer(dataURLs, files, newFileData) {
     const filesName = files.map(file => file.name);
-    if (filesName.includes(newFileData.file.name)){
+    if (!this.props.images.includes(newFileData.file.name) || filesName.includes(newFileData.file.name)){
         return
-    } else {
+    }
+    else {
         const body = new FormData()
         body.append('upload_image', newFileData.file)
         body.append('upload_id', this.props.upload_id)
@@ -125,12 +124,13 @@ class ReactImageUploadComponent extends React.Component {
             method: 'post',
             url: this.props.uploadURL,
             data: body,
-            headers: {'Content-Type': 'multipart/form-data', 'X-CSRFToken': csrftoken }
+            headers: {'Content-Type': 'multipart/form-data', 'X-CSRFToken': Cookies.get('csrftoken') }
         }).then(res => {
             if(res.status === 200){
                 dataURLs.push(newFileData.dataURL);
                 files.push(newFileData.file);
                 this.setState({pictures: dataURLs, files: files});
+                this.props.handleUploaded(files.map(file => file.name));
             }
         })
     }
@@ -171,6 +171,7 @@ class ReactImageUploadComponent extends React.Component {
     this.setState({pictures: filteredPictures, files: filteredFiles}, () => {
       this.props.onChange(this.state.files, this.state.pictures);
     });
+    this.props.handleUploaded(filteredFiles.map(file => file.name));
   }
 
   /*
@@ -214,7 +215,7 @@ class ReactImageUploadComponent extends React.Component {
       return (
         <div key={index} className="uploadPictureContainer">
           <div className="deleteImage" onClick={() => this.removeImage(picture)}>X</div>
-          <div style={{display: 'flex', flexDirection: 'column'}}>
+          <div style={{display: 'flex', flexDirection: 'column', width: '100%', overflowWrap: 'anywhere'}}>
             <img src={picture} className="uploadPicture" alt="preview"/>
             <p>{this.state.files[index].name}</p>
           </div>
@@ -278,7 +279,7 @@ ReactImageUploadComponent.defaultProps = {
   buttonText: "Choose images",
   buttonType: "button",
   withLabel: true,
-  label: "Max file size: 5mb, accepted: jpg|gif|png",
+  label: "Max file size: 5 MB | File types accepted: .jpg, .gif, .png, .tif",
   labelStyles: {},
   labelClass: "",
   imgExtension: ['.jpg', '.jpeg', '.gif', '.png'],

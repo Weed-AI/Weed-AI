@@ -7,9 +7,8 @@ import { withStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
 import axios from 'axios';
 import Cookies from 'js-cookie';
+import AuthError from './auth_error';
 
-
-const csrftoken = Cookies.get('csrftoken');
 
 const useStyles = (theme) => ({
     paper: {
@@ -23,6 +22,10 @@ const useStyles = (theme) => ({
     },
     submit: {
         margin: theme.spacing(3, 0, 2),
+        marginTop: 0
+    },
+    field: {
+        marginBottom: theme.spacing(2),
     },
 });
 
@@ -33,7 +36,7 @@ class LoginComponent extends React.Component {
     constructor() {
         super();
         this.state = {
-            login_failure: false
+            error: null
         }
         this.handleSubmit = this.handleSubmit.bind(this);
     }
@@ -50,7 +53,7 @@ class LoginComponent extends React.Component {
             url: baseURL + 'api/login/',
             mode: 'same-origin',
             data: bodyFormData,
-            headers: {'Content-Type': 'multipart/form-data', 'X-CSRFToken': csrftoken }
+            headers: {'Content-Type': 'multipart/form-data', 'X-CSRFToken': Cookies.get('csrftoken') }
         })
         .then((response) => {
             console.log(response);
@@ -58,8 +61,7 @@ class LoginComponent extends React.Component {
             this.props.handleClose();
         })
         .catch((error) => {
-            this.setState({login_failure: true})
-            console.log(error);
+            this.setState({error: error.response.data})
         });
     }
 
@@ -72,8 +74,7 @@ class LoginComponent extends React.Component {
                     <Typography component="h1" variant="h5">
                         Sign in
                     </Typography>
-                    { this.state.login_failure ? <p style={{color: 'red'}}>Invalid username and credentials</p> : ""}
-                    <form className={classes.form} noValidate onSubmit={this.handleSubmit} onChange={() => {this.setState({login_failure: false})}}>
+                    <form className={classes.form} noValidate onSubmit={this.handleSubmit} onChange={() => {this.setState({error: null})}}>
                         <TextField
                             variant="outlined"
                             margin="normal"
@@ -95,7 +96,9 @@ class LoginComponent extends React.Component {
                             type="password"
                             id="password"
                             autoComplete="current-password"
+                            className={classes.field}
                         />
+                        <AuthError error={this.state.error} />
                         <Button
                             type="submit"
                             fullWidth

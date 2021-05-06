@@ -7,12 +7,14 @@ import FormControl from '@material-ui/core/FormControl';
 import Select from '@material-ui/core/Select';
 import axios from 'axios';
 import Button from '@material-ui/core/Button';
+import ReactMarkdown from "react-markdown";
+import content from './upload.md'
+import { Helmet } from "react-helmet";
+import { useArticleStyles } from '../../styles/common'
 
 
 const useStyles = (theme) => ({
-    upload_container: {
-        margin: theme.spacing(10)
-    },
+	...useArticleStyles(theme),
     formControl: {
         margin: theme.spacing(2),
         minWidth: 200,
@@ -20,13 +22,21 @@ const useStyles = (theme) => ({
 })
 
 const baseURL = new URL(window.location.origin);
+const upload_status_mapping = {
+    'N': 'None',
+    'P': 'Processing',
+    'I': 'Incomplete',
+    'AR': 'Awaiting Review',
+    'F': 'Failed',
+    'C': 'Complete'
+}
 
 class UploadComponent extends Component {
     constructor(){
         super()
         this.state = {
             isLoggedIn: false,
-            upload_status: "N",
+            upload_status: "None",
             upload_status_details: "",
             upload_type: "",
         }
@@ -60,11 +70,11 @@ class UploadComponent extends Component {
         axios.get(baseURL + "api/upload_status/")
         .then(res => res.data)
         .then(json => {
-            this.setState({upload_status: json.upload_status,
+            this.setState({upload_status: upload_status_mapping[json.upload_status],
                            upload_status_details: json.upload_status_details})
         })
         .catch(() => {
-            this.setState({upload_status: "N",
+            this.setState({upload_status: "None",
                 upload_status_details: ""})
         })
     }
@@ -84,6 +94,12 @@ class UploadComponent extends Component {
         })
     }
 
+    componentWillMount() {
+      fetch(content).then((response) => response.text()).then((text) => {
+        this.setState({ markdownContent: text })
+      })
+    }
+
     async componentDidMount(){
         const isLoggedIn = await this.retrieveLoginStatus()
         if(isLoggedIn){
@@ -95,9 +111,16 @@ class UploadComponent extends Component {
     render() {
         const {classes} = this.props;
         return (
-            <div className={classes.upload_container}>
+            <article className={classes.page}>
+                <Helmet>
+                    <title>Upload a dataset of weed imagery in crops - Weed-AI</title>
+                    <meta name="description" content="Upload datasets of crop images annotated with weeds." />
+                </Helmet>
+                <h1>Sign In and Upload</h1>
+                <p>We welcome new contributions of datasets of images with weeds already annotated.</p>
                 { this.state.isLoggedIn
                 ?
+                <React.Fragment>
                 <div>
                     <h2>Current upload status: {this.state.upload_status}</h2>
                     <p style={{color: "#f0983a"}}>{this.state.upload_status_details}</p>
@@ -105,13 +128,6 @@ class UploadComponent extends Component {
                         Log out
                     </Button>
                 </div>
-                :
-                <AuthPrompt handleLogin={this.handleLogin} handleLogout={this.handleLogout}/> }
-                <br />
-                <p>We welcome new contributions of datasets of images with weeds already annotated.</p>
-                <p>See <em>our guide</em> for collecting and annotating images.</p>
-                <p>We support several standard formats of upload, accompanied with detailed metadata.</p>
-                <br />
                 <div style={{ display: 'flex', alignItems: 'center' }}>
                     <FormControl className={classes.formControl}>
                         <Select
@@ -123,14 +139,19 @@ class UploadComponent extends Component {
                                 Select annotation format
                             </MenuItem>
                             <MenuItem value="weedcoco">WeedCOCO</MenuItem>
-                            <MenuItem value="coco" disabled>COCO (not implemented)</MenuItem>
+                            <MenuItem value="coco">COCO</MenuItem>
                             <MenuItem value="voc" disabled>VOC (not implemented)</MenuItem>
                             <MenuItem value="masks" disabled>Segmentation masks (not implemented)</MenuItem>
                         </Select>
                     </FormControl>
-                    <UploadDialog handleUploadStatus={this.retrieveUploadStatus} uploadType={this.state.upload_type}/>
+                    <UploadDialog handleUploadStatus={this.retrieveUploadStatus} upload_type={this.state.upload_type}/>
                 </div>
-            </div>
+                </React.Fragment>
+                :
+                <AuthPrompt handleLogin={this.handleLogin} handleLogout={this.handleLogout}/> }
+
+                <ReactMarkdown source={this.state.markdownContent} />
+            </article>
         )
     }
 }

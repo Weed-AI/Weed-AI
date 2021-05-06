@@ -1,7 +1,9 @@
-# Welcome to the Weeds Imaging Database (WeedID). 
+# Welcome to Weed-AI
 
-WeedID is an open source, searchable, weeds image platform designed to facilitate the research and development of machine learning algorithms for weed recognition in cropping systems.
+Weed-AI provides is an open source, searchable, weeds image platform designed to facilitate the research and development of machine learning algorithms for weed recognition in cropping systems.
 It brings together existing datasets, enables users to contribute their own data and pulls together custom datasets for straightforward download. 
+
+See our Weed Explorer at https://weed-ai.sydney.edu.au
 
 # Background 
 
@@ -12,7 +14,7 @@ SSWC relies on accurate detection (is a weed present) and identification (what i
 Camera-based weed recognition using deep learning algorithms has emerged as a frontrunner for in-crop site-specific control with an improved ability to handle variation.
 
 Training and development of algorithms require significant quantities of high-quality, annotated images.
-WeedID is addressing this challenge by enabling the easy access and contribution of weed image data on an open source platform with search, dynamic filter and preview functions for custom dataset download capability. 
+Weed-AI is addressing this challenge by enabling the easy access and contribution of weed image data on an open source platform with search, dynamic filter and preview functions for custom dataset download capability. 
 
 # Data supported 
 
@@ -42,7 +44,7 @@ As with MS COCO, the format supports classification, bounding box and segmentati
 Reporting these details will help ensure consistency in published datasets for ease of comparison and use in further research and development.
 
 
-![WeedID Data Flow](weedID-data-flow-diagram.png)
+![Weed-AI Data Flow](https://github.com/Sydney-Informatics-Hub/Weed-ID-Interchange/blob/master/weedID-data-flow-diagram.png)
 
 # Acknowledgements 
 
@@ -53,7 +55,7 @@ The platform was developed by the Sydney Informatics Hub, a core research facili
 
 ## General 
 
-If you found WeedID useful in your research, please cite the database as: 
+If you found Weed-AI useful in your research, please cite the database as: 
 
 CITATION TBA by mid 2021
 

@@ -1,15 +1,13 @@
 crop_type: wheat
-grains_descriptive_text: na
-bbch_descriptive_text: na
-bbch_code: na
+bbch_growth_range: na
 soil_colour: grey
 surface_cover: none
 surface_coverage: 0-25
 weather_description: Nothing to note
+ground_speed: 0
 lighting: artificial
 location_lat: 90
 location_long: 90
-location_datum: 4326
 camera_make: dunno
 camera_lens: dunno
 camera_lens_focallength: 555

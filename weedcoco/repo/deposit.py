@@ -4,8 +4,9 @@ import json
 import os
 import re
 import tempfile
-from shutil import copyfile, move
+from shutil import copy
 from zipfile import ZipFile
+from PIL import Image
 from weedcoco.utils import get_image_average_hash, check_if_approved_image_extension
 from weedcoco.validation import ValidationError, validate
 
@@ -83,11 +84,14 @@ def create_image_hash(image_dir):
 def migrate_images(dataset_dir, raw_dir, image_hash):
     image_dir = dataset_dir / "images"
     mkdir_safely(image_dir)
-    for image_origin in os.listdir(raw_dir):
-        if check_if_approved_image_extension(image_origin):
-            image_path = dataset_dir / "images" / image_hash[image_origin]
+    for image_name_origin in os.listdir(raw_dir):
+        if check_if_approved_image_extension(image_name_origin):
+            image_path = dataset_dir / "images" / image_hash[image_name_origin]
             if not os.path.isfile(image_path):
-                copyfile(raw_dir / image_origin, image_path)
+                image_origin = Image.open(raw_dir / image_name_origin)
+                image_without_exif = Image.new(image_origin.mode, image_origin.size)
+                image_without_exif.putdata(image_origin.getdata())
+                image_without_exif.save(image_path)
 
 
 def deposit_weedcoco(weedcoco_path, dataset_dir, image_dir, image_hash):
@@ -120,7 +124,9 @@ def compress_to_download(dataset_dir, deposit_id, download_dir):
             zip.write(dataset_dir / "weedcoco.json", "weedcoco.json")
             for image, image_name in retrieve_image_paths(dataset_dir / "images"):
                 zip.write(image, "images/" + image_name)
-        move(zip_path, download_path)
+        # XXX: this should be move() not copy(), but move resulted in files
+        #      that we could not delete or move in the Docker volume.
+        copy(zip_path, download_path)
 
 
 def deposit(weedcoco_path, image_dir, repository_dir, download_dir, upload_id=None):

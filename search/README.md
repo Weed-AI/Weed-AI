@@ -20,6 +20,9 @@ DJANGO_SECRET_KEY=
 POSTGRES_USER=
 POSTGRES_PASSWORD=
 POSTGRES_DB=
+SMTP_HOST=smtp.sydney.edu.au
+SMTP_PORT=
+FROM_EMAIL=Sender Name <sender@host>
 ```
 
 ### Initialise database, migrate and create superuser
@@ -33,3 +36,4 @@ POSTGRES_DB=
 	2. Enter server container: `docker exec -it django bash`
 	3. Make migrations and migrate: `python manage.py makemigrations` and `python manage.py migrate`
 	4. Create superuser: `python manage.py createsuperuser` and follow the prompt instruction
+```

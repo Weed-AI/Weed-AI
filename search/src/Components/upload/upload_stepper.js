@@ -1,183 +1,3 @@
-// import React from 'react';
-// import { withStyles } from '@material-ui/core/styles';
-// import Stepper from '@material-ui/core/Stepper';
-// import Step from '@material-ui/core/Step';
-// import StepLabel from '@material-ui/core/StepLabel';
-// import Button from '@material-ui/core/Button';
-// import Typography from '@material-ui/core/Typography';
-// import UploaderSingle from './uploader_single';
-// import UploaderMultiple from './uploader_multiple';
-
-
-// const useStyles = (theme) => ({
-//   root: {
-//     width: '100%',
-//   },
-//   button: {
-//     marginRight: theme.spacing(1),
-//   },
-//   instructions: {
-//     marginTop: theme.spacing(1),
-//     marginBottom: theme.spacing(1),
-//   },
-// });
-
-// function getSteps() {
-//   return ['Upload Weedcoco', 'Add Agcontext', 'Upload Images'];
-// }
-
-// function getStepContent(step, upload_id, images, handleUploadId, handleImages) {
-//   switch (step) {
-//     case 0:
-//       return <UploaderSingle upload_id={upload_id} images={images} handleUploadId={handleUploadId} handleImages={handleImages}/>;
-//     case 1:
-//       return 'Placeholder for a Agcontext form';
-//     case 2:
-//       return <UploaderMultiple upload_id={upload_id} images={images}/>;
-//     default:
-//       return 'Unknown step';
-//   }
-// }
-
-// class UploadStepper extends React.Component {
-
-//     constructor() {
-//         super();
-//         this.state = {
-//             activeStep: 0,
-//             skipped: new Set(),
-//             steps: getSteps(),
-//             upload_id: 0,
-//             images: [],
-//         }
-//         this.isStepOptional = this.isStepOptional.bind(this);
-//         this.isStepSkipped = this.isStepSkipped.bind(this);
-//         this.handleUploadId = this.handleUploadId.bind(this);
-//         this.handleImages = this.handleImages.bind(this);
-//         this.handleNext = this.handleNext.bind(this);
-//         this.handleBack = this.handleBack.bind(this);
-//         this.handleSkip = this.handleSkip.bind(this);
-//         this.handleReset = this.handleReset.bind(this);
-//     }
-
-//     isStepOptional(step) {
-//         return step === 1;
-//     };
-
-//     isStepSkipped(step) {
-//         return this.state.skipped.has(step);
-//     };
-
-//     handleUploadId(upload_id) {
-//         this.setState({upload_id: upload_id});
-//     }
-
-//     handleImages(images) {
-//         this.setState({images: images});
-//     }
-
-//     handleNext() {
-//         let newSkipped = this.state.skipped;
-//         let activeStep = this.state.activeStep;
-//         if (this.isStepSkipped(activeStep)) {
-//             newSkipped = new Set(newSkipped.values());
-//             newSkipped.delete(activeStep);
-//         }
-//         this.setState(prevState => {return {activeStep: prevState.activeStep + 1}});
-//         this.setState({skipped: newSkipped});
-//     };
-
-//     handleBack(){
-//         this.setState(prevState => {return {activeStep: prevState.activeStep - 1}});
-//     };
-
-//     handleSkip(){
-//         if (!this.isStepOptional(this.state.activeStep)) {
-//             // You probably want to guard against something like this,
-//             // it should never occur unless someone's actively trying to break something.
-//             throw new Error("You can't skip a step that isn't optional.");
-//         }
-//         this.setState(prevState => {return {activeStep: prevState.activeStep + 1}});
-//         this.setState(prevState => {
-//             const newSkipped = new Set(prevState.skipped.values());
-//             newSkipped.add(this.state.activeStep);
-//             return {skipped: newSkipped};
-//         })
-//     };
-
-//     handleReset(){
-//         this.setState({activeStep: 0})
-//     };
-
-//     render(){
-//         const { classes } = this.props;
-//         return (
-//             <div className={classes.root}>
-//             <Stepper activeStep={this.state.activeStep}>
-//                 {this.state.steps.map((label, index) => {
-//                 const stepProps = {};
-//                 const labelProps = {};
-//                 if (this.isStepOptional(index)) {
-//                     labelProps.optional = <Typography variant="caption">Optional</Typography>;
-//                 }
-//                 if (this.isStepSkipped(index)) {
-//                     stepProps.completed = false;
-//                 }
-//                 return (
-//                     <Step key={label} {...stepProps}>
-//                     <StepLabel {...labelProps}>{label}</StepLabel>
-//                     </Step>
-//                 );
-//                 })}
-//             </Stepper>
-//             <div>
-//                 {this.state.activeStep === this.state.steps.length ? (
-//                 <div>
-//                     <Typography className={classes.instructions}>
-//                     All steps completed - you&apos;re finished
-//                     </Typography>
-//                     <Button onClick={this.handleReset} className={classes.button}>
-//                     Reset
-//                     </Button>
-//                 </div>
-//                 ) : (
-//                 <div>
-//                     <Typography className={classes.instructions}>{getStepContent(this.state.activeStep, this.state.upload_id, this.state.images, this.handleUploadId, this.handleImages)}</Typography>
-//                     <div>
-//                     <Button disabled={this.state.activeStep === 0} onClick={this.handleBack} className={classes.button}>
-//                         Back
-//                     </Button>
-//                     {this.isStepOptional(this.state.activeStep) && (
-//                         <Button
-//                         variant="contained"
-//                         color="primary"
-//                         onClick={this.handleSkip}
-//                         className={classes.button}
-//                         >
-//                         Skip
-//                         </Button>
-//                     )}
-        
-//                     <Button
-//                         variant="contained"
-//                         color="primary"
-//                         onClick={this.handleNext}
-//                         className={classes.button}
-//                     >
-//                         {this.state.activeStep === this.state.steps.length - 1 ? 'Finish' : 'Next'}
-//                     </Button>
-//                     </div>
-//                 </div>
-//                 )}
-//             </div>
-//             </div>
-//         );
-//     }
-// };
-
-// export default withStyles(useStyles)(UploadStepper);
-
-
 import React from 'react';
 import { withStyles } from '@material-ui/core/styles';
 import Stepper from '@material-ui/core/Stepper';
@@ -187,11 +7,14 @@ import Button from '@material-ui/core/Button';
 import Typography from '@material-ui/core/Typography';
 import UploaderSingle from './uploader_single';
 import UploaderImages from './uploader_images';
+import ErrorMessage from '../error/display';
+import AgContextForm from '../forms/AgContextForm';
+import UploadJsonButton from '../forms/UploadJsonButton';
+import MetadataForm from '../forms/MetadataForm';
 import axios from 'axios';
-import Cookies from 'js-cookie'
+import Cookies from 'js-cookie';
 
-
-const csrftoken = Cookies.get('csrftoken');
+const baseURL = new URL(window.location.origin);
 
 const useStyles = (theme) => ({
   root: {
@@ -206,47 +29,54 @@ const useStyles = (theme) => ({
   },
 });
 
-function getSteps() {
-  return ['Upload Weedcoco', 'Add Agcontext', 'Upload Images'];
-}
-
-function getStepContent(step, upload_id, images, handleUploadId, handleImages) {
-  switch (step) {
-    case 0:
-      return <UploaderSingle upload_id={upload_id} images={images} handleUploadId={handleUploadId} handleImages={handleImages}/>;
-    case 1:
-      return 'Placeholder for a Agcontext form';
-    case 2:
-      return <UploaderImages upload_id={upload_id} images={images}/>;
-    default:
-      return 'Unknown step';
-  }
+function getSteps(upload_type) {
+  return upload_type === 'coco'?
+         ['Upload Coco', 'Add Agcontext', 'Add Metadata', 'Upload Images']:
+         upload_type === 'weedcoco'?
+         ['Upload Weedcoco', 'Upload Images']:
+         ['Upload Coco', 'Add Agcontext', 'Add Metadata', 'Upload Images']
 }
 
 class UploadStepper extends React.Component {
 
-    constructor() {
-        super();
+    constructor(props) {
+        super(props);
         this.state = {
             activeStep: 0,
+            skip_mapping: {'weedcoco': -1, 'coco': -1},
             skipped: new Set(),
-            steps: getSteps(),
+            steps: getSteps(this.props.upload_type),
             upload_id: 0,
             images: [],
+            imageReady: false,
+            ag_context: {},
+            metadata: {},
+            coco_form_validation: {'agcontexts': false, 'metadata': false},
+            error_message: "init",
+            error_message_details: "",
         }
         this.isStepOptional = this.isStepOptional.bind(this);
         this.isStepSkipped = this.isStepSkipped.bind(this);
         this.handleUploadId = this.handleUploadId.bind(this);
         this.handleImages = this.handleImages.bind(this);
+        this.handleImageReady = this.handleImageReady.bind(this);
+        this.handleAgContextsFormData = this.handleAgContextsFormData.bind(this);
+        this.handleMetadataFormData = this.handleMetadataFormData.bind(this);
+        this.handleErrorMessage = this.handleErrorMessage.bind(this);
         this.handleNext = this.handleNext.bind(this);
         this.handleBack = this.handleBack.bind(this);
         this.handleSkip = this.handleSkip.bind(this);
         this.handleReset = this.handleReset.bind(this);
+        this.handleUploadAgcontexts = this.handleUploadAgcontexts.bind(this);
+        this.handleUploadMetadata = this.handleUploadMetadata.bind(this)
         this.handleSubmit = this.handleSubmit.bind(this);
+        this.isNextEnabled = this.isNextEnabled.bind(this);
+        this.handleValidation = this.handleValidation.bind(this);
+        this.getStepContent = this.getStepContent.bind(this);
     }
 
-    isStepOptional(step) {
-        return step === 1;
+    isStepOptional(step, upload_type) {
+        return this.state.skip_mapping[upload_type] === step;
     };
 
     isStepSkipped(step) {
@@ -259,6 +89,22 @@ class UploadStepper extends React.Component {
 
     handleImages(images) {
         this.setState({images: images});
+    }
+
+    handleImageReady(imageReady) {
+        this.setState({imageReady: imageReady});
+    }
+
+    handleAgContextsFormData(formData) {
+        this.setState({ag_context: formData});
+    }
+
+    handleMetadataFormData(formData) {
+        this.setState({metadata: formData});
+    }
+
+    handleErrorMessage(message, details="") {
+        this.setState({error_message: message, error_message_details: details});
     }
 
     handleNext() {
@@ -276,15 +122,17 @@ class UploadStepper extends React.Component {
             }
             this.setState(prevState => {return {activeStep: prevState.activeStep + 1}});
             this.setState({skipped: newSkipped});
+            this.handleErrorMessage("init")
         }
     };
 
     handleBack(){
         this.setState(prevState => {return {activeStep: prevState.activeStep - 1}});
+        this.handleErrorMessage("init")
     };
 
     handleSkip(){
-        if (!this.isStepOptional(this.state.activeStep)) {
+        if (!this.isStepOptional(this.state.activeStep, this.props.upload_type)) {
             // You probably want to guard against something like this,
             // it should never occur unless someone's actively trying to break something.
             throw new Error("You can't skip a step that isn't optional.");
@@ -301,6 +149,46 @@ class UploadStepper extends React.Component {
         this.setState({activeStep: 0})
     };
 
+    handleUploadAgcontexts(){
+        axios({
+            method: 'post',
+            url: baseURL + "api/upload_agcontexts/",
+            data: {
+                "upload_id": this.state.upload_id,
+                "ag_contexts": this.state.ag_context
+            },
+            headers: {'X-CSRFToken': Cookies.get('csrftoken') }
+        }).then(res => {
+            console.log(res)
+            this.handleErrorMessage("")
+            this.handleNext()
+        })
+        .catch(err => {
+            console.log(err)
+            this.handleErrorMessage("Invalid input for AgContext")
+        })
+    }
+
+    handleUploadMetadata(){
+        axios({
+            method: 'post',
+            url: baseURL + "api/upload_metadata/",
+            data: {
+                "upload_id": this.state.upload_id,
+                "metadata": this.state.metadata
+            },
+            headers: {'X-CSRFToken': Cookies.get('csrftoken') }
+        }).then(res => {
+            console.log(res)
+            this.handleErrorMessage("")
+            this.handleNext()
+        })
+        .catch(err => {
+            console.log(err)
+            this.handleErrorMessage("Failed to submit metadata")
+        })
+    }
+
     handleSubmit(){
         const baseURL = new URL(window.location.origin);
         const body = new FormData()
@@ -309,8 +197,81 @@ class UploadStepper extends React.Component {
             method: 'post',
             url: baseURL + "api/submit_deposit/",
             data: body,
-            headers: {'Content-Type': 'multipart/form-data', 'X-CSRFToken': csrftoken }
+            headers: {'Content-Type': 'multipart/form-data', 'X-CSRFToken': Cookies.get('csrftoken') }
         })
+    }
+
+    handleValidation(formKey, status){
+        this.setState(prevState => {
+            const newState = {coco_form_validation: {...prevState.coco_form_validation}}
+            newState.coco_form_validation[formKey] = status
+            return newState
+        })
+    }
+
+    isNextEnabled(){
+        if (this.state.activeStep === 1) {
+            return this.props.upload_type === 'coco' && this.state.coco_form_validation['agcontexts'] && 'agcontexts'
+        } else if (this.state.activeStep === 2) {
+            return this.props.upload_type === 'coco' && this.state.coco_form_validation['metadata'] && 'metadata'
+        } else {
+            return false
+        }
+    }
+
+    getStepContent(){
+        if (this.props.upload_type === 'coco') {
+            switch (this.state.activeStep) {
+                case 0:
+                  return <UploaderSingle upload_id={this.state.upload_id} images={this.state.images} handleUploadId={this.handleUploadId} handleImages={this.handleImages} handleErrorMessage={this.handleErrorMessage} schema={'compatible-coco'}/>;
+                case 1:
+                  return (
+                    <React.Fragment>
+                        <AgContextForm formData={this.state.ag_context} handleValidation={this.handleValidation} onChange={e => {
+                            this.handleAgContextsFormData(e.formData)
+                            this.handleErrorMessage("init")
+                        }} />
+                        <UploadJsonButton initialValue={this.state.ag_context} downloadName="agcontext" onClose={(value) => {this.handleAgContextsFormData(value)}} />
+                    </React.Fragment>
+                  );
+                case 2:
+                  return (
+                    <React.Fragment>
+                        <MetadataForm formData={this.state.metadataFormData} handleValidation={this.handleValidation} onChange={e => {
+                            this.handleMetadataFormData(e.formData)
+                            this.handleErrorMessage("init")
+                        }} />
+                        <UploadJsonButton initialValue={this.state.metadata} downloadName="dataset-meta" onClose={(value) => {this.handleMetadataFormData(value)}} />
+                    </React.Fragment>
+                  );
+                case 3:
+                  return <UploaderImages upload_id={this.state.upload_id} images={this.state.images} handleImageReady={this.handleImageReady} handleErrorMessage={this.handleErrorMessage}/>;
+                default:
+                  return 'Unknown step';
+            }
+        } else if (this.props.upload_type === 'weedcoco') {
+            switch (this.state.activeStep) {
+                case 0:
+                  return <UploaderSingle upload_id={this.state.upload_id} images={this.state.images} handleUploadId={this.handleUploadId} handleImages={this.handleImages} handleErrorMessage={this.handleErrorMessage} schema={'weedcoco'}/>;
+                case 1:
+                  return <UploaderImages upload_id={this.state.upload_id} images={this.state.images} handleImageReady={this.handleImageReady} handleErrorMessage={this.handleErrorMessage}/>;
+                default:
+                  return 'Unknown step';
+            }
+        } else {
+            switch (this.state.activeStep) {
+                case 0:
+                  return <UploaderSingle upload_id={this.state.upload_id} images={this.state.images} handleUploadId={this.handleUploadId} handleImages={this.handleImages} handleErrorMessage={this.handleErrorMessage}/>;
+                case 1:
+                  return <AgContextForm formData={this.state.ag_context} onChange={e => this.handleAgContextsFormData(e.formData)} />;
+                case 2:
+                  return <MetadataForm formData={this.state.metadata} onChange={e => this.handleMetadataFormData(e.formData)} />;
+                case 3:
+                  return <UploaderImages upload_id={this.state.upload_id} images={this.state.images} handleImageReady={this.handleImageReady} handleErrorMessage={this.handleErrorMessage}/>;
+                default:
+                  return 'Unknown step';
+            }
+        }
     }
 
     render(){
@@ -321,7 +282,7 @@ class UploadStepper extends React.Component {
                 {this.state.steps.map((label, index) => {
                 const stepProps = {};
                 const labelProps = {};
-                if (this.isStepOptional(index)) {
+                if (this.isStepOptional(index, this.props.upload_type)) {
                     labelProps.optional = <Typography variant="caption">Optional</Typography>;
                 }
                 if (this.isStepSkipped(index)) {
@@ -335,30 +296,39 @@ class UploadStepper extends React.Component {
                 })}
             </Stepper>
             <div>
-                <Typography className={classes.instructions}>{getStepContent(this.state.activeStep, this.state.upload_id, this.state.images, this.handleUploadId, this.handleImages)}</Typography>
+                <Typography className={classes.instructions}>
+                    {this.getStepContent()}
+                </Typography>
+                <ErrorMessage error={this.state.error_message} details={this.state.error_message_details}/>
                 <div>
-                <Button disabled={this.state.activeStep === 0} onClick={this.handleBack} className={classes.button}>
-                    Back
-                </Button>
-                {this.isStepOptional(this.state.activeStep) && (
-                    <Button
-                    variant="contained"
-                    color="primary"
-                    onClick={this.handleSkip}
-                    className={classes.button}
-                    >
-                    Skip
+                    <Button disabled={this.state.activeStep === 0} onClick={this.handleBack} className={classes.button}>
+                        Back
                     </Button>
-                )}
-    
-                <Button
-                    variant="contained"
-                    color="primary"
-                    onClick={this.handleNext}
-                    className={classes.button}
-                >
-                    {this.state.activeStep === this.state.steps.length - 1 ? 'Submit' : 'Next'}
-                </Button>
+                    {this.isStepOptional(this.state.activeStep, this.props.upload_type)
+                    && (
+                        <Button
+                        variant="contained"
+                        color="primary"
+                        onClick={this.handleSkip}
+                        className={classes.button}
+                        disabled={this.state.error_message.length > 0 && this.state.error_message !== "init"}
+                        >
+                        Skip
+                        </Button>
+                    )}
+        
+                    <Button
+                        variant="contained"
+                        color="primary"
+                        onClick={this.isNextEnabled() === 'agcontexts' ? this.handleUploadAgcontexts : this.isNextEnabled() === 'metadata' ? this.handleUploadMetadata : this.handleNext}
+                        className={classes.button}
+                        disabled={this.state.error_message.length > 0 &&
+                                  (this.state.activeStep !== this.state.steps.length - 1 ||
+                                  this.state.activeStep === this.state.steps.length - 1 && !this.state.imageReady) &&
+                                  !this.isNextEnabled()}
+                    >
+                        {this.state.activeStep === this.state.steps.length - 1 ? 'Submit' : 'Next'}
+                    </Button>
                 </div>
             </div>
             </div>

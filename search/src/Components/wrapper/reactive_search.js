@@ -1,194 +1,187 @@
 import React, { Component } from 'react';
+import Paper from '@material-ui/core/Paper';
+import IconButton from '@material-ui/core/IconButton';
+import Typography from '@material-ui/core/Typography';
+import CloseIcon from '@material-ui/icons/Close'
+import Tooltip from '@material-ui/core/Tooltip';
 import {
-	ReactiveBase,
-	RangeSlider,
-	ResultCard,
-	MultiList,
-	ReactiveList,
-	SelectedFilters
+    RangeSlider,
+    MultiList,
+    SelectedFilters,
+    MultiDropdownList
 } from '@appbaseio/reactivesearch';
-import Cookies from 'js-cookie'
+import { GeoDistanceSlider } from "@appbaseio/reactivemaps";
+import SearchBase from '../search/SearchBase';
+import ResultsList from '../search/ResultsList';
+import { Helmet } from "react-helmet";
 
 
-const csrftoken = Cookies.get('csrftoken');
+const IntroText = () => {
+  const [show, setShow] = React.useState((localStorage.getItem("showIntro") === "false") ? false : true);
+  const onClose = () => { localStorage.setItem("showIntro", "false"); setShow(false) }
+  return show ? (
+    <Paper style={{ marginTop: "15px", padding: "1em" }}>
+      <div style={{float: "right"}}><IconButton style={{ padding: 0 }} onClick={ onClose } aria-label="Close this introductory text"><CloseIcon /></IconButton></div>
+      <Typography variant="h6">Welcome to Weed-AI</Typography>
+      <Typography>
+        Find and download <a href="/datasets">datasets</a> of annotated weed imagery.
+        Search by crop and weed species, crop growth stage, location, photography attributes, annotation task type and more.
+        Collect and <a href="/upload">upload</a> your own!
+      </Typography>
+    </Paper>
+  ) : [];
+}
+
 
 class ReactiveSearchComponent extends Component {
 
-	render() {
-		let makeProps = function (id, ismultilist) {
-			let multilistFacetProps = {
-				showCheckbox: true,
-				showCount: true,
-				showFilter: true,
-				showSearch: false,
-				style: {
-					padding: "5px",
-					marginTop: "10px"
-				},
-			}
-			if (!ismultilist) {
-				multilistFacetProps = {}
-			}
-			let facetProps = {
-				innerClass: {
-					title: "filter-title",
-					checkbox: "filter-checkbox"
-				},
-				queryFormat: "or",
-				URLParams: false,
-				react: {
-					and: [
-						"searchbox",
-						"crop_type_filter",
-						"category_filter",
-						"grains_text_filter",
-						"task_type_filter",
-						"lighting_filter",
-						"resslider",
-					]
-				},
-				...multilistFacetProps
-			}
-			var idx
-			//remove id from query
-			if ((idx = facetProps.react.and.indexOf(id)) !== -1) {
-				facetProps.react.and.splice(idx, 1);
-			}
-			return (facetProps)
-		}
+    render() {
+        let makeProps = function (id, ismultilist) {
+            let multilistFacetProps = {
+                showCheckbox: true,
+                showCount: true,
+                showFilter: true,
+                showSearch: false,
+                style: {
+                    padding: "5px",
+                    marginTop: "10px"
+                },
+            }
+            if (!ismultilist) {
+                multilistFacetProps = {}
+            }
+            let facetProps = {
+                innerClass: {
+                    title: "filter-title",
+                    checkbox: "filter-checkbox"
+                },
+                queryFormat: "or",
+                URLParams: true,
+                react: {
+                    and: [
+                        "crop_type_filter",
+                        "category_filter",
+                        "grains_text_filter",
+                        "task_type_filter",
+                        "lighting_filter",
+                        "geo_distance_filter",
+                        "dataset_name_filter",
+                    ]
+                },
+                ...multilistFacetProps
+            }
+            var idx
+            //remove id from query
+            if ((idx = facetProps.react.and.indexOf(id)) !== -1) {
+                facetProps.react.and.splice(idx, 1);
+            }
+            return (facetProps)
+        }
 
-		const esURL = new URL(window.location.origin);
-
-		return (
-			<ReactiveBase
-				app="weedid"
-				url={esURL + "elasticsearch/"}
-				theme={{
-					typography: {
-						fontFamily: 'Raleway, Helvetica, sans-serif',
-					},
-					colors: {
-						primaryColor: '#0A0A0A',
-						titleColor: '#E64626',
-					},
-					component: {
-						padding: 10
-					}
-				}}
-				headers={{'X-CSRFToken': csrftoken}}
-			>
-				<div style={{ position: "fixed", width: "20rem", overflow: "scroll", height: "90%", left: 0, padding: '0 1rem' }}>
-					<MultiList
-						componentId="crop_type_filter"
-						title="Crop Type"
-						dataField="agcontext__crop_type.keyword"
-						sortBy="asc"
-						selectAllLabel="All types"
-						placeholder="Search types"
-						filterLabel="Types"
-						{...makeProps("crop_type_filter", true)}
-					/>
-					<MultiList
-						componentId="category_filter"
-						title="Annotated Species"
-						dataField="annotation__category__name.keyword"
-						sortBy="asc"
-						selectAllLabel="All species"
-						placeholder="Search Species"
-						filterLabel="Species"
-						{...makeProps("categoryfilter", true)}
+        return (
+            <SearchBase>
+                <Helmet>
+                  <title>A repository of weed imagery in crops - Weed-AI</title>
+                  <meta
+                    name="description"
+                    content="Find and download datasets of annotated weed imagery. Search by crop and weed species, crop growth stage, location, photography attributes, annotation task type and more. Collect and upload your own!"
+                  />
+                </Helmet>
+                <div style={{ position: "fixed", width: "20rem", overflow: "scroll", height: "90%", left: 0, padding: '1rem' }}>
+                    <IntroText />
+                    <MultiList
+                        componentId="crop_type_filter"
+                        title="Crop Type"
+                        dataField="agcontext__crop_type.keyword"
+                        sortBy="asc"
+                        selectAllLabel="All types"
+                        placeholder="Search types"
+                        filterLabel="Types"
+                        {...makeProps("crop_type_filter", true)}
+                    />
+                    <MultiList
+                        componentId="category_filter"
+                        title="Annotated Species"
+                        dataField="annotation__category__name.keyword"
+                        sortBy="asc"
+                        selectAllLabel="All species"
+                        placeholder="Search Species"
+                        filterLabel="Species"
+                        {...makeProps("categoryfilter", true)}
                         showSearch={true}
-					/>
-					<MultiList
-						componentId="grains_text_filter"
-						title="Crop Growth Stage"
-						dataField="agcontext__grains_descriptive_text.keyword"
-						sortBy="asc"
-						selectAllLabel="All growth stages"
-						placeholder="Search growth stage"
-						filterLabel="Growth stage"
-						{...makeProps("grainstextfilter", true)}
-					/>
-					<MultiList
-						componentId="task_type_filter"
-						title="Computer Vision Task"
-						dataField="task_type.keyword"
-						sortBy="asc"
-						selectAllLabel="All tasks"
-						placeholder="Search Tasks"
-						filterLabel="Tasks"
-						{...makeProps("task_type_filter", true)}
-					/>
-					<MultiList
-						componentId="lighting_filter"
-						title="Lighting Mode"
-						dataField="agcontext__lighting.keyword"
-						sortBy="asc"
-						selectAllLabel="All lighting"
-						placeholder="Search Lighting"
-						filterLabel="Lighting"
-						{...makeProps("lighting_filter", true)}
-					/>
-					<RangeSlider
-						componentId="resslider"
-						dataField="resolution"
-						title="Image Resolution (pixels)"
-						range={{
-							"start": 0,
-							"end": 1500000
-						}}
-						rangeLabels={{
-							"start": "Start",
-							"end": "End"
-						}}
-						stepValue={10000}
-						showHistogram={true}
-						showFilter={true}
-						interval={15000}
-						{...makeProps("resslider", false)}
-					/>
-				</div>
-				<div style={{ position: "absolute", left: "20rem", paddingRight: "1rem" }}>
-					<SelectedFilters />
-					<ReactiveList
-						componentId="result"
-						dataField="results"
-						title="Results"
-						sortOptions={[{"label": "random order", "dataField": "sortKey", "sortBy": "asc"}]}
-						from={0}
-						size={20}
-						{...makeProps("result", false)}
-						infiniteScroll={true}
-						render={({ data }) => (
-							<ReactiveList.ResultCardsWrapper>
-								{
-									data.map(item => (
-										<ResultCard key={item._id}>
-											<ResultCard.Image
-												src={item.thumbnail}
-											/>
-											<ResultCard.Description>
-												<ul className="annotations">
-												{
-													// TODO: make this more idiomatically React
-													Array.from(new Set(item.annotation__category__name)).map((annotName) => {
-														const annot = annotName.match(/^[^:]*/)
-														return annot.length > 0 ? (<li className={annot[0]}>{annot[0]}</li>) : ""
-													})
-												}
-												</ul>
-												{" in " + item.agcontext__grains_descriptive_text + " " + item.agcontext__crop_type}
-											</ResultCard.Description>
-										</ResultCard>
-									))
-								}
-							</ReactiveList.ResultCardsWrapper>
-						)}
-					/>
-				</div>
-			</ReactiveBase>
-		);
-	}
+                    />
+                    <MultiList
+                        componentId="grains_text_filter"
+                        title="Crop Growth Stage"
+                        dataField="agcontext__growth_stage_texts.keyword"
+                        sortBy="asc"
+                        selectAllLabel="All growth stages"
+                        placeholder="Search growth stage"
+                        filterLabel="Growth stage"
+                        {...makeProps("grainstextfilter", true)}
+                    />
+                    <GeoDistanceSlider
+                      title="Location"
+                      componentId="geo_distance_filter"
+                      placeholder="Search Location"
+                      dataField="location"
+                      unit="km"
+                      showFilter={true}
+                      autoLocation={false}
+                      range={{
+                        start: 10,
+                        end: 1000
+                      }}
+                      defaultValue={{
+                        distance: 1000
+                      }}
+                      rangeLabels={{
+                        start: '10km',
+                        end: '1000km',
+                      }}
+                      {...makeProps("geo_distance_filter", false)}
+                    />
+                    <MultiList
+                        componentId="task_type_filter"
+                        title="Computer Vision Task"
+                        dataField="task_type.keyword"
+                        sortBy="asc"
+                        selectAllLabel="All tasks"
+                        placeholder="Search Tasks"
+                        filterLabel="Tasks"
+                        {...makeProps("task_type_filter", true)}
+                    />
+                    <MultiList
+                        componentId="lighting_filter"
+                        title="Lighting Mode"
+                        dataField="agcontext__lighting.keyword"
+                        sortBy="asc"
+                        selectAllLabel="All lighting"
+                        placeholder="Search Lighting"
+                        filterLabel="Lighting"
+                        {...makeProps("lighting_filter", true)}
+                    />
+                </div>
+                <div style={{ position: "absolute", left: "20rem", paddingRight: "1rem", marginTop: "1rem" }}>
+                    <MultiDropdownList
+                        componentId="dataset_name_filter"
+                        dataField="dataset_name.keyword"
+                        URLParams={true}
+                        title="Dataset Name"
+                        placeholder="Search datasets"
+                        sortBy="asc"
+                        filterLabel="Datasets"
+                        {...makeProps("dataset_name_filter", true)}
+                    />
+                    <SelectedFilters clearAllLabel="Clear filters" />
+                    <ResultsList
+                        listProps={makeProps("result", false)}
+                    />
+                    {this.props.footer}
+                </div>
+            </SearchBase>
+        );
+    }
 }
 
 export default ReactiveSearchComponent;
