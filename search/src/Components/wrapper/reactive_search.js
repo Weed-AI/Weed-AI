@@ -13,6 +13,7 @@ import {
 import { GeoDistanceSlider } from "@appbaseio/reactivemaps";
 import SearchBase from '../search/SearchBase';
 import ResultsList from '../search/ResultsList';
+import { Helmet } from "react-helmet";
 
 
 const IntroText = () => {
@@ -79,6 +80,13 @@ class ReactiveSearchComponent extends Component {
 
         return (
             <SearchBase>
+                <Helmet>
+                  <title>A repository of weed imagery in crops - Weed-AI</title>
+                  <meta
+                    name="description"
+                    content="Find and download datasets of annotated weed imagery. Search by crop and weed species, crop growth stage, location, photography attributes, annotation task type and more. Collect and upload your own!"
+                  />
+                </Helmet>
                 <div style={{ position: "fixed", width: "20rem", overflow: "scroll", height: "90%", left: 0, padding: '1rem' }}>
                     <IntroText />
                     <MultiList

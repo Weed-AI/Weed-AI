@@ -131,7 +131,7 @@ class StandaloneEditor extends Component {
         return (
             <Container maxWidth="sm">
                 <Helmet>
-                    <title>Metadata Editor – Weed-AI</title>
+                    <title>Metadata Editor - Weed-AI</title>
                     <meta name="description" content="Edit and save metadata about an annotated weed imagery collection." />
                 </Helmet>
                 <h2>Dataset Metadata</h2>

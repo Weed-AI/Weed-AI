@@ -161,7 +161,7 @@ class StandaloneEditor extends Component {
         return (
             <Container maxWidth="sm">
                 <Helmet>
-                    <title>AgContext Editor – Weed-AI</title>
+                    <title>AgContext Editor - Weed-AI</title>
                     <meta name="description" content="Edit and save the agricultural and photographic context of your annotated image collection." />
                 </Helmet>
                 <h2>AgContext Editor</h2>

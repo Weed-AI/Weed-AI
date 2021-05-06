@@ -21,7 +21,7 @@ class WeedCOCOComponent extends Component {
     return (
       <article className={this.props.classes.page}>
         <Helmet>
-            <title>About WeedCOCO at Weed-AI: a repository of weed imagery in crops</title>
+            <title>About WeedCOCO - Weed-AI</title>
             <meta name="description" content="WeedCOCO is a standard interchange format for images annotated with weeds and their metadata." />
         </Helmet>
         <ReactMarkdown source={this.state.markdownContent} />
