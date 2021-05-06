@@ -21,7 +21,7 @@ const useStyles = (theme) => ({
         margin: theme.spacing(1),
         minWidth: 120,
     },
-    span: {
+    text_field: {
         marginRight: '1em'
     },
     applyButton: {
@@ -48,13 +48,13 @@ class CategoryMapper extends React.Component {
     }
 
     changeCategory(e, index) {
-        this.modifyCategories(index, "category", e.target.value);
+        this.modifyCategories(index, "role", e.target.value);
         this.props.handleCategoryStatus(false);
         this.props.handleErrorMessage("init");
     }
 
     changeSciName(e, index) {
-        this.modifyCategories(index, "scitific_name", e.target.value);
+        this.modifyCategories(index, "scientific_name", e.target.value);
         this.props.handleCategoryStatus(false);
         this.props.handleErrorMessage("init");
     }
@@ -63,27 +63,28 @@ class CategoryMapper extends React.Component {
         const { classes } = this.props;
         return (
             <React.Fragment>
-                <p className={classes.summary}>{this.state.categories.length} {this.state.categories.length > 1 ? 'categories' : 'category'} need mapping to weedcoco categories</p>
+                <p className={classes.summary}>{this.state.categories.length} {this.state.categories.length != 1 ? 'categories' : 'category'} need mapping to weedcoco categories</p>
                 <ol>
                     {
                         this.state.categories.map((category, index) => {
                             return (
                                 <li className={classes.row}>
-                                    <p className={classes.span}>{category.name} is a</p>
+                                    <p className={classes.text_field}>{category.name} is a</p>
                                     <FormControl className={classes.formControl}>
                                         <InputLabel id="category">Category</InputLabel>
                                         <Select
                                         labelId="category"
                                         id="category"
-                                        value={category.category}
+                                        value={category.role}
                                         onChange={e => {this.changeCategory(e, index)}}
                                         >
                                             <MenuItem value={"crop"}>crop</MenuItem>
                                             <MenuItem value={"weed"}>weed</MenuItem>
+                                            <MenuItem value={"other"}>other</MenuItem>
                                         </Select>
                                     </FormControl>
-                                    <p className={classes.span}>of species</p>
-                                    <TextField label="Scitific name" onChange={e => {e.persist(); this.changeSciName(e, index)}}/>
+                                    <p className={classes.text_field}>of species</p>
+                                    <TextField label="Scientific name" value={category.scientific_name} onChange={e => {e.persist(); this.changeSciName(e, index)}}/>
                                 </li>
                             )
                         })
@@ -93,13 +94,14 @@ class CategoryMapper extends React.Component {
                         color="primary"
                         className={classes.applyButton}
                         onClick={() => {
-                            if (this.state.categories.length > 0 && this.state.categories.length === this.state.categories.filter(category => category.category.length > 0).length) {
+                            if (this.state.categories.length > 0 && this.state.categories.length === this.state.categories.filter(category => category.role && category.scientific_name).length) {
                                 this.props.handleCategories(this.state.categories)
                                 this.props.handleErrorMessage("")
                                 this.props.handleCategoryStatus(true)
                             }
                             else {
-                                this.props.handleErrorMessage("Category missing")
+                                console.log(this.state.categories)
+                                this.props.handleErrorMessage("Category or Scientific name missing")
                                 this.props.handleCategoryStatus(false)
                             }
                         }}>Apply</Button>

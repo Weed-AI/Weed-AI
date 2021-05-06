@@ -37,20 +37,11 @@ def set_categories(weedcoco_path, categories):
         data = json.load(jsonFile)
     new_categories = []
     for category in categories:
-        if category["scitific_name"]:
+        if category["role"] and category["scientific_name"]:
             new_categories.append(
                 {
                     "id": category["id"],
-                    "name": ": ".join(
-                        (category["category"], category["scitific_name"])
-                    ),
-                }
-            )
-        elif category["name"] != category["category"]:
-            new_categories.append(
-                {
-                    "id": category["id"],
-                    "name": ": ".join((category["category"], category["name"])),
+                    "name": ": ".join((category["role"], category["scientific_name"])),
                 }
             )
         else:
@@ -150,17 +141,17 @@ def retrieve_listing_info(query_entity, awaiting_review):
 
 
 def retrieve_category_name(category):
-    if re.fullmatch(r"(crop|weed): ([a-z][a-z ]+|UNSPECIFIED)", category["name"]):
+    if re.fullmatch(r"(crop|weed|other): .+", category["name"]):
         return {
             "id": category["id"],
-            "category": category["name"].split(": ")[0],
-            "name": category["name"].split(": ")[1],
-            "scitific_name": "",
+            "name": category["name"],
+            "role": category["name"].split(": ")[0],
+            "scientific_name": category["name"].split(": ")[1],
         }
     else:
         return {
             "id": category["id"],
-            "category": "",
             "name": category["name"],
-            "scitific_name": "",
+            "role": "",
+            "scientific_name": "",
         }
