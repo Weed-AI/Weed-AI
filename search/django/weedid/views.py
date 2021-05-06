@@ -17,6 +17,7 @@ from weedid.utils import (
     add_metadata,
     validate_email_format,
 )
+from weedid.notification import review_notification
 from weedid.models import Dataset, WeedidUser
 from weedcoco.validation import validate, JsonValidationError
 from django.contrib.auth import login, logout
@@ -213,6 +214,7 @@ def dataset_approve(request, dataset_id):
     if upload_entity:
         weedcoco_path = os.path.join(REPOSITORY_DIR, str(dataset_id), "weedcoco.json")
         update_index_and_thumbnails(weedcoco_path, dataset_id)
+        review_notification("approved", dataset_id)
         return HttpResponse("It has been approved")
     else:
         return HttpResponseNotAllowed("Dataset to be reviewed doesn't exist")
@@ -230,6 +232,7 @@ def dataset_reject(request, dataset_id):
             upload_entity.status = "F"
             upload_entity.status_details = "It failed to proceed after review."
             upload_entity.save()
+            review_notification("rejected", dataset_id)
         return HttpResponse("The dataset has been rejected and removed")
     else:
         return HttpResponseNotAllowed("Dataset to be rejected doesn't exist")

@@ -20,4 +20,7 @@ DJANGO_SECRET_KEY=
 POSTGRES_USER=
 POSTGRES_PASSWORD=
 POSTGRES_DB=
+SMTP_HOST=smtp.sydney.edu.au
+SMTP_PORT=
+FROM_EMAIL=Sender Name <sender@host>
 ```
