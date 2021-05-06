@@ -2,6 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { BrowserRouter as Router } from 'react-router-dom';
 import './index.css';
+import './disable-speedy' // Must be imported before App
 import App from './App';
 import * as serviceWorker from './serviceWorker';
 

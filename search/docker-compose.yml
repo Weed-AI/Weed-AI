@@ -206,6 +206,22 @@ services:
     logging:
       driver: "json-file"
 
+  rendertronmobile:
+    image: rendertronmobile
+    build:
+      context: ./nginx/rendertron
+      args:
+        - CONFIGFILE=config-mobile.json
+    networks:
+      - elastic
+
+  rendertron:
+    image: rendertron
+    build:
+      context: ./nginx/rendertron
+    networks:
+      - elastic
+
 networks:
   elastic:
     driver: bridge

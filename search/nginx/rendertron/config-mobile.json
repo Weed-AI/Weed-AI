@@ -1,0 +1,11 @@
+{
+    "cache": "filesystem",
+    "timeout": 10000,
+    "renderOnly": ["https://weed-ai.sydney.edu.au"],
+    "width": 600,
+    "cacheConfig": {
+        "cacheDurationMinutes": 7200,
+        "cacheMaxEntries": 1000,
+        "snapshotDir": "/cache"
+    }
+}
