@@ -18,6 +18,16 @@ DEFAULT_TYPES = ("PFL", "SPT")
 
 
 class EppoTaxonomy:
+    SUFFIX_TO_LEVEL = {
+        "C": "Class",
+        "D": "Category",
+        "F": "Family",
+        "G": "Genus",
+        "K": "Kingdom",
+        "O": "Order",
+        "P": "Phylum",
+    }
+
     def __init__(
         self,
         path=None,
@@ -159,6 +169,11 @@ class EppoTaxonomy:
         if species_only:
             out = [entry for entry in out if entry["level"] == "species"]
         return out
+
+
+# Add FAMILY_SUFFIX etc
+for suf, name in EppoTaxonomy.SUFFIX_TO_LEVEL.items():
+    setattr(EppoTaxonomy, name.upper() + "_SUFFIX", suf)
 
 
 _EPPO_SINGLETON = {}
