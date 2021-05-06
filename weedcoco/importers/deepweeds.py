@@ -195,8 +195,9 @@ license = [
 ]
 
 metadata = {
-    "creator": [{"name": "Alex Olsen"}],
+    "creator": [{"name": "Alex Olsen", "@type": "Person"}],
     "name": "DeepWeeds: A Multiclass Weed Species Image Dataset for Deep Learning",
+    "description": "Photos of pasture classified for weed species.",
     "datePublished": "2019-02-14",
     "sameAs": ["https://github.com/AlexOlsen/DeepWeeds"],
     "identifier": ["doi:10.1038/s41598-018-38343-3"],

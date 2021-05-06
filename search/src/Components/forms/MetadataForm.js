@@ -4,12 +4,12 @@ import { withRouter } from 'react-router-dom';
 import schema from '../../Schemas/Metadata.json'
 import Container from '@material-ui/core/Container';
 import Box from '@material-ui/core/Box';
-import {
-  materialCells,
-  materialRenderers,
-} from '@jsonforms/material-renderers';
+import { createAjv } from '@jsonforms/core';
+import renderers from '../formRenderers/default_renderers';
 import { JsonForms } from '@jsonforms/react';
+import { constTester, ConstRenderer } from '../formRenderers/ConstRenderer';
 import UploadJsonButton from './UploadJsonButton';
+import { materialCells } from '@jsonforms/material-renderers';
 
 
 const uischema = {
@@ -19,6 +19,10 @@ const uischema = {
             "type": "Category",
             "label": "Basics",
             "elements": [
+                {
+                    "type": "Control",
+                    "scope": "#/properties/@type"
+                },
                 {
                     "type": "Control",
                     "scope": "#/properties/name"
@@ -75,10 +79,6 @@ const uischema = {
     ]
 };
 
-const renderers = [
-  ...materialRenderers
-];
-
 // TODO: refactor boilerplate wrt AgContextForm code
 export const toJSON = (payload) => JSON.stringify(payload, null, 2);
 export const handleSaveToPC = (payload) => {
@@ -105,6 +105,7 @@ class MetadataForm extends Component {
               data={this.props.formData}
               renderers={renderers}
               cells={materialCells}
+              ajv = {createAjv({useDefaults: true})}
               onChange={e => {
                   if (this.props.handleValidation){
                     this.props.handleValidation('metadata', e.errors.length === 0);
@@ -130,7 +131,7 @@ class StandaloneEditor extends Component {
         return (
             <Container maxWidth="sm">
                 <Helmet>
-                    <title>Metadata Editor – Weed-AI</title>
+                    <title>Metadata Editor - Weed-AI</title>
                     <meta name="description" content="Edit and save metadata about an annotated weed imagery collection." />
                 </Helmet>
                 <h2>Dataset Metadata</h2>

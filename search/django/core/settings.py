@@ -17,7 +17,7 @@ DOWNLOAD_DIR = os.path.join(BASE_DIR, "download")
 SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY", "")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.environ.get("ENV", "PROD") == "DEV"
 
 ALLOWED_HOSTS = ["*"]
 CORS_ORIGIN_ALLOW_ALL = True
@@ -30,6 +30,11 @@ DATA_UPLOAD_MAX_MEMORY_SIZE = MAX_IMAGE_SIZE
 FILE_UPLOAD_MAX_MEMORY_SIZE = MAX_IMAGE_SIZE
 
 # Application definition
+
+# SMTP config
+SMTP_HOST = os.environ.get("SMTP_HOST", "smtp.sydney.edu.au")
+SMTP_PORT = os.environ.get("SMTP_PORT", 25)
+FROM_EMAIL = os.environ.get("FROM_EMAIL", "Weed-AI <weed-ai.app@sydney.edu.au>")
 
 INSTALLED_APPS = [
     "django.contrib.admin",

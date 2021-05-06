@@ -30,6 +30,8 @@ properties:
 
   crop_type:
     title: Crop Type
+    description: |-
+      The crop grown in the images.
     oneOf:
       - type: string
         title: Grain Crop
@@ -52,9 +54,6 @@ properties:
           - linseed
           - safflower
           - cotton
-        description: |-
-          Crop type.
-          The crop grown in the image.
       - type: string
         title: Other Crop
         format: plant_species
@@ -69,9 +68,10 @@ properties:
           Non-crop agricultural land or crop land in fallow.
 
   bbch_growth_range:
+    title: BBCH Growth Stage Range
     oneOf:
       - type: object
-        title: BBCH Range
+        title: Specify Range
         required:
           - min
           - max
@@ -81,19 +81,21 @@ properties:
             type: integer
             minimum: 0
             maximum: 99
-            description: Minimum BBCH growth stage (00-99) in the dataset
+            description: |-
+              Minimum BBCH growth stage (00-99) in the dataset.
+            title: Minimum Growth Stage
           max: 
             type: integer
             minimum: 0
             maximum: 99
             description: Maximum BBCH growth stage (00-99) in the dataset
+            title: Maximum Growth Stage
       - type: string
         title: Not Applicable
         const: na
     description: |-
-      BBCH Growth Stage range
       A pair of BBCH Growth Stage codes (00-99) representing the minimum and maximum crop growth stage in the images.
-      If this AgContext is not in a cropping environment, or is in fallow, use value "na".
+      If this AgContext is not in a cropping environment, or is in fallow, use N/A ("na" in WeedCOCO).
 
   soil_colour:
     type: string
@@ -196,9 +198,14 @@ properties:
       A camera facing straight down would be 90. A camera facing forward would be 0.
 
   camera_fov:
+    title: Camera Field of View
+    description: |-
+      Field of view for camera.
+      A number representing the angle captured by the camera across the diagonal of an image, measured in degrees.
+      If this is not fixed within the AgContext (for example, because images have been cropped), use value "variable".
     oneOf:
       - type: number
-        title: Specific
+        title: Specific FOV
         minimum: 1
         maximum: 180
       - type: string

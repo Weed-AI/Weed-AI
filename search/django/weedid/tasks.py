@@ -7,6 +7,7 @@ from weedcoco.index.indexing import ElasticSearchIndexer
 from weedcoco.index.thumbnailing import thumbnailing
 from weedid.models import Dataset
 from weedid.utils import make_upload_entity_fields
+from weedid.notification import upload_notification
 from core.settings import THUMBNAILS_DIR, REPOSITORY_DIR, DOWNLOAD_DIR
 from pathlib import Path
 
@@ -40,6 +41,7 @@ def submit_upload_task(weedcoco_path, image_dir, upload_id):
         upload_entity.save()
         # TODO: raise alert
     else:
+        upload_notification(upload_id)
         upload_entity.status = "AR"
         upload_entity.status_details = "It is currently under review."
         upload_entity.save()

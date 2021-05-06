@@ -7,9 +7,8 @@ import json
 import tempfile
 import datetime
 
-import jsonschema
 from jsonschema import FormatChecker
-import jsonschema.exceptions
+from jsonschema.validators import Draft7Validator, RefResolver
 import yaml
 
 from .species_utils import get_eppo_singleton
@@ -73,6 +72,28 @@ class ValidationError(Exception):
     pass
 
 
+class JsonValidationError(ValidationError):
+    def __init__(self, message, jsonschema_errors=None):
+        super().__init__(message)
+        self.jsonschema_errors = jsonschema_errors
+
+    def get_error_details(self):
+        error_details = [
+            {
+                "path": list(error.path),
+                "value": error.instance,
+                "message": error.message,
+                "schema": error.schema,
+            }
+            for error in self.jsonschema_errors
+        ]
+        return {
+            "error_type": "jsonschema",
+            "n_errors_found": str(len(error_details)),
+            "error_details": error_details,
+        }
+
+
 def validate_json(weedcoco, schema="weedcoco", schema_dir=SCHEMA_DIR):
     """Check that the weedcoco matches its JSON schema"""
     if schema not in MAIN_SCHEMAS:
@@ -82,21 +103,20 @@ def validate_json(weedcoco, schema="weedcoco", schema_dir=SCHEMA_DIR):
         ref_store = validate_json.ref_store
     except AttributeError:
         schema_objects = [
-            yaml.safe_load(path.open()) for path in SCHEMA_DIR.glob("*.yaml")
+            yaml.safe_load(path.open()) for path in schema_dir.glob("*.yaml")
         ]
         validate_json.ref_store = {obj["$id"]: obj for obj in schema_objects}
         ref_store = validate_json.ref_store
     schema_uri = MAIN_SCHEMAS[schema]
     main_schema = ref_store[schema_uri]
-    try:
-        jsonschema.validate(
-            weedcoco,
-            schema=main_schema,
-            resolver=jsonschema.RefResolver(schema_uri, main_schema, store=ref_store),
-            format_checker=FORMAT_CHECKER,
+    validator = Draft7Validator(main_schema, format_checker=FORMAT_CHECKER)
+    validator.resolver = RefResolver(schema_uri, main_schema, store=ref_store)
+    errors = [error for error in validator.iter_errors(weedcoco)]
+    if len(errors):
+        raise JsonValidationError(
+            f"{len(errors)} violations found: {' '.join(err.message for err in errors)}",
+            errors,
         )
-    except jsonschema.ValidationError as e:
-        raise ValidationError(str(e)) from e
 
 
 def validate_references(

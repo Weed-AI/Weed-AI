@@ -3,13 +3,7 @@ import { Helmet } from "react-helmet";
 import { withStyles } from '@material-ui/core/styles';
 import ReactMarkdown from "react-markdown";
 import content from './weedcoco.md'
-
-const useStyles = (theme) => ({
-    page: {
-        margin: theme.spacing(15)
-    },
-})
-
+import { useArticleStyles } from '../../styles/common'
 
 class WeedCOCOComponent extends Component {
   constructor(props) {
@@ -27,7 +21,7 @@ class WeedCOCOComponent extends Component {
     return (
       <article className={this.props.classes.page}>
         <Helmet>
-            <title>About WeedCOCO at Weed-AI: a repository of weed imagery in crops</title>
+            <title>About WeedCOCO - Weed-AI</title>
             <meta name="description" content="WeedCOCO is a standard interchange format for images annotated with weeds and their metadata." />
         </Helmet>
         <ReactMarkdown source={this.state.markdownContent} />
@@ -36,4 +30,4 @@ class WeedCOCOComponent extends Component {
   }
 }
 
-export default withStyles(useStyles)(WeedCOCOComponent);
+export default withStyles(useArticleStyles)(WeedCOCOComponent);

@@ -367,7 +367,8 @@
         "contributor": "Sebastian Haug",
         "metadata": {
             "name": "Cwfid annotations converted into WeedCOCO",
-            "creator": [{"name": "Sebastian Haug"}],
+            "description": "Weeds annotated in carrot crop.",
+            "creator": [{"name": "Sebastian Haug", "@type": "Person"}],
             "datePublished": "2015-XX-XX",
             "license": "https://github.com/cwfid/dataset"
         }

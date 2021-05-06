@@ -3,6 +3,7 @@ $id: https://weedid.sydney.edu.au/schema/Metadata.json
 type: object
 required:
   - name
+  - description  # required by Google Dataset Search (see Rich Results Test)
   - creator
   - datePublished
   - license
@@ -10,9 +11,14 @@ definitions:
   Person:
     type: object
     required:
+      - "@type"
       - name
     properties:
+      "@type":
+        type: string
+        const: Person
       name:
+        title: Person's Name
         type: string
       givenName:
         type: string
@@ -35,9 +41,14 @@ definitions:
   Organization:
     type: object
     required:
+      - "@type"
       - name
     properties:
+      "@type":
+        type: string
+        const: Organization
       name:
+        title: Organization Name
         type: string
       sameAs:
         type: string
@@ -49,8 +60,12 @@ definitions:
         description: Physical address
     title: Organization
 properties:
+  "@type":
+    type: string
+    const: Dataset
   name:
     type: string
+    title: Dataset Name
     description: A name for this dataset, or its publication title
   creator:
     type: array
@@ -63,6 +78,7 @@ properties:
   description:
     type: string
     description: A description of this dataset
+    default: Crop photography with weeds annotated.
   identifier:
     type: array
     items:

@@ -14,6 +14,8 @@ services:
     networks:
       - elastic
     restart: always
+    logging:
+      driver: "json-file"
 
   # django backend
   django:
@@ -35,6 +37,10 @@ services:
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
       - POSTGRES_DB=${POSTGRES_DB}
+      - SMTP_HOST=${SMTP_HOST}
+      - SMTP_PORT=${SMTP_PORT}
+      - FROM_EMAIL=${FROM_EMAIL}
+      - ENV=PROD
     volumes:
       - thumbnails_dir:/code/thumbnails
       - repository_dir:/code/repository
@@ -47,6 +53,8 @@ services:
     networks:
       - elastic
     restart: always
+    logging:
+      driver: "json-file"
 
   celery:
     image: django
@@ -59,6 +67,10 @@ services:
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
       - POSTGRES_DB=${POSTGRES_DB}
+      - SMTP_HOST=${SMTP_HOST}
+      - SMTP_PORT=${SMTP_PORT}
+      - FROM_EMAIL=${FROM_EMAIL}
+      - ENV=PROD
     volumes:
       - thumbnails_dir:/code/thumbnails
       - repository_dir:/code/repository
@@ -70,12 +82,16 @@ services:
     networks:
       - elastic
     restart: always
+    logging:
+      driver: "json-file"
 
   redis:
     image: redis:alpine
     networks:
       - elastic
     restart: always
+    logging:
+      driver: "json-file"
 
   db:
     image: postgres:12.0-alpine
@@ -91,6 +107,8 @@ services:
     networks:
       - elastic
     restart: always
+    logging:
+      driver: "json-file"
 
   # search engine
   elasticsearch:
@@ -123,6 +141,8 @@ services:
       timeout: 30s
       retries: 3
     restart: always
+    logging:
+      driver: "json-file"
 
   reactivesearch:
     image: my-reactivesearch
@@ -140,6 +160,8 @@ services:
     depends_on:
       - elasticsearch
     restart: always
+    logging:
+      driver: "json-file"
 
   thumbnails:
     image: thumbnails
@@ -154,6 +176,8 @@ services:
       - elastic
     stdin_open: true
     restart: always
+    logging:
+      driver: "json-file"
 
   download:
     image: download
@@ -168,6 +192,19 @@ services:
       - elastic
     stdin_open: true
     restart: always
+    logging:
+      driver: "json-file"
+
+  fluentd:
+    container_name: fluentd
+    user: root
+    image: fluent/fluentd:v1.11-debian
+    volumes:
+      - /var/lib/docker/containers:/fluentd/log/containers
+      - ./fluent.conf:/fluentd/etc/fluent.conf
+      - /data/logs:/output/
+    logging:
+      driver: "json-file"
 
 networks:
   elastic:
