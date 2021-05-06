@@ -136,7 +136,7 @@ test_bad_category_name_expected = [
             {
                 "path": ["categories", 0, "name"],
                 "value": "foobar",
-                "message": "'foobar' does not match '^((crop|weed): ([a-z][a-z ]+|UNSPECIFIED)|crop|weed|none)$'",
+                "message": "'foobar' does not match '^((crop|weed|other): ([a-z][a-z ]+|UNSPECIFIED)|crop|weed|none)$'",
             }
         ],
     },
@@ -147,7 +147,7 @@ test_bad_category_name_expected = [
             {
                 "path": ["categories", 0, "name"],
                 "value": "weed: 1",
-                "message": "'weed: 1' does not match '^((crop|weed): ([a-z][a-z ]+|UNSPECIFIED)|crop|weed|none)$'",
+                "message": "'weed: 1' does not match '^((crop|weed|other): ([a-z][a-z ]+|UNSPECIFIED)|crop|weed|none)$'",
             }
         ],
     },
