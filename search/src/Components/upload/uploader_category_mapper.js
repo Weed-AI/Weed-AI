@@ -80,7 +80,6 @@ class CategoryMapper extends React.Component {
                                         >
                                             <MenuItem value={"crop"}>crop</MenuItem>
                                             <MenuItem value={"weed"}>weed</MenuItem>
-                                            <MenuItem value={"other"}>other</MenuItem>
                                         </Select>
                                     </FormControl>
                                     <p className={classes.text_field}>of species</p>

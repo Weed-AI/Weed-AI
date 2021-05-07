@@ -141,7 +141,7 @@ def retrieve_listing_info(query_entity, awaiting_review):
 
 
 def retrieve_category_name(category):
-    if re.fullmatch(r"(crop|weed|other): .+", category["name"]):
+    if re.fullmatch(r"(crop|weed): .+", category["name"]):
         return {
             "id": category["id"],
             "name": category["name"],
