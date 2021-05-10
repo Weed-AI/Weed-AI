@@ -200,7 +200,7 @@ export const DatasetSummary = (props) => {
     const displayMeta = {...metadata}
     const yearPublished = (displayMeta.datePublished || "????").substr(0, 4);
     displayMeta["description"] = (metadata["description"] ?? "") + DESCRIPTION_BOILERPLATE;
-    const datsetUrl = "https://weed-ai.sydney.edu.au/datasets/" + upload_id;
+    const datasetUrl = "https://weed-ai.sydney.edu.au/datasets/" + upload_id;
     displayMeta["identifier"] = [...displayMeta.identifier || [], datasetUrl];
     const authorList = listToWords(displayMeta.creator.map((creator) => creator.name));
     return (
