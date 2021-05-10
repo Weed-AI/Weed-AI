@@ -4,7 +4,9 @@ import pathlib
 import argparse
 import sys
 import json
+import datetime
 
+from jsonschema import FormatChecker
 from jsonschema.validators import Draft7Validator, RefResolver
 import yaml
 
@@ -13,6 +15,22 @@ MAIN_SCHEMAS = {
     "weedcoco": "https://weedid.sydney.edu.au/schema/main.json",
     "compatible-coco": "https://weedid.sydney.edu.au/schema/compatible-coco.json",
 }
+
+FORMAT_CHECKER = FormatChecker()
+
+
+@FORMAT_CHECKER.checks("date")
+def check_date_missing_parts_format(value):
+    if value[-1:] == "X":
+        try:
+            return datetime.datetime.strptime(value, "%Y-%m-XX")
+        except ValueError:
+            try:
+                return datetime.datetime.strptime(value, "%Y-XX-XX")
+            except ValueError:
+                return datetime.datetime.strptime(value, "XXXX-XX-XX")
+
+    return datetime.datetime.strptime(value, "%Y-%m-%d")
 
 
 class ValidationError(Exception):
@@ -56,7 +74,7 @@ def validate_json(weedcoco, schema="weedcoco", schema_dir=SCHEMA_DIR):
         ref_store = validate_json.ref_store
     schema_uri = MAIN_SCHEMAS[schema]
     main_schema = ref_store[schema_uri]
-    validator = Draft7Validator(main_schema)
+    validator = Draft7Validator(main_schema, format_checker=FORMAT_CHECKER)
     validator.resolver = RefResolver(schema_uri, main_schema, store=ref_store)
     errors = [error for error in validator.iter_errors(weedcoco)]
     if len(errors):
