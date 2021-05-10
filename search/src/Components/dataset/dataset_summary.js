@@ -200,13 +200,19 @@ export const DatasetSummary = (props) => {
     const displayMeta = {...metadata}
     const yearPublished = (displayMeta.datePublished || "????").substr(0, 4);
     displayMeta["description"] = (metadata["description"] ?? "") + DESCRIPTION_BOILERPLATE;
-    displayMeta["identifier"] = [...displayMeta.identifier || [], "https://weed-ai.sydney.edu.au/datasets/" + upload_id];
+    const datsetUrl = "https://weed-ai.sydney.edu.au/datasets/" + upload_id;
+    displayMeta["identifier"] = [...displayMeta.identifier || [], datasetUrl];
+    const authorList = listToWords(displayMeta.creator.map((creator) => creator.name));
     return (
       <React.Fragment>
         <Helmet>
           <title>{metadata.name} Dataset - Weed-AI</title>
           <meta property="og:title" content={"Weed-AI dataset: " + metadata.name} />
-          <meta name="description" content={getFirstLine(displayMeta.description) + " by " + displayMeta.creator.map((creator) => creator.name).join(', ') + "."} />
+          <meta property="og:description" content={getFirstLine(displayMeta.description)} />
+          <meta property="og:url" content={datasetUrl} />
+          <meta property="og:type" content="article" />
+          <meta property="og:article:author" content={authorList} />
+          <meta name="description" content={getFirstLine(displayMeta.description) + " by " + authorList + "."} />
         </Helmet>
         <script type="application/ld+json">
         {
