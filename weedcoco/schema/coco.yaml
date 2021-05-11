@@ -1,6 +1,6 @@
 $schema: http://json-schema.org/draft-07/schema#
 $id: https://weedid.sydney.edu.au/schema/coco.json
-description: Minimal MS COCO format with WeedCOCO category naming scheme.
+description: MS COCO format
 type: object
 required:
   - annotations
