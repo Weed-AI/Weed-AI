@@ -16,7 +16,7 @@ from weedid.utils import (
     set_categories,
     add_agcontexts,
     add_metadata,
-    retrieve_category_name,
+    parse_category_name,
 )
 from weedid.models import Dataset, WeedidUser
 from weedcoco.validation import validate, JsonValidationError
@@ -69,7 +69,7 @@ def upload(request):
         for image_reference in weedcoco_json["images"]:
             images.append(image_reference["file_name"].split("/")[-1])
         categories = [
-            retrieve_category_name(category) for category in weedcoco_json["categories"]
+            parse_category_name(category) for category in weedcoco_json["categories"]
         ]
         upload_dir, upload_id = setup_upload_dir(os.path.join(UPLOAD_DIR, str(user.id)))
         weedcoco_path = store_tmp_weedcoco(file_weedcoco, upload_dir)

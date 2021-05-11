@@ -141,13 +141,13 @@ def retrieve_listing_info(query_entity, awaiting_review):
     }
 
 
-def retrieve_category_name(category):
+def parse_category_name(category):
     if re.fullmatch(r"(crop|weed): .+", category["name"]):
         return {
             "id": category["id"],
             "name": category["name"],
-            "role": category["name"].split(": ")[0],
-            "scientific_name": category["name"].split(": ")[1],
+            "role": category["name"].split(": ", maxsplit=1)[0],
+            "scientific_name": category["name"].split(": ", maxsplit=1)[1],
         }
     else:
         return {

@@ -61,9 +61,11 @@ class CategoryMapper extends React.Component {
 
     render() {
         const { classes } = this.props;
+        const nCategories = this.state.categories.length;
+        const nComplete = this.state.categories.filter(category => category.role && category.scientific_name).length;
         return (
             <React.Fragment>
-                <p className={classes.summary}>{this.state.categories.length} {this.state.categories.length != 1 ? 'categories' : 'category'} need mapping to weedcoco categories</p>
+                <p className={classes.summary}>{nCategories - nComplete} of {nCategories} {nCategories != 1 ? 'categories' : 'category'} need mapping to weedcoco categories</p>
                 <ol>
                     {
                         this.state.categories.map((category, index) => {
@@ -71,7 +73,7 @@ class CategoryMapper extends React.Component {
                                 <li className={classes.row}>
                                     <p className={classes.text_field}>{category.name} is a</p>
                                     <FormControl className={classes.formControl}>
-                                        <InputLabel id="category">Category</InputLabel>
+                                        <InputLabel id="category">Role</InputLabel>
                                         <Select
                                         labelId="category"
                                         id="category"
@@ -83,7 +85,7 @@ class CategoryMapper extends React.Component {
                                         </Select>
                                     </FormControl>
                                     <p className={classes.text_field}>of species</p>
-                                    <TextField label="Scientific name" value={category.scientific_name} onChange={e => {e.persist(); this.changeSciName(e, index)}}/>
+                                    <TextField label="Scientific name or UNSPECIFIED" value={category.scientific_name} onChange={e => {e.persist(); this.changeSciName(e, index)}}/>
                                 </li>
                             )
                         })
@@ -93,14 +95,13 @@ class CategoryMapper extends React.Component {
                         color="primary"
                         className={classes.applyButton}
                         onClick={() => {
-                            if (this.state.categories.length > 0 && this.state.categories.length === this.state.categories.filter(category => category.role && category.scientific_name).length) {
+                            if (nCategories && nCategories === nComplete) {
                                 this.props.handleCategories(this.state.categories)
                                 this.props.handleErrorMessage("")
                                 this.props.handleCategoryStatus(true)
                             }
                             else {
-                                console.log(this.state.categories)
-                                this.props.handleErrorMessage("Category or Scientific name missing")
+                                this.props.handleErrorMessage("Role or scientific name missing")
                                 this.props.handleCategoryStatus(false)
                             }
                         }}>Apply</Button>
