@@ -49,6 +49,7 @@ def set_categories(weedcoco_path, categories):
     data["categories"] = new_categories
     with open(weedcoco_path, "w") as jsonFile:
         json.dump(data, jsonFile)
+    return data
 
 
 def add_agcontexts(weedcoco_path, ag_contexts):

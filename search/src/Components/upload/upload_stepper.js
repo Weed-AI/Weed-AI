@@ -268,7 +268,7 @@ class UploadStepper extends React.Component {
         switch (step) {
             case "coco-upload":
             case "weedcoco-upload":
-                const schema = step == "coco-upload" ? "compatible-coco" : "weedcoco"
+                const schema = step == "coco-upload" ? "coco" : "weedcoco"
                 return <UploaderSingle upload_id={this.state.upload_id} images={this.state.images} handleUploadId={this.handleUploadId} handleImages={this.handleImages} handleCategories={this.handleCategories} handleErrorMessage={this.handleErrorMessage} schema={schema}/>
             case "categories":
                 return <CategoryMapper categories={cloneDeep(this.state.categories)} handleCategories={this.handleCategories} handleCategoryStatus={this.handleCategoryStatus} handleErrorMessage={this.handleErrorMessage}/>

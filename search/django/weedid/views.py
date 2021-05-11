@@ -64,9 +64,7 @@ def upload(request):
         weedcoco_json = json.load(file_weedcoco)
         validate(
             weedcoco_json,
-            schema=request.POST["schema"]
-            if request.POST["schema"]
-            else "compatible-coco",
+            schema=request.POST["schema"] if request.POST["schema"] else "coco",
         )
         for image_reference in weedcoco_json["images"]:
             images.append(image_reference["file_name"].split("/")[-1])
@@ -117,7 +115,10 @@ def update_categories(request):
         UPLOAD_DIR, str(user.id), str(upload_id), "weedcoco.json"
     )
     try:
-        set_categories(weedcoco_path, categories)
+        updated_weedcoco_json = set_categories(weedcoco_path, categories)
+        validate(updated_weedcoco_json, schema="compatible-coco")
+    except JsonValidationError as e:
+        return HttpResponseBadRequest(e.message)
     except Exception:
         return HttpResponseNotAllowed("Failed to update categories")
     else:
