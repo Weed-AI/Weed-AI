@@ -47,7 +47,7 @@ class CategoryMapper extends React.Component {
         this.setState({categories: newCategories});
     }
 
-    changeCategory(e, index) {
+    changeRole(e, index) {
         this.modifyCategories(index, "role", e.target.value);
         this.props.handleCategoryStatus(false);
         this.props.handleErrorMessage("init");
@@ -78,7 +78,7 @@ class CategoryMapper extends React.Component {
                                         labelId="category"
                                         id="category"
                                         value={category.role}
-                                        onChange={e => {this.changeCategory(e, index)}}
+                                        onChange={e => {this.changeRole(e, index)}}
                                         >
                                             <MenuItem value={"crop"}>crop</MenuItem>
                                             <MenuItem value={"weed"}>weed</MenuItem>
