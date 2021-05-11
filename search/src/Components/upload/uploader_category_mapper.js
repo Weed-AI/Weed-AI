@@ -17,6 +17,9 @@ const useStyles = (theme) => ({
         display: 'flex',
         alignItems: 'baseline'
     },
+    incomplete: {
+        color: 'red'
+    },
     formControl: {
         margin: theme.spacing(1),
         minWidth: 120,
@@ -37,7 +40,7 @@ class CategoryMapper extends React.Component {
             categories: this.props.categories
         }
         this.modifyCategories = this.modifyCategories.bind(this);
-        this.changeCategory = this.changeCategory.bind(this);
+        this.changeRole = this.changeRole.bind(this);
         this.changeSciName = this.changeSciName.bind(this);
     }
 
@@ -70,7 +73,7 @@ class CategoryMapper extends React.Component {
                     {
                         this.state.categories.map((category, index) => {
                             return (
-                                <li className={classes.row}>
+                                <li className={category.role && category.name ? classes.row : `${classes.row} ${classes.incomplete}`}>
                                     <p className={classes.text_field}>{category.name} is a</p>
                                     <FormControl className={classes.formControl}>
                                         <InputLabel id="category">Role</InputLabel>
@@ -85,7 +88,7 @@ class CategoryMapper extends React.Component {
                                         </Select>
                                     </FormControl>
                                     <p className={classes.text_field}>of species</p>
-                                    <TextField label="Scientific name or UNSPECIFIED" value={category.scientific_name} onChange={e => {e.persist(); this.changeSciName(e, index)}}/>
+                                    <TextField className={classes.sci_name} label="Scientific name or UNSPECIFIED" value={category.scientific_name} onChange={e => {e.persist(); this.changeSciName(e, index)}}/>
                                 </li>
                             )
                         })
