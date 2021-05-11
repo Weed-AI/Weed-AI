@@ -2,6 +2,7 @@
 FROM nginx:latest
 
 # build node package
+ENV NODE_VERSION=12.0.0
 RUN apt update
 RUN apt install -y npm
 RUN npm install -g yarn
