@@ -2,8 +2,9 @@
 FROM nginx:latest
 
 # build node package
-ENV NODE_VERSION=12.0.0
+RUN curl -sL https://deb.nodesource.com/setup_12.x
 RUN apt update
+RUN apt-get install -y nodejs
 RUN apt install -y npm
 RUN npm install -g yarn
 RUN mkdir /code /code/public /code/src
