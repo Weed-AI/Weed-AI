@@ -74,7 +74,7 @@ class LoginComponent extends React.Component {
                     <Typography component="h1" variant="h5">
                         Sign in
                     </Typography>
-                    <form id="sign_in_submit" className={classes.form} noValidate onSubmit={this.handleSubmit} onChange={() => {this.setState({error: null})}}>
+                    <form className={classes.form} noValidate onSubmit={this.handleSubmit} onChange={() => {this.setState({error: null})}}>
                         <TextField
                             id="username"
                             variant="outlined"

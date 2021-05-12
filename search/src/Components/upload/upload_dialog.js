@@ -63,7 +63,7 @@ export default function UploadDialog(props) {
 
   return (
     <React.Fragment>
-      <Button id="upload_button" disabled={!props.upload_type} className={classes.uploadButton} variant="contained" onClick={handleClickOpen}>
+      <Button disabled={!props.upload_type} className={classes.uploadButton} variant="contained" onClick={handleClickOpen}>
         Begin upload
       </Button>
       <Dialog maxWidth='md' onClose={handleClose} aria-labelledby="upload-dialog-title" open={open}>

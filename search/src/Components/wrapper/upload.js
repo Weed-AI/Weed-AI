@@ -131,7 +131,6 @@ class UploadComponent extends Component {
                 <div style={{ display: 'flex', alignItems: 'center' }}>
                     <FormControl className={classes.formControl}>
                         <Select
-                        id="annotation_format"
                         value={this.state.upload_type}
                         displayEmpty
                         onChange={this.handleChange}
