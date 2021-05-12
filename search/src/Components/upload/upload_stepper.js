@@ -61,7 +61,7 @@ class UploadStepper extends React.Component {
             imageReady: false,
             ag_context: {},
             metadata: {},
-            category_status: false,
+            categories_complete: false,
             coco_form_validation: {'agcontexts': false, 'metadata': false},
             error_message: "init",
             error_message_details: "",
@@ -83,7 +83,7 @@ class UploadStepper extends React.Component {
         this.handleUploadAgcontexts = this.handleUploadAgcontexts.bind(this);
         this.handleUploadMetadata = this.handleUploadMetadata.bind(this)
         this.handleSubmit = this.handleSubmit.bind(this);
-        this.handleCategoryStatus = this.handleCategoryStatus.bind(this);
+        this.handleCategoriesComplete = this.handleCategoriesComplete.bind(this);
         this.isNextEnabled = this.isNextEnabled.bind(this);
         this.handleValidation = this.handleValidation.bind(this);
         this.getStepContent = this.getStepContent.bind(this);
@@ -247,13 +247,13 @@ class UploadStepper extends React.Component {
         })
     }
 
-    handleCategoryStatus(category_status){
-        this.setState({category_status: category_status})
+    handleCategoriesComplete(categories_complete){
+        this.setState({categories_complete: categories_complete})
     }
 
     isNextEnabled(){
         if (this.state.activeStep === 1) {
-            return this.props.upload_type === 'coco' && this.state.category_status && 'categories'
+            return this.props.upload_type === 'coco' && this.state.categories_complete && 'categories'
         } else if (this.state.activeStep == 2) {
             return this.props.upload_type === 'coco' && this.state.coco_form_validation['agcontexts'] && 'agcontexts'
         } else if (this.state.activeStep === 3) {
@@ -271,7 +271,7 @@ class UploadStepper extends React.Component {
                 const schema = step == "coco-upload" ? "coco" : "weedcoco"
                 return <UploaderSingle upload_id={this.state.upload_id} images={this.state.images} handleUploadId={this.handleUploadId} handleImages={this.handleImages} handleCategories={this.handleCategories} handleErrorMessage={this.handleErrorMessage} schema={schema}/>
             case "categories":
-                return <CategoryMapper categories={cloneDeep(this.state.categories)} handleCategories={this.handleCategories} handleCategoryStatus={this.handleCategoryStatus} handleErrorMessage={this.handleErrorMessage}/>
+                return <CategoryMapper categories={cloneDeep(this.state.categories)} handleCategories={this.handleCategories} handleCategoriesComplete={this.handleCategoriesComplete} handleErrorMessage={this.handleErrorMessage}/>
             case "agcontext":
                 return (
                     <React.Fragment>
