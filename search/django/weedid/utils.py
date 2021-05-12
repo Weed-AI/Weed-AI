@@ -41,6 +41,26 @@ def setup_upload_dir(upload_userid_dir):
     return upload_dir, upload_id
 
 
+def set_categories(weedcoco_path, categories):
+    with open(weedcoco_path, "r") as jsonFile:
+        data = json.load(jsonFile)
+    new_categories = []
+    for category in categories:
+        if category["role"] and category["scientific_name"]:
+            new_categories.append(
+                {
+                    "id": category["id"],
+                    "name": ": ".join((category["role"], category["scientific_name"])),
+                }
+            )
+        else:
+            new_categories.append({"id": category["id"], "name": category["name"]})
+    data["categories"] = new_categories
+    with open(weedcoco_path, "w") as jsonFile:
+        json.dump(data, jsonFile)
+    return data
+
+
 def add_agcontexts(weedcoco_path, ag_contexts):
     with open(weedcoco_path, "r") as jsonFile:
         data = json.load(jsonFile)
@@ -128,6 +148,37 @@ def retrieve_listing_info(query_entity, awaiting_review):
         "contributor": query_entity.user.username,
         "contributor_email": query_entity.user.email if awaiting_review else "",
     }
+
+
+def validate_email_format(email):
+    regex = "^(\\w|\\.|\\_|\\-)+[@](\\w|\\_|\\-|\\.)+[.]\\w{2,3}$"
+    return re.fullmatch(regex, email)
+
+
+def send_email(subject, body, recipients):
+    with smtplib.SMTP(SMTP_HOST, SMTP_PORT) as smtp:
+        for recipient in recipients:
+            msg = EmailMessage()
+            msg["Subject"], msg["From"], msg["To"] = subject, FROM_EMAIL, recipient
+            msg.set_content(body)
+            smtp.send_message(msg)
+
+
+def parse_category_name(category):
+    if re.fullmatch(r"(crop|weed): .+", category["name"]):
+        return {
+            "id": category["id"],
+            "name": category["name"],
+            "role": category["name"].split(": ", maxsplit=1)[0],
+            "scientific_name": category["name"].split(": ", maxsplit=1)[1],
+        }
+    else:
+        return {
+            "id": category["id"],
+            "name": category["name"],
+            "role": "",
+            "scientific_name": "",
+        }
 
 
 def validate_email_format(email):
