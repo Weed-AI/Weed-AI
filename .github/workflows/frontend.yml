@@ -21,6 +21,7 @@ jobs:
         continue-on-error: true
       - name: Bring system up
         run: |
+            set -x
             cd search
             mkdir -p live-data
             cat > .env <<HERE
