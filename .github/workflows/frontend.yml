@@ -23,6 +23,12 @@ jobs:
         run: |
             cd search
             mkdir -p live-data
+            cat > .env <<HERE
+            DJANGO_SECRET_KEY=mysecret
+            POSTGRES_USER=postgres
+            POSTGRES_PASSWORD=postgres
+            POSTGRES_DB=weedai
+            HERE
             docker-compose up -d
             sleep 1
             while docker-compose ps | grep health:.starting > /dev/null; do sleep 1; done
