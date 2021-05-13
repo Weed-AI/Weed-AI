@@ -26,7 +26,7 @@ jobs:
             mkdir -p live-data
             docker-compose up -d
             sleep 1
-            while docker-compose ps | grep health:.starting > /dev/null; do sleep 1; done
+            while docker-compose ps | grep health:.starting > /dev/null; do sleep 1; if docker-compose ps | grep -q Exit; then fail; done; done
             ! (docker-compose ps | grep -q 'elasticsearch.*Up.(unhealthy)') || (echo "Found unhealthy!" && docker-compose ps; docker-compose logs; false)
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v2
@@ -39,7 +39,12 @@ jobs:
       - name: Index test data
         run: |
           bash search/scripts/index_test_images.sh
-      # TODO: find syntax to run shutdown regardless of previous step outcomes
+      - name: Check logs for errors
+        run: |
+            cd search
+            docker-compose logs --tail 80
+            docker-compose ps
+        if: ${{ failure() }}
       - name: Shutdown
         run: |
             cd search
