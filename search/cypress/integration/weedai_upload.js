@@ -3,9 +3,9 @@ describe('Test the overallworkflow', () => {
     it('Test Weedcoco Upload', () => {
         cy.visit('http://localhost/upload', {failOnStatusCode: false})
 
-        const test_username = 'admin_test'
-        const test_password = 'password_test'
-        const test_email = 'admin_test@weed-ai.com'
+        const test_username = `test_${Math.random().toString(36).slice(-4)}`
+        const test_password = Math.random().toString(36).slice(-8);
+        const test_email = `${test_username}@weed-ai.com`
 
         cy.findAllByText(/^Sign up$/).should('have.length', 1).click()
         cy.get('#username')
