@@ -38,12 +38,10 @@ jobs:
           bash search/scripts/index_test_images.sh
       # TODO: find syntax to run shutdown regardless of previous step outcomes
       - name: Cypress run
-        run: cd search
         uses: cypress-io/github-action@v2
         with:
-          build: yarn build
-          start: yarn run cypress open
-          wait-on: http://localhost
+          install: false
+          working-directory: search
       - name: Shutdown
         run: |
             cd search
