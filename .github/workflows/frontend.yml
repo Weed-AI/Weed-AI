@@ -24,7 +24,7 @@ jobs:
             set -x
             cd search
             mkdir -p live-data
-            cat > tmp.env <<HERE
+            cat > .env <<HERE
             DJANGO_SECRET_KEY=mysecret
             POSTGRES_USER=postgres
             POSTGRES_PASSWORD=postgres
