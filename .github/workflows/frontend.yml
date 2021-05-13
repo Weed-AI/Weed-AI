@@ -22,17 +22,15 @@ jobs:
       - name: Bring system up
         run: |
             set -ex
+            set -o pipefail
             cd search
             mkdir -p live-data
             docker-compose up -d
             sleep 1
             while docker-compose ps | grep health:.starting > /dev/null; do sleep 1; done
             docker-compose ps
-            echo $?
             ! (docker-compose ps | grep -q -e Exit -e Restarting)
-            echo $?
             ! (docker-compose ps | grep -q 'elasticsearch.*Up.(unhealthy)') || (echo "Found unhealthy!"; false)
-            echo $?
         continue-on-error: false
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v2
