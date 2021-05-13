@@ -33,6 +33,7 @@ jobs:
             echo $?
             ! (docker-compose ps | grep -q 'elasticsearch.*Up.(unhealthy)') || (echo "Found unhealthy!"; false)
             echo $?
+        continue-on-error: false
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v2
         with:
