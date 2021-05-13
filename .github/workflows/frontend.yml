@@ -28,8 +28,11 @@ jobs:
             sleep 1
             while docker-compose ps | grep health:.starting > /dev/null; do sleep 1; done
             docker-compose ps
+            echo $?
             ! (docker-compose ps | grep -q -e Exit -e Restarting)
-            ! (docker-compose ps | grep -q 'elasticsearch.*Up.(unhealthy)') || (echo "Found unhealthy!" && docker-compose ps; docker-compose logs; false)
+            echo $?
+            ! (docker-compose ps | grep -q 'elasticsearch.*Up.(unhealthy)') || (echo "Found unhealthy!"; false)
+            echo $?
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v2
         with:
