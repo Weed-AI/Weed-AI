@@ -41,7 +41,13 @@ jobs:
         uses: cypress-io/github-action@v2
         with:
           working-directory: search
+      - name: Check logs for errors
+        run: |
+            docker-compose logs --tail 80
+            docker-compose ps
+        if: ${{ failure() }}
       - name: Shutdown
         run: |
             cd search
             docker-compose down
+        if: ${{ always() }}
