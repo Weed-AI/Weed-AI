@@ -40,8 +40,10 @@ jobs:
       - name: Cypress run
         uses: cypress-io/github-action@v2
         with:
-          install: false
           working-directory: search
+          build: yarn run build
+          start: yarn start
+          wait-on: 'http://localhost'
       - name: Shutdown
         run: |
             cd search
