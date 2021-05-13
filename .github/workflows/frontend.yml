@@ -41,9 +41,6 @@ jobs:
         uses: cypress-io/github-action@v2
         with:
           working-directory: search
-          build: yarn run build
-          start: yarn start
-          wait-on: 'http://localhost'
       - name: Shutdown
         run: |
             cd search
