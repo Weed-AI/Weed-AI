@@ -24,7 +24,7 @@ jobs:
             set -x
             cd search
             mkdir -p live-data
-            cat > .env <<HERE
+            cat > tmp.env <<HERE
             DJANGO_SECRET_KEY=mysecret
             POSTGRES_USER=postgres
             POSTGRES_PASSWORD=postgres
@@ -33,9 +33,8 @@ jobs:
             docker-compose up -d
             sleep 1
             while docker-compose ps | grep health:.starting > /dev/null; do sleep 1; done
-            (docker-compose ps | grep -q -e Exit -e Restarting) && false
-            (docker-compose ps | grep -q 'elasticsearch.*Up.(unhealthy)') && echo "Found unhealthy!" && false
-        continue-on-error: false
+            if ! (docker-compose ps | grep -q -e Exit -e Restarting); then false; fi
+            if ! (docker-compose ps | grep -q 'elasticsearch.*Up.(unhealthy)'); then echo "Found unhealthy!" && false; fi
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v2
         with:
