@@ -26,7 +26,7 @@ jobs:
             mkdir -p live-data
             docker-compose up -d
             sleep 1
-            while docker-compose ps | grep health:.starting > /dev/null; do sleep 1; if docker-compose ps | grep -q Exit; then fail; done; done
+            while docker-compose ps | grep health:.starting > /dev/null; do sleep 1; if docker-compose ps | grep -q Exit; then fail; fi; done
             ! (docker-compose ps | grep -q 'elasticsearch.*Up.(unhealthy)') || (echo "Found unhealthy!" && docker-compose ps; docker-compose logs; false)
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v2
