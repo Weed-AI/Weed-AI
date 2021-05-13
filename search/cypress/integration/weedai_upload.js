@@ -1,6 +1,6 @@
 describe('Test the overallworkflow', () => {
 
-    beforeEach(() => {
+    it('Test Weedcoco Upload', () => {
         cy.visit('http://localhost/upload', {failOnStatusCode: false})
 
         const test_username = 'admin_test'
@@ -27,22 +27,12 @@ describe('Test the overallworkflow', () => {
           .type(test_password)
           .should('have.value', test_password)
         cy.findAllByRole('button', /^Sign In$/).should('have.length', 1).click()
-    })
-
-    it('Test Weedcoco Upload', () => {
         cy.findAllByText(/^Select annotation format$/).should('have.length', 1).type('weedcoco{enter}')
         cy.findAllByText(/^Begin upload$/).should('have.length', 1).click()
         cy.get('.dzu-input').attachFile('test_weedcoco/weedcoco.json')
         cy.findAllByText(/^Next$/).should('have.length', 1).click()
         cy.get('div.fileContainer > input').attachFile('test_weedcoco/images/001_image.png')
         cy.findAllByText(/^Submit$/).should('have.length', 1).click()
-    })
-
-    // it('Test Coco Upload', () => {
-
-    // })
-
-    afterEach(() => {
         cy.findAllByText(/^Log out$/).should('have.length', 1).click()
     })
 })
