@@ -25,3 +25,28 @@
 // Cypress.Commands.overwrite('visit', (originalFn, url, options) => { ... })
 import 'cypress-file-upload';
 import '@testing-library/cypress/add-commands';
+
+Cypress.Commands.add('register', (username, email, password) => {
+    cy.findAllByText(/^Sign up$/).should('have.length', 1).click()
+    cy.get('#username')
+    .type(username)
+    .should('have.value', username)
+    cy.get('#email')
+    .type(email)
+    .should('have.value', email)
+    cy.get('#password')
+    .type(password)
+    .should('have.value', password)
+    cy.findAllByRole('button', /^Sign Up$/).should('have.length', 1).click()
+})
+
+Cypress.Commands.add('login', (username, password) => {
+    cy.findAllByText(/^Sign In$/).should('have.length', 1).click()
+    cy.get('#username')
+    .type(username)
+    .should('have.value', username)
+    cy.get('#password')
+    .type(password)
+    .should('have.value', password)
+    cy.findAllByRole('button', /^Sign In$/).should('have.length', 1).click()
+})
