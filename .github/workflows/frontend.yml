@@ -32,9 +32,11 @@ jobs:
             HERE
             docker-compose up -d
             sleep 1
-            while docker-compose ps | grep health:.starting > /dev/null; do sleep 1; done
-            if docker-compose ps | grep -q -e Exit -e Restarting; then false; fi
-            if docker-compose ps | grep -q 'elasticsearch.*Up.(unhealthy)'; then echo "Found unhealthy!" && false; fi
+            get_statuses() {
+              docker-compose ps -q | xargs docker inspect --format '{{.State.Status}} {{if .State.Health}}{{.State.Health.Status}}{{end}} }}'
+            }
+            while get_statuses() | grep -q starting; do sleep 1; done
+            if get_statuses() | grep -q -e exited -e restarting -e unhealthy; then false; fi
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v2
         with:
