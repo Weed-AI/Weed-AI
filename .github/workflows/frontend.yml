@@ -32,9 +32,11 @@ jobs:
             HERE
             docker-compose up -d
             sleep 1
-            get_statuses() { docker-compose ps -q | xargs docker inspect --format '{{.State.Status}} {{if .State.Health}}{{.State.Health.Status}}{{end}} }}' }
-            while get_statuses() | grep -q starting; do sleep 1; done
-            if get_statuses() | grep -q -e exited -e restarting -e unhealthy; then false; fi
+            get_statuses() {
+              docker-compose ps -q | xargs docker inspect --format '{{.State.Status}} {{if .State.Health}}{{.State.Health.Status}}{{end}} }}'
+            }
+            while get_statuses | grep -q starting; do sleep 1; done
+            if get_statuses | grep -q -e exited -e restarting -e unhealthy; then false; fi
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v2
         with:
