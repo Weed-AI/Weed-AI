@@ -49,6 +49,10 @@ jobs:
         run: |
           bash search/scripts/index_test_images.sh
       # TODO: find syntax to run shutdown regardless of previous step outcomes
+      - name: Cypress run
+        uses: cypress-io/github-action@v2
+        with:
+          working-directory: search
       - name: Check logs upon failure
         run: |
             cd search

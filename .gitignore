@@ -27,6 +27,8 @@ weedcoco/schema/*.json
 # test images for repo
 !weedcoco/tests/repo/**/*.jpg
 !weedcoco/tests/repo/**/*.png
+!search/cypress/fixtures/**/*.png
+!search/cypress/fixtures/**/*.jpg
 
 # Dev Tools
 .vscode/settings.json
