@@ -36,7 +36,7 @@ def generate_coco_annotations(
 
 
 def voc_to_coco(
-    xml_dir: Path, image_dir: Path, category_mapping: Optional[Mapping[str, int]] = None
+    xml_dir: Path, image_dir: Optional[Path] = None, category_mapping: Optional[Mapping[str, int]] = None
 ):
     """Convert VOC to MS COCO images and annotations
 
