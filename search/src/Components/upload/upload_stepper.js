@@ -6,6 +6,7 @@ import StepLabel from '@material-ui/core/StepLabel';
 import Button from '@material-ui/core/Button';
 import Typography from '@material-ui/core/Typography';
 import UploaderSingle from './uploader_single';
+import UploaderMultiple from './uploader_multiple';
 import UploaderImages from './uploader_images';
 import CategoryMapper from './uploader_category_mapper';
 import ErrorMessage from '../error/display';
@@ -42,6 +43,13 @@ const stepsByType = {
     ],
     "weedcoco": [
         {title: "Upload Weedcoco", type: "weedcoco-upload"},
+        {title: "Upload Images", type: "images"}
+    ],
+    "voc": [
+        {title: "Upload VOC", type: "voc-upload"},
+        {title: "Categories", type: "categories"},
+        {title: "Add Agcontext", type: "agcontext"},
+        {title: "Add Metadata", type: "metadata"},
         {title: "Upload Images", type: "images"}
     ]
 }
@@ -182,8 +190,7 @@ class UploadStepper extends React.Component {
             this.handleNext()
         })
         .catch(err => {
-            console.log(err)
-            this.handleErrorMessage("Invalid categories input")
+            this.handleErrorMessage(err.response.data || "Invalid categories input")
         })
     }
 
@@ -253,11 +260,11 @@ class UploadStepper extends React.Component {
 
     isNextEnabled(){
         if (this.state.activeStep === 1) {
-            return this.props.upload_type === 'coco' && this.state.categories_saved && 'categories'
-        } else if (this.state.activeStep == 2) {
-            return this.props.upload_type === 'coco' && this.state.coco_form_validation['agcontexts'] && 'agcontexts'
+            return ['coco', 'voc'].includes(this.props.upload_type) && this.state.categories_saved && 'categories'
+        } else if (this.state.activeStep === 2) {
+            return ['coco', 'voc'].includes(this.props.upload_type) && this.state.coco_form_validation['agcontexts'] && 'agcontexts'
         } else if (this.state.activeStep === 3) {
-            return this.props.upload_type === 'coco' && this.state.coco_form_validation['metadata'] && 'metadata'
+            return ['coco', 'voc'].includes(this.props.upload_type) && this.state.coco_form_validation['metadata'] && 'metadata'
         } else {
             return false
         }
@@ -270,6 +277,8 @@ class UploadStepper extends React.Component {
             case "weedcoco-upload":
                 const schema = step == "coco-upload" ? "coco" : "weedcoco"
                 return <UploaderSingle upload_id={this.state.upload_id} images={this.state.images} handleUploadId={this.handleUploadId} handleImages={this.handleImages} handleCategories={this.handleCategories} handleErrorMessage={this.handleErrorMessage} schema={schema}/>
+            case "voc-upload":
+                return <UploaderMultiple handleUploadId={this.handleUploadId} handleImages={this.handleImages} handleCategories={this.handleCategories} handleErrorMessage={this.handleErrorMessage}/>
             case "categories":
                 return <CategoryMapper categories={cloneDeep(this.state.categories)} handleCategories={this.handleCategories} handleCategoriesSaved={this.handleCategoriesSaved} handleErrorMessage={this.handleErrorMessage}/>
             case "agcontext":

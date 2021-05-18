@@ -140,7 +140,7 @@ class UploadComponent extends Component {
                             </MenuItem>
                             <MenuItem value="weedcoco">WeedCOCO</MenuItem>
                             <MenuItem value="coco">COCO</MenuItem>
-                            <MenuItem value="voc" disabled>VOC (not implemented)</MenuItem>
+                            <MenuItem value="voc">VOC</MenuItem>
                             <MenuItem value="masks" disabled>Segmentation masks (not implemented)</MenuItem>
                         </Select>
                     </FormControl>

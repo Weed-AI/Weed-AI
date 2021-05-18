@@ -10,6 +10,8 @@ from weedid.utils import (
     store_tmp_weedcoco,
     setup_upload_dir,
     store_tmp_image,
+    store_tmp_voc,
+    store_tmp_voc_coco,
     create_upload_entity,
     retrieve_listing_info,
     remove_entity_local_record,
@@ -22,6 +24,7 @@ from weedid.utils import (
 from weedid.notification import review_notification
 from weedid.models import Dataset, WeedidUser
 from weedcoco.validation import validate, JsonValidationError
+from weedcoco.importers.voc import voc_to_coco
 from django.contrib.auth import login, logout
 from django.contrib.auth.hashers import check_password
 from django.http import (
@@ -31,6 +34,7 @@ from django.http import (
     HttpResponseServerError,
 )
 from django.views.decorators.csrf import ensure_csrf_cookie
+from pathlib import Path
 
 
 @ensure_csrf_cookie
@@ -91,6 +95,74 @@ def upload(request):
         )
 
 
+def upload_voc(request):
+    if not request.method == "POST":
+        return HttpResponseNotAllowed(request.method)
+    user = request.user
+    if not (user and user.is_authenticated):
+        return HttpResponseForbidden("You dont have access to proceed")
+    try:
+        voc_dir = request.POST["voc_dir"]
+        voc = request.FILES["voc"]
+        upload_dir = os.path.join(UPLOAD_DIR, str(user.id), voc_dir)
+        store_tmp_voc(voc, upload_dir)
+    except Exception as e:
+        return HttpResponseBadRequest(str(e))
+    else:
+        return HttpResponse(f"Uploaded {voc.name} to {upload_dir}")
+
+
+def remove_voc(request):
+    if not request.method == "POST":
+        return HttpResponseNotAllowed(request.method)
+    user = request.user
+    if not (user and user.is_authenticated):
+        return HttpResponseForbidden("You dont have access to proceed")
+    voc_dir = request.POST["voc_dir"]
+    voc_name = request.POST["voc_name"]
+    voc_to_remove = os.path.join(UPLOAD_DIR, str(user.id), voc_dir, voc_name)
+    if os.path.exists(voc_to_remove):
+        os.remove(voc_to_remove)
+        return HttpResponse(f"Removed {voc_name}")
+    else:
+        return HttpResponse(f"{voc_name} doesn't exist")
+
+
+def submit_voc(request):
+    if not request.method == "POST":
+        return HttpResponseNotAllowed(request.method)
+    user = request.user
+    if not (user and user.is_authenticated):
+        return HttpResponseForbidden("You dont have access to proceed")
+    voc_dir = request.POST["voc_dir"]
+    try:
+        images = []
+        weedcoco_json = voc_to_coco(
+            Path(os.path.join(UPLOAD_DIR, str(user.id), voc_dir))
+        )
+        validate(weedcoco_json, schema="coco")
+        for image_reference in weedcoco_json["images"]:
+            images.append(image_reference["file_name"].split("/")[-1])
+        categories = [
+            parse_category_name(category) for category in weedcoco_json["categories"]
+        ]
+        upload_dir, upload_id = setup_upload_dir(os.path.join(UPLOAD_DIR, str(user.id)))
+        weedcoco_path = store_tmp_voc_coco(weedcoco_json, upload_dir)
+        create_upload_entity(weedcoco_path, upload_id, user.id)
+    except JsonValidationError as e:
+        traceback.print_exc()
+        return HttpResponseBadRequest(json.dumps(e.get_error_details()))
+    except Exception as e:
+        traceback.print_exc()
+        return HttpResponseBadRequest(str(e))
+    else:
+        return HttpResponse(
+            json.dumps(
+                {"upload_id": upload_id, "images": images, "categories": categories}
+            )
+        )
+
+
 def upload_image(request):
     if not request.method == "POST":
         return HttpResponseNotAllowed(request.method)
@@ -122,8 +194,8 @@ def update_categories(request):
         validate(updated_weedcoco_json, schema="compatible-coco")
     except JsonValidationError as e:
         return HttpResponseBadRequest(e.message)
-    except Exception:
-        return HttpResponseNotAllowed("Failed to update categories")
+    except Exception as e:
+        return HttpResponseBadRequest(str(e))
     else:
         return HttpResponse(
             f"Updated categories for user {user.id}'s upload{upload_id}"

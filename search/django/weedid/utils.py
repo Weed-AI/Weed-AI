@@ -32,6 +32,24 @@ def store_tmp_weedcoco(weedcoco, upload_dir):
     return weedcoco_path
 
 
+def store_tmp_voc(voc, voc_dir):
+    fs = FileSystemStorage()
+    fs.save(os.path.join(voc_dir, voc.name), voc)
+
+
+def store_tmp_voc_coco(weedcoco, upload_dir):
+    if "agcontexts" not in weedcoco:
+        weedcoco["agcontexts"] = [{"id": 0}]
+        for image in weedcoco["images"]:
+            image["agcontext_id"] = 0
+    if "info" not in weedcoco or "metadata" not in weedcoco["info"]:
+        weedcoco["info"] = {"metadata": dict()}
+    weedcoco_path = os.path.join(upload_dir, "weedcoco.json")
+    with open(weedcoco_path, "w") as weedcoco_file:
+        weedcoco_file.write(json.dumps(weedcoco))
+    return weedcoco_path
+
+
 def setup_upload_dir(upload_userid_dir):
     if not os.path.isdir(upload_userid_dir):
         mkdir_safely(upload_userid_dir)
@@ -179,17 +197,3 @@ def parse_category_name(category):
             "role": "",
             "scientific_name": "",
         }
-
-
-def validate_email_format(email):
-    regex = "^(\\w|\\.|\\_|\\-)+[@](\\w|\\_|\\-|\\.)+[.]\\w{2,3}$"
-    return re.fullmatch(regex, email)
-
-
-def send_email(subject, body, recipients):
-    with smtplib.SMTP(SMTP_HOST, SMTP_PORT) as smtp:
-        for recipient in recipients:
-            msg = EmailMessage()
-            msg["Subject"], msg["From"], msg["To"] = subject, FROM_EMAIL, recipient
-            msg.set_content(body)
-            smtp.send_message(msg)
