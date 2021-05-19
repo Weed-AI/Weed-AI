@@ -7,7 +7,6 @@ import Box from '@material-ui/core/Box';
 import { createAjv } from '@jsonforms/core';
 import renderers from '../formRenderers/default_renderers';
 import { JsonForms } from '@jsonforms/react';
-import { constTester, ConstRenderer } from '../formRenderers/ConstRenderer';
 import UploadJsonButton from './UploadJsonButton';
 import { materialCells } from '@jsonforms/material-renderers';
 
