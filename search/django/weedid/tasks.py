@@ -6,9 +6,9 @@ from weedcoco.repo.deposit import deposit, compress_to_download
 from weedcoco.index.indexing import ElasticSearchIndexer
 from weedcoco.index.thumbnailing import thumbnailing
 from weedid.models import Dataset
-from weedid.utils import make_upload_entity_fields
+from weedid.utils import make_upload_entity_fields, atomic_copy
 from weedid.notification import upload_notification
-from core.settings import THUMBNAILS_DIR, REPOSITORY_DIR, DOWNLOAD_DIR
+from core.settings import THUMBNAILS_DIR, REPOSITORY_DIR, DOWNLOAD_DIR, TMP_DIR
 from pathlib import Path
 
 
@@ -31,9 +31,10 @@ def submit_upload_task(weedcoco_path, image_dir, upload_id):
             Path(weedcoco_path),
             Path(image_dir),
             Path(REPOSITORY_DIR),
-            Path(DOWNLOAD_DIR),
+            Path(TMP_DIR),
             upload_id,
         )
+        atomic_copy(Path(REPOSITORY_DIR), Path(DOWNLOAD_DIR), Path(TMP_DIR), upload_id)
     except Exception as e:
         traceback.print_exc()
         upload_entity.status = "F"

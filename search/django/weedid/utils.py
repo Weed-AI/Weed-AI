@@ -1,5 +1,5 @@
 import os
-from shutil import rmtree
+from shutil import rmtree, copytree, copyfile
 import json
 import re
 from uuid import uuid4
@@ -137,6 +137,17 @@ def remove_entity_local_record(user_id, upload_id):
             os.remove(dir_path)
 
 
+def atomic_copy(repository_dir, download_dir, tmp_dir, upload_id):
+    repo_path = tmp_dir / upload_id
+    zip_path = tmp_dir / f"{upload_id}.zip"
+    if os.path.isdir(repo_path):
+        copytree(repo_path, repository_dir / upload_id)
+        rmtree(repo_path, ignore_errors=True)
+    if os.path.isfile(zip_path):
+        copyfile(zip_path, download_dir / f"{upload_id}.zip")
+        os.remove(zip_path)
+
+
 def retrieve_listing_info(query_entity, awaiting_review):
     """Retrieving info from specific upload entity"""
     return {
@@ -179,17 +190,3 @@ def parse_category_name(category):
             "role": "",
             "scientific_name": "",
         }
-
-
-def validate_email_format(email):
-    regex = "^(\\w|\\.|\\_|\\-)+[@](\\w|\\_|\\-|\\.)+[.]\\w{2,3}$"
-    return re.fullmatch(regex, email)
-
-
-def send_email(subject, body, recipients):
-    with smtplib.SMTP(SMTP_HOST, SMTP_PORT) as smtp:
-        for recipient in recipients:
-            msg = EmailMessage()
-            msg["Subject"], msg["From"], msg["To"] = subject, FROM_EMAIL, recipient
-            msg.set_content(body)
-            smtp.send_message(msg)
