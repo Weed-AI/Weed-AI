@@ -85,6 +85,7 @@ class UploadStepper extends React.Component {
         this.handleSubmit = this.handleSubmit.bind(this);
         this.handleCategoriesSaved = this.handleCategoriesSaved.bind(this);
         this.isNextEnabled = this.isNextEnabled.bind(this);
+        this.nextHandler = this.nextHandler.bind(this);
         this.handleValidation = this.handleValidation.bind(this);
         this.getStepContent = this.getStepContent.bind(this);
     }
@@ -251,18 +252,6 @@ class UploadStepper extends React.Component {
         this.setState({categories_saved: categories_saved})
     }
 
-    isNextEnabled(){
-        if (this.state.activeStep === 1) {
-            return this.props.upload_type === 'coco' && this.state.categories_saved && 'categories'
-        } else if (this.state.activeStep == 2) {
-            return this.props.upload_type === 'coco' && this.state.coco_form_validation['agcontexts'] && 'agcontexts'
-        } else if (this.state.activeStep === 3) {
-            return this.props.upload_type === 'coco' && this.state.coco_form_validation['metadata'] && 'metadata'
-        } else {
-            return false
-        }
-    }
-
     getStepContent() {
         const step = stepsByType[this.props.upload_type][this.state.activeStep].type
         switch (step) {
@@ -296,6 +285,39 @@ class UploadStepper extends React.Component {
                 return <UploaderImages upload_id={this.state.upload_id} images={this.state.images} handleImageReady={this.handleImageReady} handleErrorMessage={this.handleErrorMessage}/>
             default:
                 return ''
+        }
+    }
+
+    isNextEnabled() {
+        const step = stepsByType[this.props.upload_type][this.state.activeStep].type
+        const currentStageValid = (step) => {
+            switch (step) {
+                case "categories":
+                    return this.state.categories_saved
+                case "agcontext":
+                    return this.state.coco_form_validation['agcontexts']
+                case "metadata":
+                    return this.state.coco_form_validation['metadata']
+                case "images":
+                    return this.state.imageReady
+                default:
+                    return true
+            }
+        }
+        return currentStageValid(step) && this.state.error_message.length === 0
+    }
+
+    nextHandler() {
+        const step = stepsByType[this.props.upload_type][this.state.activeStep].type
+        switch (step) {
+            case "categories":
+                return this.handleUpdateCategories
+            case "agcontext":
+                return this.handleUploadAgcontexts
+            case "metadata":
+                return this.handleUploadMetadata
+            default:
+                return this.handleNext
         }
     }
 
@@ -345,12 +367,9 @@ class UploadStepper extends React.Component {
                     <Button
                         variant="contained"
                         color="primary"
-                        onClick={this.isNextEnabled() === 'categories' ? this.handleUpdateCategories : this.isNextEnabled() === 'agcontexts' ? this.handleUploadAgcontexts : this.isNextEnabled() === 'metadata' ? this.handleUploadMetadata : this.handleNext}
+                        onClick={this.nextHandler()}
                         className={classes.button}
-                        disabled={this.state.error_message.length > 0 &&
-                                  (this.state.activeStep !== this.state.steps.length - 1 ||
-                                  this.state.activeStep === this.state.steps.length - 1 && !this.state.imageReady) &&
-                                  !this.isNextEnabled()}
+                        disabled={!this.isNextEnabled()}
                     >
                         {this.state.activeStep === this.state.steps.length - 1 ? 'Submit' : 'Next'}
                     </Button>
