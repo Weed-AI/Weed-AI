@@ -129,16 +129,16 @@ def compress_to_download(dataset_dir, deposit_id, download_dir):
         copy(zip_path, download_path)
 
 
-def deposit(weedcoco_path, image_dir, repository_dir, download_dir, upload_id=None):
+def deposit(weedcoco_path, image_dir, repository_dir, temp_dir, upload_id=None):
     image_hash = create_image_hash(image_dir)
     validate_duplicate_images(image_hash)
     validate_existing_images(repository_dir, image_hash)
-    dataset_dir, deposit_id = setup_dataset_dir(repository_dir, upload_id)
+    dataset_dir, deposit_id = setup_dataset_dir(temp_dir, upload_id)
     new_dataset_dir = deposit_weedcoco(
         weedcoco_path, dataset_dir, image_dir, image_hash
     )
     migrate_images(dataset_dir, image_dir, image_hash)
-    compress_to_download(dataset_dir, deposit_id, download_dir)
+    compress_to_download(dataset_dir, deposit_id, temp_dir)
     return str(new_dataset_dir)
 
 
