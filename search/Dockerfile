@@ -4,6 +4,8 @@ FROM nginx:latest
 # build node package
 RUN apt update
 RUN apt install -y npm
+RUN curl -sL https://deb.nodesource.com/setup_12.x | bash
+RUN apt install -y nodejs
 RUN npm install -g yarn
 RUN mkdir /code /code/public /code/src
 COPY public /code/public
