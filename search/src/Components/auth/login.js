@@ -76,17 +76,18 @@ class LoginComponent extends React.Component {
                     </Typography>
                     <form className={classes.form} noValidate onSubmit={this.handleSubmit} onChange={() => {this.setState({error: null})}}>
                         <TextField
+                            id="username"
                             variant="outlined"
                             margin="normal"
                             required
                             fullWidth
-                            id="username"
                             label="Username"
                             name="username"
                             autoComplete="username"
                             autoFocus
                         />
                         <TextField
+                            id="password"
                             variant="outlined"
                             margin="normal"
                             required
@@ -94,7 +95,6 @@ class LoginComponent extends React.Component {
                             name="password"
                             label="Password"
                             type="password"
-                            id="password"
                             autoComplete="current-password"
                             className={classes.field}
                         />

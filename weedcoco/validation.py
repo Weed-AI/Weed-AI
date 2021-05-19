@@ -17,6 +17,7 @@ SCHEMA_DIR = pathlib.Path(__file__).parent / "schema"
 MAIN_SCHEMAS = {
     "weedcoco": "https://weedid.sydney.edu.au/schema/main.json",
     "compatible-coco": "https://weedid.sydney.edu.au/schema/compatible-coco.json",
+    "coco": "https://weedid.sydney.edu.au/schema/coco.json",
 }
 
 FORMAT_CHECKER = FormatChecker()
@@ -98,6 +99,7 @@ def validate_json(weedcoco, schema="weedcoco", schema_dir=SCHEMA_DIR):
     """Check that the weedcoco matches its JSON schema"""
     if schema not in MAIN_SCHEMAS:
         raise ValueError(f"schema should be one of {sorted(MAIN_SCHEMAS)}")
+    # Allow the links between schemas to rely on local schema files
     try:
         # memoise the schema
         ref_store = validate_json.ref_store
