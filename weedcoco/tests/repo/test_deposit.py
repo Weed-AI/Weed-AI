@@ -21,6 +21,7 @@ TEST_DUPLICATE_DIR = TEST_DATA_DIR / "duplicate"
 def executor(tmpdir):
     test_repo_dir = tmpdir / "test_repo"
     test_download_dir = tmpdir / "test_download"
+    test_temp_dir = tmpdir / "test_temp"
 
     class Executor:
         def run(
@@ -39,6 +40,8 @@ def executor(tmpdir):
                 repository_dir,
                 "--download-dir",
                 download_dir,
+                "--temp-dir",
+                test_temp_dir,
             ]
             args = [str(arg) for arg in args]
             main(args)

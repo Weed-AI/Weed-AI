@@ -1,5 +1,5 @@
 import os
-from shutil import rmtree, copytree, copyfile
+from shutil import rmtree
 import json
 import re
 from uuid import uuid4
@@ -135,17 +135,6 @@ def remove_entity_local_record(user_id, upload_id):
             rmtree(dir_path, ignore_errors=True)
         elif os.path.isfile(dir_path):
             os.remove(dir_path)
-
-
-def atomic_copy(repository_dir, download_dir, tmp_dir, upload_id):
-    repo_path = tmp_dir / upload_id
-    zip_path = tmp_dir / f"{upload_id}.zip"
-    if os.path.isdir(repo_path):
-        copytree(repo_path, repository_dir / upload_id)
-        rmtree(repo_path, ignore_errors=True)
-    if os.path.isfile(zip_path):
-        copyfile(zip_path, download_dir / f"{upload_id}.zip")
-        os.remove(zip_path)
 
 
 def retrieve_listing_info(query_entity, awaiting_review):
