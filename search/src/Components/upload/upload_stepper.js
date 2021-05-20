@@ -84,7 +84,6 @@ class UploadStepper extends React.Component {
         this.handleUploadMetadata = this.handleUploadMetadata.bind(this)
         this.handleSubmit = this.handleSubmit.bind(this);
         this.handleCategoriesSaved = this.handleCategoriesSaved.bind(this);
-        this.isNextEnabled = this.isNextEnabled.bind(this);
         this.nextHandler = this.nextHandler.bind(this);
         this.handleValidation = this.handleValidation.bind(this);
         this.getStepContent = this.getStepContent.bind(this);
@@ -288,37 +287,26 @@ class UploadStepper extends React.Component {
         }
     }
 
-    isNextEnabled() {
+    nextHandler() {
         const step = stepsByType[this.props.upload_type][this.state.activeStep].type
         const currentStageValid = (step) => {
             switch (step) {
                 case "categories":
-                    return this.state.categories_saved
+                    return [this.state.categories_saved, this.handleUpdateCategories]
                 case "agcontext":
-                    return this.state.coco_form_validation['agcontexts']
+                    return [this.state.coco_form_validation['agcontexts'], this.handleUploadAgcontexts]
                 case "metadata":
-                    return this.state.coco_form_validation['metadata']
+                    return [this.state.coco_form_validation['metadata'], this.handleUploadMetadata]
                 case "images":
-                    return this.state.imageReady
+                    return [this.state.imageReady, this.handleNext]
                 default:
-                    return true
+                    return [true, this.handleNext]
             }
         }
-        return currentStageValid(step) && this.state.error_message.length === 0
-    }
-
-    nextHandler() {
-        const step = stepsByType[this.props.upload_type][this.state.activeStep].type
-        switch (step) {
-            case "categories":
-                return this.handleUpdateCategories
-            case "agcontext":
-                return this.handleUploadAgcontexts
-            case "metadata":
-                return this.handleUploadMetadata
-            default:
-                return this.handleNext
-        }
+        return {
+                nextValid: currentStageValid(step)[0] && this.state.error_message.length === 0,
+                nextHandler: currentStageValid(step)[1]
+               }
     }
 
     render(){
@@ -367,9 +355,9 @@ class UploadStepper extends React.Component {
                     <Button
                         variant="contained"
                         color="primary"
-                        onClick={this.nextHandler()}
+                        onClick={this.nextHandler().nextHandler}
                         className={classes.button}
-                        disabled={!this.isNextEnabled()}
+                        disabled={!this.nextHandler().nextValid}
                     >
                         {this.state.activeStep === this.state.steps.length - 1 ? 'Submit' : 'Next'}
                     </Button>
