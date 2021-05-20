@@ -60,8 +60,8 @@ class UploadStepper extends React.Component {
             categories: [],
             ag_context: {},
             metadata: {},
-            stepValid: {'categories': false, 'agcontexts': false, 'metadata': false, 'images': false},
-            error_message: "init",
+            stepValid: stepsByType[this.props.upload_type].reduce((steps, step) => {return {...steps, [step.type]: false}}, {}),
+            error_message: "",
             error_message_details: "",
         }
         this.isStepOptional = this.isStepOptional.bind(this);
@@ -132,13 +132,13 @@ class UploadStepper extends React.Component {
             }
             this.setState(prevState => {return {activeStep: prevState.activeStep + 1}});
             this.setState({skipped: newSkipped});
-            this.handleErrorMessage("init")
+            this.handleErrorMessage("")
         }
     };
 
     handleBack(){
         this.setState(prevState => {return {activeStep: prevState.activeStep - 1}});
-        this.handleErrorMessage("init")
+        this.handleErrorMessage("")
     };
 
     handleSkip(){
@@ -175,6 +175,7 @@ class UploadStepper extends React.Component {
         })
         .catch(err => {
             console.log(err)
+            this.handleValidation("categories", false)
             this.handleErrorMessage("Invalid categories input")
         })
     }
@@ -215,6 +216,7 @@ class UploadStepper extends React.Component {
         })
         .catch(err => {
             console.log(err)
+            this.handleValidation("metadata", false)
             this.handleErrorMessage("Failed to submit metadata")
         })
     }
@@ -244,7 +246,7 @@ class UploadStepper extends React.Component {
             case "coco-upload":
             case "weedcoco-upload":
                 const schema = step == "coco-upload" ? "coco" : "weedcoco"
-                return <UploaderSingle upload_id={this.state.upload_id} images={this.state.images} handleUploadId={this.handleUploadId} handleImages={this.handleImages} handleCategories={this.handleCategories} handleErrorMessage={this.handleErrorMessage} schema={schema}/>
+                return <UploaderSingle upload_id={this.state.upload_id} images={this.state.images} handleUploadId={this.handleUploadId} handleImages={this.handleImages} handleCategories={this.handleCategories} handleValidation={this.handleValidation} handleErrorMessage={this.handleErrorMessage} schema={schema}/>
             case "categories":
                 return <CategoryMapper categories={cloneDeep(this.state.categories)} handleCategories={this.handleCategories} handleValidation={this.handleValidation} handleErrorMessage={this.handleErrorMessage}/>
             case "agcontext":
@@ -252,7 +254,7 @@ class UploadStepper extends React.Component {
                     <React.Fragment>
                         <AgContextForm formData={this.state.ag_context} handleValidation={this.handleValidation} onChange={e => {
                             this.handleAgContextsFormData(e.formData)
-                            this.handleErrorMessage("init")
+                            this.handleErrorMessage("")
                         }} />
                         <UploadJsonButton initialValue={this.state.ag_context} downloadName="agcontext" onClose={(value) => {this.handleAgContextsFormData(value)}} />
                     </React.Fragment>
@@ -262,7 +264,7 @@ class UploadStepper extends React.Component {
                     <React.Fragment>
                         <MetadataForm formData={this.state.metadataFormData} handleValidation={this.handleValidation} onChange={e => {
                             this.handleMetadataFormData(e.formData)
-                            this.handleErrorMessage("init")
+                            this.handleErrorMessage("")
                         }} />
                         <UploadJsonButton initialValue={this.state.metadata} downloadName="dataset-meta" onClose={(value) => {this.handleMetadataFormData(value)}} />
                     </React.Fragment>
@@ -325,12 +327,12 @@ class UploadStepper extends React.Component {
                         color="primary"
                         onClick={this.handleSkip}
                         className={classes.button}
-                        disabled={this.state.error_message.length > 0 && this.state.error_message !== "init"}
+                        disabled={this.state.error_message.length > 0}
                         >
                         Skip
                         </Button>
                     )}
-        
+
                     <Button
                         variant="contained"
                         color="primary"

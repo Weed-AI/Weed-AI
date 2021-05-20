@@ -53,13 +53,13 @@ class CategoryMapper extends React.Component {
     changeRole(e, index) {
         this.modifyCategories(index, "role", e.target.value);
         this.props.handleValidation('categories', false);
-        this.props.handleErrorMessage("init");
+        this.props.handleErrorMessage("");
     }
 
     changeSciName(e, index) {
         this.modifyCategories(index, "scientific_name", e.target.value);
         this.props.handleValidation('categories', false);
-        this.props.handleErrorMessage("init");
+        this.props.handleErrorMessage("");
     }
 
     render() {

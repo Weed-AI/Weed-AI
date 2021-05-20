@@ -13,10 +13,10 @@ const UploaderImages = props => {
     const missingImagesAmount = props.images.length - updatedFilesName.length;
     const missingImages = [...props.images].filter(image => !updatedFilesName.includes(image));
     if (missingImagesAmount == 0 && new Set(missingImages).size === 0) {
-        this.props.handleValidation('images', true);
+        props.handleValidation('images', true);
         props.handleErrorMessage("");
     } else {
-        this.props.handleValidation('images', false);
+        props.handleValidation('images', false);
         props.handleErrorMessage(`${missingImagesAmount} ${missingImagesAmount > 1 ? "images" : "image"} missing`, {error_type: "image", missingImages: missingImages});
     }
   }
