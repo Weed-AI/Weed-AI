@@ -209,7 +209,9 @@ services:
     networks:
       - elastic
     stdin_open: true
-    logging: *default-logging
+    restart: always
+    logging:
+      driver: "json-file"
 
   fluentd:
     container_name: fluentd
