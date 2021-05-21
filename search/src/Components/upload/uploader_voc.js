@@ -7,6 +7,7 @@ import Cookies from 'js-cookie';
 
 
 const tmp_voc = Math.random().toString(36).slice(-8);
+const voc_max_size = 10240;
 const UploaderVoc = (props) => {
     const baseURL = new URL(window.location.origin);
 
@@ -76,6 +77,7 @@ const UploaderVoc = (props) => {
       <Dropzone
         getUploadParams={getUploadParams}
         multiple={true}
+        maxSizeBytes={voc_max_size}
         autoUpload={true}
         onChangeStatus={handleChangeStatus}
         onSubmit={handleSubmit}
