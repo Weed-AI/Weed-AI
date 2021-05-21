@@ -19,24 +19,23 @@ const UploaderSingle  = (props) => {
     }
   
     const handleChangeStatus = ({ meta, file, xhr }, status) => {
-        const step = props.schema == "coco" ? "coco-upload" : "weedcoco-upload"
         if (status === 'done'){
             const res = JSON.parse(xhr.response)
             props.handleUploadId(res.upload_id)
             props.handleImages(res.images)
             props.handleCategories(res.categories)
-            props.handleValidation(step, true)
+            props.handleValidation(true)
             props.handleErrorMessage("")
         }
         else if (status === 'error_upload'){
-            xhr.addEventListener('loadend', (e) => {const res = JSON.parse(e.target.responseText); props.handleErrorMessage(jsonSchemaTitle(res), res); props.handleValidation(step, false)});
+            xhr.addEventListener('loadend', (e) => {const res = JSON.parse(e.target.responseText); props.handleErrorMessage(jsonSchemaTitle(res), res); props.handleValidation(false)});
         }
         else if (status === 'error_file_size') {
-            props.handleValidation(step, false)
+            props.handleValidation(false)
             props.handleErrorMessage("The file size exceeds the limitation")
         }
         else if (status === 'removed') {
-            props.handleValidation(step, false)
+            props.handleValidation(false)
             props.handleErrorMessage("")
         }
     }

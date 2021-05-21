@@ -175,7 +175,7 @@ class UploadStepper extends React.Component {
         })
         .catch(err => {
             console.log(err)
-            this.handleValidation("categories", false)
+            this.handleValidation(false)
             this.handleErrorMessage("Invalid categories input")
         })
     }
@@ -216,7 +216,7 @@ class UploadStepper extends React.Component {
         })
         .catch(err => {
             console.log(err)
-            this.handleValidation("metadata", false)
+            this.handleValidation(false)
             this.handleErrorMessage("Failed to submit metadata")
         })
     }
@@ -233,10 +233,11 @@ class UploadStepper extends React.Component {
         })
     }
 
-    handleValidation(formKey, status){
+    handleValidation(status){
+        const currentStep = stepsByType[this.props.upload_type][this.state.activeStep].type
         this.setState(prevState => {
             const newState = {stepValid: {...prevState.stepValid}}
-            newState.stepValid[formKey] = status
+            newState.stepValid[currentStep] = status
             return newState
         })
     }

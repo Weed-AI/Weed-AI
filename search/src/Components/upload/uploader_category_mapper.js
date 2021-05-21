@@ -52,13 +52,13 @@ class CategoryMapper extends React.Component {
 
     changeRole(e, index) {
         this.modifyCategories(index, "role", e.target.value);
-        this.props.handleValidation('categories', false);
+        this.props.handleValidation(false);
         this.props.handleErrorMessage("");
     }
 
     changeSciName(e, index) {
         this.modifyCategories(index, "scientific_name", e.target.value);
-        this.props.handleValidation('categories', false);
+        this.props.handleValidation(false);
         this.props.handleErrorMessage("");
     }
 
@@ -101,11 +101,11 @@ class CategoryMapper extends React.Component {
                             if (nCategories && nCategories === nComplete) {
                                 this.props.handleCategories(this.state.categories)
                                 this.props.handleErrorMessage("")
-                                this.props.handleValidation('categories', true);
+                                this.props.handleValidation(true);
                             }
                             else {
                                 this.props.handleErrorMessage("Role or scientific name missing")
-                                this.props.handleValidation('categories', true);
+                                this.props.handleValidation(true);
                             }
                         }}>Apply</Button>
             </React.Fragment>
