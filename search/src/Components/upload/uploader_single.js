@@ -28,7 +28,12 @@ const UploaderSingle  = (props) => {
             props.handleErrorMessage("")
         }
         else if (status === 'error_upload'){
-            xhr.addEventListener('loadend', (e) => {const res = JSON.parse(e.target.responseText); props.handleErrorMessage(jsonSchemaTitle(res), res); props.handleValidation(false)});
+            xhr.addEventListener('loadend', 
+              (e) => {
+                const res = JSON.parse(e.target.responseText);
+                props.handleErrorMessage(jsonSchemaTitle(res), res);
+                props.handleValidation(false)
+              });
         }
         else if (status === 'error_file_size') {
             props.handleValidation(false)
