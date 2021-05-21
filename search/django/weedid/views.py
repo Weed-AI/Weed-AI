@@ -121,11 +121,14 @@ def remove_voc(request):
     voc_dir = request.POST["voc_dir"]
     voc_name = request.POST["voc_name"]
     voc_to_remove = os.path.join(UPLOAD_DIR, str(user.id), voc_dir, voc_name)
-    if os.path.exists(voc_to_remove):
-        os.remove(voc_to_remove)
-        return HttpResponse(f"Removed {voc_name}")
-    else:
-        return HttpResponse(f"{voc_name} doesn't exist")
+    try:
+        if os.path.exists(voc_to_remove):
+            os.remove(voc_to_remove)
+            return HttpResponse(f"Removed {voc_name}")
+        else:
+            return HttpResponse(f"{voc_name} doesn't exist")
+    except Exception:
+        return HttpResponseBadRequest(f"Error when removing {voc_name}")
 
 
 def submit_voc(request):
