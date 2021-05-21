@@ -29,7 +29,6 @@ def store_tmp_weedcoco(weedcoco, upload_dir):
     fs = FileSystemStorage()
     weedcoco_path = os.path.join(upload_dir, "weedcoco.json")
     fs.save(weedcoco_path, weedcoco)
-    return weedcoco_path
 
 
 def store_tmp_voc(voc, voc_dir):
@@ -38,16 +37,9 @@ def store_tmp_voc(voc, voc_dir):
 
 
 def store_tmp_voc_coco(weedcoco, upload_dir):
-    if "agcontexts" not in weedcoco:
-        weedcoco["agcontexts"] = [{"id": 0}]
-        for image in weedcoco["images"]:
-            image["agcontext_id"] = 0
-    if "info" not in weedcoco or "metadata" not in weedcoco["info"]:
-        weedcoco["info"] = {"metadata": dict()}
     weedcoco_path = os.path.join(upload_dir, "weedcoco.json")
     with open(weedcoco_path, "w") as weedcoco_file:
         weedcoco_file.write(json.dumps(weedcoco))
-    return weedcoco_path
 
 
 def setup_upload_dir(upload_userid_dir):
@@ -131,14 +123,9 @@ def make_upload_entity_fields(weedcoco):
     }
 
 
-def create_upload_entity(weedcoco_path, upload_id, upload_userid):
+def create_upload_entity(upload_id, upload_userid):
     upload_user = WeedidUser.objects.get(id=upload_userid)
-
-    with open(weedcoco_path) as f:
-        weedcoco_json = json.load(f)
-    fields = make_upload_entity_fields(weedcoco_json)
-
-    upload_entity = Dataset(upload_id=upload_id, user=upload_user, status="N", **fields)
+    upload_entity = Dataset(upload_id=upload_id, user=upload_user, status="N")
     upload_entity.save()
     upload_user.latest_upload = upload_entity
     upload_user.save()

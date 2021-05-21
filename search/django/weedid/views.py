@@ -79,8 +79,8 @@ def upload(request):
             parse_category_name(category) for category in weedcoco_json["categories"]
         ]
         upload_dir, upload_id = setup_upload_dir(os.path.join(UPLOAD_DIR, str(user.id)))
-        weedcoco_path = store_tmp_weedcoco(file_weedcoco, upload_dir)
-        create_upload_entity(weedcoco_path, upload_id, user.id)
+        store_tmp_weedcoco(file_weedcoco, upload_dir)
+        create_upload_entity(upload_id, user.id)
     except JsonValidationError as e:
         traceback.print_exc()
         return HttpResponseBadRequest(json.dumps(e.get_error_details()))
@@ -147,8 +147,8 @@ def submit_voc(request):
             parse_category_name(category) for category in weedcoco_json["categories"]
         ]
         upload_dir, upload_id = setup_upload_dir(os.path.join(UPLOAD_DIR, str(user.id)))
-        weedcoco_path = store_tmp_voc_coco(weedcoco_json, upload_dir)
-        create_upload_entity(weedcoco_path, upload_id, user.id)
+        store_tmp_voc_coco(weedcoco_json, upload_dir)
+        create_upload_entity(upload_id, user.id)
     except JsonValidationError as e:
         traceback.print_exc()
         return HttpResponseBadRequest(json.dumps(e.get_error_details()))
