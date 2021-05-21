@@ -7,7 +7,7 @@ import Cookies from 'js-cookie';
 
 
 const tmp_voc = Math.random().toString(36).slice(-8);
-const UploaderMultiple = (props) => {
+const UploaderVoc = (props) => {
     const baseURL = new URL(window.location.origin);
 
     const removeVoc = file => {
@@ -84,4 +84,4 @@ const UploaderMultiple = (props) => {
     )
   }
 
-  export default UploaderMultiple;
+  export default UploaderVoc;

@@ -6,7 +6,7 @@ import StepLabel from '@material-ui/core/StepLabel';
 import Button from '@material-ui/core/Button';
 import Typography from '@material-ui/core/Typography';
 import UploaderSingle from './uploader_single';
-import UploaderMultiple from './uploader_multiple';
+import UploaderVoc from './uploader_voc';
 import UploaderImages from './uploader_images';
 import CategoryMapper from './uploader_category_mapper';
 import ErrorMessage from '../error/display';
@@ -278,7 +278,7 @@ class UploadStepper extends React.Component {
                 const schema = step == "coco-upload" ? "coco" : "weedcoco"
                 return <UploaderSingle upload_id={this.state.upload_id} images={this.state.images} handleUploadId={this.handleUploadId} handleImages={this.handleImages} handleCategories={this.handleCategories} handleErrorMessage={this.handleErrorMessage} schema={schema}/>
             case "voc-upload":
-                return <UploaderMultiple handleUploadId={this.handleUploadId} handleImages={this.handleImages} handleCategories={this.handleCategories} handleErrorMessage={this.handleErrorMessage}/>
+                return <UploaderVoc handleUploadId={this.handleUploadId} handleImages={this.handleImages} handleCategories={this.handleCategories} handleErrorMessage={this.handleErrorMessage}/>
             case "categories":
                 return <CategoryMapper categories={cloneDeep(this.state.categories)} handleCategories={this.handleCategories} handleCategoriesSaved={this.handleCategoriesSaved} handleErrorMessage={this.handleErrorMessage}/>
             case "agcontext":
