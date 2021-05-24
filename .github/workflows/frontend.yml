@@ -21,7 +21,7 @@ jobs:
         continue-on-error: true
       - name: Bring system up
         run: |
-            set -ex
+            set -x
             cd search
             mkdir -p live-data
             cat > .env <<HERE
@@ -30,10 +30,14 @@ jobs:
             POSTGRES_PASSWORD=postgres
             POSTGRES_DB=weedai
             HERE
+            # TODO The following could be a separate GitHub action
             docker-compose up -d
             sleep 1
-            while docker-compose ps | grep health:.starting > /dev/null; do sleep 1; done
-            ! (docker-compose ps | grep -q 'elasticsearch.*Up.(unhealthy)') || (echo "Found unhealthy!" && docker-compose ps; docker-compose logs; false)
+            get_statuses() {
+              docker-compose ps -q | xargs docker inspect --format '{{.State.Status}} {{if .State.Health}}{{.State.Health.Status}}{{end}} }}'
+            }
+            while get_statuses | grep -q starting; do sleep 1; done
+            if get_statuses | grep -q -e exited -e restarting -e unhealthy; then false; fi
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v2
         with:
@@ -50,6 +54,12 @@ jobs:
         uses: cypress-io/github-action@v2
         with:
           working-directory: search
+      - name: Check logs upon failure
+        run: |
+            cd search
+            docker-compose logs --tail 80
+            docker-compose ps
+        if: ${{ failure() }}
       - name: Shutdown
         run: |
             cd search

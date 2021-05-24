@@ -21,7 +21,7 @@ const UploaderVoc = (props) => {
             data: body,
             headers: {'Content-Type': 'multipart/form-data', 'X-CSRFToken': Cookies.get('csrftoken')}
         }).then(() => {
-            props.handleErrorMessage("init")
+            props.handleErrorMessage("")
         })
     }
 
@@ -49,9 +49,11 @@ const UploaderVoc = (props) => {
             props.handleUploadId(res.upload_id)
             props.handleImages(res.images)
             props.handleCategories(res.categories)
+            props.handleValidation(true)
             props.handleErrorMessage("")
         }).catch(err => {
             const res = err.response
+            props.handleValidation(false)
             try {
                 res = JSON.parse(res.data)
                 props.handleErrorMessage(jsonSchemaTitle(res), res)
@@ -64,9 +66,11 @@ const UploaderVoc = (props) => {
     const handleChangeStatus = ({ meta, file, xhr }, status) => {
       if (status === 'error_upload'){
           props.handleErrorMessage("Wrong file format")
+          props.handleValidation(false)
       }
       else if (status === 'error_file_size') {
           props.handleErrorMessage("The file size exceeds the limitation")
+          props.handleValidation(false)
       }
       else if (status === 'removed') {
           removeVoc(file)
