@@ -138,17 +138,17 @@ def atomic_copy(repository_dir, download_dir, temp_dir, deposit_id):
         move(str(zip_path), str(download_dir))
 
 
-def deposit(
-    weedcoco_path, image_dir, repository_dir, download_dir, temp_dir, upload_id=None
-):
+def deposit(weedcoco_path, image_dir, repository_dir, download_dir, upload_id=None):
     image_hash = create_image_hash(image_dir)
     validate_duplicate_images(image_hash)
     validate_existing_images(repository_dir, image_hash)
-    dataset_dir, deposit_id = setup_dataset_dir(repository_dir, temp_dir, upload_id)
-    deposit_weedcoco(weedcoco_path, dataset_dir, image_dir, image_hash)
-    migrate_images(dataset_dir, image_dir, image_hash)
-    compress_to_download(dataset_dir, deposit_id, temp_dir)
-    atomic_copy(repository_dir, download_dir, temp_dir, deposit_id)
+    with tempfile.TemporaryDirectory() as temp_dir:
+        temp_dir = pathlib.Path(temp_dir)
+        dataset_dir, deposit_id = setup_dataset_dir(repository_dir, temp_dir, upload_id)
+        deposit_weedcoco(weedcoco_path, dataset_dir, image_dir, image_hash)
+        migrate_images(dataset_dir, image_dir, image_hash)
+        compress_to_download(dataset_dir, deposit_id, temp_dir)
+        atomic_copy(repository_dir, download_dir, temp_dir, deposit_id)
     return str(repository_dir)
 
 
@@ -160,14 +160,12 @@ def main(args=None):
     ap.add_argument("--image-dir", default="cwfid_images", type=pathlib.Path)
     ap.add_argument("--repository-dir", default="repository", type=pathlib.Path)
     ap.add_argument("--download-dir", default="download", type=pathlib.Path)
-    ap.add_argument("--temp-dir", default="temp", type=pathlib.Path)
     args = ap.parse_args(args)
     deposit(
         args.weedcoco_path,
         args.image_dir,
         args.repository_dir,
         args.download_dir,
-        args.temp_dir,
     )
 
 

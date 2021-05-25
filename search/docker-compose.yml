@@ -46,7 +46,6 @@ services:
       - repository_dir:/code/repository
       - upload_dir:/code/upload
       - download_dir:/code/download
-      - temp_dir:/code/temp
     command: python manage.py runserver 0.0.0.0:8000
     entrypoint: /entrypoint.sh
     ports:
@@ -77,7 +76,6 @@ services:
       - repository_dir:/code/repository
       - upload_dir:/code/upload
       - download_dir:/code/download
-      - temp_dir:/code/temp
     depends_on:
       - django
       - redis
@@ -197,22 +195,6 @@ services:
     logging:
       driver: "json-file"
 
-  temp:
-    image: temp
-    container_name: temp
-    build:
-      context: ./nginx/temp
-    volumes:
-      - temp_dir:/tmp/temp
-    ports:
-      - "8083:80"
-    networks:
-      - elastic
-    stdin_open: true
-    restart: always
-    logging:
-      driver: "json-file"
-
   fluentd:
     container_name: fluentd
     user: root
@@ -240,6 +222,4 @@ volumes:
   download_dir:
     driver: local
   upload_dir:
-    driver: local
-  temp_dir:
     driver: local

@@ -8,7 +8,7 @@ from weedcoco.index.thumbnailing import thumbnailing
 from weedid.models import Dataset
 from weedid.utils import make_upload_entity_fields
 from weedid.notification import upload_notification
-from core.settings import THUMBNAILS_DIR, REPOSITORY_DIR, DOWNLOAD_DIR, TMP_DIR
+from core.settings import THUMBNAILS_DIR, REPOSITORY_DIR, DOWNLOAD_DIR
 from pathlib import Path
 
 
@@ -32,7 +32,6 @@ def submit_upload_task(weedcoco_path, image_dir, upload_id):
             Path(image_dir),
             Path(REPOSITORY_DIR),
             Path(DOWNLOAD_DIR),
-            Path(TMP_DIR),
             upload_id,
         )
     except Exception as e:

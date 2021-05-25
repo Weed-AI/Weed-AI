@@ -52,7 +52,6 @@ services:
       - repository_dir:/code/repository
       - upload_dir:/code/upload
       - download_dir:/code/download
-      - temp_dir:/code/temp
     ports:
       - "8000:8000"
     networks:
@@ -80,7 +79,6 @@ services:
       - repository_dir:/code/repository
       - upload_dir:/code/upload
       - download_dir:/code/download
-      - temp_dir:/code/temp
     depends_on:
       - django
       - redis
@@ -189,20 +187,6 @@ services:
     stdin_open: true
     logging: *default-logging
 
-  temp:
-    image: temp
-    container_name: temp
-    build:
-      context: ./nginx/temp
-    volumes:
-      - temp_dir:/tmp/temp
-    ports:
-      - "8083:80"
-    networks:
-      - elastic
-    stdin_open: true
-    logging: *default-logging
-
 networks:
   elastic:
     driver: bridge
@@ -219,6 +203,4 @@ volumes:
   download_dir:
     driver: local
   upload_dir:
-    driver: local
-  temp_dir:
     driver: local
