@@ -4,7 +4,13 @@ import requests
 import os
 import json
 import traceback
-from core.settings import UPLOAD_DIR, REPOSITORY_DIR, MAX_IMAGE_SIZE, MAX_VOC_SIZE, SITE_BASE_URL
+from core.settings import (
+    UPLOAD_DIR,
+    REPOSITORY_DIR,
+    MAX_IMAGE_SIZE,
+    MAX_VOC_SIZE,
+    SITE_BASE_URL,
+)
 from weedid.tasks import submit_upload_task, update_index_and_thumbnails
 from weedid.utils import (
     store_tmp_weedcoco,
