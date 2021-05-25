@@ -4,7 +4,7 @@ import requests
 import os
 import json
 import traceback
-from core.settings import UPLOAD_DIR, REPOSITORY_DIR, MAX_IMAGE_SIZE, SITE_BASE_URL
+from core.settings import UPLOAD_DIR, REPOSITORY_DIR, MAX_IMAGE_SIZE, MAX_VOC_SIZE, SITE_BASE_URL
 from weedid.tasks import submit_upload_task, update_index_and_thumbnails
 from weedid.utils import (
     store_tmp_weedcoco,
@@ -104,6 +104,8 @@ def upload_voc(request):
     try:
         voc_dir = request.POST["voc_dir"]
         voc = request.FILES["voc"]
+        if voc.size > MAX_VOC_SIZE:
+            return HttpResponseBadRequest("This voc has exceeded the size limit!")
         upload_dir = os.path.join(UPLOAD_DIR, str(user.id), voc_dir)
         store_tmp_voc(voc, upload_dir)
     except Exception as e:
