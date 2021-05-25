@@ -110,6 +110,8 @@ def upload_voc(request):
         return HttpResponseForbidden("You dont have access to proceed")
     try:
         voc_id = request.POST["voc_id"]
+        if "/" in voc_id:
+            return HttpResponseBadRequest("Bad voc id")
         voc = request.FILES["voc"]
         if voc.size > MAX_VOC_SIZE:
             return HttpResponseBadRequest("This voc has exceeded the size limit!")
@@ -128,10 +130,12 @@ def remove_voc(request):
     user = request.user
     if not (user and user.is_authenticated):
         return HttpResponseForbidden("You dont have access to proceed")
-    voc_id = request.POST["voc_id"]
-    voc_name = request.POST["voc_name"]
-    voc_to_remove = os.path.join(UPLOAD_DIR, str(user.id), voc_id, voc_name)
     try:
+        voc_id = request.POST["voc_id"]
+        if "/" in voc_id:
+            return HttpResponseBadRequest("Bad voc id")
+        voc_name = request.POST["voc_name"]
+        voc_to_remove = os.path.join(UPLOAD_DIR, str(user.id), voc_id, voc_name)
         if os.path.exists(voc_to_remove):
             os.remove(voc_to_remove)
             return HttpResponse(f"Removed {voc_name}")
@@ -147,8 +151,10 @@ def submit_voc(request):
     user = request.user
     if not (user and user.is_authenticated):
         return HttpResponseForbidden("You dont have access to proceed")
-    voc_id = request.POST["voc_id"]
     try:
+        voc_id = request.POST["voc_id"]
+        if "/" in voc_id:
+            return HttpResponseBadRequest("Bad voc id")
         images = []
         weedcoco_json = voc_to_coco(
             Path(os.path.join(UPLOAD_DIR, str(user.id), voc_id))
@@ -184,6 +190,8 @@ def move_voc(request):
         return HttpResponseForbidden("You dont have access to proceed")
     try:
         voc_id = request.POST["voc_id"]
+        if "/" in voc_id:
+            return HttpResponseBadRequest("Bad voc id")
         upload_id = request.POST["upload_id"]
         voc_dir = os.path.join(UPLOAD_DIR, str(user.id), voc_id)
         upload_dir = os.path.join(UPLOAD_DIR, str(user.id), upload_id)
