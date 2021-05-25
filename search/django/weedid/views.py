@@ -107,6 +107,7 @@ def upload_voc(request):
         upload_dir = os.path.join(UPLOAD_DIR, str(user.id), voc_dir)
         store_tmp_voc(voc, upload_dir)
     except Exception as e:
+        traceback.print_exc()
         return HttpResponseBadRequest(str(e))
     else:
         return HttpResponse(f"Uploaded {voc.name} to {upload_dir}")
@@ -198,6 +199,7 @@ def update_categories(request):
     except JsonValidationError as e:
         return HttpResponseBadRequest(e.message)
     except Exception as e:
+        traceback.print_exc()
         return HttpResponseBadRequest(str(e))
     else:
         return HttpResponse(
