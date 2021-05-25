@@ -47,6 +47,8 @@ def mkdir_safely(local_dir):
 
 
 def setup_dataset_dir(repository_dir, temp_dir, upload_id=None):
+    if not repository_dir.is_dir():
+        mkdir_safely(repository_dir)
     if upload_id is None:
         if not temp_dir.is_dir():
             mkdir_safely(temp_dir)
