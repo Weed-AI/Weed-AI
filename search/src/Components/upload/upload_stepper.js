@@ -64,6 +64,7 @@ class UploadStepper extends React.Component {
             skipped: new Set(),
             steps: stepsByType[this.props.upload_type].map(step => step.title),
             upload_id: 0,
+            voc_id: Math.random().toString(36).slice(-8),
             images: [],
             categories: [],
             ag_context: {},
@@ -86,7 +87,8 @@ class UploadStepper extends React.Component {
         this.handleSkip = this.handleSkip.bind(this);
         this.handleReset = this.handleReset.bind(this);
         this.handleUploadAgcontexts = this.handleUploadAgcontexts.bind(this);
-        this.handleUploadMetadata = this.handleUploadMetadata.bind(this)
+        this.handleUploadMetadata = this.handleUploadMetadata.bind(this);
+        this.handleMoveVoc = this.handleMoveVoc.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
         this.nextHandler = this.nextHandler.bind(this);
         this.handleValidation = this.handleValidation.bind(this);
@@ -229,6 +231,27 @@ class UploadStepper extends React.Component {
         })
     }
 
+    handleMoveVoc(){
+        const body = new FormData()
+        body.append('upload_id', this.state.upload_id)
+        body.append('voc_id', this.state.voc_id)
+        axios({
+            method: 'post',
+            url: baseURL + "api/move_voc/",
+            data: body,
+            headers: {'X-CSRFToken': Cookies.get('csrftoken') }
+        }).then(res => {
+            console.log(res)
+            this.handleErrorMessage("")
+            this.handleNext()
+        })
+        .catch(err => {
+            console.log(err)
+            this.handleValidation(false)
+            this.handleErrorMessage("Failed to move voc")
+        })
+    }
+
     handleSubmit(){
         const baseURL = new URL(window.location.origin);
         const body = new FormData()
@@ -258,7 +281,7 @@ class UploadStepper extends React.Component {
                 const schema = step == "coco-upload" ? "coco" : "weedcoco"
                 return <UploaderSingle upload_id={this.state.upload_id} images={this.state.images} handleUploadId={this.handleUploadId} handleImages={this.handleImages} handleCategories={this.handleCategories} handleValidation={this.handleValidation} handleErrorMessage={this.handleErrorMessage} schema={schema}/>
             case "voc-upload":
-                return <UploaderVoc handleUploadId={this.handleUploadId} handleImages={this.handleImages} handleCategories={this.handleCategories} handleValidation={this.handleValidation} handleErrorMessage={this.handleErrorMessage}/>
+                return <UploaderVoc handleUploadId={this.handleUploadId} handleImages={this.handleImages} handleCategories={this.handleCategories} handleValidation={this.handleValidation} handleErrorMessage={this.handleErrorMessage} voc_id={this.state.voc_id}/>
             case "categories":
                 return <CategoryMapper categories={cloneDeep(this.state.categories)} handleCategories={this.handleCategories} handleValidation={this.handleValidation} handleErrorMessage={this.handleErrorMessage}/>
             case "agcontext":
@@ -290,6 +313,8 @@ class UploadStepper extends React.Component {
 
     nextHandler(step) {
         switch (step) {
+            case "voc-upload":
+                return this.handleMoveVoc
             case "categories":
                 return this.handleUpdateCategories
             case "agcontext":

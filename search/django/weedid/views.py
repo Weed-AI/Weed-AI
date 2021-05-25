@@ -18,6 +18,7 @@ from weedid.utils import (
     store_tmp_image,
     store_tmp_voc,
     store_tmp_voc_coco,
+    move_voc_to_upload,
     create_upload_entity,
     retrieve_listing_info,
     remove_entity_local_record,
@@ -108,11 +109,11 @@ def upload_voc(request):
     if not (user and user.is_authenticated):
         return HttpResponseForbidden("You dont have access to proceed")
     try:
-        voc_dir = request.POST["voc_dir"]
+        voc_id = request.POST["voc_id"]
         voc = request.FILES["voc"]
         if voc.size > MAX_VOC_SIZE:
             return HttpResponseBadRequest("This voc has exceeded the size limit!")
-        upload_dir = os.path.join(UPLOAD_DIR, str(user.id), voc_dir)
+        upload_dir = os.path.join(UPLOAD_DIR, str(user.id), voc_id)
         store_tmp_voc(voc, upload_dir)
     except Exception as e:
         traceback.print_exc()
@@ -127,9 +128,9 @@ def remove_voc(request):
     user = request.user
     if not (user and user.is_authenticated):
         return HttpResponseForbidden("You dont have access to proceed")
-    voc_dir = request.POST["voc_dir"]
+    voc_id = request.POST["voc_id"]
     voc_name = request.POST["voc_name"]
-    voc_to_remove = os.path.join(UPLOAD_DIR, str(user.id), voc_dir, voc_name)
+    voc_to_remove = os.path.join(UPLOAD_DIR, str(user.id), voc_id, voc_name)
     try:
         if os.path.exists(voc_to_remove):
             os.remove(voc_to_remove)
@@ -146,11 +147,11 @@ def submit_voc(request):
     user = request.user
     if not (user and user.is_authenticated):
         return HttpResponseForbidden("You dont have access to proceed")
-    voc_dir = request.POST["voc_dir"]
+    voc_id = request.POST["voc_id"]
     try:
         images = []
         weedcoco_json = voc_to_coco(
-            Path(os.path.join(UPLOAD_DIR, str(user.id), voc_dir))
+            Path(os.path.join(UPLOAD_DIR, str(user.id), voc_id))
         )
         validate(weedcoco_json, schema="coco")
         for image_reference in weedcoco_json["images"]:
@@ -173,6 +174,23 @@ def submit_voc(request):
                 {"upload_id": upload_id, "images": images, "categories": categories}
             )
         )
+
+
+def move_voc(request):
+    if not request.method == "POST":
+        return HttpResponseNotAllowed(request.method)
+    user = request.user
+    if not (user and user.is_authenticated):
+        return HttpResponseForbidden("You dont have access to proceed")
+    try:
+        voc_id = request.POST["voc_id"]
+        upload_id = request.POST["upload_id"]
+        voc_dir = os.path.join(UPLOAD_DIR, str(user.id), voc_id)
+        upload_dir = os.path.join(UPLOAD_DIR, str(user.id), upload_id)
+        move_voc_to_upload(voc_dir, upload_dir)
+        return HttpResponse(f"VOC files of {voc_id} has been moved to {upload_dir}")
+    except Exception as e:
+        return HttpResponseBadRequest(str(e))
 
 
 def upload_image(request):

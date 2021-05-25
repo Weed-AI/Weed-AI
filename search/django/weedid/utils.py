@@ -1,5 +1,5 @@
 import os
-from shutil import rmtree
+from shutil import rmtree, move
 import json
 import re
 from uuid import uuid4
@@ -40,6 +40,10 @@ def store_tmp_voc_coco(weedcoco, upload_dir):
     weedcoco_path = os.path.join(upload_dir, "weedcoco.json")
     with open(weedcoco_path, "w") as weedcoco_file:
         weedcoco_file.write(json.dumps(weedcoco))
+
+
+def move_voc_to_upload(voc_dir, upload_dir):
+    move(voc_dir, upload_dir + "/voc")
 
 
 def setup_upload_dir(upload_userid_dir):

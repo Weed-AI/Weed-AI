@@ -6,6 +6,7 @@ api_urlpatterns = [
     path("upload_voc/", views.upload_voc, name="upload_voc"),
     path("remove_voc/", views.remove_voc, name="remove_voc"),
     path("submit_voc/", views.submit_voc, name="submit_voc"),
+    path("move_voc/", views.move_voc, name="move_voc"),
     path("upload_image/", views.upload_image, name="upload_image"),
     path("update_categories/", views.update_categories, name="update_categories"),
     path("upload_agcontexts/", views.upload_agcontexts, name="upload_agcontexts"),

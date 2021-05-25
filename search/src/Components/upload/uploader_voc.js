@@ -6,7 +6,6 @@ import axios from 'axios';
 import Cookies from 'js-cookie';
 
 
-const tmp_voc = Math.random().toString(36).slice(-8);
 const voc_max_size = 1024 * 5;
 const UploaderVoc = (props) => {
     const baseURL = new URL(window.location.origin);
@@ -14,7 +13,7 @@ const UploaderVoc = (props) => {
     const removeVoc = file => {
         const body = new FormData()
         body.append('voc_name', file.name)
-        body.append('voc_dir', tmp_voc)
+        body.append('voc_id', props.voc_id)
         axios({
             method: 'post',
             url: baseURL + "api/remove_voc/",
@@ -28,7 +27,7 @@ const UploaderVoc = (props) => {
     const getUploadParams = ({ file, meta }) => {
         const body = new FormData()
         body.append('voc', file)
-        body.append('voc_dir', tmp_voc)
+        body.append('voc_id', props.voc_id)
         return { url: baseURL + 'api/upload_voc/',
                  mode: 'same-origin',
                  headers: {'X-CSRFToken': Cookies.get('csrftoken')},
@@ -38,7 +37,7 @@ const UploaderVoc = (props) => {
     
     const handleSubmit = (files, allFiles) => {
         const body = new FormData()
-        body.append('voc_dir', tmp_voc)
+        body.append('voc_id', props.voc_id)
         axios({
             method: 'post',
             url: baseURL + "api/submit_voc/",
