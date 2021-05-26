@@ -1,0 +1,23 @@
+{
+  "metadata": {
+      "name": "Test Dataset",
+      "creator": [
+          {
+              "sameAs": "https://test.org/",
+              "familyName": "Test",
+              "givenName": "Test",
+              "name": "Test Test"
+          }
+      ],
+      "datePublished": "2021-02-19",
+      "license": "https://creativecommons.org/licenses/by/4.0/legalcode",
+      "funder": [
+          {
+              "name": "Grains Research and Development Corporation",
+              "sameAs": "https://test.org/"
+          }
+      ]
+  },
+  "description": "Test Dataset",
+  "year": 2021
+}

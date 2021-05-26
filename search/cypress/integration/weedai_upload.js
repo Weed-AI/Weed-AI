@@ -11,11 +11,30 @@ describe('overall upload workflow', () => {
 
     it('Test Weedcoco Upload', () => {
         cy.findAllByText(/^Select annotation format$/).should('have.length', 1).type('weedcoco{enter}')
-        cy.findAllByText(/^Begin upload$/).should('have.length', 1).click()
+        cy.click_text(/^Begin upload$/)
         cy.get('.dzu-input').attachFile('test_weedcoco/weedcoco.json')
-        cy.findAllByText(/^Next$/).should('have.length', 1).click()
+        cy.click_text(/^Next$/)
         cy.get('div.fileContainer > input').attachFile('test_weedcoco/images/001_image.png')
-        cy.findAllByText(/^Submit$/).should('have.length', 1).click()
+        cy.click_text(/^Submit$/)
+    })
+
+    it('Test Coco Upload', () => {
+        cy.findAllByText(/^Select annotation format$/).should('have.length', 1).type('coco{enter}')
+        cy.click_text(/^Begin upload$/)
+        cy.get('.dzu-input').attachFile('test_coco/weedcoco.json')
+        cy.click_text(/^Next$/)
+        cy.click_text(/^Apply$/)
+        cy.click_text(/^Next$/)
+        cy.click_text(/^Upload and Download Form Contents$/)
+        cy.get('.dzu-input').attachFile('test_coco/agcontext.json')
+        cy.click_text(/^Set Form$/)
+        cy.click_text(/^Next$/)
+        cy.click_text(/^Upload and Download Form Contents$/)
+        cy.get('.dzu-input').attachFile('test_coco/agcontext.json')
+        cy.click_text(/^Set Form$/)
+        cy.click_text(/^Next$/)
+        cy.get('div.fileContainer > input').attachFile('test_coco/images/002_image.png')
+        cy.click_text(/^Submit$/)
     })
 
     afterEach(() => {
