@@ -64,8 +64,6 @@ describe('overall upload workflow', () => {
     })
 
     afterEach(() => {
-        cy.findAllByRole('heading').should('contain', 'Processing')
-        cy.findAllByRole('heading').should('contain', 'Awaiting Review')
         cy.findAllByText(/^Log out$/).should('have.length', 1).click()
     })
 })
