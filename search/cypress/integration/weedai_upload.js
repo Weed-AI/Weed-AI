@@ -64,6 +64,8 @@ describe('overall upload workflow', () => {
     })
 
     afterEach(() => {
+        cy.findAllByRole('heading').should('contain', 'Current upload status: Processing', { timeout: 10000 })
+        cy.findAllByRole('heading').should('contain', 'Current upload status: Awaiting Review', { timeout: 50000 })
         cy.findAllByText(/^Log out$/).should('have.length', 1).click()
     })
 })
