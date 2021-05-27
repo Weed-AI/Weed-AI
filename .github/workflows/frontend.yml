@@ -29,6 +29,7 @@ jobs:
             POSTGRES_USER=postgres
             POSTGRES_PASSWORD=postgres
             POSTGRES_DB=weedai
+            SEND_EMAIL=False
             HERE
             # TODO The following could be a separate GitHub action
             docker-compose up -d
