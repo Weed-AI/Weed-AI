@@ -179,17 +179,3 @@ def parse_category_name(category):
             "role": "",
             "scientific_name": "",
         }
-
-
-def validate_email_format(email):
-    regex = "^(\\w|\\.|\\_|\\-)+[@](\\w|\\_|\\-|\\.)+[.]\\w{2,3}$"
-    return re.fullmatch(regex, email)
-
-
-def send_email(subject, body, recipients):
-    with smtplib.SMTP(SMTP_HOST, SMTP_PORT) as smtp:
-        for recipient in recipients:
-            msg = EmailMessage()
-            msg["Subject"], msg["From"], msg["To"] = subject, FROM_EMAIL, recipient
-            msg.set_content(body)
-            smtp.send_message(msg)
