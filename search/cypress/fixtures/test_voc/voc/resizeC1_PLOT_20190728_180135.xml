@@ -1,0 +1,50 @@
+<annotation>
+	<folder>img</folder>
+	<filename>resizeC1_PLOT_20190728_180135.jpg</filename>
+	<path>C:\Users\gcol4791\PycharmProjects\Tools\Wheat\img\resizeC1_PLOT_20190728_180135.jpg</path>
+	<source>
+		<database>Unknown</database>
+	</source>
+	<size>
+		<width>1536</width>
+		<height>960</height>
+		<depth>3</depth>
+	</size>
+	<segmented>0</segmented>
+	<object>
+		<name>weed: ryegrass</name>
+		<pose>Unspecified</pose>
+		<truncated>0</truncated>
+		<difficult>0</difficult>
+		<bndbox>
+			<xmin>817</xmin>
+			<ymin>835</ymin>
+			<xmax>858</xmax>
+			<ymax>889</ymax>
+		</bndbox>
+	</object>
+	<object>
+		<name>crop: turnip</name>
+		<pose>Unspecified</pose>
+		<truncated>0</truncated>
+		<difficult>0</difficult>
+		<bndbox>
+			<xmin>1163</xmin>
+			<ymin>314</ymin>
+			<xmax>1190</xmax>
+			<ymax>329</ymax>
+		</bndbox>
+	</object>
+	<object>
+		<name>crop: turnip</name>
+		<pose>Unspecified</pose>
+		<truncated>0</truncated>
+		<difficult>0</difficult>
+		<bndbox>
+			<xmin>1511</xmin>
+			<ymin>208</ymin>
+			<xmax>1531</xmax>
+			<ymax>238</ymax>
+		</bndbox>
+	</object>
+</annotation>
