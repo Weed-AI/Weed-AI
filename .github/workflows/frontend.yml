@@ -58,15 +58,13 @@ jobs:
       - uses: actions/upload-artifact@v1
         if: failure()
         with:
-          path: /home/runner/work/Weed-AI/Weed-AI/search/cypress/screenshots
           name: cypress-screenshots
-          path: cypress/screenshots
+          path: search/cypress/screenshots
       - uses: actions/upload-artifact@v1
         if: always()
         with:
-          path: /home/runner/work/Weed-AI/Weed-AI/search/cypress/screenshots
           name: cypress-videos
-          path: cypress/videos
+          path: search/cypress/videos
       - name: Check logs upon failure
         run: |
             cd search
