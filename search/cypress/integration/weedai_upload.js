@@ -19,7 +19,8 @@ describe('overall upload workflow', () => {
     })
 
     it('Test Coco Upload', () => {
-        cy.findAllByText(/^Select annotation format$/).should('have.length', 1).type('coco{enter}')
+        cy.findByText(/^Select annotation format$/).click()
+        cy.findByText("COCO").click()
         cy.click_text(/^Begin upload$/)
         cy.get('.dzu-input').attachFile('test_coco/weedcoco.json')
         cy.click_text(/^Next$/)
@@ -40,7 +41,8 @@ describe('overall upload workflow', () => {
     })
 
     it('Test Voc Upload', () => {
-        cy.findAllByText(/^Select annotation format$/).should('have.length', 1).type('voc{enter}')
+        cy.findByText(/^Select annotation format$/).click()
+        cy.findByText("VOC").click()
         cy.click_text(/^Begin upload$/)
         cy.get('.dzu-input').attachFile('test_voc/voc/resizeC1_PLOT_20190728_175852.xml')
         cy.get('.dzu-input').attachFile('test_voc/voc/resizeC1_PLOT_20190728_180135.xml')
