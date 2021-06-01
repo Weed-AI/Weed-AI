@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import Mapping
+from typing import Mapping, Optional, Iterable, Tuple
 import argparse
 import json
 import warnings
@@ -54,14 +54,13 @@ def generate_segmentations(mask_path, color_map, colors_not_found):
         yield segmentation, category
 
 
-def masks_to_coco(
+def generate_mask_and_image_paths(
     image_dir: Path,
     mask_dir: Path,
-    color_to_category_map: Mapping[str, str],
-    image_to_mask_pattern=None,
+    image_to_mask_pattern: Optional[str] = None,
     on_missing_mask: str = "error",
 ):
-    """Converts images and masks to MS COCO images and annotations
+    """Collects masks corresponding to images in a directory
 
     Parameters
     ----------
@@ -69,8 +68,6 @@ def masks_to_coco(
     mask_dir : pathlib.Path
         Filenames should be identical to those in image-dir except for .png
         extension, unelss image_to_mask_pattern is given.
-    color_to_category_map : Mapping
-        Maps colours of format "RRGGBB" to valid WeedCOCO category names
     image_to_mask_pattern : str
         A regular expression that will match a substring of an image filename.
         The matched portion will have ".png" added and will be sought in
@@ -79,12 +76,10 @@ def masks_to_coco(
         If there is no mask available for a given image file, by default an
         error will be raised.  This allows it to instead be skipped.
 
-    Returns
-    -------
-    dict
-        Keys present should be 'images', 'annotations', and
-        'categories'.
-        Other COCO components should be added as a post-process.
+    Yields
+    ------
+    mask_path : str
+    image_path : str
     """
     if not image_dir.is_dir():
         raise NotADirectoryError(f"Not a directory: {image_dir}")
@@ -92,12 +87,6 @@ def masks_to_coco(
         raise NotADirectoryError(f"Not a directory: {mask_dir}")
     if image_to_mask_pattern is None:
         image_to_mask_pattern = r"$.*\.(?=[^.]+$)"
-
-    categories = []
-    color_to_idx_map = {}
-    for i, (color, name) in enumerate(color_to_category_map.items()):
-        categories.append({"id": i, "name": name})
-        color_to_idx_map[color.lower()] = i
 
     def _image_name_to_mask(name):
         try:
@@ -108,11 +97,8 @@ def masks_to_coco(
                 f"using pattern {repr(image_to_mask_pattern)}"
             )
 
-    images = []
-    annotations = []
-    colors_not_found = set()
-    categories_found = set()
-    for path in sorted(image_dir.glob("*.*")):
+    all_paths = sorted(image_dir.glob("*.*"))
+    for path in all_paths:
         if path.name.startswith("."):
             # real glob excludes these
             continue
@@ -127,11 +113,51 @@ def masks_to_coco(
                     f"No mask found at {mask_path} for image named {path.name}."
                 )
             continue
+
+        yield mask_path, path
+
+    if not all_paths:
+        raise ValueError(f"No images found in {image_dir}")
+
+
+def masks_to_coco(
+    path_pairs: Iterable[Tuple[str, str]],
+    color_to_category_map: Mapping[str, str],
+    check_consistent_dimensions: bool = True,
+):
+    """Converts images and masks to MS COCO images and annotations
+
+    Parameters
+    ----------
+    path_pairs : Iterable
+        Pairs of (mask_path, image_path). mask_path needs to be readable,
+        while image_path is copied verbatim into the COCO output.
+    color_to_category_map : Mapping
+        Maps colours of format "RRGGBB" to valid WeedCOCO category names
+
+    Returns
+    -------
+    dict
+        Keys present should be 'images', 'annotations', and
+        'categories'.
+        Other COCO components should be added as a post-process.
+    """
+    categories = []
+    color_to_idx_map = {}
+    for i, (color, name) in enumerate(color_to_category_map.items()):
+        categories.append({"id": i, "name": name})
+        color_to_idx_map[color.lower()] = i
+
+    images = []
+    annotations = []
+    colors_not_found = set()
+    categories_found = set()
+    for mask_path, image_path in path_pairs:
         dims = get_image_dimensions(mask_path)
-        if get_image_dimensions(path) != dims:
+        if check_consistent_dimensions and get_image_dimensions(image_path) != dims:
             raise ValueError(
                 f"Got inconsistent dimensions for image "
-                f"({get_image_dimensions(path)}) and mask ({dims})"
+                f"({get_image_dimensions(image_path)}) and mask ({dims})"
             )
 
         segmentations = generate_segmentations(
@@ -150,10 +176,7 @@ def masks_to_coco(
             }
             annotations.append(annotation)
 
-        images.append({"id": len(images), "file_name": path.name, **dims})
-
-    if not images:
-        raise ValueError(f"No images found in {image_dir}")
+        images.append({"id": len(images), "file_name": Path(image_path).name, **dims})
 
     if len(colors_not_found) > 1:
         raise ValueError(
@@ -214,12 +237,17 @@ def main(args=None):
     args = ap.parse_args(args)
 
     color_to_category_map = load_json_or_yaml(args.category_map)
-    coco = masks_to_coco(
+    path_pairs = generate_mask_and_image_paths(
         args.image_dir,
         args.mask_dir,
-        color_to_category_map,
         image_to_mask_pattern=args.path_to_mask_pattern,
         on_missing_mask=args.on_missing_mask,
+    )
+    check_consistent_dimensions = True
+    coco = masks_to_coco(
+        path_pairs,
+        color_to_category_map,
+        check_consistent_dimensions=check_consistent_dimensions,
     )
 
     if args.agcontext_path:
