@@ -2,7 +2,6 @@ import { fixedItemsTester, FixedItemsRenderer } from './FixedItemsRenderer';
 import { constTester, ConstRenderer } from './ConstRenderer';
 import { oneOfTester, OneOfRenderer } from './OneOfRenderer';
 import {
-  materialCells,
   materialRenderers,
 } from '@jsonforms/material-renderers';
 
