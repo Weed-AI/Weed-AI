@@ -16,9 +16,8 @@ jobs:
         python-version: [3.7]
     steps:
       - uses: actions/checkout@v2
-      - uses: satackey/action-docker-layer-caching@v0.0.11
-        # Ignore the failure of a step and avoid terminating the job.
-        continue-on-error: true
+#      - uses: satackey/action-docker-layer-caching@v0.0.11
+#        continue-on-error: true
       - name: Bring system up
         run: |
             set -x
@@ -31,7 +30,7 @@ jobs:
             POSTGRES_DB=weedai
             HERE
             # TODO The following could be a separate GitHub action
-            docker-compose up -d
+            docker-compose up -d --build
             sleep 1
             get_statuses() {
               docker-compose ps -q | xargs docker inspect --format '{{.State.Status}} {{if .State.Health}}{{.State.Health.Status}}{{end}} }}'
@@ -42,7 +41,6 @@ jobs:
         uses: actions/setup-python@v2
         with:
           python-version: ${{ matrix.python-version }}
-      - uses: actions/checkout@v2
       - name: Install weedcoco library
         run: |
           pip install .
