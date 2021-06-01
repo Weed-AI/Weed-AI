@@ -68,11 +68,11 @@ def generate_mask_and_image_paths(
     mask_dir : pathlib.Path
         Filenames should be identical to those in image-dir except for .png
         extension, unelss image_to_mask_pattern is given.
-    image_to_mask_pattern : str
+    image_to_mask_pattern : str, optional
         A regular expression that will match a substring of an image filename.
         The matched portion will have ".png" added and will be sought in
         mask_dir.
-    on_missing_mask : one of {"error", "skip", "warn"}
+    on_missing_mask : one of {"error", "skip", "warn"}, default="error"
         If there is no mask available for a given image file, by default an
         error will be raised.  This allows it to instead be skipped.
 
@@ -121,6 +121,20 @@ def generate_mask_and_image_paths(
 
 
 def generate_paths_from_mask_only(mask_dir: Path, image_ext: str = "jpg"):
+    """Generates image filenames corresponding to masks in a directory
+
+    Parameters
+    ----------
+    mask_dir : pathlib.Path
+    image_ext : str
+        The extension to append to each mask path's stem to produce its
+        corresponding image filename.
+
+    Yields
+    ------
+    mask_path : str
+    image_path : str
+    """
     all_paths = sorted(mask_dir.glob("*.*"))
     for mask_path in all_paths:
         if mask_path.name.startswith("."):
@@ -133,9 +147,21 @@ def generate_paths_from_mask_only(mask_dir: Path, image_ext: str = "jpg"):
         raise ValueError(f"No masks found in {mask_dir}")
 
 
+class DefaultColorMapping(dict):
+    def __init__(self, background_color):
+        self.background_color = background_color
+
+    def __missing__(self, k):
+        if k == self.background_color:
+            raise KeyError(k)
+        out = self[k] = len(self)
+        return out
+
+
 def masks_to_coco(
     path_pairs: Iterable[Tuple[str, str]],
-    color_to_category_map: Mapping[str, str],
+    color_to_category_map: Mapping[str, str] = None,
+    background_if_unmapped: str = None,
     check_consistent_dimensions: bool = True,
 ):
     """Converts images and masks to MS COCO images and annotations
@@ -145,8 +171,16 @@ def masks_to_coco(
     path_pairs : Iterable
         Pairs of (mask_path, image_path). mask_path needs to be readable,
         while image_path is copied verbatim into the COCO output.
-    color_to_category_map : Mapping
+    color_to_category_map : Mapping, optional
         Maps colours of format "RRGGBB" to valid WeedCOCO category names
+    background_if_unmapped : str, optional
+        Must be given if color_to_category_map is not. If not None, category
+        names are set to hexadecimal colour values, rather than being mapped.
+        The colour hex provided as `background_if_unmapped` will be treated as
+        the background colour and will not be mapped.
+    check_consistent_dimensions : bool, default=True
+        Whether to check images and masks match in size. Should be false if
+        images are not available.
 
     Returns
     -------
@@ -155,11 +189,14 @@ def masks_to_coco(
         'categories'.
         Other COCO components should be added as a post-process.
     """
-    categories = []
-    color_to_idx_map = {}
-    for i, (color, name) in enumerate(color_to_category_map.items()):
-        categories.append({"id": i, "name": name})
-        color_to_idx_map[color.lower()] = i
+    if background_if_unmapped:
+        color_to_idx_map = DefaultColorMapping(background_if_unmapped)
+    else:
+        categories = []
+        color_to_idx_map = {}
+        for i, (color, name) in enumerate(color_to_category_map.items()):
+            categories.append({"id": i, "name": name})
+            color_to_idx_map[color.lower()] = i
 
     images = []
     annotations = []
@@ -190,6 +227,9 @@ def masks_to_coco(
             annotations.append(annotation)
 
         images.append({"id": len(images), "file_name": Path(image_path).name, **dims})
+
+    if background_if_unmapped:
+        categories = [{"id": v, "name": k} for k, v in color_to_idx_map.items()]
 
     if len(colors_not_found) > 1:
         raise ValueError(
@@ -240,16 +280,29 @@ def main(args=None):
             "to generate an image file name."
         ),
     )
-    ap.add_argument(
+
+    cat_group = ap.add_mutually_exclusive_group(required=True)
+    cat_group.add_argument(
         "-C",
         "--category-map",
-        required=True,
         type=Path,
         help=(
             "JSON or YAML mapping of colors (RRGGBB) to WeedCOCO category names. "
             "The background color should not be mapped."
         ),
     )
+    cat_group.add_argument(
+        "-U",
+        "--unmapped-on-black",
+        action="store_const",
+        dest="background_if_unmapped",
+        const="000000",
+        help=(
+            "Do not map the colours, and output hex colours as COCO category "
+            "names. Assume the background is black."
+        ),
+    )
+
     ap.add_argument("--agcontext-path", type=Path)
     ap.add_argument("--metadata-path", type=Path)
     ap.add_argument("--validate", action="store_true", default=False)
@@ -270,7 +323,6 @@ def main(args=None):
     )
     args = ap.parse_args(args)
 
-    color_to_category_map = load_json_or_yaml(args.category_map)
     if args.image_ext:
         path_pairs = generate_paths_from_mask_only(args.mask_dir, args.image_ext)
         check_consistent_dimensions = False
@@ -282,10 +334,16 @@ def main(args=None):
             on_missing_mask=args.on_missing_mask,
         )
         check_consistent_dimensions = True
+
+    if args.category_map is None:
+        color_to_category_map = None
+    else:
+        color_to_category_map = load_json_or_yaml(args.category_map)
     coco = masks_to_coco(
         path_pairs,
         color_to_category_map,
         check_consistent_dimensions=check_consistent_dimensions,
+        background_if_unmapped=args.background_if_unmapped,
     )
 
     if args.agcontext_path:
