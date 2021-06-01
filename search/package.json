@@ -44,7 +44,9 @@
     "start3000": "PORT=3000 HOST=localhost react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "cosmos": "cross-env FAST_REFRESH=false cosmos",
+    "cosmos:export": "cosmos-export"
   },
   "eslintConfig": {
     "extends": "react-app"
@@ -62,6 +64,7 @@
     ]
   },
   "devDependencies": {
+    "react-cosmos": "^5.6.2",
     "@testing-library/cypress": "^7.0.6",
     "cypress": "^7.2.0",
     "cypress-file-upload": "^5.0.7",
