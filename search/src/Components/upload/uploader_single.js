@@ -24,15 +24,23 @@ const UploaderSingle  = (props) => {
             props.handleUploadId(res.upload_id)
             props.handleImages(res.images)
             props.handleCategories(res.categories)
+            props.handleValidation(true)
             props.handleErrorMessage("")
         }
         else if (status === 'error_upload'){
-            xhr.addEventListener('loadend', (e) => {const res = JSON.parse(e.target.responseText); props.handleErrorMessage(jsonSchemaTitle(res), res)});
+            xhr.addEventListener('loadend', 
+              (e) => {
+                const res = JSON.parse(e.target.responseText);
+                props.handleErrorMessage(jsonSchemaTitle(res), res);
+                props.handleValidation(false)
+              });
         }
         else if (status === 'error_file_size') {
+            props.handleValidation(false)
             props.handleErrorMessage("The file size exceeds the limitation")
         }
         else if (status === 'removed') {
+            props.handleValidation(false)
             props.handleErrorMessage("")
         }
     }

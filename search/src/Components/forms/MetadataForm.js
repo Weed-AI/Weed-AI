@@ -7,7 +7,6 @@ import Box from '@material-ui/core/Box';
 import { createAjv } from '@jsonforms/core';
 import renderers from '../formRenderers/default_renderers';
 import { JsonForms } from '@jsonforms/react';
-import { constTester, ConstRenderer } from '../formRenderers/ConstRenderer';
 import UploadJsonButton from './UploadJsonButton';
 import { materialCells } from '@jsonforms/material-renderers';
 
@@ -108,7 +107,7 @@ class MetadataForm extends Component {
               ajv = {createAjv({useDefaults: true})}
               onChange={e => {
                   if (this.props.handleValidation){
-                    this.props.handleValidation('metadata', e.errors.length === 0);
+                    this.props.handleValidation(e.errors.length === 0);
                   }
                   this.setState({formData: e.data});
                   if (this.props.onChange) {

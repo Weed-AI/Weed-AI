@@ -1,5 +1,5 @@
 import os
-from shutil import rmtree
+from shutil import rmtree, move
 import json
 import re
 from uuid import uuid4
@@ -29,7 +29,21 @@ def store_tmp_weedcoco(weedcoco, upload_dir):
     fs = FileSystemStorage()
     weedcoco_path = os.path.join(upload_dir, "weedcoco.json")
     fs.save(weedcoco_path, weedcoco)
-    return weedcoco_path
+
+
+def store_tmp_voc(voc, voc_dir):
+    fs = FileSystemStorage()
+    fs.save(os.path.join(voc_dir, voc.name), voc)
+
+
+def store_tmp_voc_coco(weedcoco, upload_dir):
+    weedcoco_path = os.path.join(upload_dir, "weedcoco.json")
+    with open(weedcoco_path, "w") as weedcoco_file:
+        weedcoco_file.write(json.dumps(weedcoco))
+
+
+def move_voc_to_upload(voc_dir, upload_dir):
+    move(voc_dir, upload_dir + "/voc")
 
 
 def setup_upload_dir(upload_userid_dir):
@@ -113,14 +127,9 @@ def make_upload_entity_fields(weedcoco):
     }
 
 
-def create_upload_entity(weedcoco_path, upload_id, upload_userid):
+def create_upload_entity(upload_id, upload_userid):
     upload_user = WeedidUser.objects.get(id=upload_userid)
-
-    with open(weedcoco_path) as f:
-        weedcoco_json = json.load(f)
-    fields = make_upload_entity_fields(weedcoco_json)
-
-    upload_entity = Dataset(upload_id=upload_id, user=upload_user, status="N", **fields)
+    upload_entity = Dataset(upload_id=upload_id, user=upload_user, status="N")
     upload_entity.save()
     upload_user.latest_upload = upload_entity
     upload_user.save()
@@ -179,17 +188,3 @@ def parse_category_name(category):
             "role": "",
             "scientific_name": "",
         }
-
-
-def validate_email_format(email):
-    regex = "^(\\w|\\.|\\_|\\-)+[@](\\w|\\_|\\-|\\.)+[.]\\w{2,3}$"
-    return re.fullmatch(regex, email)
-
-
-def send_email(subject, body, recipients):
-    with smtplib.SMTP(SMTP_HOST, SMTP_PORT) as smtp:
-        for recipient in recipients:
-            msg = EmailMessage()
-            msg["Subject"], msg["From"], msg["To"] = subject, FROM_EMAIL, recipient
-            msg.set_content(body)
-            smtp.send_message(msg)
