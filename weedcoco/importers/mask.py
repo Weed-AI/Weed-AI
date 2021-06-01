@@ -121,6 +121,20 @@ def generate_mask_and_image_paths(
 
 
 def generate_paths_from_mask_only(mask_dir: Path, image_ext: str = "jpg"):
+    """Generates image filenames corresponding to masks in a directory
+
+    Parameters
+    ----------
+    mask_dir : pathlib.Path
+    image_ext : str
+        The extension to append to each mask path's stem to produce its
+        corresponding image filename.
+
+    Yields
+    ------
+    mask_path : str
+    image_path : str
+    """
     all_paths = sorted(mask_dir.glob("*.*"))
     for mask_path in all_paths:
         if mask_path.name.startswith("."):
