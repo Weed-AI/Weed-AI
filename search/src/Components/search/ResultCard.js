@@ -5,6 +5,11 @@ import {
 } from '@appbaseio/reactivesearch';
 import SearchBase from './SearchBase';
 
+const AnnotationCategory = ({ categoryName }) => {
+  const annot = categoryName.match(/^([^:]*): (.*)/)
+  return annot.length > 0 ? (<Tooltip title={categoryName}><li className={annot[1]}>{annot[2]}</li></Tooltip>) : ""
+}
+
 const WeedAIResultCard = (props) => {
   const {item, baseURL, linkToDataset} = props;
   const formatCropType = (typ) => {
@@ -27,10 +32,8 @@ const WeedAIResultCard = (props) => {
             <ul className="annotations">
             {
                 // TODO: make this more idiomatically React
-                Array.from(new Set(item.annotation__category__name)).map((annotName) => {
-                    const annot = annotName.match(/^([^:]*): (.*)/)
-                    return annot.length > 0 ? (<Tooltip title={annotName}><li className={annot[1]}>{annot[2]}</li></Tooltip>) : ""
-                })
+                Array.from(new Set(item.annotation__category__name)).map(
+                  (annotName) => <AnnotationCategory categoryName={annotName} />)
             }
             </ul>
             {
