@@ -120,6 +120,19 @@ def generate_mask_and_image_paths(
         raise ValueError(f"No images found in {image_dir}")
 
 
+def generate_paths_from_mask_only(mask_dir: Path, image_ext: str = "jpg"):
+    all_paths = sorted(mask_dir.glob("*.*"))
+    for mask_path in all_paths:
+        if mask_path.name.startswith("."):
+            # real glob excludes these
+            continue
+        image_file_name = f"{mask_path.stem}.{image_ext}"
+        yield mask_path, image_file_name
+
+    if not all_paths:
+        raise ValueError(f"No masks found in {mask_dir}")
+
+
 def masks_to_coco(
     path_pairs: Iterable[Tuple[str, str]],
     color_to_category_map: Mapping[str, str],
@@ -211,14 +224,22 @@ def masks_to_coco(
 
 def main(args=None):
     ap = argparse.ArgumentParser(description=__doc__)
-    ap.add_argument("--image-dir", required=True, type=Path)
     ap.add_argument(
         "--mask-dir",
         required=True,
         type=Path,
         help="Filenames should be identical to those in image-dir, with extensions replaced by PNG",
     )
-    ap.add_argument("-P", "--path-to-mask-pattern", default=None)
+    image_dir_meg = ap.add_mutually_exclusive_group(required=True)
+    image_dir_meg.add_argument("--image-dir", type=Path)
+    image_dir_meg.add_argument(
+        "--image-ext",
+        type=str,
+        help=(
+            "The filename extension (excl .) to apply to mask file names "
+            "to generate an image file name."
+        ),
+    )
     ap.add_argument(
         "-C",
         "--category-map",
@@ -233,17 +254,34 @@ def main(args=None):
     ap.add_argument("--metadata-path", type=Path)
     ap.add_argument("--validate", action="store_true", default=False)
     ap.add_argument("-o", "--out-path", default="coco_from_mask.json", type=Path)
-    ap.add_argument("--on-missing-mask", choices={"skip", "warn", "error"})
+    ap.add_argument(
+        "-P",
+        "--path-to-mask-pattern",
+        default=None,
+        help="Pattern to extract mask name from image path when using --image-dir",
+    )
+    ap.add_argument(
+        "--on-missing-mask",
+        choices={"skip", "warn", "error"},
+        help=(
+            "Whether to 'skip', 'warn', or 'error' if the matching "
+            "mask can not be found when --image-dir is used"
+        ),
+    )
     args = ap.parse_args(args)
 
     color_to_category_map = load_json_or_yaml(args.category_map)
-    path_pairs = generate_mask_and_image_paths(
-        args.image_dir,
-        args.mask_dir,
-        image_to_mask_pattern=args.path_to_mask_pattern,
-        on_missing_mask=args.on_missing_mask,
-    )
-    check_consistent_dimensions = True
+    if args.image_ext:
+        path_pairs = generate_paths_from_mask_only(args.mask_dir, args.image_ext)
+        check_consistent_dimensions = False
+    else:
+        path_pairs = generate_mask_and_image_paths(
+            args.image_dir,
+            args.mask_dir,
+            image_to_mask_pattern=args.path_to_mask_pattern,
+            on_missing_mask=args.on_missing_mask,
+        )
+        check_consistent_dimensions = True
     coco = masks_to_coco(
         path_pairs,
         color_to_category_map,
