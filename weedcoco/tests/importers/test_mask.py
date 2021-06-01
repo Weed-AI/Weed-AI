@@ -126,6 +126,24 @@ def test_image_ext(converter):
     assert expected == actual
 
 
+def test_unmapped_on_black(converter):
+    actual = converter.run(["--image-dir", TEST_IMAGE_DIR, "--unmapped-on-black"])
+    id_to_color = {
+        category["id"]: category["name"] for category in actual["categories"]
+    }
+    assert set(id_to_color) == {0, 1}
+    assert set(id_to_color.values()) == {"ff0000", "00ff00"}
+    expected_color_to_id = {"ff0000": 0, "00ff00": 1}
+    # To check that everything is otherwise identical,
+    # first transform actual to match expected:
+    for annotation in actual["annotations"]:
+        annotation["category_id"] = expected_color_to_id[
+            id_to_color[annotation["category_id"]]
+        ]
+    actual["categories"] = BASIC_EXPECTED["categories"]
+    assert BASIC_EXPECTED == actual
+
+
 def test_excess_categories(converter):
     with pytest.raises(ValueError, match="Got 2: #000000, #00ff00"):
         converter.run(
