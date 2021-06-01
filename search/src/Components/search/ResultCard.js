@@ -1,13 +1,16 @@
 import React from 'react';
+import CategoryTooltip from './CategoryTooltip';
 import Tooltip from '@material-ui/core/Tooltip';
 import {
     ResultCard
 } from '@appbaseio/reactivesearch';
 
 const AnnotationCategory = ({ categoryName }) => {
-  const annot = categoryName.match(/^([^:]*): (.*)/)
-  return annot.length > 0 ? (<Tooltip title={categoryName}><li className={annot[1]}>{annot[2]}</li></Tooltip>) : ""
-}
+  const [role, species] = categoryName.match(/^([^:]*): (.*)/).slice(1);
+  return <CategoryTooltip categoryName={categoryName}>
+    <li className={role}>{species}</li>
+  </CategoryTooltip>
+};
 
 const WeedAIResultCard = (props) => {
   const {item, baseURL, linkToDataset} = props;
