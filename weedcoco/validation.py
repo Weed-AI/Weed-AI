@@ -4,7 +4,6 @@ import pathlib
 import argparse
 import sys
 import json
-import tempfile
 import datetime
 
 from jsonschema import FormatChecker
@@ -22,7 +21,7 @@ MAIN_SCHEMAS = {
 
 FORMAT_CHECKER = FormatChecker()
 # TODO: change from temp path to config
-EPPO_CACHE_PATH = pathlib.Path(tempfile.gettempdir()) / "eppo-codes.zip"
+EPPO_CACHE_PATH = pathlib.Path(__file__).parent / "eppo-codes.zip"
 
 
 @FORMAT_CHECKER.checks("date")

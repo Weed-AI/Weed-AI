@@ -37,6 +37,8 @@ jobs:
             }
             while get_statuses | grep -q starting; do sleep 1; done
             if get_statuses | grep -q -e exited -e restarting -e unhealthy; then false; fi
+            # warm up (would be better in wsgi.py)
+            docker-compose exec django python -m weedcoco.validation <(echo '{"categories": [{"name": "weed: foobar", "id": 0}]}') || echo "Completed as expected"
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v2
         with:

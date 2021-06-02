@@ -2,9 +2,11 @@ import zipfile
 from collections import defaultdict
 import datetime
 import requests
+import pathlib
 import io
 import os
 from xml.etree import ElementTree
+import joblib
 
 # This uses data from https://data.eppo.int/ in accordance with
 # the EPPO Codes Open Data Licence (https://data.eppo.int/media/Open_Licence.pdf)
@@ -12,6 +14,7 @@ from xml.etree import ElementTree
 # TODO: get non-taxonomic group membership for a list of all crop species (3CRGK), for instance
 
 
+memory = joblib.Memory(pathlib.Path(__file__).parent / "_cache")
 SOURCE_URL = "https://data.eppo.int/files/xmlfull.zip"
 DEFAULT_LANGUAGES = ("en",)
 DEFAULT_TYPES = ("PFL", "SPT")
@@ -184,7 +187,7 @@ def get_eppo_singleton(
 ):
     # Note: languages and types should be sorted tuples
     if (languages, types) not in _EPPO_SINGLETON:
-        _EPPO_SINGLETON[languages, types] = EppoTaxonomy(
-            path=path, cache=cache, languages=languages, types=types
+        _EPPO_SINGLETON[languages, types] = memory.cache(EppoTaxonomy)(
+            path=str(path), cache=cache, languages=languages, types=types
         )
     return _EPPO_SINGLETON[languages, types]
