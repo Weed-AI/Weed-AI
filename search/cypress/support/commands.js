@@ -27,7 +27,7 @@ import 'cypress-file-upload';
 import '@testing-library/cypress/add-commands';
 
 Cypress.Commands.add('register', (username, email, password) => {
-    cy.click_text(/^Sign up$/)
+    cy.clickText(/^Sign up$/)
     cy.get('#username')
     .type(username)
     .should('have.value', username)
@@ -41,7 +41,7 @@ Cypress.Commands.add('register', (username, email, password) => {
 })
 
 Cypress.Commands.add('login', (username, password) => {
-    cy.click_text(/^Sign In$/)
+    cy.clickText(/^Sign In$/)
     cy.get('#username')
     .type(username)
     .should('have.value', username)
