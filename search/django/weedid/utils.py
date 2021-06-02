@@ -46,6 +46,10 @@ def move_voc_to_upload(voc_dir, upload_dir):
     move(voc_dir, upload_dir + "/voc")
 
 
+def move_mask_to_upload(mask_dir, upload_dir):
+    move(mask_dir, upload_dir + "/masks")
+
+
 def setup_upload_dir(upload_userid_dir):
     if not os.path.isdir(upload_userid_dir):
         mkdir_safely(upload_userid_dir)

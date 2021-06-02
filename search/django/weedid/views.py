@@ -19,6 +19,7 @@ from weedid.utils import (
     store_tmp_voc,
     store_tmp_voc_coco,
     move_voc_to_upload,
+    move_mask_to_upload,
     create_upload_entity,
     retrieve_listing_info,
     remove_entity_local_record,
@@ -32,6 +33,7 @@ from weedid.notification import review_notification
 from weedid.models import Dataset, WeedidUser
 from weedcoco.validation import validate, JsonValidationError
 from weedcoco.importers.voc import voc_to_coco
+from weedcoco.importers.mask import masks_to_coco, generate_paths_from_mask_only
 from django.contrib.auth import login, logout
 from django.contrib.auth.hashers import check_password
 from django.http import (
@@ -197,6 +199,102 @@ def move_voc(request):
         upload_dir = os.path.join(UPLOAD_DIR, str(user.id), upload_id)
         move_voc_to_upload(voc_dir, upload_dir)
         return HttpResponse(f"VOC files of {voc_id} has been moved to {upload_dir}")
+    except Exception as e:
+        return HttpResponseBadRequest(str(e))
+
+
+def upload_mask(request):
+    if not request.method == "POST":
+        return HttpResponseNotAllowed(request.method)
+    user = request.user
+    if not (user and user.is_authenticated):
+        return HttpResponseForbidden("You dont have access to proceed")
+    try:
+        mask_id = request.POST["upload_id"]
+        upload_mask = request.FILES["upload_image"]
+        if upload_mask.size > MAX_IMAGE_SIZE:
+            return HttpResponseBadRequest("This image has exceeded the size limit!")
+        mask_dir = os.path.join(UPLOAD_DIR, str(user.id), mask_id)
+        store_tmp_image(upload_mask, mask_dir)
+    except Exception as e:
+        traceback.print_exc()
+        return HttpResponseBadRequest(str(e))
+    else:
+        return HttpResponse(f"Uploaded {upload_mask.name} to {mask_dir}")
+
+
+def remove_mask(request):
+    if not request.method == "POST":
+        return HttpResponseNotAllowed(request.method)
+    user = request.user
+    if not (user and user.is_authenticated):
+        return HttpResponseForbidden("You dont have access to proceed")
+    try:
+        mask_id = request.POST["upload_id"]
+        mask_name = request.POST["image_name"]
+        mask_to_remove = os.path.join(UPLOAD_DIR, str(user.id), mask_id, mask_name)
+        if os.path.exists(mask_to_remove):
+            os.remove(mask_to_remove)
+            return HttpResponse(f"Removed {mask_name}")
+        else:
+            return HttpResponse(f"{mask_name} doesn't exist")
+    except Exception:
+        return HttpResponseBadRequest(f"Error when removing {mask_name}")
+
+
+def submit_mask(request):
+    if not request.method == "POST":
+        return HttpResponseNotAllowed(request.method)
+    user = request.user
+    if not (user and user.is_authenticated):
+        return HttpResponseForbidden("You dont have access to proceed")
+    try:
+        mask_id = request.POST["mask_id"]
+        image_ext = request.POST["image_ext"]
+        images = []
+        weedcoco_json = masks_to_coco(
+            generate_paths_from_mask_only(
+                Path(os.path.join(UPLOAD_DIR, str(user.id), mask_id)), image_ext
+            ),
+            background_if_unmapped="000000",
+            check_consistent_dimensions=False,
+        )
+        validate(weedcoco_json, schema="coco")
+        for image_reference in weedcoco_json["images"]:
+            images.append(image_reference["file_name"].split("/")[-1])
+        categories = [
+            parse_category_name(category) for category in weedcoco_json["categories"]
+        ]
+        upload_dir, upload_id = setup_upload_dir(os.path.join(UPLOAD_DIR, str(user.id)))
+        store_tmp_voc_coco(weedcoco_json, upload_dir)
+        create_upload_entity(upload_id, user.id)
+    except JsonValidationError as e:
+        traceback.print_exc()
+        return HttpResponseBadRequest(json.dumps(e.get_error_details()))
+    except Exception as e:
+        traceback.print_exc()
+        return HttpResponseBadRequest(str(e))
+    else:
+        return HttpResponse(
+            json.dumps(
+                {"upload_id": upload_id, "images": images, "categories": categories}
+            )
+        )
+
+
+def move_mask(request):
+    if not request.method == "POST":
+        return HttpResponseNotAllowed(request.method)
+    user = request.user
+    if not (user and user.is_authenticated):
+        return HttpResponseForbidden("You dont have access to proceed")
+    try:
+        mask_id = request.POST["mask_id"]
+        upload_id = request.POST["upload_id"]
+        mask_dir = os.path.join(UPLOAD_DIR, str(user.id), mask_id)
+        upload_dir = os.path.join(UPLOAD_DIR, str(user.id), upload_id)
+        move_mask_to_upload(mask_dir, upload_dir)
+        return HttpResponse(f"Mask files of {mask_id} has been moved to {upload_dir}")
     except Exception as e:
         return HttpResponseBadRequest(str(e))
 

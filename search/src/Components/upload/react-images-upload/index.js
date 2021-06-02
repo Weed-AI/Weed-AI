@@ -113,7 +113,7 @@ class ReactImageUploadComponent extends React.Component {
    */
   uploadFileToServer(dataURLs, files, newFileData) {
     const filesName = files.map(file => file.name);
-    if (!this.props.images.includes(newFileData.file.name) || filesName.includes(newFileData.file.name)){
+    if (this.props.images && !this.props.images.includes(newFileData.file.name) || filesName.includes(newFileData.file.name)){
         return
     }
     else {
@@ -130,7 +130,7 @@ class ReactImageUploadComponent extends React.Component {
                 dataURLs.push(newFileData.dataURL);
                 files.push(newFileData.file);
                 this.setState({pictures: dataURLs, files: files});
-                this.props.handleUploaded(files.map(file => file.name));
+                if (this.props.handleUploaded) this.props.handleUploaded(files.map(file => file.name));
             }
         })
     }
@@ -165,13 +165,27 @@ class ReactImageUploadComponent extends React.Component {
    */
   removeImage(picture) {
     const removeIndex = this.state.pictures.findIndex(e => e === picture);
+    const removeImageName = this.state.files[removeIndex].name;
     const filteredPictures = this.state.pictures.filter((e, index) => index !== removeIndex);
     const filteredFiles = this.state.files.filter((e, index) => index !== removeIndex);
 
     this.setState({pictures: filteredPictures, files: filteredFiles}, () => {
       this.props.onChange(this.state.files, this.state.pictures);
     });
-    this.props.handleUploaded(filteredFiles.map(file => file.name));
+    if (this.props.handleUploaded) this.props.handleUploaded(filteredFiles.map(file => file.name));
+    if (this.props.removeURL) {
+      const body = new FormData()
+      body.append('image_name', removeImageName)
+      body.append('upload_id', this.props.upload_id)
+      axios({
+          method: 'post',
+          url: this.props.removeURL,
+          data: body,
+          headers: {'Content-Type': 'multipart/form-data', 'X-CSRFToken': Cookies.get('csrftoken')}
+      }).then(() => {
+          this.props.handleErrorMessage("")
+      })
+    }
   }
 
   /*
