@@ -101,12 +101,12 @@ class ReactiveSearchComponent extends Component {
                     />
                     <MultiList
                         componentId="category_filter"
-                        title="Annotated Species"
-                        dataField="annotation__category__name.keyword"
+                        title="Annotated Species/Taxon"
+                        dataField="annotation__category__taxo_names.keyword"
                         sortBy="asc"
-                        selectAllLabel="All species"
-                        placeholder="Search Species"
-                        filterLabel="Species"
+                        selectAllLabel="All species/taxa"
+                        placeholder="Search Species/Taxa"
+                        filterLabel="Species/Taxon"
                         {...makeProps("categoryfilter", true)}
                         showSearch={true}
                     />
