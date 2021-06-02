@@ -1,7 +1,8 @@
 import React from 'react';
 import 'react-dropzone-uploader/dist/styles.css';
 import Dropzone from 'react-dropzone-uploader';
-import Cookies from 'js-cookie'
+import Cookies from 'js-cookie';
+import {jsonSchemaTitle} from '../error/utils';
 
 
 const UploaderSingle  = (props) => {
@@ -22,15 +23,24 @@ const UploaderSingle  = (props) => {
             const res = JSON.parse(xhr.response)
             props.handleUploadId(res.upload_id)
             props.handleImages(res.images)
+            props.handleCategories(res.categories)
+            props.handleValidation(true)
             props.handleErrorMessage("")
         }
         else if (status === 'error_upload'){
-            xhr.addEventListener('loadend', (e) => {props.handleErrorMessage(e.target.responseText)});
+            xhr.addEventListener('loadend', 
+              (e) => {
+                const res = JSON.parse(e.target.responseText);
+                props.handleErrorMessage(jsonSchemaTitle(res), res);
+                props.handleValidation(false)
+              });
         }
         else if (status === 'error_file_size') {
+            props.handleValidation(false)
             props.handleErrorMessage("The file size exceeds the limitation")
         }
         else if (status === 'removed') {
+            props.handleValidation(false)
             props.handleErrorMessage("")
         }
     }

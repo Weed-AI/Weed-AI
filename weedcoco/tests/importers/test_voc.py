@@ -66,7 +66,8 @@ COMPLETE_WEEDCOCO = {
         "year": 2020,
         "metadata": {
             "name": "Dataset collected at Narrabri under artificial illumination",
-            "creator": [{"name": "Plony"}],
+            "description": "Dataset collected at Narrabri under artificial illumination",
+            "creator": [{"name": "Plony", "@type": "Person"}],
             "datePublished": "2020-XX-XX",
             "license": "https://creativecommons.org/licenses/by/4.0/",
         },
@@ -152,7 +153,7 @@ def test_category_name_map2(converter):
 
     # category_name_map2 has categories in a different order to category_name_map1.
     assert result["categories"] == [
-        {"id": 0, "name": "weed: fake species name"},
+        {"id": 0, "name": "weed: raphanus raphanistrum"},
         {"id": 1, "name": "weed: rapistrum rugosum"},
         {"id": 2, "name": "weed: lolium perenne"},
     ]

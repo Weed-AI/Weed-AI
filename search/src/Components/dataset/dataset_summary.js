@@ -32,7 +32,7 @@ import ResultsList from '../search/ResultsList';
 
 const DESCRIPTION_BOILERPLATE = "\n\nEvery dataset in Weed-AI includes imagery of crops or pasture with weeds annotated, and is available in an MS-COCO derived format with standardised agricultural metadata."
 
-const useStyles = (theme) => ({
+export const useStyles = (theme) => ({
   root: {
     flexGrow: 1,
     margin: theme.spacing(10)
@@ -179,6 +179,7 @@ const listToWords = l => l.map((x, i) => [i == 0 ? "" : i == l.length - 1 ? (i >
 
 export const DatasetSummary = (props) => {
     const {metadata, agcontexts, classes, rootURL, upload_id} = props;
+    console.log('!', metadata)
     const linkedEntity = (ent) => {
       if (ent.sameAs)
         return (<a href={ent.sameAs}>{ent.name}</a>);
@@ -200,12 +201,19 @@ export const DatasetSummary = (props) => {
     const displayMeta = {...metadata}
     const yearPublished = (displayMeta.datePublished || "????").substr(0, 4);
     displayMeta["description"] = (metadata["description"] ?? "") + DESCRIPTION_BOILERPLATE;
-    displayMeta["identifier"] = [...displayMeta.identifier || [], "https://weed-ai.sydney.edu.au/datasets/" + upload_id];
+    const datasetUrl = "https://weed-ai.sydney.edu.au/datasets/" + upload_id;
+    displayMeta["identifier"] = [...displayMeta.identifier || [], datasetUrl];
+    const authorList = listToWords(displayMeta.creator.map((creator) => creator.name));
     return (
       <React.Fragment>
         <Helmet>
-          <title>"{displayMeta.name}" Dataset in Weed-AI: a repository of weed imagery in crops</title>
-          <meta name="description" content={getFirstLine(displayMeta.description) + " by " + displayMeta.creator.map((creator) => creator.name).join(', ') + "."} />
+          <title>{metadata.name} Dataset - Weed-AI</title>
+          <meta property="og:title" content={"Weed-AI dataset: " + metadata.name} />
+          <meta property="og:description" content={getFirstLine(displayMeta.description)} />
+          <meta property="og:url" content={datasetUrl} />
+          <meta property="og:type" content="article" />
+          <meta property="og:article:author" content={authorList} />
+          <meta name="description" content={getFirstLine(displayMeta.description) + " by " + authorList + "."} />
         </Helmet>
         <script type="application/ld+json">
         {
@@ -318,32 +326,6 @@ class DatasetSummaryPage extends Component {
       </div>
     );
   }
-}
-
-export const TestDatasetSummary = () => {
-    const props = {
-        "upload_id": "foobar",
-        "metadata": {
-            "creator": [
-                {"name": "Sebastian Haug"},
-                {"name": "J\u00f6rn Ostermann", "sameAs": "https://orcid.org/0000-0002-6743-3324", "affiliation": {"name": "Leibniz Universität Hannover", "sameAs": "https://ror.org/0304hq317", "@type": "Organization"}}
-            ],
-            "funder": [{"name": "some funder"}],
-            "name": "A Crop/Weed Field Image Dataset for the Evaluation of Computer Vision Based Precision Agriculture Tasks",
-            "datePublished": "2015-03-19",
-            "identifier": ["doi:10.1007/978-3-319-16220-1_8"],
-            "license": "https://github.com/cwfid/dataset",
-            "description": "Foobar",
-            "citation": "Sebastian Haug, Jörn Ostermann: A Crop/Weed Field Image Dataset for the Evaluation of Computer Vision Based Precision Agriculture Tasks, CVPPP 2014 Workshop, ECCV 2014"
-        },
-        "agcontexts": [
-            {"n_images": 3, "category_statistics": 
-        {"crop: foo": {"annotation_count": 2, "image_count": 1, "segmentation_count": 2, "bounding_box_count": 2},
-        "weed: bar": {"annotation_count": 3, "image_count": 2, "segmentation_count": 3, "bounding_box_count": 3},
-        "weed: blah": {"annotation_count": 1, "image_count": 1, "segmentation_count": 0, "bounding_box_count": 0}},
-                "id": 77, "lighting": "natural", "bbch_code": "na", "crop_type": "sorghum", "camera_fov": "variable", "camera_lens": "Telephoto", "camera_make": "Canon", "soil_colour": "dark_brown", "camera_angle": 45, "emr_channels": "visual", "location_lat": 80, "camera_height": 500, "location_long": 80, "surface_cover": "oilseed", "cropped_to_plant": true, "surface_coverage": "0-25", "weather_description": "rainy", "bbch_descriptive_text": "stem elongation", "camera_lens_focallength": 180, "grains_descriptive_text": "emergence", "photography_description": "poor lighting"}]}
-    const Out = withStyles(useStyles)(DatasetSummary);
-    return (<div style={{ margin: "3em" }}><Out {...props} /></div>);
 }
 
 export default withStyles(useStyles)(DatasetSummaryPage);

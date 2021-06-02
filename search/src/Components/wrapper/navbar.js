@@ -126,7 +126,7 @@ const MobileNavbar = (props) => {
 const Logo = (props) => {
   const {classes} = props;
   return (
-      <Typography variant='p' className={classes.logo}><span style={{color: '#f0983a'}}>Weed-</span>AI</Typography>
+      <Typography variant='h1' className={classes.logo}><span style={{color: '#f0983a'}}>Weed-</span>AI</Typography>
   );
 }
 
@@ -134,7 +134,7 @@ const DesktopNavbar = (props) => {
   const {handleChange, selectedTab, classes} = props;
   return (
     <StyledTabs onChange={handleChange} value={selectedTab}>
-      { sections.filter(section => section.mobileOnly !== true).map(section => <StyledTab value={section.value} href={section.href} label={section.label} />) }
+      { sections.filter(section => section.mobileOnly !== true).map(section => <StyledTab value={section.value} key={section.value} href={section.href} label={section.label} />) }
       <Logo classes={classes} />
     </StyledTabs>
   );

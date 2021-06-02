@@ -13,6 +13,7 @@ import {
 import { GeoDistanceSlider } from "@appbaseio/reactivemaps";
 import SearchBase from '../search/SearchBase';
 import ResultsList from '../search/ResultsList';
+import { Helmet } from "react-helmet";
 
 
 const IntroText = () => {
@@ -79,6 +80,13 @@ class ReactiveSearchComponent extends Component {
 
         return (
             <SearchBase>
+                <Helmet>
+                  <title>A repository of weed imagery in crops - Weed-AI</title>
+                  <meta
+                    name="description"
+                    content="Find and download datasets of annotated weed imagery. Search by crop and weed species, crop growth stage, location, photography attributes, annotation task type and more. Collect and upload your own!"
+                  />
+                </Helmet>
                 <div style={{ position: "fixed", width: "20rem", overflow: "scroll", height: "90%", left: 0, padding: '1rem' }}>
                     <IntroText />
                     <MultiList
@@ -93,12 +101,12 @@ class ReactiveSearchComponent extends Component {
                     />
                     <MultiList
                         componentId="category_filter"
-                        title="Annotated Species"
-                        dataField="annotation__category__name.keyword"
+                        title="Annotated Species/Taxon"
+                        dataField="annotation__category__taxo_names.keyword"
                         sortBy="asc"
-                        selectAllLabel="All species"
-                        placeholder="Search Species"
-                        filterLabel="Species"
+                        selectAllLabel="All species/taxa"
+                        placeholder="Search Species/Taxa"
+                        filterLabel="Species/Taxon"
                         {...makeProps("categoryfilter", true)}
                         showSearch={true}
                     />

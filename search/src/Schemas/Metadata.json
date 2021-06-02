@@ -3,6 +3,7 @@
   "type": "object",
   "required": [
     "name",
+    "description",
     "creator",
     "datePublished",
     "license"
@@ -11,9 +12,14 @@
     "Person": {
       "type": "object",
       "required": [
+        "@type",
         "name"
       ],
       "properties": {
+        "@type": {
+          "type": "string",
+          "const": "Person"
+        },
         "name": {
           "title": "Person's Name",
           "type": "string"
@@ -46,9 +52,14 @@
     "Organization": {
       "type": "object",
       "required": [
+        "@type",
         "name"
       ],
       "properties": {
+        "@type": {
+          "type": "string",
+          "const": "Organization"
+        },
         "name": {
           "title": "Organization Name",
           "type": "string"
@@ -68,6 +79,10 @@
     }
   },
   "properties": {
+    "@type": {
+      "type": "string",
+      "const": "Dataset"
+    },
     "name": {
       "type": "string",
       "title": "Dataset Name",
@@ -90,7 +105,8 @@
     },
     "description": {
       "type": "string",
-      "description": "A description of this dataset"
+      "description": "A description of this dataset",
+      "default": "Crop photography with weeds annotated."
     },
     "identifier": {
       "type": "array",

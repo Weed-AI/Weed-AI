@@ -5,9 +5,9 @@
   "dependencies": {
     "@appbaseio/reactivemaps": "^3.0.0-beta.11",
     "@appbaseio/reactivesearch": "^3.12.2",
-    "@jsonforms/core": "^2.5.0",
-    "@jsonforms/material-renderers": "^2.5.0",
-    "@jsonforms/react": "^2.5.0",
+    "@jsonforms/core": "^2.5.1",
+    "@jsonforms/material-renderers": "^2.5.1",
+    "@jsonforms/react": "^2.5.1",
     "@material-ui/core": "^4.11.2",
     "@material-ui/icons": "^4.11.2",
     "@material-ui/styles": "^4.11.3",
@@ -23,6 +23,7 @@
     "helmet": "^4.4.1",
     "js-cookie": "^2.2.1",
     "js-yaml": "^4.0.0",
+    "lodash.clonedeep": "^4.5.0",
     "node-fetch": "^2.6.1",
     "node-forge": "^0.10.0",
     "react": "^16.13.1",
@@ -43,7 +44,9 @@
     "start3000": "PORT=3000 HOST=localhost react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "cosmos": "cross-env FAST_REFRESH=false cosmos",
+    "cosmos:export": "cosmos-export"
   },
   "eslintConfig": {
     "extends": "react-app"
@@ -59,5 +62,12 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "react-cosmos": "^5.6.2",
+    "@testing-library/cypress": "^7.0.6",
+    "cypress": "^7.2.0",
+    "cypress-file-upload": "^5.0.7",
+    "cypress-plugin-tab": "^1.0.5"
   }
 }

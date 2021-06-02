@@ -134,10 +134,15 @@ class AgContextForm extends Component {
               data={this.props.formData}
               renderers={renderers}
               cells={materialCells}
-              ajv = {createAjv({useDefaults: true})}
+              ajv = {createAjv({
+                useDefaults: true,
+                formats: {
+                  'plant_species': {test: x => true},  // bypass validation for now
+                },
+              })}
               onChange={e => {
                   if (this.props.handleValidation){
-                    this.props.handleValidation('agcontexts', e.errors.length === 0);
+                    this.props.handleValidation(e.errors.length === 0);
                   }
                   this.setState({formData: e.data});
                   if (this.props.onChange) {
@@ -161,7 +166,7 @@ class StandaloneEditor extends Component {
         return (
             <Container maxWidth="sm">
                 <Helmet>
-                    <title>AgContext Editor – Weed-AI</title>
+                    <title>AgContext Editor - Weed-AI</title>
                     <meta name="description" content="Edit and save the agricultural and photographic context of your annotated image collection." />
                 </Helmet>
                 <h2>AgContext Editor</h2>

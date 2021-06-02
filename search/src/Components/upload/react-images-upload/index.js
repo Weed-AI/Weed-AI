@@ -113,9 +113,10 @@ class ReactImageUploadComponent extends React.Component {
    */
   uploadFileToServer(dataURLs, files, newFileData) {
     const filesName = files.map(file => file.name);
-    if (filesName.includes(newFileData.file.name)){
+    if (!this.props.images.includes(newFileData.file.name) || filesName.includes(newFileData.file.name)){
         return
-    } else {
+    }
+    else {
         const body = new FormData()
         body.append('upload_image', newFileData.file)
         body.append('upload_id', this.props.upload_id)
@@ -129,6 +130,7 @@ class ReactImageUploadComponent extends React.Component {
                 dataURLs.push(newFileData.dataURL);
                 files.push(newFileData.file);
                 this.setState({pictures: dataURLs, files: files});
+                this.props.handleUploaded(files.map(file => file.name));
             }
         })
     }
@@ -169,6 +171,7 @@ class ReactImageUploadComponent extends React.Component {
     this.setState({pictures: filteredPictures, files: filteredFiles}, () => {
       this.props.onChange(this.state.files, this.state.pictures);
     });
+    this.props.handleUploaded(filteredFiles.map(file => file.name));
   }
 
   /*
