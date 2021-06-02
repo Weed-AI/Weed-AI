@@ -51,6 +51,6 @@ Cypress.Commands.add('login', (username, password) => {
     cy.findAllByRole('button', /^Sign In$/).should('have.length', 1).click()
 })
 
-Cypress.Commands.add('click_text', text => {
+Cypress.Commands.add('clickText', text => {
     cy.findAllByText(text).should('have.length', 1).click()
 })
