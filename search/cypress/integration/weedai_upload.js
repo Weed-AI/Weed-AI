@@ -22,7 +22,7 @@ describe('overall upload workflow', () => {
         cy.findByText(/^Select annotation format$/).click()
         cy.findByText("COCO").click()
         cy.click_text(/^Begin upload$/)
-        cy.get('.dzu-input').attachFile('test_coco/weedcoco.json')
+        cy.get('.dzu-input').attachFile('test_coco/coco.json')
         cy.click_text(/^Next$/)
         cy.click_text(/^Apply$/)
         cy.click_text(/^Next$/)

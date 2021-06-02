@@ -4,7 +4,6 @@
             "id": 2,
             "file_name": "/Weed-ID-Interchange/weedcoco/tests/repo/deposit_data/basic_1/images/002_image.png",
             "license": 0,
-            "agcontext_id": 0,
             "width": 1296,
             "height": 966
         }
@@ -360,51 +359,9 @@
             "id": 1
         }
     ],
-    "info": {
-        "year": 2015,
-        "description": "Cwfid annotations converted into WeedCOCO",
-        "secondary_contributor": "Converted to WeedCOCO by Henry Lydecker",
-        "contributor": "Sebastian Haug",
-        "metadata": {
-            "name": "Cwfid annotations converted into WeedCOCO",
-            "description": "Weeds annotated in carrot crop.",
-            "creator": [{"name": "Sebastian Haug", "@type": "Person"}],
-            "datePublished": "2015-XX-XX",
-            "license": "https://github.com/cwfid/dataset"
-        }
-    },
     "license": [
         {
             "id": 0,
-            "url": "https://github.com/cwfid/dataset"
-        }
-    ],
-    "agcontexts": [
-        {
-            "id": 0,
-            "agcontext_name": "cwfid",
-            "crop_type": "daucus carota",
-            "bbch_growth_range": {
-                "min": 10,
-                "max": 20
-            },
-            "soil_colour": "grey",
-            "surface_cover": "none",
-            "surface_coverage": "0-25",
-            "weather_description": "sunny",
-            "location_lat": 53,
-            "location_long": 11,
-            "upload_time": "2020-10-27 09:58:36",
-            "camera_make": "JAI AD-130GE",
-            "camera_lens": "Fujinon TF15-DA-8",
-            "camera_lens_focallength": 15,
-            "camera_height": 450,
-            "camera_angle": 90,
-            "camera_fov": 22.6,
-            "photography_description": "Mounted on boom",
-            "ground_speed": 0,
-            "lighting": "natural",
-            "cropped_to_plant": false,
             "url": "https://github.com/cwfid/dataset"
         }
     ]
