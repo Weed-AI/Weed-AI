@@ -134,10 +134,18 @@ def atomic_copy(repository_dir, download_dir, temp_dir, deposit_id):
     dataset_path = temp_dir / deposit_id
     zip_path = temp_dir / f"{deposit_id}.zip"
     repository_dir = repository_dir / deposit_id
-    if os.path.isdir(dataset_path):
-        move(str(dataset_path), str(repository_dir))
-    if os.path.isfile(zip_path):
-        move(str(zip_path), str(download_dir))
+    try:
+        if os.path.isfile(zip_path):
+            move(str(zip_path), str(download_dir))
+        if os.path.isdir(dataset_path):
+            move(str(dataset_path), str(repository_dir))
+    except Exception:
+        # roll back to leave a clean repository
+        (download_dir / zip_path).unlink(missing_ok=True)
+        for path in (repository_dir / deposit_id).glob("*"):
+            path.unlink(missing_ok=True)
+        (repository_dir / deposit_id).rmdir()
+        raise
 
 
 def deposit(weedcoco_path, image_dir, repository_dir, download_dir, upload_id=None):
