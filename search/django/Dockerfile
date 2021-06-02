@@ -6,6 +6,8 @@ RUN pip install -r requirements.txt
 ARG weedcoco_version=master
 ADD "http://github.com/Sydney-Informatics-Hub/Weed-AI/archive/"$weedcoco_version".zip" /tmp/weedcoco.zip
 RUN pip install /tmp/weedcoco.zip
+# warm up cache:
+RUN python -m weedcoco.validation <(echo '{"categories": [{"name": "weed: foobar", "id": 0}]}') || echo "Completed as expected"
 COPY ./entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 COPY ./ .
