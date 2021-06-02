@@ -24,6 +24,8 @@ describe('overall upload workflow', () => {
         cy.clickText(/^Begin upload$/)
         cy.get('.dzu-input').attachFile('test_coco/coco.json')
         cy.clickText(/^Next$/)
+        cy.findByText("crop").type('weed{enter}')
+        cy.findByDisplayValue(/^UNSPECIFIED$/).click().clear().type('rapistrum rugosum{enter}')
         cy.clickText(/^Apply$/)
         cy.clickText(/^Next$/)
         cy.clickText(/^Upload and Download Form Contents$/)
