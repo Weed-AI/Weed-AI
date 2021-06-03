@@ -53,6 +53,11 @@ jobs:
         uses: cypress-io/github-action@v2
         with:
           working-directory: search
+      - uses: actions/upload-artifact@v1
+        if: always()
+        with:
+          name: cypress-videos
+          path: search/cypress/videos
       - name: Check logs upon failure
         run: |
             cd search
