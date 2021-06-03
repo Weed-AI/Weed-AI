@@ -1,7 +1,7 @@
 {
   "cropped_to_plant": true,
   "id": 0,
-  "crop_type": "wheat",
+  "crop_type": "",
   "bbch_growth_range": {
     "min": 10,
     "max": 20
