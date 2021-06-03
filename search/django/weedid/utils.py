@@ -17,6 +17,7 @@ from core.settings import (
     SMTP_HOST,
     SMTP_PORT,
     FROM_EMAIL,
+    SEND_EMAIL,
 )
 
 
@@ -165,12 +166,13 @@ def validate_email_format(email):
 
 
 def send_email(subject, body, recipients):
-    with smtplib.SMTP(SMTP_HOST, SMTP_PORT) as smtp:
-        for recipient in recipients:
-            msg = EmailMessage()
-            msg["Subject"], msg["From"], msg["To"] = subject, FROM_EMAIL, recipient
-            msg.set_content(body)
-            smtp.send_message(msg)
+    if SEND_EMAIL is True:
+        with smtplib.SMTP(SMTP_HOST, SMTP_PORT) as smtp:
+            for recipient in recipients:
+                msg = EmailMessage()
+                msg["Subject"], msg["From"], msg["To"] = subject, FROM_EMAIL, recipient
+                msg.set_content(body)
+                smtp.send_message(msg)
 
 
 def parse_category_name(category):

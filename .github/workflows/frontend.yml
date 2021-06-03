@@ -28,6 +28,7 @@ jobs:
             POSTGRES_USER=postgres
             POSTGRES_PASSWORD=postgres
             POSTGRES_DB=weedai
+            SEND_EMAIL=False
             HERE
             # TODO The following could be a separate GitHub action
             docker-compose up -d --build
@@ -53,6 +54,16 @@ jobs:
         uses: cypress-io/github-action@v2
         with:
           working-directory: search
+      - uses: actions/upload-artifact@v2
+        if: failure()
+        with:
+          name: cypress-screenshots
+          path: search/cypress/screenshots
+      - uses: actions/upload-artifact@v2
+        if: always()
+        with:
+          name: cypress-videos
+          path: search/cypress/videos
       - name: Check logs upon failure
         run: |
             cd search

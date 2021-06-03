@@ -1,0 +1,24 @@
+{
+  "cropped_to_plant": true,
+  "id": 0,
+  "crop_type": "",
+  "bbch_growth_range": {
+    "min": 10,
+    "max": 20
+  },
+  "soil_colour": "not_visible",
+  "surface_cover": "cereal",
+  "surface_coverage": "0-25",
+  "location_lat": 33,
+  "location_long": 100,
+  "camera_make": "Canon",
+  "camera_lens": "Telephoto",
+  "camera_lens_focallength": 200,
+  "camera_height": 23,
+  "camera_angle": 90,
+  "camera_fov": 20,
+  "ground_speed": 10,
+  "lighting": "artificial",
+  "photography_description": "something",
+  "weather_description": "poor"
+}
