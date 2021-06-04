@@ -141,6 +141,7 @@ class AgContextForm extends Component {
                 },
               })}
               onChange={e => {
+                  if (e.errors) console.log(e.errors);
                   if (this.props.handleValidation){
                     this.props.handleValidation(e.errors.length === 0);
                   }

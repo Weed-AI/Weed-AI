@@ -249,7 +249,11 @@ def upload_agcontexts(request):
         return HttpResponseForbidden("You dont have access to proceed")
     data = json.loads(request.body)
     upload_id, ag_contexts = data["upload_id"], data["ag_contexts"]
-    validate_json(ag_contexts, schema="agcontext")
+    try:
+        validate_json(ag_contexts, schema="agcontext")
+    except JsonValidationError as e:
+        traceback.print_exc()
+        return HttpResponseBadRequest(json.dumps(e.get_error_details()))
     weedcoco_path = os.path.join(
         UPLOAD_DIR, str(user.id), str(upload_id), "weedcoco.json"
     )
@@ -270,6 +274,11 @@ def upload_metadata(request):
         if user and user.is_authenticated:
             data = json.loads(request.body)
             upload_id, metadata = data["upload_id"], data["metadata"]
+            try:
+                validate_json(metadata, schema="metadata")
+            except JsonValidationError as e:
+                traceback.print_exc()
+                return HttpResponseBadRequest(json.dumps(e.get_error_details()))
             weedcoco_path = os.path.join(
                 UPLOAD_DIR, str(user.id), str(upload_id), "weedcoco.json"
             )

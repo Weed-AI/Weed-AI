@@ -19,6 +19,7 @@ MAIN_SCHEMAS = {
     "compatible-coco": "https://weedid.sydney.edu.au/schema/compatible-coco.json",
     "coco": "https://weedid.sydney.edu.au/schema/coco.json",
     "agcontext": "https://weedid.sydney.edu.au/schema/AgContext.json",
+    "metadata": "https://weedid.sydney.edu.au/schema/Metadata.json",
 }
 
 FORMAT_CHECKER = FormatChecker()
