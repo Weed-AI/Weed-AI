@@ -106,7 +106,7 @@ def test_bad_category_name(func, bad_name, messages):
 
 @pytest.mark.parametrize("func", [validate, validate_json])
 @pytest.mark.parametrize(
-    "bad_name",
+    "name",
     [
         "wheat",
         "oats",
@@ -116,9 +116,9 @@ def test_bad_category_name(func, bad_name, messages):
         "brassica oleracea var. alboglabra",
     ],
 )
-def test_crop_type(func, bad_name):
+def test_crop_type(func, name):
     weedcoco = copy.deepcopy(SMALL_WEEDCOCO)
-    weedcoco["agcontexts"][0]["crop_type"] = bad_name
+    weedcoco["agcontexts"][0]["crop_type"] = name
     func(weedcoco)
 
 
@@ -128,6 +128,7 @@ def test_crop_type(func, bad_name):
     [
         "weet",
         "daugus carota",
+        "",
     ],
 )
 def test_bad_crop_type(func, bad_name):

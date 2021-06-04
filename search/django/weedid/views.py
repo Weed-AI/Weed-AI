@@ -30,7 +30,7 @@ from weedid.utils import (
 )
 from weedid.notification import review_notification
 from weedid.models import Dataset, WeedidUser
-from weedcoco.validation import validate, JsonValidationError
+from weedcoco.validation import validate, validate_json, JsonValidationError
 from weedcoco.importers.voc import voc_to_coco
 from django.contrib.auth import login, logout
 from django.contrib.auth.hashers import check_password
@@ -249,6 +249,7 @@ def upload_agcontexts(request):
         return HttpResponseForbidden("You dont have access to proceed")
     data = json.loads(request.body)
     upload_id, ag_contexts = data["upload_id"], data["ag_contexts"]
+    validate_json(ag_contexts, schema="agcontext")
     weedcoco_path = os.path.join(
         UPLOAD_DIR, str(user.id), str(upload_id), "weedcoco.json"
     )
