@@ -71,7 +71,7 @@ jobs:
       - name: Check logs upon failure
         run: |
             cd search
-            docker-compose logs --tail 80
+            docker-compose logs --tail="all"
             docker-compose ps
         if: ${{ failure() }}
       - name: Shutdown
