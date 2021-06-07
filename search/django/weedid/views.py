@@ -231,7 +231,7 @@ def update_categories(request):
         updated_weedcoco_json = set_categories(weedcoco_path, categories)
         validate(updated_weedcoco_json, schema="compatible-coco")
     except JsonValidationError as e:
-        return HttpResponseBadRequest(e.message)
+        return HttpResponseBadRequest(str(e))
     except Exception as e:
         traceback.print_exc()
         return HttpResponseBadRequest(str(e))
