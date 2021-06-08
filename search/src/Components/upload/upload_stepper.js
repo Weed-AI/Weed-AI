@@ -16,6 +16,7 @@ import MetadataForm from '../forms/MetadataForm';
 import axios from 'axios';
 import Cookies from 'js-cookie';
 import cloneDeep from 'lodash/cloneDeep';
+import {jsonSchemaTitle} from '../error/utils';
 
 
 const baseURL = new URL(window.location.origin);
@@ -184,9 +185,10 @@ class UploadStepper extends React.Component {
             this.handleNext()
         })
         .catch(err => {
-            console.log(err)
             this.handleValidation(false)
-            this.handleErrorMessage(err.response.data || "Invalid categories input")
+            const data = err.response.data
+            if (typeof data === "object") this.handleErrorMessage(jsonSchemaTitle(data), data);
+            else this.handleErrorMessage(data || "Invalid categories input")
         })
     }
 
