@@ -188,7 +188,7 @@ class UploadStepper extends React.Component {
             this.handleValidation(false)
             const data = err.response.data
             if (typeof data === "object") this.handleErrorMessage(jsonSchemaTitle(data), data);
-            else this.handleErrorMessage(data || "Invalid categories input")
+            else this.handleErrorMessage(data || "Server error saving categories")
         })
     }
 
@@ -208,7 +208,9 @@ class UploadStepper extends React.Component {
         })
         .catch(err => {
             console.log(err)
-            this.handleErrorMessage("Invalid input for AgContext")
+            const data = err.response.data
+            if (typeof data === "object") this.handleErrorMessage(jsonSchemaTitle(data), data);
+            else this.handleErrorMessage(data || "Server error saving AgContext")
         })
     }
 

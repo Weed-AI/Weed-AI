@@ -49,6 +49,12 @@ def set_csrf(request):
     return HttpResponse("Success")
 
 
+def json_validation_response(exc):
+    return HttpResponseBadRequest(
+        json.dumps(exc.get_error_details()), content_type="application/json"
+    )
+
+
 def elasticsearch_query(request):
     try:
         elasticsearch_url = "/".join(request.path.split("/")[2:])
@@ -90,7 +96,7 @@ def upload(request):
         create_upload_entity(upload_id, user.id)
     except JsonValidationError as e:
         traceback.print_exc()
-        return HttpResponseBadRequest(json.dumps(e.get_error_details()))
+        return json_validation_response(e)
     except Exception as e:
         traceback.print_exc()
         return HttpResponseBadRequest(str(e))
@@ -170,7 +176,7 @@ def submit_voc(request):
         create_upload_entity(upload_id, user.id)
     except JsonValidationError as e:
         traceback.print_exc()
-        return HttpResponseBadRequest(json.dumps(e.get_error_details()))
+        return json_validation_response(e)
     except Exception as e:
         traceback.print_exc()
         return HttpResponseBadRequest(str(e))
@@ -232,7 +238,7 @@ def update_categories(request):
         validate_json(updated_weedcoco_json, schema="compatible-coco")
     except JsonValidationError as e:
         traceback.print_exc()
-        return HttpResponseBadRequest(json.dumps(e.get_error_details()))
+        return json_validation_response(e)
     except Exception as e:
         traceback.print_exc()
         return HttpResponseBadRequest(str(e))
@@ -254,7 +260,7 @@ def upload_agcontexts(request):
         validate_json(ag_contexts, schema="agcontext")
     except JsonValidationError as e:
         traceback.print_exc()
-        return HttpResponseBadRequest(json.dumps(e.get_error_details()))
+        return json_validation_response(e)
     weedcoco_path = os.path.join(
         UPLOAD_DIR, str(user.id), str(upload_id), "weedcoco.json"
     )
@@ -279,7 +285,7 @@ def upload_metadata(request):
                 validate_json(metadata, schema="metadata")
             except JsonValidationError as e:
                 traceback.print_exc()
-                return HttpResponseBadRequest(json.dumps(e.get_error_details()))
+                return json_validation_response(e)
             weedcoco_path = os.path.join(
                 UPLOAD_DIR, str(user.id), str(upload_id), "weedcoco.json"
             )
