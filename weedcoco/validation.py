@@ -220,16 +220,17 @@ def validate_coordinates(weedcoco):
                         "Polygons must have an even number of elements"
                     )
 
-            is_x = True
-            for val in polygon:
-                if val >= (width if is_x else height):
-                    raise ValidationError(
-                        f"Polygon coordinate out of bounds: "
-                        f"{val} >= {'width' if is_x else 'height'}="
-                        f"{width if is_x else height}"
-                    )
+                is_x = True
+                for val in polygon:
+                    if val >= (width if is_x else height):
+                        raise ValidationError(
+                            f"Polygon coordinate out of bounds: "
+                            f"{val} >= {'width' if is_x else 'height'}="
+                            f"{width if is_x else height}"
+                        )
+                    is_x = not is_x
 
-        # TODO: check area within tolerance
+        # TODO: check area is within tolerance
 
 
 def validate_image_sizes(weedcoco, images_root):
