@@ -64,8 +64,7 @@ class ReactImageUploadComponent extends React.Component {
   onDropFile(e) {
     const files = e.target.files;
     const fileErrors = [];
-    const uploadedFiles = this.state.files.slice() ? this.state.files.slice() : [];
-    const filesName = uploadedFiles.map(file => file.name);
+    const filesName = (this.state.files || []).map(file => file.name);
 
     // Iterate over all uploaded files
     for (let i = 0; i < files.length; i++) {
