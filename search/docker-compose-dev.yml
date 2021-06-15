@@ -1,0 +1,206 @@
+version: "3"
+
+x-logging: 
+  &default-logging
+  driver: "json-file"
+
+services:
+  # nginx reverse proxy
+  reverse-proxy:
+    image: reverse-proxy
+    container_name: reverse_proxy
+    depends_on:
+        - django
+        - reactivesearch
+    build:
+        context: ./nginx/nginx
+    ports:
+      - "80:80"
+    networks:
+      - elastic
+    logging: *default-logging
+
+  # django backend
+  django:
+    image: django
+    container_name: django
+    depends_on:
+      - elasticsearch
+      - db
+      - redis
+    build:
+      context: ./django
+      dockerfile:  Dockerfile-dev
+      args:
+        - WEEDCOCO_VERSION=${WEEDCOCO_VERSION:-master}
+    environment:
+      - DJANGO_SECRET_KEY=${DJANGO_SECRET_KEY}
+      - CELERY_BROKER=redis://redis:6379/0
+      - CELERY_BACKEND=redis://redis:6379/0
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
+      - SMTP_HOST=${SMTP_HOST}
+      - SMTP_PORT=${SMTP_PORT}
+      - FROM_EMAIL=${FROM_EMAIL}
+      - ENV=DEV
+    command: python manage.py runserver 0.0.0.0:8000
+    entrypoint: /entrypoint.sh
+    volumes:
+      - ./django/:/code
+      - thumbnails_dir:/code/thumbnails
+      - repository_dir:/code/repository
+      - upload_dir:/code/upload
+      - download_dir:/code/download
+    ports:
+      - "8000:8000"
+    networks:
+      - elastic
+    logging: *default-logging
+
+  celery:
+    image: django
+    container_name: celery
+    command: celery -A core worker -l INFO
+    environment:
+      - DJANGO_SECRET_KEY=${DJANGO_SECRET_KEY}
+      - CELERY_BROKER=redis://redis:6379/0
+      - CELERY_BACKEND=redis://redis:6379/0
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
+      - SMTP_HOST=${SMTP_HOST}
+      - SMTP_PORT=${SMTP_PORT}
+      - FROM_EMAIL=${FROM_EMAIL}
+      - ENV=DEV
+    volumes:
+      - ./django/:/code
+      - thumbnails_dir:/code/thumbnails
+      - repository_dir:/code/repository
+      - upload_dir:/code/upload
+      - download_dir:/code/download
+    depends_on:
+      - django
+      - redis
+    networks:
+      - elastic
+    logging: *default-logging
+
+  redis:
+    image: redis:alpine
+    networks:
+      - elastic
+    logging: *default-logging
+
+  db:
+    image: postgres:12.0-alpine
+    container_name: db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
+    ports:
+      - "5432:5432"
+    networks:
+      - elastic
+    logging: *default-logging
+
+  # search engine
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch-oss:7.8.1
+    container_name: elasticsearch
+    environment:
+      - discovery.type=single-node
+      - http.port=9200
+      - http.cors.enabled=true
+      # - http.cors.allow-origin=http://localhost:1358,http://127.0.0.1:1358,http://localhost:1337,http://127.0.0.1:1337,http://localhost:8000
+      - http.cors.allow-origin=*
+      - http.cors.allow-headers=X-Requested-With,X-Auth-Token,Content-Type,Content-Length,Authorization
+      - http.cors.allow-credentials=true
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    volumes:
+      - esdata1:/usr/share/elasticsearch/data
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+    networks:
+      - elastic
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "curl --silent --fail localhost:9200/_cluster/health || exit 1",
+        ]
+      interval: 30s
+      timeout: 30s
+      retries: 3
+    logging: *default-logging
+
+  reactivesearch:
+    image: my-reactivesearch
+    container_name: reactivesearch
+    build:
+      context: .
+      dockerfile:  Dockerfile-dev
+    volumes:
+       - ./:/code # for development, unused in production
+       - /code/node_modules # an exception from the above volume
+    ports:
+      - "8080:80"
+    environment:
+      - NODE_ENV=development
+    networks:
+      - elastic
+    stdin_open: true
+    depends_on:
+      - elasticsearch
+    logging: *default-logging
+
+  thumbnails:
+    image: thumbnails
+    container_name: thumbnails
+    build:
+      context: ./nginx/thumbnails
+    volumes:
+      - thumbnails_dir:/tmp/thumbnails
+    ports:
+      - "8081:80"
+    networks:
+      - elastic
+    stdin_open: true
+    logging: *default-logging
+
+  download:
+    image: download
+    container_name: download
+    build:
+      context: ./nginx/download
+    volumes:
+      - download_dir:/tmp/download
+    ports:
+      - "8082:80"
+    networks:
+      - elastic
+    stdin_open: true
+    logging: *default-logging
+
+networks:
+  elastic:
+    driver: bridge
+
+volumes:
+  esdata1:
+    driver: local
+  postgres_data:
+    driver: local
+  repository_dir:
+    driver: local
+  thumbnails_dir:
+    driver: local
+  download_dir:
+    driver: local
+  upload_dir:
+    driver: local

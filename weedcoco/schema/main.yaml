@@ -9,8 +9,7 @@ required:
   - agcontexts
   - annotations
   - categories
-  - collections
-  - collection_memberships
+  - info
   - images
 properties:
   images:
@@ -29,7 +28,24 @@ properties:
     type: array
     items:
       $ref: https://weedid.sydney.edu.au/schema/AgContext.json#/
-  collections:
-    type: array
-    items:
-      $ref: https://weedid.sydney.edu.au/schema/Collection.json#/
+  info:
+    type: object
+    required:
+      - description
+      - metadata
+    properties:
+      description:
+        type: string
+      contributor:
+        type: string
+      url:
+        type: string
+      version:
+        type: string
+      date_created:
+        type: string
+        format: date-time
+      year:
+        url: string
+      metadata:
+        $ref: https://weedid.sydney.edu.au/schema/Metadata.json#/

@@ -52,11 +52,9 @@ jobs:
           pip install pyyaml
           cd weedcoco/schema
           make
+      - name: Check schemas in web match
+        run: |
+          for f in search/src/Schemas/*.json; do diff $f weedcoco/schema/$(basename $f) || exit 1; done
       - uses: actions/setup-node@v1
         with:
           node-version: '10'
-      - run: npm install -g ajv-cli
-      - name: Validate JSON with ajv until we are confident with Python's jsonschema
-        run: |
-          cd weedcoco/schema
-          ajv -s main.json -r '*.json' -d ../cwfid_to_json/cwfid_imageinfo.json -d ../deepweeds_to_json/deepweeds_imageinfo.json

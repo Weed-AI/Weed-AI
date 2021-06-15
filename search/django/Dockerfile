@@ -1,0 +1,11 @@
+FROM python:3.7
+WORKDIR /code
+COPY ./requirements.txt .
+RUN pip install --upgrade pip
+RUN pip install -r requirements.txt
+ARG weedcoco_version=master
+ADD "http://github.com/Sydney-Informatics-Hub/Weed-AI/archive/"$weedcoco_version".zip" /tmp/weedcoco.zip
+RUN pip install /tmp/weedcoco.zip
+COPY ./entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+COPY ./ .

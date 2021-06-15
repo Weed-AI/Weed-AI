@@ -11,6 +11,9 @@ weedcoco/cwfid_to_json/*.yaml
 weedcoco/cwfid_to_json/annotations/*.yaml
 weedcoco/concatenation/*.json
 
+# generated files
+weedcoco/schema/*.json
+
 # Images
 # JPEG
 *.jpg
@@ -21,6 +24,14 @@ weedcoco/concatenation/*.json
 # Annotations
 *.xml
 
+# test images for repo
+!weedcoco/tests/repo/**/*.jpg
+!weedcoco/tests/repo/**/*.png
+!search/cypress/fixtures/**/*.png
+!search/cypress/fixtures/**/*.jpg
 
 # Dev Tools
 .vscode/settings.json
+
+# .env
+.env

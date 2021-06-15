@@ -1,0 +1,69 @@
+ .App {
+    text-align: center;
+  }
+  
+  .App-logo {
+    height: 40vmin;
+    pointer-events: none;
+  }
+  
+  .annotations {
+      display: inline;
+      list-style-type: none;
+      padding: 0;
+  }
+  .annotations li {
+      display: inline-block;
+      font-weight: 700;
+      padding: .25em .4em;
+      border-radius: .25em;
+      margin: .1em;
+  }
+  .annotations li.weed {
+      color: white;
+      background: #dc3545;
+  }
+  .annotations li.crop {
+      color: white;
+      background: #28a745;
+  }
+  
+  @media (prefers-reduced-motion: no-preference) {
+    .App-logo {
+      animation: App-logo-spin infinite 20s linear;
+    }
+  }
+  
+  .App-header {
+    background-color: #282c34;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-size: calc(10px + 2vmin);
+    color: white;
+  }
+  
+  .App-link {
+    color: #61dafb;
+  }
+  
+  @keyframes App-logo-spin {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
+  
+  /* TODO: use innerClass to get unpacked class name */
+  .filter-checkbox + label::before {
+    border-color: white !important;
+  }
+  
+  .filter-checkbox + label:hover::before {
+    border-color: #424242 !important;
+  }
+  

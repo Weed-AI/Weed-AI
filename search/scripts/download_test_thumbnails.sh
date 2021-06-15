@@ -1,23 +1,48 @@
-#! zsh
+#!/usr/bin/env zsh
 mypath=$0:A
+
+usage() {
+	echo $0 "[OPTIONS]" >&2
+	echo Options: >&2
+	echo " -r|--rds      Set the path to the iweeds RDS" >&2
+	exit 1
+}
+
+while [[ "$#" -gt 0 ]]; do
+    case $1 in
+        -h|--help) usage ;;
+        -r|--rds) rds_root="$2"; shift ;;
+        *) echo "Unknown parameter passed: $1"; usage ;;
+    esac
+    shift
+done
+
 thumbnails_root=$(dirname "$mypath")/../public/thumbnails
 mkdir -p "$thumbnails_root"
 tmpd=$(mktemp -d)
 trap 'rm -rf "$tmpd"; rm -rf "$thumbnails_root"/Makefile' EXIT
 
+if [ -n "$rds_root" ]
+then
+	rds_cp='cp -r "'$rds_root'"'
+else
+	rds_cp='scp -r research-data-int.sydney.edu.au:/rds/PRJ-iweeds'
+fi
+
 cat > "$thumbnails_root"/Makefile <<EOF
 all: deepweeds cwfid digifarm-mungbeans artificial natural ginger
 
 deepweeds:
-	wget -O $tmpd/deepweeds.zip https://nextcloud.qriscloud.org.au/index.php/s/a3KxPawpqkiorST/download
 	mkdir $tmpd/deepweeds
+	$rds_cp/external_datasets/raw/deepweeds/images.zip $tmpd/deepweeds.zip
 	unzip -d $tmpd/deepweeds $tmpd/deepweeds.zip
 	rm -r $tmpd/deepweeds.zip
 	# find $tmpd/deepweeds -name "*.jpg" -exec magick "{}" -resize 300x300 '{}' ';'
 	mv $tmpd/deepweeds .
 	
 cwfid:
-	cd $tmpd && git clone https://github.com/cwfid/dataset && cd -
+	mkdir $tmpd/dataset
+	$rds_cp/external_datasets/raw/cwfid/dataset $tmpd/
 	mkdir cwfid
 	find $tmpd/dataset/images -name "*.png" -exec magick "{}" -resize 300x300 '{}' ';'
 	mv $tmpd/dataset/images/*.png cwfid/
@@ -26,26 +51,41 @@ cwfid:
 
 digifarm-mungbeans:
 	mkdir $tmpd/digifarm-mungbeans
-	scp research-data-int.sydney.edu.au:/rds/PRJ-iweeds/Narrabri/digifarm/mungbeans/*/images/*.jpg $tmpd/digifarm-mungbeans
+	$rds_cp/data/raw/SOLES/narrabri/2020-summer/20200402/img/*.jpg $tmpd/digifarm-mungbeans
 	find $tmpd/digifarm-mungbeans/ -name "*.jpg" -exec magick "{}" -resize 300x300 '{}' ';'
 	mv $tmpd/digifarm-mungbeans .
 
 
 artificial:
 	mkdir $tmpd/artificial
-	scp research-data-int.sydney.edu.au:/rds/PRJ-iweeds/Narrabri/artificial_illumination/20190728_Z16/images/*.jpg $tmpd/artificial
+	$rds_cp/data/raw/SOLES/narrabri/2019-winter/20190728/img/*.jpg $tmpd/artificial
 	find $tmpd/artificial/ -name "*.jpg" -exec magick "{}" -resize 300x300 '{}' ';'
 	mv $tmpd/artificial .
 
 natural:
 	mkdir $tmpd/natural
-	scp research-data-int.sydney.edu.au:/rds/PRJ-iweeds/Narrabri/natural_illumination/*/images/*.jpg $tmpd/natural
+	$rds_cp/data/raw/SOLES/narrabri/2019-winter/20190729/img/*.jpg $tmpd/natural
+	$rds_cp/data/raw/SOLES/cobbity/2020-winter/20200923/20200923-ld_wht_tos4_tw_19110130/img/*.jpg $tmpd/natural
+	$rds_cp/data/raw/SOLES/cobbity/2020-winter/20200923/20200923-ld_why_tos4_tw_19345061/img/*.jpg $tmpd/natural
 	find $tmpd/natural/ -name "*.jpg" -exec magick "{}" -resize 300x300 '{}' ';'
 	mv $tmpd/natural .
 
+natural2:
+	mkdir $tmpd/natural2
+	$rds_cp/data/raw/SOLES/narrabri/2019-winter/20190803/img/*.jpg $tmpd/natural2
+	find $tmpd/natural2/ -name "*.jpg" -exec magick "{}" -resize 300x300 '{}' ';'
+	mv $tmpd/natural2 .
+
+overcast:
+	mkdir $tmpd/overcast
+	$rds_cp/data/raw/SOLES/cobbity/2020-winter/20201006/20201006-ld_wht_tos4_tw_19345061/img/*.jpg $tmpd/overcast
+	$rds_cp/data/raw/SOLES/cobbity/2020-winter/20201006/20201006-ld_wht_tos4_tw_19110130/img/*.jpg $tmpd/overcast
+	find $tmpd/overcast/ -name "*.jpg" -exec magick "{}" -resize 300x300 '{}' ';'
+	mv $tmpd/overcast .
+
 ginger:
 	mkdir $tmpd/ginger
-	scp research-data-int.sydney.edu.au:/rds/PRJ-iweeds/Ginger/artificial/img/*.png $tmpd/ginger
+	$rds_cp/data/raw/SOLES/chromakey/2020-spring/20200804/20200804-ginger-shed/img/*.png $tmpd/ginger
 	find $tmpd/ginger/ -name "*.png" -exec magick "{}" -resize 300x300 '{}' ';'
 	mv $tmpd/ginger .
 EOF

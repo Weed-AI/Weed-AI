@@ -3,24 +3,50 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@appbaseio/reactivemaps": "^3.0.0-beta.11",
     "@appbaseio/reactivesearch": "^3.12.2",
+    "@jsonforms/core": "^2.5.1",
+    "@jsonforms/material-renderers": "^2.5.1",
+    "@jsonforms/react": "^2.5.1",
+    "@material-ui/core": "^4.11.2",
+    "@material-ui/icons": "^4.11.2",
+    "@material-ui/styles": "^4.11.3",
+    "@nuxtjs/axios": "^5.12.2",
     "@testing-library/dom": "^5",
     "@testing-library/jest-dom": "^4.2.4",
     "@testing-library/react": "^9.3.2",
     "@testing-library/user-event": "^7.1.2",
+    "@types/jest": "^26.0.20",
+    "@types/node": "^14.14.22",
+    "@types/react": "^17.0.0",
+    "@types/react-dom": "^17.0.0",
+    "helmet": "^4.4.1",
+    "js-cookie": "^2.2.1",
+    "js-yaml": "^4.0.0",
+    "lodash.clonedeep": "^4.5.0",
     "node-fetch": "^2.6.1",
     "node-forge": "^0.10.0",
     "react": "^16.13.1",
+    "react-cookie-consent": "^6.2.2",
     "react-dom": "^16.13.1",
-    "react-scripts": "3.4.3",
+    "react-dropzone-uploader": "^2.11.0",
+    "react-flip-move": "^3.0.4",
+    "react-google-login": "^5.2.2",
+    "react-helmet": "^6.1.0",
+    "react-markdown": "^5.0.3",
+    "react-router-dom": "^5.2.0",
+    "react-scripts": "4.0.3",
     "redux": "^2.0.0",
-    "typescript": "^2.8.0"
+    "typescript": "^4.1.4"
   },
   "scripts": {
-    "start": "react-scripts start",
+    "start": "PORT=80 react-scripts start",
+    "start3000": "PORT=3000 HOST=localhost react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "cosmos": "cross-env FAST_REFRESH=false cosmos",
+    "cosmos:export": "cosmos-export"
   },
   "eslintConfig": {
     "extends": "react-app"
@@ -36,5 +62,12 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "react-cosmos": "^5.6.2",
+    "@testing-library/cypress": "^7.0.6",
+    "cypress": "^7.2.0",
+    "cypress-file-upload": "^5.0.7",
+    "cypress-plugin-tab": "^1.0.5"
   }
 }
