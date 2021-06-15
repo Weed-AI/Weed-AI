@@ -206,7 +206,8 @@ class ReactImageUploadComponent extends React.Component {
   }
 
   renderPreviewPictures() {
-    return this.state.pictures.map((picture, index) => {
+    return this.state.pictures.length <= 100 ?
+    this.state.pictures.map((picture, index) => {
       return (
         <div key={index} className="uploadPictureContainer">
           <div className="deleteImage" onClick={() => this.removeImage(picture)}>X</div>
@@ -216,7 +217,9 @@ class ReactImageUploadComponent extends React.Component {
           </div>
         </div>
       );
-    });
+    })
+    :
+    <p>No preview for images more than 50</p>
   }
 
   /*
