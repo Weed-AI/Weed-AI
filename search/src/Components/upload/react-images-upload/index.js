@@ -63,7 +63,6 @@ class ReactImageUploadComponent extends React.Component {
   onDropFile(e) {
     const files = e.target.files;
     const fileErrors = [];
-    const {singleImage} = this.props;
 
     // Iterate over all uploaded files
     for (let i = 0; i < files.length; i++) {
@@ -90,10 +89,7 @@ class ReactImageUploadComponent extends React.Component {
         continue;
       }
       this.readFile(file).then(newFileData => {
-        const dataURLs = singleImage?[]:this.state.pictures.slice();
-        const files = singleImage?[]:this.state.files.slice();
-        this.uploadFileToServer(dataURLs, files, newFileData);
-        this.setState({pictures: dataURLs, files: files});
+        this.uploadFileToServer(newFileData);
       });
     }
   }
@@ -102,12 +98,8 @@ class ReactImageUploadComponent extends React.Component {
      Customised function modified on original codebase
      Copyright (c) 2020 Zheng Li
    */
-  async uploadFileToServer(dataURLs, files, newFileData) {
-    const filesName = files.map(file => file.name);
-    if (!this.props.images.includes(newFileData.file.name) || filesName.includes(newFileData.file.name)){
-        return
-    }
-    else {
+  async uploadFileToServer(newFileData) {
+        const {singleImage} = this.props;
         const body = new FormData()
         body.append('upload_image', newFileData.file)
         body.append('upload_id', this.props.upload_id)
@@ -118,12 +110,13 @@ class ReactImageUploadComponent extends React.Component {
             headers: {'Content-Type': 'multipart/form-data', 'X-CSRFToken': Cookies.get('csrftoken') }
         })
         if(res.status === 200){
+            const dataURLs = singleImage?[]:this.state.pictures.slice();
+            const files = singleImage?[]:this.state.files.slice();
             dataURLs.push(newFileData.dataURL);
             files.push(newFileData.file);
+            this.setState({pictures: dataURLs, files: files});
             this.props.handleUploaded(files.map(file => file.name));
         }
-        return
-    }
   }
 
   onUploadClick(e) {
