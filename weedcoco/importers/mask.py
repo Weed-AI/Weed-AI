@@ -160,7 +160,7 @@ class DefaultColorMapping(dict):
 
 def masks_to_coco(
     path_pairs: Iterable[Tuple[str, str]],
-    color_to_category_map: Mapping[str, str] = None,
+    color_to_category_map: Optional[Mapping[str, str]] = None,
     background_if_unmapped: str = None,
     check_consistent_dimensions: bool = True,
 ):
