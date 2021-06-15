@@ -3,6 +3,7 @@ from weedid import views
 
 api_urlpatterns = [
     path("upload/", views.upload, name="upload"),
+    path("warmup/", views.warmup, name="warmup"),
     path("upload_voc/", views.upload_voc, name="upload_voc"),
     path("remove_voc/", views.remove_voc, name="remove_voc"),
     path("submit_voc/", views.submit_voc, name="submit_voc"),

@@ -16,7 +16,8 @@ const styles = {
 
 const ERROR = {
   NOT_SUPPORTED_EXTENSION: 'NOT_SUPPORTED_EXTENSION',
-  FILESIZE_TOO_LARGE: 'FILESIZE_TOO_LARGE'
+  FILESIZE_TOO_LARGE: 'FILESIZE_TOO_LARGE',
+  FILE_DUPLICATE: 'FILE_DUPLICATE'
 }
 
 class ReactImageUploadComponent extends React.Component {
@@ -62,8 +63,9 @@ class ReactImageUploadComponent extends React.Component {
    */
   onDropFile(e) {
     const files = e.target.files;
-    const allFilePromises = [];
     const fileErrors = [];
+    const uploadedFiles = this.state.files.slice() ? this.state.files.slice() : [];
+    const filesName = uploadedFiles.map(file => file.name);
 
     // Iterate over all uploaded files
     for (let i = 0; i < files.length; i++) {
@@ -77,6 +79,7 @@ class ReactImageUploadComponent extends React.Component {
           type: ERROR.NOT_SUPPORTED_EXTENSION
         });
         fileErrors.push(fileError);
+        this.setState({fileErrors});
         continue;
       }
       // Check for file size
@@ -85,55 +88,47 @@ class ReactImageUploadComponent extends React.Component {
           type: ERROR.FILESIZE_TOO_LARGE
         });
         fileErrors.push(fileError);
+        this.setState({fileErrors});
         continue;
       }
-
-      allFilePromises.push(this.readFile(file));
-    }
-
-    this.setState({
-      fileErrors
-    });
-
-    const {singleImage} = this.props;
-
-    Promise.all(allFilePromises).then(newFilesData => {
-      const dataURLs = singleImage?[]:this.state.pictures.slice();
-      const files = singleImage?[]:this.state.files.slice();
-
-      newFilesData.forEach(newFileData => {
-        this.uploadFileToServer(dataURLs, files, newFileData);
+      // Check for duplication
+      if (!this.props.images.includes(file.name) || filesName.includes(file.name)){
+        fileError = Object.assign(fileError, {
+          type: ERROR.FILE_DUPLICATE
+        });
+        fileErrors.push(fileError);
+        this.setState({fileErrors});
+        continue;
+      }
+      this.readFile(file).then(newFileData => {
+        this.uploadFileToServer(newFileData);
       });
-    });
+    }
   }
 
   /*
      Customised function modified on original codebase
      Copyright (c) 2020 Zheng Li
    */
-  uploadFileToServer(dataURLs, files, newFileData) {
-    const filesName = files.map(file => file.name);
-    if (!this.props.images.includes(newFileData.file.name) || filesName.includes(newFileData.file.name)){
-        return
-    }
-    else {
-        const body = new FormData()
-        body.append('upload_image', newFileData.file)
-        body.append('upload_id', this.props.upload_id)
-        axios({
-            method: 'post',
-            url: this.props.uploadURL,
-            data: body,
-            headers: {'Content-Type': 'multipart/form-data', 'X-CSRFToken': Cookies.get('csrftoken') }
-        }).then(res => {
-            if(res.status === 200){
-                dataURLs.push(newFileData.dataURL);
-                files.push(newFileData.file);
-                this.setState({pictures: dataURLs, files: files});
-                this.props.handleUploaded(files.map(file => file.name));
-            }
-        })
-    }
+  async uploadFileToServer(newFileData) {
+      const {singleImage} = this.props;
+      const body = new FormData()
+      body.append('upload_image', newFileData.file)
+      body.append('upload_id', this.props.upload_id)
+      const res = await axios({
+          method: 'post',
+          url: this.props.uploadURL,
+          data: body,
+          headers: {'Content-Type': 'multipart/form-data', 'X-CSRFToken': Cookies.get('csrftoken') }
+      })
+      if(res.status === 200){
+          const dataURLs = singleImage?[]:this.state.pictures.slice();
+          const files = singleImage?[]:this.state.files.slice();
+          dataURLs.push(newFileData.dataURL);
+          files.push(newFileData.file);
+          this.setState({pictures: dataURLs, files: files});
+          this.props.handleUploaded(files.map(file => file.name));
+      }
   }
 
   onUploadClick(e) {
@@ -182,7 +177,7 @@ class ReactImageUploadComponent extends React.Component {
     return fileErrors.map((fileError, index) => {
       return (
         <div className={'errorMessage ' + this.props.errorClass} key={index} style={this.props.errorStyle}>
-          * {fileError.name} {fileError.type === ERROR.FILESIZE_TOO_LARGE ? this.props.fileSizeError: this.props.fileTypeError}
+          * {fileError.name} {fileError.type === ERROR.FILESIZE_TOO_LARGE ? this.props.fileSizeError : fileError.type === ERROR.NOT_SUPPORTED_EXTENSION ? this.props.fileTypeError : this.props.fileDuplicateError}
         </div>
       );
     });
@@ -286,6 +281,7 @@ ReactImageUploadComponent.defaultProps = {
   maxFileSize: 5242880,
   fileSizeError: " file size is too big",
   fileTypeError: " is not a supported file extension",
+  fileDuplicateError: " is a duplicate file",
   errorClass: "",
   style: {},
   errorStyle: {},
@@ -316,6 +312,7 @@ ReactImageUploadComponent.propTypes = {
   maxFileSize: PropTypes.number,
   fileSizeError: PropTypes.string,
   fileTypeError: PropTypes.string,
+  fileDuplicateError: PropTypes.string,
   errorClass: PropTypes.string,
   errorStyle: PropTypes.object,
   singleImage: PropTypes.bool,

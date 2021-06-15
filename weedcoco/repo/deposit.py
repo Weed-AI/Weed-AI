@@ -4,7 +4,7 @@ import json
 import os
 import re
 import tempfile
-from shutil import copy
+from shutil import copy, move
 from zipfile import ZipFile
 from PIL import Image
 from weedcoco.utils import get_image_average_hash, check_if_approved_image_extension
@@ -46,10 +46,12 @@ def mkdir_safely(local_dir):
             raise RuntimeError(f"{local_dir} exists but is not a directory") from e
 
 
-def setup_dataset_dir(repository_dir, upload_id=None):
+def setup_dataset_dir(repository_dir, temp_dir, upload_id=None):
+    if not repository_dir.is_dir():
+        mkdir_safely(repository_dir)
     if upload_id is None:
-        if not repository_dir.is_dir():
-            mkdir_safely(repository_dir)
+        if not temp_dir.is_dir():
+            mkdir_safely(temp_dir)
             deposit_id = "dataset_1"
         else:
             latest_dataset_dir_index = max(
@@ -63,13 +65,13 @@ def setup_dataset_dir(repository_dir, upload_id=None):
             deposit_id = f"dataset_{latest_dataset_dir_index + 1}"
     else:
         deposit_id = upload_id
-    dataset_dir = repository_dir / deposit_id
+    dataset_dir = temp_dir / deposit_id
     try:
         os.mkdir(dataset_dir)
     except FileExistsError:
         if upload_id is not None:
             raise
-        return setup_dataset_dir(repository_dir, upload_id=None)
+        return setup_dataset_dir(temp_dir, upload_id=None)
     return dataset_dir, deposit_id
 
 
@@ -106,7 +108,6 @@ def deposit_weedcoco(weedcoco_path, dataset_dir, image_dir, image_hash):
     new_dataset_dir = dataset_dir / "weedcoco.json"
     with (new_dataset_dir).open("w") as out:
         json.dump(weedcoco, out, indent=4)
-    return new_dataset_dir
 
 
 def retrieve_image_paths(images_path):
@@ -129,17 +130,36 @@ def compress_to_download(dataset_dir, deposit_id, download_dir):
         copy(zip_path, download_path)
 
 
+def atomic_copy(repository_dir, download_dir, temp_dir, deposit_id):
+    dataset_path = temp_dir / deposit_id
+    zip_path = temp_dir / f"{deposit_id}.zip"
+    repository_dir = repository_dir / deposit_id
+    try:
+        if os.path.isfile(zip_path):
+            move(str(zip_path), str(download_dir))
+        if os.path.isdir(dataset_path):
+            move(str(dataset_path), str(repository_dir))
+    except Exception:
+        # roll back to leave a clean repository
+        (download_dir / zip_path).unlink(missing_ok=True)
+        for path in (repository_dir / deposit_id).glob("*"):
+            path.unlink(missing_ok=True)
+        (repository_dir / deposit_id).rmdir()
+        raise
+
+
 def deposit(weedcoco_path, image_dir, repository_dir, download_dir, upload_id=None):
     image_hash = create_image_hash(image_dir)
     validate_duplicate_images(image_hash)
     validate_existing_images(repository_dir, image_hash)
-    dataset_dir, deposit_id = setup_dataset_dir(repository_dir, upload_id)
-    new_dataset_dir = deposit_weedcoco(
-        weedcoco_path, dataset_dir, image_dir, image_hash
-    )
-    migrate_images(dataset_dir, image_dir, image_hash)
-    compress_to_download(dataset_dir, deposit_id, download_dir)
-    return str(new_dataset_dir)
+    with tempfile.TemporaryDirectory() as temp_dir:
+        temp_dir = pathlib.Path(temp_dir)
+        dataset_dir, deposit_id = setup_dataset_dir(repository_dir, temp_dir, upload_id)
+        deposit_weedcoco(weedcoco_path, dataset_dir, image_dir, image_hash)
+        migrate_images(dataset_dir, image_dir, image_hash)
+        compress_to_download(dataset_dir, deposit_id, temp_dir)
+        atomic_copy(repository_dir, download_dir, temp_dir, deposit_id)
+    return str(repository_dir)
 
 
 def main(args=None):
@@ -151,7 +171,12 @@ def main(args=None):
     ap.add_argument("--repository-dir", default="repository", type=pathlib.Path)
     ap.add_argument("--download-dir", default="download", type=pathlib.Path)
     args = ap.parse_args(args)
-    deposit(args.weedcoco_path, args.image_dir, args.repository_dir, args.download_dir)
+    deposit(
+        args.weedcoco_path,
+        args.image_dir,
+        args.repository_dir,
+        args.download_dir,
+    )
 
 
 if __name__ == "__main__":

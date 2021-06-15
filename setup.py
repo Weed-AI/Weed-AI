@@ -19,6 +19,7 @@ requirements = [
     "imagehash",
     "requests",
     "elasticsearch",
+    "joblib",
 ]
 
 setup(
