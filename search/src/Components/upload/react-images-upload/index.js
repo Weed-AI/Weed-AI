@@ -62,8 +62,8 @@ class ReactImageUploadComponent extends React.Component {
    */
   onDropFile(e) {
     const files = e.target.files;
-    const allFilePromises = [];
     const fileErrors = [];
+    const {singleImage} = this.props;
 
     // Iterate over all uploaded files
     for (let i = 0; i < files.length; i++) {
@@ -77,6 +77,7 @@ class ReactImageUploadComponent extends React.Component {
           type: ERROR.NOT_SUPPORTED_EXTENSION
         });
         fileErrors.push(fileError);
+        this.setState({fileErrors});
         continue;
       }
       // Check for file size
@@ -85,33 +86,23 @@ class ReactImageUploadComponent extends React.Component {
           type: ERROR.FILESIZE_TOO_LARGE
         });
         fileErrors.push(fileError);
+        this.setState({fileErrors});
         continue;
       }
-
-      allFilePromises.push(this.readFile(file));
-    }
-
-    this.setState({
-      fileErrors
-    });
-
-    const {singleImage} = this.props;
-
-    Promise.all(allFilePromises).then(newFilesData => {
-      const dataURLs = singleImage?[]:this.state.pictures.slice();
-      const files = singleImage?[]:this.state.files.slice();
-
-      newFilesData.forEach(newFileData => {
+      this.readFile(file).then(newFileData => {
+        const dataURLs = singleImage?[]:this.state.pictures.slice();
+        const files = singleImage?[]:this.state.files.slice();
         this.uploadFileToServer(dataURLs, files, newFileData);
+        this.setState({pictures: dataURLs, files: files});
       });
-    });
+    }
   }
 
   /*
      Customised function modified on original codebase
      Copyright (c) 2020 Zheng Li
    */
-  uploadFileToServer(dataURLs, files, newFileData) {
+  async uploadFileToServer(dataURLs, files, newFileData) {
     const filesName = files.map(file => file.name);
     if (!this.props.images.includes(newFileData.file.name) || filesName.includes(newFileData.file.name)){
         return
@@ -120,19 +111,18 @@ class ReactImageUploadComponent extends React.Component {
         const body = new FormData()
         body.append('upload_image', newFileData.file)
         body.append('upload_id', this.props.upload_id)
-        axios({
+        const res = await axios({
             method: 'post',
             url: this.props.uploadURL,
             data: body,
             headers: {'Content-Type': 'multipart/form-data', 'X-CSRFToken': Cookies.get('csrftoken') }
-        }).then(res => {
-            if(res.status === 200){
-                dataURLs.push(newFileData.dataURL);
-                files.push(newFileData.file);
-                this.setState({pictures: dataURLs, files: files});
-                this.props.handleUploaded(files.map(file => file.name));
-            }
         })
+        if(res.status === 200){
+            dataURLs.push(newFileData.dataURL);
+            files.push(newFileData.file);
+            this.props.handleUploaded(files.map(file => file.name));
+        }
+        return
     }
   }
 
