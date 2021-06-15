@@ -28,6 +28,7 @@ import {
 } from '@appbaseio/reactivesearch';
 import SearchBase from '../search/SearchBase';
 import ResultsList from '../search/ResultsList';
+import CategoryTooltip from '../search/CategoryTooltip';
 
 
 const DESCRIPTION_BOILERPLATE = "\n\nEvery dataset in Weed-AI includes imagery of crops or pasture with weeds annotated, and is available in an MS-COCO derived format with standardised agricultural metadata."
@@ -159,7 +160,7 @@ const AgContextDetails = (props) => {
                 <TableBody>
                   {Object.keys(agcontext.category_statistics).map((catName) =>
                     <TableRow key={catName}>
-                      <TableCell>{catName}</TableCell>
+                      <CategoryTooltip categoryName={catName}><TableCell>{catName}</TableCell></CategoryTooltip>
                       {Object.keys(tableFields).map((field) => <TableCell key={field}>{agcontext.category_statistics[catName][field]}</TableCell>)}
                     </TableRow>
                   )}
