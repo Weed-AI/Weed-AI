@@ -1,6 +1,6 @@
 import React from 'react';
 import {jsonSchemaTransform} from './utils';
-import ReactMarkdown from "react-markdown";
+import Markdown from "../../Common/Markdown";
 import { makeStyles } from '@material-ui/core/styles';
 import Accordion from '@material-ui/core/Accordion';
 import AccordionSummary from '@material-ui/core/AccordionSummary';
@@ -42,7 +42,7 @@ const JsonSchemaDetails = (props) => {
                             )}
                         </ol>
                         {tfError[path].description ? <p>Description of this field:</p> : ""}
-                        <ReactMarkdown source={tfError[path].description} />
+                        <Markdown source={tfError[path].description} />
                     </AccordionDetails>
                 </Accordion>
             </div>

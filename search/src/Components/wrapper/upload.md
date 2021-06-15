@@ -33,15 +33,29 @@ dataset reviewers:
 
 Currently only new images to the repository will be accepted.
 
+## Data Formats Supported
+
+Images and annotations can be uploaded in the following formats, for which we have noted supported annotation layers:
+
+| Format | Classification | Bounding Boxes | Segmentation |
+|:-------|:--------------:|:--------------:|:--------------:|
+| [WeedCOCO](./weedcoco) | ✔️ | ✔️ | ✔️ |
+| [MS COCO](https://cocodataset.org/#format-data) | ✔️ | ✔️ | ✔️ |
+| Pascal VOC XML | | ✔️ | |
+| Color-coded segmentation masks | | | ✔️ |
+
+Uploads will be converted to WeedCOCO format, with a standard category nomenclature, agricultural context and publication metadata.
+
 ## Upload Process
 
 The uploading process is a five-step process:
 
 1. Select the data annotation format above.
-2. Upload the annotation file. Only COCO or WeedCOCO are supported currently. Please check that your images and annotations.
-3. If not WeedCOCO, upload the AgContext file or generate a new one by completing the online form.
-4. Include publication-level metadata about the dataset and how to attribute it.
-5. Finally, upload the relevant images for the dataset
+2. Upload the annotation file. Please check that your images and annotations.
+3. If not WeedCOCO, confirm a mapping from the entered category labels to role (weed or crop) and species.
+4. If not WeedCOCO, upload the AgContext file or generate a new one by completing the online form.
+5. Enter publication-level metadata about the dataset and how to attribute it.
+6. Finally, upload the relevant images for the dataset
 
 A Weed-AI administrator will review your submission. If the dataset is accepted
 you will be notified and can continue uploading new datasets. The new dataset
