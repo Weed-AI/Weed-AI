@@ -21,6 +21,9 @@ import ListIcon from '@material-ui/icons/List';
 import PhotoIcon from '@material-ui/icons/Photo';
 import DownloadIcon from '@material-ui/icons/CloudDownload';
 import IconButton from '@material-ui/core/IconButton';
+import Card from '@material-ui/core/Card';
+import CardContent from '@material-ui/core/CardContent';
+import { makeStyles } from "@material-ui/core/styles";
 import Cookies from 'js-cookie'
 import ReactMarkdown from "react-markdown";
 import {
@@ -28,6 +31,7 @@ import {
 } from '@appbaseio/reactivesearch';
 import SearchBase from '../search/SearchBase';
 import ResultsList from '../search/ResultsList';
+import agcontextSchema from '../../Schemas/AgContext.json'
 
 
 const DESCRIPTION_BOILERPLATE = "\n\nEvery dataset in Weed-AI includes imagery of crops or pasture with weeds annotated, and is available in an MS-COCO derived format with standardised agricultural metadata."
@@ -88,21 +92,94 @@ export const useStyles = (theme) => ({
 
 const baseURL = new URL(window.location.origin);
 
+
+const useCardStyles = makeStyles({
+  root: {
+    minWidth: 175,
+    margin: "4px",
+    "&:hover": {
+      "& $description": {
+        maxHeight: "12em",
+        textOverflow: "initial",
+        overflow: "visible",
+        whiteSpace: "normal",
+        transition: "max-height 0.25s ease-in",
+      },
+    },
+  },
+  title: {
+    fontSize: 14,
+  },
+  value: {
+    fontWeight: "140%",
+    fontSize: 26,
+    marginBottom: 12,
+  },
+  description: {
+    maxWidth: 175,
+    textOverflow: "ellipsis",
+    overflow: "hidden",
+    whiteSpace: "nowrap",
+    maxHeight: "1.5em",
+    transition: "max-height 0.15s ease-out",
+  },
+});
+
+const AgFieldCard = ({ title, value, description }) => {
+  const classes = useCardStyles();
+  return (
+    <Card className={classes.root}>
+      <CardContent>
+        <Typography
+          className={classes.title}
+          component="h4"
+          color="textSecondary"
+          gutterBottom
+        >
+          {title}
+        </Typography>
+        <Typography className={classes.value}>{value}</Typography>
+        <Typography className={classes.description} variant="body2" component="p">
+          {description}
+        </Typography>
+      </CardContent>
+    </Card>
+  );
+}
+
+const useFieldListStyles = makeStyles({
+  details: {
+    flexWrap: "wrap",
+  },
+});
+
 const AgContextFieldList = (props) => {
+    const classes = useFieldListStyles();
     const {title, agcontext, fields, MyAccordionSummary, ...accordionProps} = props;
     const formatters = {
       bbch_growth_range: (val) => (val["min"] !== undefined ? val["min"] + " to " + val["max"] : val),
     }
-    const format = (key, val) => (formatters.hasOwnProperty(key) ? formatters[key](val) : val);
+    const format = (key, val) => (
+      formatters.hasOwnProperty(key)
+      ? formatters[key](val)
+      : typeof val === "boolean" ? val.toString()
+      : typeof val === "string" ? val.replace("_", " ") : val
+    );
     return (
       <Accordion {...accordionProps}>
         <MyAccordionSummary>{title}</MyAccordionSummary>
-        <AccordionDetails>
-          <ul>
-            {fields.map(key =>
-            (agcontext[key] ? <li key={key}><Typography variant='body2'>{snakeToText(key)}:&nbsp;{format(key, agcontext[key])}</Typography></li> : ""))
-            }
-          </ul>
+        <AccordionDetails className={classes.details}>
+            {fields.map(key => {
+              if (!agcontext[key])
+                return [];
+              const schema = agcontextSchema.properties[key] || {};
+              const title = schema[key] || snakeToText(key);
+              return <AgFieldCard
+                title={title}
+                value={format(key, agcontext[key])}
+                description={schema.description}
+              />
+            })}
         </AccordionDetails>
       </Accordion>
     );
@@ -179,7 +256,6 @@ const listToWords = l => l.map((x, i) => [i == 0 ? "" : i == l.length - 1 ? (i >
 
 export const DatasetSummary = (props) => {
     const {metadata, agcontexts, classes, rootURL, upload_id} = props;
-    console.log('!', metadata)
     const linkedEntity = (ent) => {
       if (ent.sameAs)
         return (<a href={ent.sameAs}>{ent.name}</a>);
@@ -254,7 +330,7 @@ export const DatasetSummary = (props) => {
           <Grid item xs={2}>
             <div className={classes.summary}>
                 <Button component="a" variant="contained" className={classes.download} startIcon={<DownloadIcon />} onClick={() => window.open(`${rootURL}/code/download/${upload_id}.zip`)}>Download in WeedCOCO format</Button>
-				<Button variant="outlined" startIcon={<PhotoIcon/>} href={"/explore?dataset_name_filter=%5B%22" + metadata.name + "%22%5D"}>Explore the Images</Button>
+        <Button variant="outlined" startIcon={<PhotoIcon/>} href={"/explore?dataset_name_filter=%5B%22" + metadata.name + "%22%5D"}>Explore the Images</Button>
             </div>
           </Grid>
         </Grid>
@@ -311,9 +387,6 @@ class DatasetSummaryPage extends Component {
     .then(res => res.data)
     .then(json => {
         this.setState(json)
-    })
-    .then(() => {
-        console.log(this.state)
     })
   }
 
