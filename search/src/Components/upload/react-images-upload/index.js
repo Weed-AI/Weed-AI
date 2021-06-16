@@ -83,7 +83,6 @@ class ReactImageUploadComponent extends React.Component {
           type: ERROR.NOT_SUPPORTED_EXTENSION
         });
         fileErrors.push(fileError);
-        this.setState({fileErrors});
         continue;
       }
       // Check for file size
@@ -92,13 +91,13 @@ class ReactImageUploadComponent extends React.Component {
           type: ERROR.FILESIZE_TOO_LARGE
         });
         fileErrors.push(fileError);
-        this.setState({fileErrors});
         continue;
       }
       this.readFile(file).then(newFileData => {
         this.uploadFileToServer(newFileData);
       });
     }
+    this.setState({fileErrors});
   }
 
   /*
