@@ -1,13 +1,20 @@
 ## Annotation Formats
 
-We currently support uploads in MS COCO and [WeedCOCO](/weedcoco) formats.
+Annotations can currently be uploaded in the following formats, for which we note the supported annotation layers:
 
+| Format | Classification | Bounding Boxes | Segmentation |
+|:-------|:--------------:|:--------------:|:--------------:|
+| [WeedCOCO](./weedcoco) | ✔️ | ✔️ | ✔️ |
+| [MS COCO](https://cocodataset.org/#format-data) | ✔️ | ✔️ | ✔️ |
+| Pascal VOC XML | | ✔️ | |
+| Color-coded segmentation masks | | | ✔️ |
 
 We natively support WeedCOCO format which extends on MS COCO to specify a weed
 ID-oriented category naming scheme, to include agricultural context and
-[schema.org/Dataset](https://schema.org/Dataset)-compatible metadata. We provide an uploader
-for MS COCO format, with forms to enter agricultural context and metadata
-please ensure the category names are conformant before uploading.
+[schema.org/Dataset](https://schema.org/Dataset)-compatible metadata.
+Uploads in other formats be converted to WeedCOCO format, with
+forms to enter agricultural context and metadata, as well as to
+map category names to our standardised nomenclature.
 
 We require that contributors license their images and annotations under the
 liberal [CC-BY 4.0 licence](https://creativecommons.org/licenses/by/4.0/)
@@ -19,6 +26,7 @@ In brief (and not a substitute for the License), the CC BY 4.0 License enables
 users to freely share and adapt the material for any purpose, even
 commercially, given appropriate attribution and that there are no additional
 restrictions made.
+
 
 ## Data Quality Requirements
 
@@ -32,19 +40,6 @@ dataset reviewers:
 * Images with explicit content
 
 Currently only new images to the repository will be accepted.
-
-## Data Formats Supported
-
-Images and annotations can be uploaded in the following formats, for which we have noted supported annotation layers:
-
-| Format | Classification | Bounding Boxes | Segmentation |
-|:-------|:--------------:|:--------------:|:--------------:|
-| [WeedCOCO](./weedcoco) | ✔️ | ✔️ | ✔️ |
-| [MS COCO](https://cocodataset.org/#format-data) | ✔️ | ✔️ | ✔️ |
-| Pascal VOC XML | | ✔️ | |
-| Color-coded segmentation masks | | | ✔️ |
-
-Uploads will be converted to WeedCOCO format, with a standard category nomenclature, agricultural context and publication metadata.
 
 ## Upload Process
 
