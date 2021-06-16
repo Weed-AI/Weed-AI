@@ -24,10 +24,22 @@ const useStyles = makeStyles(theme => (console.log(theme) || {
     width: "auto",
     height: "auto",
   },
+  bbox: {
+    pointerEvents: "none",
+    border: "1px solid",
+    position: "absolute",
+  },
+  bboxLabel: {
+    fontSize: ".6em",
+    color: "#ffffff",
+    position: "absolute",
+    overflow: "hidden",
+    top: 0,
+  }
 }));
 
 
-const BBox = ({ item, annot }) => {
+const BBox = ({ classes, item, annot }) => {
   const containerHeight = 220;
   const containerWidth = 250; // XXX: can we compute this? it can be less...
   const aspectRatio = item.width / item.height;
@@ -36,29 +48,22 @@ const BBox = ({ item, annot }) => {
   const thumbLeft = 0 // (containerWidth - item.width * thumbScale) / 2;
   const species = annot.category.name.match(/^([^:]*): (.*)/)[2]
   const color = annot.category.name.startsWith("weed") ? "#dc3545" : annot.category.name.startsWith("crop") ? "#28a745" : "#808080";
-  return <div style={{
-      pointerEvents: "none",
-      border: "1px solid",
-      borderColor: color,
-      position: "absolute",
-      left: thumbLeft + thumbScale * annot.bbox[0],
-      top: thumbTop + thumbScale * annot.bbox[1],
-      width: thumbScale * annot.bbox[2],
-      height: thumbScale * annot.bbox[3],
+  return <div className={classes.bbox} style={{
+    borderColor: color,
+    left: thumbLeft + thumbScale * annot.bbox[0],
+    top: thumbTop + thumbScale * annot.bbox[1],
+    width: thumbScale * annot.bbox[2],
+    height: thumbScale * annot.bbox[3],
   }} >
-    { species ? <span style={{
-      fontSize: ".5em",
-      background: color + "30",  // transparent
-      color: "white",
-      position: "absolute",
-      overflow: "hidden",
+    { species ? <span className={classes.bboxLabel} style={{
+      background: color + "40",  // transparent
       maxWidth: Math.max(60, thumbScale * annot.bbox[2]),
-      top: 0,
     }}>{species}</span> : [] }
   </div>
 }
 
 const WeedAIResultCard = (props) => {
+  const [ loadZoom, setLoadZoom ] = React.useState(false);
   const {item, baseURL, linkToDataset} = props;
   const classes = useStyles();
   const formatCropType = (typ) => {
@@ -73,14 +78,14 @@ const WeedAIResultCard = (props) => {
     taskTypes.includes("segmentation") ? "segment" : (taskTypes.includes("bounding box") ? "bounding box" : "labels"));
   const pluralise = (text, n) => n === 1 ? text : (text.match(/[zsx]$/) ? text + "es" : text + "s");
   return (
-    <ResultCard style={{position: "relative"}}>
-        <div className={classes.imageContainer}>
-    <MagnifierContainer >
-    <MagnifierPreview imageSrc={item.thumbnail} className={classes.image} />
-            {item.annotations.filter(annot => annot.bbox).map(annot => <BBox item={item} annot={annot} />)}
-    <MagnifierZoom style={{ height: "120px", zIndex: 5 }} imageSrc={"/code/images/" + item.upload_id + "/" + item.file_name} />
-</MagnifierContainer>
-        </div>
+    <ResultCard style={{position: "relative"}} onMouseEnter={() => { setLoadZoom(true) }}>
+        <MagnifierContainer className={classes.imageContainer}>
+          <MagnifierPreview imageSrc={item.thumbnail} className={classes.image} />
+          {item.annotations.filter(annot => annot.bbox).map(annot =>
+            <BBox classes={classes} item={item} annot={annot} />
+          )}
+          {loadZoom ? <MagnifierZoom style={{ height: "120px", zIndex: 5 }} imageSrc={item.thumbnail_large} /> : [] }
+        </MagnifierContainer>
         <ResultCard.Description style={{position: "absolute", bottom: "12px"}}>
             <ul className="annotations">
             {
