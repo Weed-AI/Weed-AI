@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import { Helmet } from "react-helmet";
 import { withStyles } from '@material-ui/core/styles';
-import ReactMarkdown from "react-markdown";
+import Markdown from "../../Common/Markdown";
 import content from './weedcoco.md'
 import { useArticleStyles } from '../../styles/common'
 
@@ -24,7 +24,7 @@ class WeedCOCOComponent extends Component {
             <title>About WeedCOCO - Weed-AI</title>
             <meta name="description" content="WeedCOCO is a standard interchange format for images annotated with weeds and their metadata." />
         </Helmet>
-        <ReactMarkdown source={this.state.markdownContent} />
+        <Markdown source={this.state.markdownContent} />
       </article>
     );
   }
