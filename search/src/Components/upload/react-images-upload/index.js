@@ -16,9 +16,10 @@ const styles = {
 
 const ERROR = {
   NOT_SUPPORTED_EXTENSION: 'NOT_SUPPORTED_EXTENSION',
-  FILESIZE_TOO_LARGE: 'FILESIZE_TOO_LARGE',
-  FILE_DUPLICATE: 'FILE_DUPLICATE'
+  FILESIZE_TOO_LARGE: 'FILESIZE_TOO_LARGE'
 }
+
+const preview_maximum = 100;
 
 class ReactImageUploadComponent extends React.Component {
   constructor(props) {
@@ -72,6 +73,10 @@ class ReactImageUploadComponent extends React.Component {
       let fileError = {
         name: file.name,
       };
+      // Check for duplication
+      if (!this.props.images.includes(file.name) || filesName.includes(file.name)){
+        continue;
+      }
       // Check for file extension
       if (!this.hasExtension(file.name)) {
         fileError = Object.assign(fileError, {
@@ -90,15 +95,6 @@ class ReactImageUploadComponent extends React.Component {
         this.setState({fileErrors});
         continue;
       }
-      // Check for duplication
-      if (!this.props.images.includes(file.name) || filesName.includes(file.name)){
-        fileError = Object.assign(fileError, {
-          type: ERROR.FILE_DUPLICATE
-        });
-        fileErrors.push(fileError);
-        this.setState({fileErrors});
-        continue;
-      }
       this.readFile(file).then(newFileData => {
         this.uploadFileToServer(newFileData);
       });
@@ -109,25 +105,27 @@ class ReactImageUploadComponent extends React.Component {
      Customised function modified on original codebase
      Copyright (c) 2020 Zheng Li
    */
-  async uploadFileToServer(newFileData) {
+  uploadFileToServer(newFileData) {
       const {singleImage} = this.props;
       const body = new FormData()
       body.append('upload_image', newFileData.file)
       body.append('upload_id', this.props.upload_id)
-      const res = await axios({
+      axios({
           method: 'post',
           url: this.props.uploadURL,
           data: body,
           headers: {'Content-Type': 'multipart/form-data', 'X-CSRFToken': Cookies.get('csrftoken') }
+      }).then(res => {
+          if(res.status === 200){
+            const dataURLs = singleImage?[]:this.state.pictures.slice();
+            const files = singleImage?[]:this.state.files.slice();
+            dataURLs.push(newFileData.dataURL);
+            files.push(newFileData.file);
+            this.setState({pictures: dataURLs, files: files});
+            this.props.handleUploaded(files.map(file => file.name));
+          }
       })
-      if(res.status === 200){
-          const dataURLs = singleImage?[]:this.state.pictures.slice();
-          const files = singleImage?[]:this.state.files.slice();
-          dataURLs.push(newFileData.dataURL);
-          files.push(newFileData.file);
-          this.setState({pictures: dataURLs, files: files});
-          this.props.handleUploaded(files.map(file => file.name));
-      }
+      
   }
 
   onUploadClick(e) {
@@ -205,7 +203,7 @@ class ReactImageUploadComponent extends React.Component {
   }
 
   renderPreviewPictures() {
-    return this.state.pictures.length <= 100 ?
+    return this.state.pictures.length <= preview_maximum ?
     this.state.pictures.map((picture, index) => {
       return (
         <div key={index} className="uploadPictureContainer">
@@ -218,7 +216,7 @@ class ReactImageUploadComponent extends React.Component {
       );
     })
     :
-    <p>No preview for images more than 100</p>
+    <p>No preview for images more than {preview_maximum}</p>
   }
 
   /*
