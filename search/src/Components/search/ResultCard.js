@@ -4,7 +4,6 @@ import {
     ResultCard
 } from '@appbaseio/reactivesearch';
 import { makeStyles } from '@material-ui/core/styles';
-import Magnifier from "react-magnifier";
 import {
   MagnifierContainer, MagnifierZoom, MagnifierPreview,
 } from "react-image-magnifiers";
