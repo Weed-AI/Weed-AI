@@ -165,9 +165,23 @@ services:
     build:
       context: ./nginx/thumbnails
     volumes:
-      - thumbnails_dir:/tmp/thumbnails
+      - thumbnails_dir:/images/thumbnails
     ports:
       - "8081:80"
+    networks:
+      - elastic
+    stdin_open: true
+    logging: *default-logging
+
+  images:
+    image: thumbnails
+    container_name: images
+    build:
+      context: ./nginx/thumbnails
+    volumes:
+      - repository_dir:/images/
+    ports:
+      - "8083:80"
     networks:
       - elastic
     stdin_open: true
