@@ -12,12 +12,13 @@ Annotations can currently be uploaded in the following formats, for which we not
 We natively support WeedCOCO format which extends on MS COCO to specify a weed
 ID-oriented category naming scheme, to include agricultural context and
 [schema.org/Dataset](https://schema.org/Dataset)-compatible metadata.
-Uploads in other formats be converted to WeedCOCO format, with
-forms to enter agricultural context and metadata, as well as to
-map category names to our standardised nomenclature.
+Uploads in other formats will be converted to WeedCOCO format in our uploader,
+which provides forms to enter [agricultural context](/editor) and
+[metadata](/meta-editor), as well as to map category names to our
+standardised nomenclature.
 
 We require that contributors license their images and annotations under the
-liberal [CC-BY 4.0 licence](https://creativecommons.org/licenses/by/4.0/)
+[CC-BY 4.0 licence](https://creativecommons.org/licenses/by/4.0/)
 (Creative Commons Attribution Required). Uploaders must have the rights to the
 content that they upload, and must agree to release their content (images and
 annotations) under the terms of that licence.
