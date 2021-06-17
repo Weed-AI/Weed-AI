@@ -118,10 +118,13 @@ class ReactImageUploadComponent extends React.Component {
           if(res.status === 200){
             const dataURLs = singleImage?[]:this.state.pictures.slice();
             const files = singleImage?[]:this.state.files.slice();
-            dataURLs.push(newFileData.dataURL);
-            files.push(newFileData.file);
-            this.setState({pictures: dataURLs, files: files});
-            this.props.handleUploaded(files.map(file => file.name));
+            const filesName = files.map(file => file.name);
+            if (!filesName.includes(newFileData.file.name)){
+                dataURLs.push(newFileData.dataURL);
+                files.push(newFileData.file);
+                this.setState({pictures: dataURLs, files: files});
+                this.props.handleUploaded(files.map(file => file.name));
+            }
           }
       })
       
