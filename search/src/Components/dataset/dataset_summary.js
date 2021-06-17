@@ -22,7 +22,7 @@ import PhotoIcon from '@material-ui/icons/Photo';
 import DownloadIcon from '@material-ui/icons/CloudDownload';
 import IconButton from '@material-ui/core/IconButton';
 import Cookies from 'js-cookie'
-import ReactMarkdown from "react-markdown";
+import Markdown from "../../Common/Markdown";
 import {
     ReactiveComponent,
 } from '@appbaseio/reactivesearch';
@@ -237,7 +237,7 @@ export const DatasetSummary = (props) => {
                 <Typography variant='h4' style={{fontWeight: 600}}>{displayMeta.name}</Typography>
               </div>
               <div style={{fontSize: "1.2em" }}>
-              <ReactMarkdown source={displayMeta.description}  />
+              <Markdown source={displayMeta.description}  />
               </div>
               <Typography>
                 Published {displayMeta.datePublished ? ["in ", yearPublished] : []} by {listToWords(displayMeta.creator.map((creator, i) => (
