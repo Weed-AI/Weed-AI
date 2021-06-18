@@ -37,17 +37,16 @@ def store_tmp_image(image, image_dir):
 
 
 def store_tmp_image_from_zip(upload_image_zip, image_dir, full_images):
-    stored_images = []
     if not os.path.isdir(image_dir):
         mkdir_safely(image_dir)
+    existing_images = os.listdir(image_dir)
     with tempfile.TemporaryDirectory() as tempdir:
         ZipFile(upload_image_zip).extractall(tempdir)
         for dir, _, filenames in os.walk(tempdir):
             for filename in filenames:
-                if filename in full_images:
+                if filename in full_images and filename not in existing_images:
                     copy(os.path.join(dir, filename), os.path.join(image_dir, filename))
-                    stored_images.append(filename)
-    return list(set(full_images) - set(stored_images))
+    return list(set(full_images) - set(os.listdir(image_dir)))
 
 
 def store_tmp_weedcoco(weedcoco, upload_dir):
