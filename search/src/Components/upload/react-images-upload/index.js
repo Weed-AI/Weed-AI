@@ -3,7 +3,8 @@ import PropTypes from 'prop-types';
 import './index.css';
 import FlipMove from 'react-flip-move';
 import axios from 'axios';
-import Cookies from 'js-cookie'
+import Cookies from 'js-cookie';
+import https from 'https';
 
 
 const styles = {
@@ -20,6 +21,7 @@ const ERROR = {
 }
 
 const preview_maximum = 100;
+const httpsAgent = new https.Agent({ keepAlive: true });
 
 class ReactImageUploadComponent extends React.Component {
   constructor(props) {
@@ -109,11 +111,13 @@ class ReactImageUploadComponent extends React.Component {
       const body = new FormData()
       body.append('upload_image', newFileData.file)
       body.append('upload_id', this.props.upload_id)
+      const instance = axios.create({httpsAgent})
       axios({
           method: 'post',
           url: this.props.uploadURL,
           data: body,
-          headers: {'Content-Type': 'multipart/form-data', 'X-CSRFToken': Cookies.get('csrftoken') }
+          headers: {'Content-Type': 'multipart/form-data', 'X-CSRFToken': Cookies.get('csrftoken') },
+          httpAgent: httpsAgent
       }).then(res => {
           if(res.status === 200){
             const dataURLs = singleImage?[]:this.state.pictures.slice();
