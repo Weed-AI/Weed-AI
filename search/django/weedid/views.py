@@ -16,6 +16,7 @@ from weedid.utils import (
     store_tmp_weedcoco,
     setup_upload_dir,
     store_tmp_image,
+    store_tmp_image_from_zip,
     store_tmp_voc,
     store_tmp_voc_coco,
     move_voc_to_upload,
@@ -76,10 +77,10 @@ def upload(request):
         images = []
         file_weedcoco = request.FILES["weedcoco"]
         weedcoco_json = json.load(file_weedcoco)
-        validate(
-            weedcoco_json,
-            schema=request.POST["schema"] if request.POST["schema"] else "coco",
-        )
+        # validate(
+        #     weedcoco_json,
+        #     schema=request.POST["schema"] if request.POST["schema"] else "coco",
+        # )
         for image_reference in weedcoco_json["images"]:
             images.append(image_reference["file_name"].split("/")[-1])
         categories = [
@@ -214,6 +215,25 @@ def upload_image(request):
     upload_dir = os.path.join(UPLOAD_DIR, str(user.id), upload_id, "images")
     store_tmp_image(upload_image, upload_dir)
     return HttpResponse(f"Uploaded {upload_image.name} to {upload_dir}")
+
+
+def upload_image_zip(request):
+    if not request.method == "POST":
+        return HttpResponseNotAllowed(request.method)
+    user = request.user
+    if not (user and user.is_authenticated):
+        return HttpResponseForbidden("You dont have access to proceed")
+    upload_id = request.POST["upload_id"]
+    upload_image_zip = request.FILES["upload_image_zip"]
+    images = request.POST["images"].split(",")
+    upload_dir = os.path.join(UPLOAD_DIR, str(user.id), upload_id, "images")
+    try:
+        missing_images = store_tmp_image_from_zip(upload_image_zip, upload_dir, images)
+    except Exception as e:
+        return HttpResponseBadRequest(str(e))
+    return HttpResponse(
+        json.dumps({"upload_id": upload_id, "missing_images": missing_images})
+    )
 
 
 def update_categories(request):

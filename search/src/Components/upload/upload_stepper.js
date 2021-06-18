@@ -8,6 +8,7 @@ import Typography from '@material-ui/core/Typography';
 import UploaderSingle from './uploader_single';
 import UploaderVoc from './uploader_voc';
 import UploaderImages from './uploader_images';
+import UploaderZip from './uploader_zip';
 import CategoryMapper from './uploader_category_mapper';
 import ErrorMessage from '../error/display';
 import AgContextForm from '../forms/AgContextForm';
@@ -16,6 +17,9 @@ import MetadataForm from '../forms/MetadataForm';
 import axios from 'axios';
 import Cookies from 'js-cookie';
 import cloneDeep from 'lodash/cloneDeep';
+import MenuItem from '@material-ui/core/MenuItem';
+import FormControl from '@material-ui/core/FormControl';
+import Select from '@material-ui/core/Select';
 
 
 const baseURL = new URL(window.location.origin);
@@ -30,6 +34,9 @@ const useStyles = (theme) => ({
   instructions: {
     marginTop: theme.spacing(1),
     marginBottom: theme.spacing(1),
+  },
+  imageFormatSelection: {
+    margin: theme.spacing(1),
   },
 });
 
@@ -72,11 +79,13 @@ class UploadStepper extends React.Component {
             stepValid: stepsByType[this.props.upload_type].reduce((steps, step) => {return {...steps, [step.type]: false}}, {}),
             error_message: "",
             error_message_details: "",
+            upload_image_format: "image",
         }
         this.isStepOptional = this.isStepOptional.bind(this);
         this.isStepSkipped = this.isStepSkipped.bind(this);
         this.handleUploadId = this.handleUploadId.bind(this);
         this.handleImages = this.handleImages.bind(this);
+        this.handleUploadImageFormat = this.handleUploadImageFormat.bind(this);
         this.handleCategories = this.handleCategories.bind(this);
         this.handleUpdateCategories = this.handleUpdateCategories.bind(this);
         this.handleAgContextsFormData = this.handleAgContextsFormData.bind(this);
@@ -110,6 +119,10 @@ class UploadStepper extends React.Component {
     handleImages(images) {
         this.setState({images: images});
     }
+
+    handleUploadImageFormat(event){
+        this.setState({upload_image_format: event.target.value})
+    };
 
     handleCategories(categories) {
         this.setState({categories: cloneDeep(categories)});
@@ -305,7 +318,11 @@ class UploadStepper extends React.Component {
                     </React.Fragment>
                 )
             case "images":
-                return <UploaderImages upload_id={this.state.upload_id} images={this.state.images} handleValidation={this.handleValidation} handleErrorMessage={this.handleErrorMessage}/>
+                return this.state.upload_image_format === "image"
+                       ?
+                       <UploaderImages upload_id={this.state.upload_id} images={this.state.images} handleValidation={this.handleValidation} handleErrorMessage={this.handleErrorMessage}/>
+                       :
+                       <UploaderZip upload_id={this.state.upload_id} images={this.state.images} handleValidation={this.handleValidation} handleErrorMessage={this.handleErrorMessage}/>
             default:
                 return ''
         }
@@ -352,6 +369,22 @@ class UploadStepper extends React.Component {
                 <Typography className={classes.instructions}>
                     {this.getStepContent(stepName)}
                 </Typography>
+                {stepName === "images" ?
+                    <FormControl className={classes.imageFormatSelection}>
+                        <Select
+                        value={this.state.upload_image_format}
+                        displayEmpty
+                        onChange={this.handleUploadImageFormat}
+                        >
+                            <MenuItem value="" disabled>
+                                Select upload format
+                            </MenuItem>
+                            <MenuItem value="image">Upload Image Individually</MenuItem>
+                            <MenuItem value="zip">Upload Image Zip</MenuItem>
+                        </Select>
+                    </FormControl>
+                    : ""
+                }
                 <ErrorMessage error={this.state.error_message} details={this.state.error_message_details}/>
                 <div>
                     <Button disabled={this.state.activeStep === 0} onClick={this.handleBack} className={classes.button}>

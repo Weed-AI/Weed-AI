@@ -5,6 +5,9 @@ import re
 from uuid import uuid4
 import smtplib
 from email.message import EmailMessage
+import tempfile
+from zipfile import ZipFile
+from shutil import copy
 from weedcoco.repo.deposit import mkdir_safely
 from weedcoco.utils import set_info, set_licenses
 from weedcoco.stats import WeedCOCOStats
@@ -24,6 +27,20 @@ from core.settings import (
 def store_tmp_image(image, image_dir):
     fs = FileSystemStorage()
     fs.save(os.path.join(image_dir, image.name), image)
+
+
+def store_tmp_image_from_zip(upload_image_zip, image_dir, full_images):
+    stored_images = []
+    if not os.path.isdir(image_dir):
+        mkdir_safely(image_dir)
+    with tempfile.TemporaryDirectory() as tempdir:
+        ZipFile(upload_image_zip).extractall(tempdir)
+        for dir, _, filenames in os.walk(tempdir):
+            for filename in filenames:
+                if filename in full_images:
+                    copy(os.path.join(dir, filename), os.path.join(image_dir, filename))
+                    stored_images.append(filename)
+    return list(set(full_images) - set(stored_images))
 
 
 def store_tmp_weedcoco(weedcoco, upload_dir):
