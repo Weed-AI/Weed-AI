@@ -29,6 +29,7 @@ weedcoco/schema/*.json
 !weedcoco/tests/repo/**/*.png
 !search/cypress/fixtures/**/*.png
 !search/cypress/fixtures/**/*.jpg
+!search/cypress/fixtures/**/*.xml
 
 # Dev Tools
 .vscode/settings.json

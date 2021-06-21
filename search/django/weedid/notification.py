@@ -9,7 +9,7 @@ def upload_notification(upload_id):
     uploader = upload_entity.user
     email_body = f"""\
     User {uploader.username} <{uploader.email}> has uploaded a dataset {upload_entity.metadata['name']} to review.
-    {'You can check it from ' + SITE_BASE_URL + '/datasets/' + upload_id}.
+    {'Please review it now by accessing the dataset here: ' + SITE_BASE_URL + '/datasets/' + upload_id}.
     """
     staff_recipients = [
         staff.email for staff in WeedidUser.objects.filter(is_staff=True)
@@ -25,10 +25,13 @@ def review_notification(message, upload_id):
     upload_entity = Dataset.objects.get(upload_id=upload_id)
     uploader = upload_entity.user
     email_body = f"""\
-    Dear Weed-AI contributor,
+    Dear {uploader.username},
+    
+    Many thanks for contributing to a growing community and repository of weed image datasets.
 
-    Your dataset upload {upload_entity.metadata['name']} has been {message} after review
-    {'You can check it from ' + SITE_BASE_URL + '/datasets/' + upload_id if message == 'approved' else 'Feel free to contact our admin'}.
+    Your dataset upload {upload_entity.metadata['name']} has been {message} after review.
+        
+    {'Congratulations! You can now view the entire dataset online from ' + SITE_BASE_URL + '/datasets/' + upload_id if message == 'approved' else 'Unfortunately at this stage your dataset has not been approved. Please contact our admin.'}.
 
     Regards,
     Weed-AI Team

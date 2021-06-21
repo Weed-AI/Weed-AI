@@ -7,11 +7,10 @@ import FormControl from '@material-ui/core/FormControl';
 import Select from '@material-ui/core/Select';
 import axios from 'axios';
 import Button from '@material-ui/core/Button';
-import ReactMarkdown from "react-markdown";
 import content from './upload.md'
 import { Helmet } from "react-helmet";
 import { useArticleStyles } from '../../styles/common'
-
+import Markdown from "../../Common/Markdown";
 
 const useStyles = (theme) => ({
 	...useArticleStyles(theme),
@@ -150,7 +149,7 @@ class UploadComponent extends Component {
                 :
                 <AuthPrompt handleLogin={this.handleLogin} handleLogout={this.handleLogout}/> }
 
-                <ReactMarkdown source={this.state.markdownContent} />
+                <Markdown source={this.state.markdownContent} />
             </article>
         )
     }
