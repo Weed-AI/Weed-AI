@@ -99,11 +99,12 @@ const useCardStyles = makeStyles({
     margin: "4px",
     "&:hover": {
       "& $description": {
-        maxHeight: "12em",
+        maxHeight: "20em",
         textOverflow: "initial",
         overflow: "visible",
         whiteSpace: "normal",
-        transition: "max-height 0.25s ease-in",
+        position: "relative",
+        maxWidth: "20em"
       },
     },
   },
@@ -121,7 +122,6 @@ const useCardStyles = makeStyles({
     overflow: "hidden",
     whiteSpace: "nowrap",
     maxHeight: "1.5em",
-    transition: "max-height 0.15s ease-out",
   },
 });
 
@@ -156,8 +156,15 @@ const useFieldListStyles = makeStyles({
 const AgContextFieldList = (props) => {
     const classes = useFieldListStyles();
     const {title, agcontext, fields, MyAccordionSummary, ...accordionProps} = props;
+    const addUnit = (unit) => (val) => (typeof val == "number" ? val + unit : val)
     const formatters = {
       bbch_growth_range: (val) => (val["min"] !== undefined ? val["min"] + " to " + val["max"] : val),
+      location: (val) => ((val.lat < 0 ? val.lat : "+" + val.lat) + ',' + (val.lon < 0 ? val.lon : "+" + val.lon)),
+      camera_height: addUnit("mm"),
+      camera_lens_focallength: addUnit("mm"),
+      camera_angle: addUnit("°"),
+      surface_coverage: (val) => (val.includes("-") ? val + "%" : val),
+      cropped_to_plant: (val) => (val ? "cropped" : "uncropped"),
     }
     const format = (key, val) => (
       formatters.hasOwnProperty(key)
@@ -165,19 +172,33 @@ const AgContextFieldList = (props) => {
       : typeof val === "boolean" ? val.toString()
       : typeof val === "string" ? val.replace("_", " ") : val
     );
+    const localAgcontext = {...agcontext}
+    localAgcontext['location'] = {'lat': localAgcontext.location_lat, 'lon': localAgcontext.location_long};
+    const schemas = Object.fromEntries(
+      fields
+      .filter(key => localAgcontext[key])
+      .map(key =>
+        [key,
+          agcontextSchema.properties[key] ||
+          (key == 'location'? {description: "Approximate location of photography, in decimal degrees (WGS84)"} : {})]
+      )
+    );
+    const data = Object.keys(schemas).map(key => ({
+      key: key,
+      title: schemas[key].title || snakeToText(key),
+      value: format(key, localAgcontext[key]),
+      description: schemas[key].description,
+    }))
     return (
       <Accordion {...accordionProps}>
         <MyAccordionSummary>{title}</MyAccordionSummary>
         <AccordionDetails className={classes.details}>
-            {fields.map(key => {
-              if (!agcontext[key])
-                return [];
-              const schema = agcontextSchema.properties[key] || {};
-              const title = schema[key] || snakeToText(key);
+            {data.map(field => {
               return <AgFieldCard
-                title={title}
-                value={format(key, agcontext[key])}
-                description={schema.description}
+                key={field.key}
+                title={field.title}
+                value={field.value}
+                description={field.description}
               />
             })}
         </AccordionDetails>
@@ -245,7 +266,7 @@ const AgContextDetails = (props) => {
             </TableContainer>
           </AccordionDetails>
         </Accordion>
-        <AgContextFieldList MyAccordionSummary={MyAccordionSummary} agcontext={agcontext} title="The Crop" fields={["crop_type", "bbch_growth_range", "soil_colour", "surface_cover", "surface_coverage", "location_lat", "location_long"]} />
+        <AgContextFieldList MyAccordionSummary={MyAccordionSummary} agcontext={agcontext} title="The Crop" fields={["crop_type", "bbch_growth_range", "soil_colour", "surface_cover", "surface_coverage", "location"]} />
         <AgContextFieldList MyAccordionSummary={MyAccordionSummary} agcontext={agcontext} title="The Photography" fields={["camera_make", "camera_lens", "camera_lens_focallength", "camera_height", "camera_angle", "camera_fov", "ground_speed", "lighting", "photography_description"]} />
         <AgContextFieldList MyAccordionSummary={MyAccordionSummary} agcontext={agcontext} title="Other Details" fields={["cropped_to_plant", "emr_channels", "weather_description"]} />
       </article>
