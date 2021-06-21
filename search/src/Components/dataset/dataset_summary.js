@@ -97,7 +97,7 @@ const useCardStyles = makeStyles({
   root: {
     minWidth: 175,
     margin: "4px",
-    "&:hover": {
+    "&:hover, &:active": {
       "& $description": {
         maxHeight: "20em",
         textOverflow: "initial",
@@ -118,6 +118,7 @@ const useCardStyles = makeStyles({
   },
   description: {
     maxWidth: 175,
+    fontSize: ".8em",
     textOverflow: "ellipsis",
     overflow: "hidden",
     whiteSpace: "nowrap",
