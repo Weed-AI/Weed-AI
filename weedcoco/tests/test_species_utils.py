@@ -14,6 +14,13 @@ def eppo():
     return get_eppo_singleton(path=CACHE_DIR / "eppo_full_cache.zip", cache=True)
 
 
+def test_eppo_bad_cache(tmpdir):
+    cache_path = tmpdir / "eppo_cache.zip"
+    cache_path.open().write("this is not a zip")
+    return get_eppo_singleton(path=cache_path, cache=True)
+    
+
+
 @pytest.mark.parametrize(
     "name,species_only,code",
     [
