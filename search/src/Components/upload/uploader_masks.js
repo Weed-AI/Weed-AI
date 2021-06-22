@@ -39,9 +39,9 @@ const UploaderMasks = props => {
             {...props}
             withPreview={true}
             onChange={onDrop}
-            imgExtension={[".jpg", ".gif", ".png", ".jpeg", ".tif", ".tiff"]}
+            imgExtension={[".gif", ".png"]}
             maxFileSize={10485760}
-            label={"Max file size: 10 MB | File types accepted: .jpg, .gif, .png, .jpeg, .tif, .tiff"}
+            label={"Max file size: 10 MB | File types accepted: .gif, .png"}
             uploadURL={baseURL + 'api/upload_mask/'}
             removeURL={baseURL + 'api/remove_mask/'}
         />
