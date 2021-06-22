@@ -57,7 +57,7 @@ def thumbnailing(
                 coco_by_filename[filename],
                 f"{dirpath}/{filename}",
                 thumbnails_dir,
-                thumbnail_size=thumbnail_sizes,
+                thumbnail_sizes=thumbnail_sizes,
             )
 
 
