@@ -22,7 +22,7 @@ class DatasetAdmin(admin.ModelAdmin):
     actions = [reindex]
 
     def name(self, instance):
-        return instance.metadata["name"]
+        return (instance.metadata or {}).get("name", "<Untitled>")
 
 
 admin.site.register(WeedidUser)
