@@ -37,6 +37,7 @@ const UploaderMasks = props => {
       <React.Fragment>
           <ReactImageUploadComponent
             {...props}
+            idName={"mask_id"}
             withPreview={true}
             onChange={onDrop}
             imgExtension={[".gif", ".png"]}

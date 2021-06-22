@@ -119,7 +119,7 @@ class ReactImageUploadComponent extends React.Component {
     else {
         const body = new FormData()
         body.append('upload_image', newFileData.file)
-        body.append('upload_id', this.props.upload_id)
+        body.append(this.props.idName ? this.props.idName : "upload_id", this.props.upload_id)
         axios({
             method: 'post',
             url: this.props.uploadURL,
@@ -176,7 +176,7 @@ class ReactImageUploadComponent extends React.Component {
     if (this.props.removeURL) {
       const body = new FormData()
       body.append('image_name', removeImageName)
-      body.append('upload_id', this.props.upload_id)
+      body.append(this.props.idName ? this.props.idName : "upload_id", this.props.upload_id)
       axios({
           method: 'post',
           url: this.props.removeURL,
