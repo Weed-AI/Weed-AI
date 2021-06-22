@@ -38,7 +38,7 @@ const useStyles = makeStyles(theme => (console.log(theme) || {
 }));
 
 
-const BBox = ({ classes, item, annot }) => {
+const BBox = ({ classes, item, annot, nCategories }) => {
   const containerHeight = 220;
   const containerWidth = 250; // XXX: can we compute this? it can be less...
   const aspectRatio = item.width / item.height;
@@ -54,15 +54,15 @@ const BBox = ({ classes, item, annot }) => {
     width: thumbScale * annot.bbox[2],
     height: thumbScale * annot.bbox[3],
   }} >
-    { species ? <span className={classes.bboxLabel} style={{
-      background: color + "40",  // transparent
+    { (species && nCategories > 1) ? <span className={classes.bboxLabel} style={{
+      background: "#00000030",  // alpha
       maxWidth: Math.max(60, thumbScale * annot.bbox[2]),
     }}>{species}</span> : [] }
   </div>
 }
 
 const WeedAIResultCard = (props) => {
-  const [ loadZoom, setLoadZoom ] = React.useState(false);
+  const [ loadZoom, setLoadZoom ] = React.useState(false); // used to avoid pre-loading too many images
   const {item, baseURL, linkToDataset} = props;
   const classes = useStyles();
   const formatCropType = (typ) => {
@@ -76,20 +76,21 @@ const WeedAIResultCard = (props) => {
   const formatTaskType = (taskTypes) => (
     taskTypes.includes("segmentation") ? "segment" : (taskTypes.includes("bounding box") ? "bounding box" : "labels"));
   const pluralise = (text, n) => n === 1 ? text : (text.match(/[zsx]$/) ? text + "es" : text + "s");
+  const categoryNames = new Set(item.annotation__category__name);
   return (
     <ResultCard style={{position: "relative"}} onMouseEnter={() => { setLoadZoom(true) }}>
         <MagnifierContainer className={classes.imageContainer}>
           <MagnifierPreview imageSrc={item.thumbnail} className={classes.image} />
           {item.annotations.filter(annot => annot.bbox).map(annot =>
-            <BBox classes={classes} item={item} annot={annot} />
+            <BBox classes={classes} item={item} annot={annot} nCategories={categoryNames.size} />
           )}
-          {loadZoom ? <MagnifierZoom style={{ height: "120px", zIndex: 5 }} imageSrc={item.thumbnail_large} /> : [] }
+          {loadZoom ? <MagnifierZoom style={{ height: "125px", zIndex: 5 }} imageSrc={item.thumbnail_large} /> : [] }
         </MagnifierContainer>
         <ResultCard.Description style={{position: "absolute", bottom: "12px"}}>
             <ul className="annotations">
             {
                 // TODO: make this more idiomatically React
-                Array.from(new Set(item.annotation__category__name)).map((annotName) => {
+                Array.from(categoryNames).map((annotName) => {
                     const annot = annotName.match(/^([^:]*): (.*)/)
                     return annot.length > 0 ? (<Tooltip title={annotName}><li className={annot[1]}>{annot[2]}</li></Tooltip>) : ""
                 })
