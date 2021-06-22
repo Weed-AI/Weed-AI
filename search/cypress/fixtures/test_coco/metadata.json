@@ -1,0 +1,16 @@
+{
+    "description": "Crop photography with weeds annotated.",
+    "license": "https://creativecommons.org/licenses/by/4.0/",
+    "@type": "Dataset",
+    "name": "test name",
+    "datePublished": "2021-05-25",
+    "creator": [
+      {
+        "@type": "Organization",
+        "affiliation": {
+          "@type": "Organization"
+        },
+        "name": "name"
+      }
+    ]
+}

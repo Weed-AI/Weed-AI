@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import { withStyles } from '@material-ui/core/styles';
-import ReactMarkdown from "react-markdown";
+import Markdown from "../../Common/Markdown";
 import content from './privacy.md'
 import { useArticleStyles } from '../../styles/common'
 
@@ -19,7 +19,7 @@ class PrivacyComponent extends Component {
   render() {
     return (
       <article className={this.props.classes.page}>
-        <ReactMarkdown source={this.state.markdownContent} />
+        <Markdown source={this.state.markdownContent} />
       </article>
     );
   }

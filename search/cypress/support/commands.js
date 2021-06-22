@@ -27,7 +27,7 @@ import 'cypress-file-upload';
 import '@testing-library/cypress/add-commands';
 
 Cypress.Commands.add('register', (username, email, password) => {
-    cy.findAllByText(/^Sign up$/).should('have.length', 1).click()
+    cy.clickText(/^Sign up$/)
     cy.get('#username')
     .type(username)
     .should('have.value', username)
@@ -41,7 +41,7 @@ Cypress.Commands.add('register', (username, email, password) => {
 })
 
 Cypress.Commands.add('login', (username, password) => {
-    cy.findAllByText(/^Sign In$/).should('have.length', 1).click()
+    cy.clickText(/^Sign In$/)
     cy.get('#username')
     .type(username)
     .should('have.value', username)
@@ -49,4 +49,8 @@ Cypress.Commands.add('login', (username, password) => {
     .type(password)
     .should('have.value', password)
     cy.findAllByRole('button', /^Sign In$/).should('have.length', 1).click()
+})
+
+Cypress.Commands.add('clickText', text => {
+    cy.findAllByText(text).should('have.length', 1).click()
 })

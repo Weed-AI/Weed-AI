@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import { Helmet } from "react-helmet";
 import { withStyles } from '@material-ui/core/styles';
-import ReactMarkdown from "react-markdown";
+import Markdown from "../../Common/Markdown";
 import content from './about.md'
 import { useArticleStyles } from '../../styles/common'
 
@@ -29,7 +29,7 @@ class AboutComponent extends Component {
             />
         </Helmet>
         <img src="/weedai-logo-small.png" title="Weed-AI" alt="Weed-AI logo" style={{float: "right", marginBottom: "1rem", marginLeft: "1rem"}} />
-        <ReactMarkdown source={this.state.markdownContent} />
+        <Markdown source={this.state.markdownContent} />
       </article>
     );
   }
