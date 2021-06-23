@@ -117,7 +117,9 @@ class CustomUploader:
                 return HttpResponseBadRequest("Bad id")
             payload = request.FILES[cls.payload_name]
             if payload.size > cls.max_file_size:
-                return HttpResponseBadRequest("This file has exceeded the size limit!")
+                return HttpResponseBadRequest(
+                    f"This file has exceeded the size limit {cls.max_file_size} Byte!"
+                )
             store_dir = os.path.join(UPLOAD_DIR, str(user.id), store_id)
             cls.store_tmp(payload, store_dir)
         except Exception as e:
@@ -180,7 +182,7 @@ class CustomUploader:
         try:
             store_id = request.POST[cls.id_name]
             if "/" in store_id:
-                return HttpResponseBadRequest("Bad voc id")
+                return HttpResponseBadRequest("Bad id")
             images = []
             coco_json = cls.convert_to_coco(
                 Path(os.path.join(UPLOAD_DIR, str(user.id), store_id)), request
