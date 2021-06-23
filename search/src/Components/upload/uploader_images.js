@@ -26,6 +26,7 @@ const UploaderImages = props => {
   return (
         <ReactImageUploadComponent
             {...props}
+            idName={"upload_id"}
             withPreview={true}
             onChange={onDrop}
             imgExtension={[".jpg", ".gif", ".png", ".jpeg", ".tif", ".tiff"]}

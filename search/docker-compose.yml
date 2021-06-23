@@ -6,7 +6,6 @@ services:
     container_name: reverse_proxy
     depends_on:
         - django
-        - reactivesearch
     build:
         context: ./nginx/nginx
     ports:
@@ -22,6 +21,7 @@ services:
     image: django
     container_name: django
     depends_on:
+      - mystatic
       - elasticsearch
       - db
       - redis
@@ -46,7 +46,8 @@ services:
       - repository_dir:/code/repository
       - upload_dir:/code/upload
       - download_dir:/code/download
-    command: python manage.py runserver 0.0.0.0:8000
+      - mystatic_dir:/code/mystatic
+    command: bash -c "python manage.py makemigrations && python manage.py migrate && python manage.py collectstatic <<<yes && gunicorn core.wsgi -b 0.0.0.0:8000"
     entrypoint: /entrypoint.sh
     ports:
       - "8000:8000"
@@ -195,6 +196,22 @@ services:
     logging:
       driver: "json-file"
 
+  mystatic:
+    image: mystatic
+    container_name: mystatic
+    build:
+      context: ./nginx/mystatic
+    volumes:
+      - mystatic_dir:/mystatic
+    ports:
+      - "8083:80"
+    networks:
+      - elastic
+    stdin_open: true
+    restart: always
+    logging:
+      driver: "json-file"
+
   fluentd:
     container_name: fluentd
     user: root
@@ -222,4 +239,6 @@ volumes:
   download_dir:
     driver: local
   upload_dir:
+    driver: local
+  mystatic_dir:
     driver: local

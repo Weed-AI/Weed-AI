@@ -108,32 +108,26 @@ class ReactImageUploadComponent extends React.Component {
      Customised function modified on original codebase
      Copyright (c) 2020 Zheng Li
    */
-  uploadFileToServer(newFileData) {
-      const {singleImage} = this.props;
-      const body = new FormData()
-      body.append('upload_image', newFileData.file)
-      body.append('upload_id', this.props.upload_id)
-      const instance = axios.create({
-          httpAgent,
-          httpsAgent,
-      })
-      axios({
-          method: 'post',
-          url: this.props.uploadURL,
-          data: body,
-          headers: {'Content-Type': 'multipart/form-data', 'X-CSRFToken': Cookies.get('csrftoken') },
-          httpAgent: httpAgent,
-          httpsAgent: httpsAgent
-      }).then(res => {
-          if(res.status === 200){
-            const dataURLs = singleImage?[]:this.state.pictures.slice();
-            const files = singleImage?[]:this.state.files.slice();
-            const filesName = files.map(file => file.name);
-            if (!filesName.includes(newFileData.file.name)){
+  uploadFileToServer(dataURLs, files, newFileData) {
+    const filesName = files.map(file => file.name);
+    if (this.props.images && !this.props.images.includes(newFileData.file.name) || filesName.includes(newFileData.file.name)){
+        return
+    }
+    else {
+        const body = new FormData()
+        body.append('upload_image', newFileData.file)
+        body.append(this.props.idName ? this.props.idName : "upload_id", this.props.upload_id)
+        axios({
+            method: 'post',
+            url: this.props.uploadURL,
+            data: body,
+            headers: {'Content-Type': 'multipart/form-data', 'X-CSRFToken': Cookies.get('csrftoken') }
+        }).then(res => {
+            if(res.status === 200){
                 dataURLs.push(newFileData.dataURL);
                 files.push(newFileData.file);
                 this.setState({pictures: dataURLs, files: files});
-                this.props.handleUploaded(files.map(file => file.name));
+                if (this.props.handleUploaded) this.props.handleUploaded(files.map(file => file.name));
             }
           }
       })
@@ -169,13 +163,27 @@ class ReactImageUploadComponent extends React.Component {
    */
   removeImage(picture) {
     const removeIndex = this.state.pictures.findIndex(e => e === picture);
+    const removeImageName = this.state.files[removeIndex].name;
     const filteredPictures = this.state.pictures.filter((e, index) => index !== removeIndex);
     const filteredFiles = this.state.files.filter((e, index) => index !== removeIndex);
 
     this.setState({pictures: filteredPictures, files: filteredFiles}, () => {
       this.props.onChange(this.state.files, this.state.pictures);
     });
-    this.props.handleUploaded(filteredFiles.map(file => file.name));
+    if (this.props.handleUploaded) this.props.handleUploaded(filteredFiles.map(file => file.name));
+    if (this.props.removeURL) {
+      const body = new FormData()
+      body.append('image_name', removeImageName)
+      body.append(this.props.idName ? this.props.idName : "upload_id", this.props.upload_id)
+      axios({
+          method: 'post',
+          url: this.props.removeURL,
+          data: body,
+          headers: {'Content-Type': 'multipart/form-data', 'X-CSRFToken': Cookies.get('csrftoken')}
+      }).then(() => {
+          this.props.handleErrorMessage("")
+      })
+    }
   }
 
   /*
