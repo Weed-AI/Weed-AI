@@ -158,7 +158,7 @@ def redeposit_dataset(
     if os.path.exists(upload_id_dir):
         rmtree(upload_id_dir)
     move(str(dataset_dir), str(upload_user_dir))
-    move(str(download_dir / f"{upload_id}.zip"), str(upload_user_dir))
+    move(str(download_dir / f"{upload_id}.zip"), str(upload_id_dir))
     images_dir = upload_id_dir / "images"
     weedcoco_path = upload_id_dir / "weedcoco.json"
     submit_upload_task.delay(
