@@ -8,7 +8,7 @@ from shutil import copy, move
 from zipfile import ZipFile
 from PIL import Image
 from weedcoco.utils import get_image_average_hash, check_if_approved_image_extension
-from weedcoco.validation import ValidationError
+from weedcoco.validation import ValidationError, validate
 
 
 def validate_duplicate_images(image_hash):
@@ -104,7 +104,7 @@ def deposit_weedcoco(weedcoco_path, dataset_dir, image_dir, image_hash):
         if file_name in image_hash:
             image_reference["file_name"] = "images/" + image_hash[file_name]
 
-    # validate(weedcoco, image_dir)
+    validate(weedcoco, image_dir)
     new_dataset_dir = dataset_dir / "weedcoco.json"
     with (new_dataset_dir).open("w") as out:
         json.dump(weedcoco, out, indent=4)
