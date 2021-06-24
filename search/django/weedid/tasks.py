@@ -132,4 +132,6 @@ def redeposit_dataset(
     dataset_dir = Path(repository_dir) / upload_id
     images_dir = dataset_dir / "images"
     weedcoco_path = dataset_dir / "weedcoco.json"
-    submit_upload_task.delay(weedcoco_path, images_dir, upload_id, new_upload=False)
+    submit_upload_task.delay(
+        str(weedcoco_path), str(images_dir), upload_id, new_upload=False
+    )

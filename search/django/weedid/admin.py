@@ -3,7 +3,7 @@
 # Register your models here.
 from django.contrib import admin
 from .models import WeedidUser, Dataset
-from .tasks import reindex_dataset
+from .tasks import reindex_dataset, redeposit_dataset
 
 
 def reindex(modeladmin, request, datasets):
@@ -13,7 +13,7 @@ def reindex(modeladmin, request, datasets):
 
 def redeposit(modeladmin, request, datasets):
     for dataset in datasets:
-        reindex_dataset.delay(dataset.upload_id)
+        redeposit_dataset.delay(dataset.upload_id)
 
 
 reindex.short_description = "Re-index selected datasets"
