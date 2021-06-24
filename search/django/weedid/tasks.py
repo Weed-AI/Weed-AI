@@ -8,8 +8,10 @@ from weedcoco.index.thumbnailing import thumbnailing
 from weedid.models import Dataset
 from weedid.utils import make_upload_entity_fields
 from weedid.notification import upload_notification
-from core.settings import THUMBNAILS_DIR, REPOSITORY_DIR, DOWNLOAD_DIR
+from core.settings import THUMBNAILS_DIR, REPOSITORY_DIR, DOWNLOAD_DIR, UPLOAD_DIR
 from pathlib import Path
+import os
+from shutil import move, rmtree
 
 
 @shared_task
@@ -18,13 +20,19 @@ def submit_upload_task(weedcoco_path, image_dir, upload_id, new_upload=True):
     if new_upload:
         upload_entity.status = "P"
         upload_entity.status_details = ""
-
-    # Update fields in database
-    # XXX: maybe this should be delayed
-    with open(weedcoco_path) as f:
-        weedcoco = json.load(f)
-    for k, v in make_upload_entity_fields(weedcoco).items():
-        setattr(upload_entity, k, v)
+        # Update fields in database
+        # XXX: maybe this should be delayed
+        with open(weedcoco_path) as f:
+            weedcoco = json.load(f)
+        for k, v in make_upload_entity_fields(weedcoco).items():
+            setattr(upload_entity, k, v)
+    else:
+        with open(weedcoco_path) as f:
+            weedcoco = json.load(f)
+        weedcoco["metadata"] = upload_entity.metadata
+        weedcoco["agcontexts"] = upload_entity.agcontext
+        with open(weedcoco_path, "w") as f:
+            json.dump(weedcoco, f)
 
     upload_entity.save()
     try:
@@ -37,6 +45,19 @@ def submit_upload_task(weedcoco_path, image_dir, upload_id, new_upload=True):
         )
     except Exception as e:
         if not new_upload:
+            move(
+                str(
+                    Path(UPLOAD_DIR)
+                    / upload_entity.user_id
+                    / upload_id
+                    / f"{upload_id}.zip"
+                ),
+                DOWNLOAD_DIR,
+            )
+            move(
+                Path(UPLOAD_DIR) / upload_entity.user_id / upload_id,
+                Path(REPOSITORY_DIR) / upload_id,
+            )
             raise
         traceback.print_exc()
         upload_entity.status = "F"
@@ -127,11 +148,19 @@ def redeposit_dataset(
     upload_id,
     repository_dir=REPOSITORY_DIR,
     download_dir=DOWNLOAD_DIR,
+    upload_dir=UPLOAD_DIR,
 ):
+    upload_entity = Dataset.objects.get(upload_id=upload_id)
     download_dir = Path(download_dir)
     dataset_dir = Path(repository_dir) / upload_id
-    images_dir = dataset_dir / "images"
-    weedcoco_path = dataset_dir / "weedcoco.json"
+    upload_user_dir = Path(upload_dir) / str(upload_entity.user_id)
+    upload_id_dir = upload_user_dir / upload_id
+    if os.path.exists(upload_id_dir):
+        rmtree(upload_id_dir)
+    move(str(dataset_dir), str(upload_user_dir))
+    move(str(download_dir / f"{upload_id}.zip"), str(upload_user_dir))
+    images_dir = upload_id_dir / "images"
+    weedcoco_path = upload_id_dir / "weedcoco.json"
     submit_upload_task.delay(
         str(weedcoco_path), str(images_dir), upload_id, new_upload=False
     )
