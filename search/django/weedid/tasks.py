@@ -29,7 +29,7 @@ def submit_upload_task(weedcoco_path, image_dir, upload_id, new_upload=True):
     else:
         with open(weedcoco_path) as f:
             weedcoco = json.load(f)
-        weedcoco["metadata"] = upload_entity.metadata
+        weedcoco["info"]["metadata"] = upload_entity.metadata
         weedcoco["agcontexts"] = upload_entity.agcontext
         with open(weedcoco_path, "w") as f:
             json.dump(weedcoco, f)
