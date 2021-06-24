@@ -48,15 +48,15 @@ def submit_upload_task(weedcoco_path, image_dir, upload_id, new_upload=True):
             move(
                 str(
                     Path(UPLOAD_DIR)
-                    / upload_entity.user_id
+                    / str(upload_entity.user_id)
                     / upload_id
                     / f"{upload_id}.zip"
                 ),
                 DOWNLOAD_DIR,
             )
             move(
-                Path(UPLOAD_DIR) / upload_entity.user_id / upload_id,
-                Path(REPOSITORY_DIR) / upload_id,
+                str(Path(UPLOAD_DIR) / str(upload_entity.user_id) / upload_id),
+                str(Path(REPOSITORY_DIR) / upload_id),
             )
             raise
         traceback.print_exc()
