@@ -26,7 +26,6 @@ services:
     image: django
     container_name: django
     depends_on:
-      - mystatic
       - elasticsearch
       - db
       - redis
