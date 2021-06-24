@@ -13,10 +13,11 @@ from pathlib import Path
 
 
 @shared_task
-def submit_upload_task(weedcoco_path, image_dir, upload_id):
+def submit_upload_task(weedcoco_path, image_dir, upload_id, new_upload=True):
     upload_entity = Dataset.objects.get(upload_id=upload_id)
-    upload_entity.status = "P"
-    upload_entity.status_details = ""
+    if new_upload:
+        upload_entity.status = "P"
+        upload_entity.status_details = ""
 
     # Update fields in database
     # XXX: maybe this should be delayed
@@ -35,12 +36,16 @@ def submit_upload_task(weedcoco_path, image_dir, upload_id):
             upload_id,
         )
     except Exception as e:
+        if not new_upload:
+            raise
         traceback.print_exc()
         upload_entity.status = "F"
         upload_entity.status_details = str(e)
         upload_entity.save()
         # TODO: raise alert
     else:
+        if not new_upload:
+            return
         upload_notification(upload_id)
         upload_entity.status = "AR"
         upload_entity.status_details = "It is currently under review."
@@ -115,3 +120,16 @@ def reindex_dataset(
         repository_dir=str(repository_dir),
         new_upload=False,
     )
+
+
+@shared_task
+def redeposit_dataset(
+    upload_id,
+    repository_dir=REPOSITORY_DIR,
+    download_dir=DOWNLOAD_DIR,
+):
+    download_dir = Path(download_dir)
+    dataset_dir = Path(repository_dir) / upload_id
+    images_dir = dataset_dir / "images"
+    weedcoco_path = dataset_dir / "weedcoco.json"
+    submit_upload_task.delay(weedcoco_path, images_dir, upload_id, new_upload=False)
