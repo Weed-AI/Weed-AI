@@ -29,6 +29,12 @@ const useStyles = (theme) => ({
     },
     applyButton: {
         float: 'right'
+    },
+    color: {
+        height: '1.2em',
+        width: '1.2em',
+        borderRadius: '50%',
+        margin: '1em'
     }
 });
 
@@ -74,7 +80,8 @@ class CategoryMapper extends React.Component {
                         this.state.categories.map((category, index) => {
                             return (
                                 <li className={category.role && category.name ? classes.row : `${classes.row} ${classes.incomplete}`}>
-                                    <p className={classes.text_field}>{category.name} is a</p>
+                                    {/^[0-9A-Fa-f]{6}$/i.test(category.name) ? <div className={classes.color} style={{backgroundColor: '#' + category.name}}></div> : <p>{category.name}</p>}
+                                    <p className={classes.text_field}> is a</p>
                                     <FormControl className={classes.formControl}>
                                         <InputLabel id="category">Role</InputLabel>
                                         <Select

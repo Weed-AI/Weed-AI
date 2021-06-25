@@ -7,11 +7,10 @@ import FormControl from '@material-ui/core/FormControl';
 import Select from '@material-ui/core/Select';
 import axios from 'axios';
 import Button from '@material-ui/core/Button';
-import ReactMarkdown from "react-markdown";
 import content from './upload.md'
 import { Helmet } from "react-helmet";
 import { useArticleStyles } from '../../styles/common'
-
+import Markdown from "../../Common/Markdown";
 
 const useStyles = (theme) => ({
 	...useArticleStyles(theme),
@@ -141,7 +140,7 @@ class UploadComponent extends Component {
                             <MenuItem value="weedcoco">WeedCOCO</MenuItem>
                             <MenuItem value="coco">COCO</MenuItem>
                             <MenuItem value="voc">VOC</MenuItem>
-                            <MenuItem value="masks" disabled>Segmentation masks (not implemented)</MenuItem>
+                            <MenuItem value="masks">Segmentation masks</MenuItem>
                         </Select>
                     </FormControl>
                     <UploadDialog handleUploadStatus={this.retrieveUploadStatus} upload_type={this.state.upload_type}/>
@@ -150,7 +149,7 @@ class UploadComponent extends Component {
                 :
                 <AuthPrompt handleLogin={this.handleLogin} handleLogout={this.handleLogout}/> }
 
-                <ReactMarkdown source={this.state.markdownContent} />
+                <Markdown source={this.state.markdownContent} />
             </article>
         )
     }

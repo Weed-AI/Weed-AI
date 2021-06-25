@@ -16,10 +16,11 @@ jobs:
         python-version: [3.7]
     steps:
       - uses: actions/checkout@v2
-      - uses: satackey/action-docker-layer-caching@v0.0.11
-        # Ignore the failure of a step and avoid terminating the job.
-        continue-on-error: true
+#      - uses: satackey/action-docker-layer-caching@v0.0.11
+#        continue-on-error: true
       - name: Bring system up
+        env:
+          MERGE_SHA: ${{ github.sha }}
         run: |
             set -x
             cd search
@@ -29,20 +30,23 @@ jobs:
             POSTGRES_USER=postgres
             POSTGRES_PASSWORD=postgres
             POSTGRES_DB=weedai
+            WEEDCOCO_VERSION=$MERGE_SHA
+            SEND_EMAIL=False
             HERE
+            cat .env
             # TODO The following could be a separate GitHub action
-            docker-compose up -d
+            docker-compose up -d --build
             sleep 1
             get_statuses() {
               docker-compose ps -q | xargs docker inspect --format '{{.State.Status}} {{if .State.Health}}{{.State.Health.Status}}{{end}} }}'
             }
             while get_statuses | grep -q starting; do sleep 1; done
             if get_statuses | grep -q -e exited -e restarting -e unhealthy; then false; fi
+            curl -L http://localhost/api/warmup/
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v2
         with:
           python-version: ${{ matrix.python-version }}
-      - uses: actions/checkout@v2
       - name: Install weedcoco library
         run: |
           pip install .
@@ -54,6 +58,16 @@ jobs:
         uses: cypress-io/github-action@v2
         with:
           working-directory: search
+      - uses: actions/upload-artifact@v2
+        if: failure()
+        with:
+          name: cypress-screenshots
+          path: search/cypress/screenshots
+      - uses: actions/upload-artifact@v2
+        if: always()
+        with:
+          name: cypress-videos
+          path: search/cypress/videos
       - name: Check logs upon failure
         run: |
             cd search

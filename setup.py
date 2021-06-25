@@ -19,6 +19,7 @@ requirements = [
     "imagehash",
     "requests",
     "elasticsearch",
+    "joblib",
 ]
 
 setup(
@@ -54,4 +55,5 @@ setup(
         "Programming Language :: Python :: Implementation :: CPython",
         "Topic :: Software Development",
     ],
+    zip_safe=False,  # since we use __file__
 )

@@ -22,7 +22,6 @@ export default <DatasetSummaryWrapper
         "datePublished": "2015-03-19",
         "identifier": ["doi:10.1007/978-3-319-16220-1_8"],
         "license": "https://github.com/cwfid/dataset",
-        "description": "Foobar",
         "citation": "Sebastian Haug, Jörn Ostermann: A Crop/Weed Field Image Dataset for the Evaluation of Computer Vision Based Precision Agriculture Tasks, CVPPP 2014 Workshop, ECCV 2014"
     }}
     agcontexts={[
