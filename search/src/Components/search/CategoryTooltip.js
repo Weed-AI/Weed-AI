@@ -4,6 +4,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import Link from '@material-ui/core/Link';
 import Tooltip from '@material-ui/core/Tooltip';
+import wssa_vernacular_names from '../../Data/wssa_vernacular_names.json';
 
 const useStyles = makeStyles((theme) => ({
   taxonomy: {
@@ -50,14 +51,16 @@ export const CategoryCard = (props) => {
       "rank": rank.toLowerCase()
     });
   }
+  // Workaround for anomalies in GBIF vernacular names: use WSSA names
+  const updatedVernacularName = wssa_vernacular_names[canonicalName.toLowerCase()] || vernacularName;
   return (
     <React.Fragment>
     <Typography variant="body1" className={classes.heading}>{categoryName}</Typography>
-    { vernacularName ? <Typography variant="body2" className={classes.vernacular}>{vernacularName}</Typography> : []}
+    { updatedVernacularName ? <Typography variant="body2" className={classes.vernacular}>{updatedVernacularName}</Typography> : []}
     { canonicalName ?
       <ul className={classes.taxonomy}>
          {hierarchy.map(entry =>
-           <li key="entry.rank">
+           <li key={entry.rank}>
              <Link target="_blank" rel="noopener" href={"https://www.gbif.org/species/" + entry.key} variant="caption" display="inline" className={classes.scientificName}>{entry.name}</Link>
              <Typography className={classes.rank} variant="caption" display="inline"> {entry.rank}</Typography>
            </li>

@@ -35,7 +35,7 @@ const WeedAIResultCard = (props) => {
             {
                 // TODO: make this more idiomatically React
                 Array.from(new Set(item.annotation__category__name)).map(
-                  (annotName) => <AnnotationCategory categoryName={annotName} />)
+                  (annotName) => <AnnotationCategory categoryName={annotName} key={annotName} />)
             }
             </ul>
             {
@@ -48,7 +48,7 @@ const WeedAIResultCard = (props) => {
                 : "") +
               "."
             }
-            {linkToDataset === false ? [] : <div><Tooltip title={item.dataset_name}><a title={item.dataset_name} href={`${baseURL}datasets/${item.upload_id}`}>See Dataset</a></Tooltip></div>}
+            {linkToDataset === false ? [] : <div><Tooltip title={item.dataset_name}><a href={`${baseURL}datasets/${item.upload_id}`}>See Dataset</a></Tooltip></div>}
         </ResultCard.Description>
     </ResultCard>
   );
