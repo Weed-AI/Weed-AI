@@ -91,8 +91,18 @@ services:
     container_name: celery-beat
     command: celery -A core beat -l INFO
     environment:
+      - DJANGO_SECRET_KEY=${DJANGO_SECRET_KEY}
       - CELERY_BROKER=redis://redis:6379/0
       - CELERY_BACKEND=redis://redis:6379/0
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
+      - ENV=PROD
+      - GIT_REMOTE_PATH=/mnt/git_remote
+      - DVC_REMOTE_PATH=/mnt/dvc_remote
+    volumes:
+      - ${GIT_REMOTE_PATH}:/mnt/git_remote
+      - ${DVC_REMOTE_PATH}:/mnt/dvc_remote
     depends_on:
       - redis
     networks:
