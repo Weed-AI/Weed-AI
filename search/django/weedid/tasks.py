@@ -16,6 +16,16 @@ from shutil import move, rmtree
 
 @shared_task
 def submit_upload_task(weedcoco_path, image_dir, upload_id, new_upload=True):
+    """Submit deposit task from upload
+
+    Parameters
+    ----------
+    weedcoco_path : str
+    image_dir : str
+    upload_id : str
+    new_upload : bool, default=True
+        If it's not a new upload and fails the deposit, updated metadata and agcontexts need to be applied to weedcoco.json and previous deposited dataset and zip file should be copied back when exception raised during deposit.
+    """
     upload_entity = Dataset.objects.get(upload_id=upload_id)
     if new_upload:
         upload_entity.status = "P"
@@ -82,6 +92,18 @@ def update_index_and_thumbnails(
     repository_dir=REPOSITORY_DIR,
     new_upload=True,
 ):
+    """Submit deposit task from upload
+
+    Parameters
+    ----------
+    weedcoco_path : str
+    upload_id : str
+    process_thumbnails: bool, default=True
+    thumbnails_dir: str, default=THUMBNAILS_DIR
+    repository_dir: str, default=REPOSITORY_DIR
+    new_upload : bool, default=True
+        If it's not a new upload, upload status and status details don't need to be updated.
+    """
     upload_entity = Dataset.objects.get(upload_id=upload_id)
     try:
         if process_thumbnails:
