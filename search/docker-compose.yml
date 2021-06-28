@@ -86,6 +86,20 @@ services:
     logging:
       driver: "json-file"
 
+  celery-beat:
+    image: django
+    container_name: celery-beat
+    command: celery -A core beat -l INFO
+    environment:
+      - CELERY_BROKER=redis://redis:6379/0
+      - CELERY_BACKEND=redis://redis:6379/0
+    depends_on:
+      - redis
+    networks:
+      - elastic
+    logging:
+      driver: "json-file"
+
   redis:
     image: redis:alpine
     networks:
