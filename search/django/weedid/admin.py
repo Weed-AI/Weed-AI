@@ -6,24 +6,20 @@ from .models import WeedidUser, Dataset
 from .tasks import reindex_dataset, redeposit_dataset
 
 
-@admin.action(
-    description="Reindex this content in Elastic Search and regenerate thumbnails"
-)
 def reindex(modeladmin, request, datasets):
     for dataset in datasets:
         reindex_dataset.delay(dataset.upload_id)
 
 
-@admin.action(
-    description="Recreate repository and download entry using metadata and agcontexts from database, as well as updated algorithms"
-)
 def redeposit(modeladmin, request, datasets):
     for dataset in datasets:
         redeposit_dataset.delay(dataset.upload_id)
 
 
-reindex.short_description = "Re-index selected datasets"
-redeposit.short_description = "Re-deposit selected datasets"
+reindex.short_description = (
+    "Reindex this content in Elastic Search and regenerate thumbnails"
+)
+redeposit.short_description = "Recreate repository and download entry using metadata and agcontexts from database, as well as updated algorithms"
 
 
 class DatasetAdmin(admin.ModelAdmin):
