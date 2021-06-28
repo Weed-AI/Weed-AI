@@ -139,9 +139,9 @@ USE_TZ = True
 STATIC_ROOT = os.path.join(BASE_DIR, "mystatic")
 STATIC_URL = "/mystatic/"
 
-CELERY_broker_url = os.environ.get("CELERY_BROKER", "redis://redis:6379/0")
-CELERY_result_backend = "django-db"
-CELERY_cache_backend = "django-cache"
+CELERY_BROKER_URL = os.environ.get("CELERY_BROKER", "redis://redis:6379/0")
+CELERY_RESULT_BACKEND = "django-db"
+CELERY_CACHE_BACKEND = "django-cache"
 
 GIT_REMOTE_PATH = os.environ.get("GIT_REMOTE_PATH")
 DVC_REMOTE_PATH = os.environ.get("GIT_REMOTE_PATH")
@@ -150,7 +150,8 @@ if GIT_REMOTE_PATH and DVC_REMOTE_PATH:
     CELERY_beat_schedule = {
         "add-at-melbourne-sunset": {
             "task": "weedid.tasks.backup_repository_changes",
-            "schedule": crontab(minute=0, hour="*/3"),
+            # "schedule": crontab(minute=0, hour="*/3"),
+            "schedule": crontab(minute="*", hour="*/3"),
         },
     }
 elif not DEBUG:
