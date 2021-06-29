@@ -243,7 +243,7 @@ services:
     volumes:
       - /var/lib/docker/containers:/fluentd/log/containers
       - ./fluent.conf:/fluentd/etc/fluent.conf
-      - /data/logs:/output/
+      - ${FLUENTD_LOGS_PATH:-/data/logs}:/output/
     logging:
       driver: "json-file"
 
