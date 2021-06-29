@@ -148,7 +148,6 @@ DVC_REMOTE_PATH = os.environ.get("DVC_REMOTE_PATH")
 CELERY_BEAT_SCHEDULE = {
     "regular-versioned-backup": {
         "task": "weedid.tasks.backup_repository_changes",
-        # "schedule": crontab(minute=0, hour="*/3"),
-        "schedule": crontab(minute="*/2", hour="*"),
+        "schedule": crontab(minute="*", hour="*/3"),
     },
 }
