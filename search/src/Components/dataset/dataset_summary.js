@@ -31,6 +31,7 @@ import {
 } from '@appbaseio/reactivesearch';
 import SearchBase from '../search/SearchBase';
 import ResultsList from '../search/ResultsList';
+import CategoryTooltip from '../search/CategoryTooltip';
 import agcontextSchema from '../../Schemas/AgContext.json'
 
 
@@ -258,7 +259,7 @@ const AgContextDetails = (props) => {
                 <TableBody>
                   {Object.keys(agcontext.category_statistics).map((catName) =>
                     <TableRow key={catName}>
-                      <TableCell>{catName}</TableCell>
+                      <CategoryTooltip categoryName={catName}><TableCell>{catName}</TableCell></CategoryTooltip>
                       {Object.keys(tableFields).map((field) => <TableCell key={field}>{agcontext.category_statistics[catName][field]}</TableCell>)}
                     </TableRow>
                   )}
