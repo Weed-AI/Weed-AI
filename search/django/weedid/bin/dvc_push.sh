@@ -34,7 +34,9 @@ dvc remote add -f -d storage "$dvc_remote"
 dvc add */images
 git add */*.json
 dvc commit
-git add */images.dvc
+git add */images.dvc .dvc/config
+git config user.email "weed-ai.app@sydney.edu.au"
+git config user.name "Weed-AI production"
 git commit -m "$commit_msg" || (echo "Nothing to commit"; exit 0)
 dvc push
 git push storage master:master

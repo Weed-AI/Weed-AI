@@ -147,9 +147,9 @@ GIT_REMOTE_PATH = os.environ.get("GIT_REMOTE_PATH")
 DVC_REMOTE_PATH = os.environ.get("DVC_REMOTE_PATH")
 
 CELERY_BEAT_SCHEDULE = {
-    "add-at-melbourne-sunset": {
+    "regular-versioned-backup": {
         "task": "weedid.tasks.backup_repository_changes",
         # "schedule": crontab(minute=0, hour="*/3"),
-        "schedule": crontab(minute="*/5", hour="*"),
+        "schedule": crontab(minute="*/2", hour="*"),
     },
 }
