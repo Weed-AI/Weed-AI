@@ -6,7 +6,7 @@ import pathlib
 import io
 import os
 from xml.etree import ElementTree
-import jobli
+import joblib
 
 # This uses data from https://data.eppo.int/ in accordance with
 # the EPPO Codes Open Data Licence (https://data.eppo.int/media/Open_Licence.pdf)
