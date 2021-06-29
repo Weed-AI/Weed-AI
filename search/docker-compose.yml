@@ -6,9 +6,8 @@ services:
     container_name: reverse_proxy
     depends_on:
         - django
-        - reactivesearch
     build:
-        context: ./nginx/nginx
+        context: ./nginx/reverse-proxy
     ports:
       - "80:80"
     networks:
@@ -16,6 +15,11 @@ services:
     restart: always
     logging:
       driver: "json-file"
+    volumes:
+      # Static file service
+      - thumbnails_dir:/media/thumbnails
+      - download_dir:/media/download
+      - mystatic_dir:/media/mystatic
 
   # django backend
   django:
@@ -46,7 +50,8 @@ services:
       - repository_dir:/code/repository
       - upload_dir:/code/upload
       - download_dir:/code/download
-    command: python manage.py runserver 0.0.0.0:8000
+      - mystatic_dir:/code/mystatic
+    command: bash -c "python manage.py makemigrations && python manage.py migrate && python manage.py collectstatic <<<yes && gunicorn core.wsgi -b 0.0.0.0:8000"
     entrypoint: /entrypoint.sh
     ports:
       - "8000:8000"
@@ -163,38 +168,6 @@ services:
     logging:
       driver: "json-file"
 
-  thumbnails:
-    image: thumbnails
-    container_name: thumbnails
-    build:
-      context: ./nginx/thumbnails
-    volumes:
-      - thumbnails_dir:/tmp/thumbnails
-    ports:
-      - "8081:80"
-    networks:
-      - elastic
-    stdin_open: true
-    restart: always
-    logging:
-      driver: "json-file"
-
-  download:
-    image: download
-    container_name: download
-    build:
-      context: ./nginx/download
-    volumes:
-      - download_dir:/tmp/download
-    ports:
-      - "8082:80"
-    networks:
-      - elastic
-    stdin_open: true
-    restart: always
-    logging:
-      driver: "json-file"
-
   fluentd:
     container_name: fluentd
     user: root
@@ -222,4 +195,6 @@ volumes:
   download_dir:
     driver: local
   upload_dir:
+    driver: local
+  mystatic_dir:
     driver: local

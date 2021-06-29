@@ -50,8 +50,8 @@ def store_tmp_voc_coco(weedcoco, upload_dir):
         weedcoco_file.write(json.dumps(weedcoco))
 
 
-def move_voc_to_upload(voc_dir, upload_dir):
-    move(voc_dir, upload_dir + "/voc")
+def move_to_upload(store_dir, upload_dir, mode=""):
+    move(store_dir, os.path.join(upload_dir, mode))
 
 
 def setup_upload_dir(upload_userid_dir):
