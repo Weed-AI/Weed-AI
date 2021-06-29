@@ -129,9 +129,8 @@ class ReactImageUploadComponent extends React.Component {
                 this.setState({pictures: dataURLs, files: files});
                 if (this.props.handleUploaded) this.props.handleUploaded(files.map(file => file.name));
             }
-          }
-      })
-      
+        })
+    }
   }
 
   onUploadClick(e) {

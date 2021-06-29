@@ -1,6 +1,8 @@
 from __future__ import absolute_import, unicode_literals
 import json
 import traceback
+import datetime
+import subprocess
 from celery import shared_task
 from weedcoco.repo.deposit import deposit, compress_to_download
 from weedcoco.index.indexing import ElasticSearchIndexer
@@ -8,7 +10,14 @@ from weedcoco.index.thumbnailing import thumbnailing
 from weedid.models import Dataset
 from weedid.utils import make_upload_entity_fields
 from weedid.notification import upload_notification
-from core.settings import THUMBNAILS_DIR, REPOSITORY_DIR, DOWNLOAD_DIR, UPLOAD_DIR
+from core.settings import (
+    THUMBNAILS_DIR,
+    REPOSITORY_DIR,
+    DOWNLOAD_DIR,
+    UPLOAD_DIR,
+    GIT_REMOTE_PATH,
+    DVC_REMOTE_PATH,
+)
 from pathlib import Path
 import os
 from shutil import move, rmtree
@@ -163,4 +172,20 @@ def redeposit_dataset(
     weedcoco_path = upload_id_dir / "weedcoco.json"
     submit_upload_task.delay(
         str(weedcoco_path), str(images_dir), upload_id, new_upload=False
+    )
+
+
+@shared_task
+def backup_repository_changes(repository_dir=REPOSITORY_DIR, commit_message=None):
+    if commit_message is None:
+        commit_message = f"repo updates until {datetime.datetime.now()}"
+    subprocess.run(
+        [
+            "bash",
+            Path(__file__).parent / "bin" / "dvc_push.sh",
+            GIT_REMOTE_PATH,
+            DVC_REMOTE_PATH,
+            commit_message,
+        ],
+        cwd=REPOSITORY_DIR,
     )
