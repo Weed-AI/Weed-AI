@@ -75,14 +75,14 @@ def add_metadata_from_file(coco, metadata_path):
     return coco
 
 
-def get_image_hash(path, image_hash_size=8, digest_size=10):
+def get_image_hash(path, image_hash_size=8, digest_size=20):
     """Return an average hash of an image, rehashed to compress it"""
-    md5 = hashlib.md5(digest_size=digest_size)
+    md5 = hashlib.md5()
     img_hash = str(
         imagehash.average_hash(PIL.Image.open(path), hash_size=image_hash_size)
     )
     md5.update(img_hash.encode("utf8"))
-    return md5.hexdigest()
+    return md5.hexdigest()[:digest_size]
 
 
 def check_if_approved_image_extension(image_name):
