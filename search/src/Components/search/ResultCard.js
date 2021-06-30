@@ -8,7 +8,7 @@ import {
   MagnifierContainer, MagnifierZoom, MagnifierPreview,
 } from "react-image-magnifiers";
 
-const useStyles = makeStyles(theme => (console.log(theme) || {
+const useStyles = makeStyles(theme => ( {
   imageContainer: {
     width: "calc(100% + 20px)",
     maxHeight: "220px",
@@ -38,9 +38,8 @@ const useStyles = makeStyles(theme => (console.log(theme) || {
 }));
 
 
-const BBox = ({ classes, item, annot, nCategories }) => {
-  const containerHeight = 220;
-  const containerWidth = 250; // XXX: can we compute this? it can be less...
+const BBox = ({ classes, item, annot, nCategories, containerWidth, containerHeight }) => {
+  if (!containerWidth) return [];
   const aspectRatio = item.width / item.height;
   const thumbScale = aspectRatio >= (containerWidth / containerHeight) ? containerWidth / item.width : containerHeight / item.height;
   const thumbTop = 0 // (containerHeight - item.height * thumbScale) / 2;
@@ -77,12 +76,21 @@ const WeedAIResultCard = (props) => {
     taskTypes.includes("segmentation") ? "segment" : (taskTypes.includes("bounding box") ? "bounding box" : "labels"));
   const pluralise = (text, n) => n === 1 ? text : (text.match(/[zsx]$/) ? text + "es" : text + "s");
   const categoryNames = new Set(item.annotation__category__name);
+
+  // Handle sizing for bbox placement
+  const [imageWidth, setImageWidth] = React.useState('');
+  const handlePreviewLoad = (ev) => {
+    // XXX: Using refs didn't work for me to access underlying img
+    setImageWidth(ev.target.offsetWidth)
+    ev.target.addEventListener('resize', () => {setImageWidth(ev.target.offsetWidth)});
+  }
+
   return (
     <ResultCard style={{position: "relative"}} onMouseEnter={() => { setLoadZoom(true) }}>
         <MagnifierContainer className={classes.imageContainer}>
-          <MagnifierPreview imageSrc={item.thumbnail} className={classes.image} />
+          <MagnifierPreview onImageLoad={handlePreviewLoad} imageSrc={item.thumbnail} className={classes.image} />
           {item.annotations.filter(annot => annot.bbox).map(annot =>
-            <BBox classes={classes} item={item} annot={annot} nCategories={categoryNames.size} />
+            <BBox classes={classes} item={item} annot={annot} nCategories={categoryNames.size} containerWidth={imageWidth} containerHeight={220} />
           )}
           {loadZoom ? <MagnifierZoom style={{ height: "125px", zIndex: 5 }} imageSrc={item.thumbnail_large} /> : [] }
         </MagnifierContainer>
