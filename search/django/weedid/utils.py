@@ -21,19 +21,26 @@ from core.settings import (
 )
 
 
+class OverwriteStorage(FileSystemStorage):
+    def get_available_name(self, name, max_length=None):
+        if self.exists(name):
+            os.remove(name)
+        return name
+
+
 def store_tmp_image(image, image_dir):
-    fs = FileSystemStorage()
+    fs = OverwriteStorage()
     fs.save(os.path.join(image_dir, image.name), image)
 
 
 def store_tmp_weedcoco(weedcoco, upload_dir):
-    fs = FileSystemStorage()
+    fs = OverwriteStorage()
     weedcoco_path = os.path.join(upload_dir, "weedcoco.json")
     fs.save(weedcoco_path, weedcoco)
 
 
 def store_tmp_voc(voc, voc_dir):
-    fs = FileSystemStorage()
+    fs = OverwriteStorage()
     fs.save(os.path.join(voc_dir, voc.name), voc)
 
 
@@ -43,8 +50,8 @@ def store_tmp_voc_coco(weedcoco, upload_dir):
         weedcoco_file.write(json.dumps(weedcoco))
 
 
-def move_voc_to_upload(voc_dir, upload_dir):
-    move(voc_dir, upload_dir + "/voc")
+def move_to_upload(store_dir, upload_dir, mode=""):
+    move(store_dir, os.path.join(upload_dir, mode))
 
 
 def setup_upload_dir(upload_userid_dir):

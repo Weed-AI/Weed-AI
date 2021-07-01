@@ -1,4 +1,5 @@
 import os
+from celery.schedules import crontab
 
 SITE_BASE_URL = "https://weed-ai.sydney.edu.au"
 
@@ -138,6 +139,15 @@ STATIC_ROOT = os.path.join(BASE_DIR, "mystatic")
 STATIC_URL = "/mystatic/"
 
 CELERY_BROKER_URL = os.environ.get("CELERY_BROKER", "redis://redis:6379/0")
-CELERY_RESULT_BACKEND = os.environ.get("CELERY_BACKEND", "redis://redis:6379/0")
 CELERY_RESULT_BACKEND = "django-db"
 CELERY_CACHE_BACKEND = "django-cache"
+
+GIT_REMOTE_PATH = os.environ.get("GIT_REMOTE_PATH")
+DVC_REMOTE_PATH = os.environ.get("DVC_REMOTE_PATH")
+
+CELERY_BEAT_SCHEDULE = {
+    "regular-versioned-backup": {
+        "task": "weedid.tasks.backup_repository_changes",
+        "schedule": crontab(minute="0", hour="*/3"),
+    },
+}

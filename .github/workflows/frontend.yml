@@ -32,6 +32,8 @@ jobs:
             POSTGRES_DB=weedai
             WEEDCOCO_VERSION=$MERGE_SHA
             SEND_EMAIL=False
+            GIT_REMOTE_PATH=/tmp/git_remote
+            DVC_REMOTE_PATH=/tmp/dvc_remote
             HERE
             cat .env
             # TODO The following could be a separate GitHub action

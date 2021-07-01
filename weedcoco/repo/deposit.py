@@ -7,13 +7,27 @@ import tempfile
 from shutil import copy, move
 from zipfile import ZipFile
 from PIL import Image
-from weedcoco.utils import get_image_average_hash, check_if_approved_image_extension
+from collections import defaultdict
+from weedcoco.utils import get_image_hash, check_if_approved_image_extension
 from weedcoco.validation import ValidationError, validate
 
 
 def validate_duplicate_images(image_hash):
     if len(get_hashset_from_image_name(image_hash)) != len(image_hash):
-        raise ValidationError("There are identical images in the image directory.")
+        hash_dict = defaultdict(list)
+        for image_name, hash_string in image_hash.items():
+            hash_dict[hash_string].append(image_name)
+        image_pairs = "; ".join(
+            [
+                " <-> ".join(sorted(hash_dict[hash_string]))
+                for hash_string in hash_dict.keys()
+                if len(hash_dict[hash_string]) > 1
+            ]
+        )
+        raise ValidationError(
+            "There are identical images in the image directory. Identical image sets are: "
+            + image_pairs
+        )
 
 
 def validate_existing_images(repository_dir, image_hash):
@@ -77,7 +91,7 @@ def setup_dataset_dir(repository_dir, temp_dir, upload_id=None):
 
 def create_image_hash(image_dir):
     return {
-        image_name: f"{get_image_average_hash(image_dir / image_name, 10)}{os.path.splitext(image_name)[-1]}"
+        image_name: f"{get_image_hash(image_dir / image_name, 16)}{os.path.splitext(image_name)[-1]}"
         for image_name in os.listdir(image_dir)
         if check_if_approved_image_extension(image_name)
     }

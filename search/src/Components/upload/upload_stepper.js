@@ -7,6 +7,7 @@ import Button from '@material-ui/core/Button';
 import Typography from '@material-ui/core/Typography';
 import UploaderSingle from './uploader_single';
 import UploaderVoc from './uploader_voc';
+import UploaderMasks from './uploader_masks';
 import UploaderImages from './uploader_images';
 import CategoryMapper from './uploader_category_mapper';
 import ErrorMessage from '../error/display';
@@ -52,6 +53,13 @@ const stepsByType = {
         {title: "Add Agcontext", type: "agcontext"},
         {title: "Add Metadata", type: "metadata"},
         {title: "Upload Images", type: "images"}
+    ],
+    "masks": [
+        {title: "Upload Segmentation Masks", type: "masks-upload"},
+        {title: "Categories", type: "categories"},
+        {title: "Add Agcontext", type: "agcontext"},
+        {title: "Add Metadata", type: "metadata"},
+        {title: "Upload Images", type: "images"}
     ]
 }
 
@@ -66,6 +74,8 @@ class UploadStepper extends React.Component {
             steps: stepsByType[this.props.upload_type].map(step => step.title),
             upload_id: 0,
             voc_id: Math.random().toString(36).slice(-8),
+            mask_id: Math.random().toString(36).slice(-8),
+            image_ext: '',
             images: [],
             categories: [],
             ag_context: {},
@@ -77,6 +87,7 @@ class UploadStepper extends React.Component {
         this.isStepOptional = this.isStepOptional.bind(this);
         this.isStepSkipped = this.isStepSkipped.bind(this);
         this.handleUploadId = this.handleUploadId.bind(this);
+        this.handleImageExtension = this.handleImageExtension.bind(this);
         this.handleImages = this.handleImages.bind(this);
         this.handleCategories = this.handleCategories.bind(this);
         this.handleUpdateCategories = this.handleUpdateCategories.bind(this);
@@ -90,6 +101,7 @@ class UploadStepper extends React.Component {
         this.handleUploadAgcontexts = this.handleUploadAgcontexts.bind(this);
         this.handleUploadMetadata = this.handleUploadMetadata.bind(this);
         this.handleMoveVoc = this.handleMoveVoc.bind(this);
+        this.handleMoveMask = this.handleMoveMask.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
         this.nextHandler = this.nextHandler.bind(this);
         this.handleValidation = this.handleValidation.bind(this);
@@ -106,6 +118,10 @@ class UploadStepper extends React.Component {
 
     handleUploadId(upload_id) {
         this.setState({upload_id: upload_id});
+    }
+
+    handleImageExtension(image_ext) {
+        this.setState({image_ext: image_ext})
     }
 
     handleImages(images) {
@@ -235,6 +251,27 @@ class UploadStepper extends React.Component {
         })
     }
 
+    handleMoveMask(){
+        const body = new FormData()
+        body.append('upload_id', this.state.upload_id)
+        body.append('mask_id', this.state.mask_id)
+        axios({
+            method: 'post',
+            url: baseURL + "api/move_mask/",
+            data: body,
+            headers: {'X-CSRFToken': Cookies.get('csrftoken') }
+        }).then(res => {
+            console.log(res)
+            this.handleErrorMessage("")
+            this.handleNext()
+        })
+        .catch(err => {
+            console.log(err)
+            this.handleValidation(false)
+            this.handleErrorMessage("Failed to move mask")
+        })
+    }
+
     handleMoveVoc(){
         const body = new FormData()
         body.append('upload_id', this.state.upload_id)
@@ -286,6 +323,8 @@ class UploadStepper extends React.Component {
                 return <UploaderSingle upload_id={this.state.upload_id} images={this.state.images} handleUploadId={this.handleUploadId} handleImages={this.handleImages} handleCategories={this.handleCategories} handleValidation={this.handleValidation} handleErrorMessage={this.handleErrorMessage} schema={schema}/>
             case "voc-upload":
                 return <UploaderVoc handleUploadId={this.handleUploadId} handleImages={this.handleImages} handleCategories={this.handleCategories} handleValidation={this.handleValidation} handleErrorMessage={this.handleErrorMessage} voc_id={this.state.voc_id}/>
+            case "masks-upload":
+                return <UploaderMasks upload_id={this.state.mask_id} handleUploadId={this.handleUploadId} image_ext={this.state.image_ext} handleImageExtension={this.handleImageExtension} handleImages={this.handleImages} handleCategories={this.handleCategories} handleValidation={this.handleValidation} handleErrorMessage={this.handleErrorMessage}/>
             case "categories":
                 return <CategoryMapper categories={cloneDeep(this.state.categories)} handleCategories={this.handleCategories} handleValidation={this.handleValidation} handleErrorMessage={this.handleErrorMessage}/>
             case "agcontext":
@@ -319,6 +358,8 @@ class UploadStepper extends React.Component {
         switch (step) {
             case "voc-upload":
                 return this.handleMoveVoc
+            case "masks-upload":
+                return this.handleMoveMask
             case "categories":
                 return this.handleUpdateCategories
             case "agcontext":

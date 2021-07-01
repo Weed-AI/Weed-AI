@@ -1,16 +1,24 @@
 ## Annotation Formats
 
-We currently support uploads in MS COCO and [WeedCOCO](/weedcoco) formats.
+Annotations can currently be uploaded in the following formats, for which we note the supported annotation layers:
 
+| Format | Classification | Bounding Boxes | Segmentation |
+|:-------|:--------------:|:--------------:|:--------------:|
+| [WeedCOCO](./weedcoco) | ✔️ | ✔️ | ✔️ |
+| [MS COCO](https://cocodataset.org/#format-data) | ✔️ | ✔️ | ✔️ |
+| Pascal VOC XML | | ✔️ | |
+| Color-coded segmentation masks | | | ✔️ |
 
 We natively support WeedCOCO format which extends on MS COCO to specify a weed
 ID-oriented category naming scheme, to include agricultural context and
-[schema.org/Dataset](https://schema.org/Dataset)-compatible metadata. We provide an uploader
-for MS COCO format, with forms to enter agricultural context and metadata
-please ensure the category names are conformant before uploading.
+[schema.org/Dataset](https://schema.org/Dataset)-compatible metadata.
+Uploads in other formats will be converted to WeedCOCO format in our uploader,
+which provides forms to enter [agricultural context](/editor) and
+[metadata](/meta-editor), as well as to map category names to our
+standardised nomenclature.
 
 We require that contributors license their images and annotations under the
-liberal [CC-BY 4.0 licence](https://creativecommons.org/licenses/by/4.0/)
+[CC-BY 4.0 licence](https://creativecommons.org/licenses/by/4.0/)
 (Creative Commons Attribution Required). Uploaders must have the rights to the
 content that they upload, and must agree to release their content (images and
 annotations) under the terms of that licence.
@@ -19,6 +27,7 @@ In brief (and not a substitute for the License), the CC BY 4.0 License enables
 users to freely share and adapt the material for any purpose, even
 commercially, given appropriate attribution and that there are no additional
 restrictions made.
+
 
 ## Data Quality Requirements
 
@@ -38,10 +47,11 @@ Currently only new images to the repository will be accepted.
 The uploading process is a five-step process:
 
 1. Select the data annotation format above.
-2. Upload the annotation file. Only COCO or WeedCOCO are supported currently. Please check that your images and annotations.
-3. If not WeedCOCO, upload the AgContext file or generate a new one by completing the online form.
-4. Include publication-level metadata about the dataset and how to attribute it.
-5. Finally, upload the relevant images for the dataset
+2. Upload the annotation file. Please check that your images and annotations.
+3. If not WeedCOCO, confirm a mapping from the entered category labels to role (weed or crop) and species.
+4. If not WeedCOCO, upload the AgContext file or generate a new one by completing the online form.
+5. Enter publication-level metadata about the dataset and how to attribute it.
+6. Finally, upload the relevant images for the dataset
 
 A Weed-AI administrator will review your submission. If the dataset is accepted
 you will be notified and can continue uploading new datasets. The new dataset
