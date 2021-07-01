@@ -3,6 +3,7 @@ import os
 import pathlib
 import json
 import sys
+from uuid import uuid4
 from elasticsearch import Elasticsearch, helpers
 from weedcoco.utils import (
     denormalise_weedcoco,
@@ -49,6 +50,7 @@ class ElasticSearchIndexer:
             self.es_client = Elasticsearch(hosts=hosts)
         self.indexes = indexes if indexes is not None else {}
         self.upload_id = upload_id
+        self.version_tag = str(uuid4())
 
     def generate_index_entries(self):
         """
@@ -135,6 +137,7 @@ class ElasticSearchIndexer:
                 "location"
             ] = f'{image["agcontext"]["location_lat"]}, {image["agcontext"]["location_long"]}'
             image["dataset_name"] = coco["info"]["metadata"]["name"]
+            image["version_tag"] = self.version_tag
             yield image
 
     def generate_batches(self):
@@ -165,6 +168,36 @@ class ElasticSearchIndexer:
             else:
                 # a file for dry run
                 self.es_client.write(json.dumps(index_batch, indent=2))
+
+    def remove_other_versions(self):
+        # in case other filenames had been submitted with this upload_id
+        if self.upload_id == "#":
+            raise ValueError("remove_other_versions requires upload_id != '#'")
+        assert '"' not in self.upload_id
+        assert "\\" not in self.upload_id
+        assert '"' not in self.version_tag
+        assert "\\" not in self.version_tag
+
+        if not hasattr(self.es_client, "bulk"):
+            return
+        body = f"""
+        {{
+          "query": {{
+            "bool": {{
+              "match": {{
+                "upload_id": "{self.upload_id}"
+              }}
+            }},
+            "must_not": {{
+                "version_tag": "{self.version_tag}"
+            }}
+          }}
+        }}
+        """
+        if hasattr(self.es_client, "bulk"):
+            self.es_client.delete_by_query(self.es_index_name, body)
+        else:
+            self.es_client.write()
 
 
 def main(args=None):
