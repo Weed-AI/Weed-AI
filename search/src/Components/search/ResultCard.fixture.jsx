@@ -36,6 +36,12 @@ export default <ResultCardWrapper item={ {
             564
           ]
         ],
+        "bbox": [
+          694,
+          563,
+          155,
+          178
+        ],
         "iscrowd": 0,
         "category": {
           "name": "crop: daucus carota",
@@ -77,6 +83,12 @@ export default <ResultCardWrapper item={ {
             799,
             758
           ]
+        ],
+        "bbox": [
+          699,
+          747,
+          100,
+          153
         ],
         "iscrowd": 0,
         "category": {
@@ -120,6 +132,12 @@ export default <ResultCardWrapper item={ {
             738
           ]
         ],
+        "bbox": [
+          88,
+          711,
+          157,
+          150
+        ],
         "iscrowd": 0,
         "category": {
           "name": "weed: UNSPECIFIED",
@@ -159,6 +177,12 @@ export default <ResultCardWrapper item={ {
             841,
             240
           ]
+        ],
+        "bbox": [
+          682,
+          216,
+          224,
+          195
         ],
         "iscrowd": 0,
         "category": {
