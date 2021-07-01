@@ -4,7 +4,8 @@ import pathlib
 import json
 import sys
 from uuid import uuid4
-from elasticsearch import Elasticsearch, helpers
+import elasticsearch  # using `from elastisearch` breaks elasticmock
+from elasticsearch import helpers
 from weedcoco.utils import (
     denormalise_weedcoco,
     lookup_growth_stage_name,
@@ -47,7 +48,7 @@ class ElasticSearchIndexer:
         if dry_run:
             self.es_client = sys.stdout
         else:
-            self.es_client = Elasticsearch(hosts=hosts)
+            self.es_client = elasticsearch.Elasticsearch(hosts=hosts)
         self.indexes = indexes if indexes is not None else {}
         self.upload_id = upload_id
         self.version_tag = str(uuid4())
@@ -204,12 +205,14 @@ def main(args=None):
         "--dry-run",
         action="store_true",
         default=False,
-        upload_id=args.upload_id,
         help="When set, index entries will be printed to stdout instead of the Elastic server.",
     )
     args = ap.parse_args(args)
     ElasticSearchIndexer(
-        args.weedcoco_path, args.thumbnail_dir, dry_run=args.dry_run
+        args.weedcoco_path,
+        args.thumbnail_dir,
+        dry_run=args.dry_run,
+        upload_id=args.upload_id,
     ).post_index_entries()
 
 

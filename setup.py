@@ -39,7 +39,7 @@ setup(
         "test": [
             "pytest==6.2.*",
             "pytest-cov",
-            "elasticmock==1.7.*",
+            "elasticmock==1.8.*",
         ]
     },
     classifiers=[
