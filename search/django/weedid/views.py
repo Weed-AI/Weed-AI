@@ -30,7 +30,7 @@ from weedid.utils import (
 )
 from weedid.notification import review_notification
 from weedid.models import Dataset, WeedidUser
-from weedcoco.validation import validate, JsonValidationError
+from weedcoco.validation import validate, validate_json, JsonValidationError
 from weedcoco.importers.voc import voc_to_coco
 from weedcoco.importers.mask import masks_to_coco, generate_paths_from_mask_only
 from django.contrib.auth import login, logout
@@ -48,6 +48,12 @@ from pathlib import Path
 @ensure_csrf_cookie
 def set_csrf(request):
     return HttpResponse("Success")
+
+
+def json_validation_response(exc):
+    return HttpResponseBadRequest(
+        json.dumps(exc.get_error_details()), content_type="application/json"
+    )
 
 
 def elasticsearch_query(request):
@@ -91,7 +97,7 @@ def upload(request):
         create_upload_entity(upload_id, user.id)
     except JsonValidationError as e:
         traceback.print_exc()
-        return HttpResponseBadRequest(json.dumps(e.get_error_details()))
+        return json_validation_response(e)
     except Exception as e:
         traceback.print_exc()
         return HttpResponseBadRequest(str(e))
@@ -200,7 +206,7 @@ class CustomUploader:
             create_upload_entity(upload_id, user.id)
         except JsonValidationError as e:
             traceback.print_exc()
-            return HttpResponseBadRequest(json.dumps(e.get_error_details()))
+            return json_validation_response(e)
         except Exception as e:
             traceback.print_exc()
             return HttpResponseBadRequest(str(e))
@@ -213,7 +219,6 @@ class CustomUploader:
 
 
 class VocUploader(CustomUploader):
-
     mode = "voc"
     id_name = "voc_id"
     payload_name = "voc"
@@ -272,9 +277,10 @@ def update_categories(request):
     )
     try:
         updated_weedcoco_json = set_categories(weedcoco_path, categories)
-        validate(updated_weedcoco_json, schema="compatible-coco")
+        validate_json(updated_weedcoco_json, schema="compatible-coco")
     except JsonValidationError as e:
-        return HttpResponseBadRequest(e.message)
+        traceback.print_exc()
+        return json_validation_response(e)
     except Exception as e:
         traceback.print_exc()
         return HttpResponseBadRequest(str(e))
@@ -292,6 +298,11 @@ def upload_agcontexts(request):
         return HttpResponseForbidden("You dont have access to proceed")
     data = json.loads(request.body)
     upload_id, ag_contexts = data["upload_id"], data["ag_contexts"]
+    try:
+        validate_json(ag_contexts, schema="agcontext")
+    except JsonValidationError as e:
+        traceback.print_exc()
+        return json_validation_response(e)
     weedcoco_path = os.path.join(
         UPLOAD_DIR, str(user.id), str(upload_id), "weedcoco.json"
     )
@@ -312,6 +323,11 @@ def upload_metadata(request):
         if user and user.is_authenticated:
             data = json.loads(request.body)
             upload_id, metadata = data["upload_id"], data["metadata"]
+            try:
+                validate_json(metadata, schema="metadata")
+            except JsonValidationError as e:
+                traceback.print_exc()
+                return json_validation_response(e)
             weedcoco_path = os.path.join(
                 UPLOAD_DIR, str(user.id), str(upload_id), "weedcoco.json"
             )
