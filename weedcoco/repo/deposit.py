@@ -19,7 +19,7 @@ def validate_duplicate_images(image_hash):
             hash_dict[hash_string].append(image_name)
         image_pairs = "; ".join(
             [
-                " <-> ".join(hash_dict[hash_string])
+                " <-> ".join(sorted(hash_dict[hash_string]))
                 for hash_string in hash_dict.keys()
                 if len(hash_dict[hash_string]) > 1
             ]
