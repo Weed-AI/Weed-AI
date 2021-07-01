@@ -35,7 +35,7 @@ def thumbnail_one(coco_image, image_path, thumbnails_dir, thumbnail_sizes):
         thumb = image.copy()
         thumb.thumbnail(thumbnail_size)
         _ensure_dir(thumb_path)
-        image.save(thumb_path)
+        thumb.save(thumb_path)
 
 
 def thumbnailing(
