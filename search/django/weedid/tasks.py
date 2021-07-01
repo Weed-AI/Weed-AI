@@ -76,6 +76,8 @@ def submit_upload_task(weedcoco_path, image_dir, upload_id, new_upload=True):
         # TODO: raise alert
     else:
         if not new_upload:
+            if upload_entity.status == "C":
+                reindex_dataset.delay(upload_id)
             return
         upload_notification(upload_id)
         upload_entity.status = "AR"
