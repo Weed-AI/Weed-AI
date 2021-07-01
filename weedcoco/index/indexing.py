@@ -175,8 +175,6 @@ class ElasticSearchIndexer:
             raise ValueError("remove_other_versions requires upload_id != '#'")
         assert '"' not in self.upload_id
         assert "\\" not in self.upload_id
-        assert '"' not in self.version_tag
-        assert "\\" not in self.version_tag
 
         if not hasattr(self.es_client, "bulk"):
             return
@@ -194,28 +192,26 @@ class ElasticSearchIndexer:
           }}
         }}
         """
-        if hasattr(self.es_client, "bulk"):
-            self.es_client.delete_by_query(self.es_index_name, body)
-        else:
-            self.es_client.write()
+        self.es_client.delete_by_query(self.es_index_name, body)
 
 
 def main(args=None):
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--weedcoco-path", type=pathlib.Path, required=True)
     ap.add_argument("--thumbnail-dir", type=pathlib.Path, required=True)
+    ap.add_argument("--upload-id", required=True)
     ap.add_argument(
         "--dry-run",
         action="store_true",
         default=False,
+        upload_id=args.upload_id,
         help="When set, index entries will be printed to stdout instead of the Elastic server.",
     )
     args = ap.parse_args(args)
-    return ElasticSearchIndexer(
+    ElasticSearchIndexer(
         args.weedcoco_path, args.thumbnail_dir, dry_run=args.dry_run
-    )
+    ).post_index_entries()
 
 
 if __name__ == "__main__":
-    es_index = main()
-    es_index.post_index_entries()
+    main()
