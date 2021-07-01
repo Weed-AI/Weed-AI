@@ -14,7 +14,7 @@ from weedcoco.validation import ValidationError, validate
 
 def validate_duplicate_images(image_hash):
     if len(get_hashset_from_image_name(image_hash)) != len(image_hash):
-        hash_dict = defaultdict(lambda: [])
+        hash_dict = defaultdict(list)
         for image_name, hash_string in image_hash.items():
             hash_dict[hash_string].append(image_name)
         image_pairs = "; ".join(
