@@ -23,6 +23,9 @@ POSTGRES_DB=
 SMTP_HOST=smtp.sydney.edu.au
 SMTP_PORT=
 FROM_EMAIL=Sender Name <sender@host>
+# The following works when they are local directories on the host, which are periodically rsynced to a remote
+GIT_REMOTE_PATH=/path/to/git/remote/on/rds
+DVC_REMOTE_PATH=/path/to/dvc/remote/on/rds
 ```
 
 ### Initialise database, migrate and create superuser
