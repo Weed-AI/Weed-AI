@@ -21,6 +21,7 @@ import cloneDeep from 'lodash/cloneDeep';
 import MenuItem from '@material-ui/core/MenuItem';
 import FormControl from '@material-ui/core/FormControl';
 import Select from '@material-ui/core/Select';
+import {jsonSchemaTitle} from '../error/utils';
 
 
 const baseURL = new URL(window.location.origin);
@@ -213,9 +214,10 @@ class UploadStepper extends React.Component {
             this.handleNext()
         })
         .catch(err => {
-            console.log(err)
             this.handleValidation(false)
-            this.handleErrorMessage(err.response.data || "Invalid categories input")
+            const data = err.response.data
+            if (typeof data === "object") this.handleErrorMessage(jsonSchemaTitle(data), data);
+            else this.handleErrorMessage(data || "Server error saving categories")
         })
     }
 
@@ -235,7 +237,9 @@ class UploadStepper extends React.Component {
         })
         .catch(err => {
             console.log(err)
-            this.handleErrorMessage("Invalid input for AgContext")
+            const data = err.response.data
+            if (typeof data === "object") this.handleErrorMessage(jsonSchemaTitle(data), data);
+            else this.handleErrorMessage(data || "Server error saving AgContext")
         })
     }
 

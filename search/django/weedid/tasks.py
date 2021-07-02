@@ -199,6 +199,7 @@ def redeposit_dataset(
 
 @shared_task
 def backup_repository_changes(repository_dir=REPOSITORY_DIR, commit_message=None):
+    # XXX: Not safe for concurrency
     if commit_message is None:
         commit_message = f"repo updates until {datetime.datetime.now()}"
     assert GIT_REMOTE_PATH, r"GIT_REMOTE_PATH={repr(GIT_REMOTE_PATH)}"

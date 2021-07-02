@@ -59,6 +59,7 @@
           "type": "string",
           "title": "Other Crop",
           "format": "plant_species",
+          "pattern": "^(?!wheat|barley|oats|triticale|sorghum|rice|lupins|chickpeas|lentils|field_peas|faba_beans|mung_beans|canola|mustard|flax|linseed|safflower|cotton|pasture|fallow)",
           "description": "Specify the crop's scientific name."
         },
         {
