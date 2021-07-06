@@ -366,9 +366,9 @@ class UploadStepper extends React.Component {
                 })}
             </Stepper>
             <div>
-                <Typography className={classes.instructions}>
+                <div className={classes.instructions}>
                     {this.getStepContent(stepName)}
-                </Typography>
+                </div>
                 {stepName === "images" ?
                     <FormControl className={classes.imageFormatSelection}>
                         <Select
