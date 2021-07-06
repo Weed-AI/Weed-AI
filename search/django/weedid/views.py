@@ -225,6 +225,7 @@ def upload_image_zip(request):
         return HttpResponseForbidden("You dont have access to proceed")
     upload_id = request.POST["upload_id"]
     upload_image_zip = request.FILES["upload_image_zip"]
+    # Get list of missing images from frontend to calculate images that are still missing after the current zip being uploaded
     images = request.POST["images"].split(",")
     upload_dir = os.path.join(UPLOAD_DIR, str(user.id), upload_id, "images")
     try:
