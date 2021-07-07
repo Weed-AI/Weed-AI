@@ -379,8 +379,8 @@ class UploadStepper extends React.Component {
                             <MenuItem value="" disabled>
                                 Select upload format
                             </MenuItem>
-                            <MenuItem value="image">Upload Image Individually</MenuItem>
-                            <MenuItem value="zip">Upload Image Zip</MenuItem>
+                            <MenuItem value="image">Upload Image Files</MenuItem>
+                            <MenuItem value="zip">Upload Images in Zip</MenuItem>
                         </Select>
                     </FormControl>
                     : ""
