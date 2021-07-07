@@ -22,8 +22,6 @@ const ERROR = {
 }
 
 const preview_maximum = 100;
-const httpAgent = new http.Agent({ keepAlive: true });
-const httpsAgent = new https.Agent({ keepAlive: true });
 
 class ReactImageUploadComponent extends React.Component {
   constructor(props) {
@@ -113,17 +111,11 @@ class ReactImageUploadComponent extends React.Component {
       const body = new FormData()
       body.append('upload_image', newFileData.file)
       body.append('upload_id', this.props.upload_id)
-      const instance = axios.create({
-          httpAgent,
-          httpsAgent,
-      })
       axios({
           method: 'post',
           url: this.props.uploadURL,
           data: body,
-          headers: {'Content-Type': 'multipart/form-data', 'X-CSRFToken': Cookies.get('csrftoken') },
-          httpAgent: httpAgent,
-          httpsAgent: httpsAgent
+          headers: {'Content-Type': 'multipart/form-data', 'X-CSRFToken': Cookies.get('csrftoken') }
       }).then(res => {
           if(res.status === 200){
             const dataURLs = singleImage?[]:this.state.pictures.slice();
