@@ -61,6 +61,7 @@ const UploaderZip  = props => {
         onChangeStatus={handleChangeStatus}
         multiple={false}
         maxFiles={1}
+        accept=".zip"
         autoUpload={true}
         submitButtonContent={null}
         styles={{ dropzone: { minHeight: 200, maxHeight: 250 } }}
