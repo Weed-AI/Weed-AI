@@ -31,7 +31,7 @@ def review_notification(message, upload_id):
 
     Your dataset upload {upload_entity.metadata['name']} has been {message} after review.
         
-    {'Congratulations! You can now view the entire dataset online from ' + SITE_BASE_URL + '/datasets/' + upload_id if message == 'approved' else 'Unfortunately at this stage your dataset has not been approved. Please contact our admin.'}.
+    {'Congratulations! You can now view the entire dataset online from ' + SITE_BASE_URL + '/datasets/' + upload_id if message == 'approved' else 'Unfortunately at this stage your dataset has not been approved. Please contact weed-ai.app@sydney.edu.au for further information.'}.
 
     Regards,
     Weed-AI Team

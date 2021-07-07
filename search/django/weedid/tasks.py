@@ -9,7 +9,7 @@ from weedcoco.index.indexing import ElasticSearchIndexer
 from weedcoco.index.thumbnailing import thumbnailing
 from weedid.models import Dataset
 from weedid.utils import make_upload_entity_fields
-from weedid.notification import upload_notification
+from weedid.notification import upload_notification, review_notification
 from core.settings import (
     THUMBNAILS_DIR,
     REPOSITORY_DIR,
@@ -138,7 +138,8 @@ def update_index_and_thumbnails(
         if not new_upload:
             return
         upload_entity.status = "C"
-        upload_entity.status_details = "It has been successfully submitted."
+        upload_entity.status_details = "It has been successfully indexed."
+        review_notification("approved and indexed", upload_id)
     finally:
         upload_entity.save()
 

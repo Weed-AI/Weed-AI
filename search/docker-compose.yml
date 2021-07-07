@@ -109,6 +109,7 @@ services:
       - elastic
     logging:
       driver: "json-file"
+    restart: always
 
   redis:
     image: redis:alpine
@@ -198,6 +199,7 @@ services:
       - ${FLUENTD_LOGS_PATH:-/data/logs}:/output/
     logging:
       driver: "json-file"
+    restart: always
 
 networks:
   elastic:
