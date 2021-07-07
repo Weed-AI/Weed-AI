@@ -19,7 +19,7 @@ from weedid.utils import (
     store_tmp_image_from_zip,
     store_tmp_voc,
     store_tmp_voc_coco,
-    move_voc_to_upload,
+    move_to_upload,
     create_upload_entity,
     retrieve_listing_info,
     remove_entity_local_record,
@@ -31,8 +31,9 @@ from weedid.utils import (
 )
 from weedid.notification import review_notification
 from weedid.models import Dataset, WeedidUser
-from weedcoco.validation import validate, JsonValidationError
+from weedcoco.validation import validate, validate_json, JsonValidationError
 from weedcoco.importers.voc import voc_to_coco
+from weedcoco.importers.mask import masks_to_coco, generate_paths_from_mask_only
 from django.contrib.auth import login, logout
 from django.contrib.auth.hashers import check_password
 from django.http import (
@@ -48,6 +49,12 @@ from pathlib import Path
 @ensure_csrf_cookie
 def set_csrf(request):
     return HttpResponse("Success")
+
+
+def json_validation_response(exc):
+    return HttpResponseBadRequest(
+        json.dumps(exc.get_error_details()), content_type="application/json"
+    )
 
 
 def elasticsearch_query(request):
@@ -77,10 +84,10 @@ def upload(request):
         images = []
         file_weedcoco = request.FILES["weedcoco"]
         weedcoco_json = json.load(file_weedcoco)
-        validate(
-            weedcoco_json,
-            schema=request.POST["schema"] if request.POST["schema"] else "coco",
-        )
+        # validate(
+        #     weedcoco_json,
+        #     schema=request.POST["schema"] if request.POST["schema"] else "coco",
+        # )
         for image_reference in weedcoco_json["images"]:
             images.append(image_reference["file_name"].split("/")[-1])
         categories = [
@@ -91,7 +98,7 @@ def upload(request):
         create_upload_entity(upload_id, user.id)
     except JsonValidationError as e:
         traceback.print_exc()
-        return HttpResponseBadRequest(json.dumps(e.get_error_details()))
+        return json_validation_response(e)
     except Exception as e:
         traceback.print_exc()
         return HttpResponseBadRequest(str(e))
@@ -103,103 +110,144 @@ def upload(request):
         )
 
 
-def upload_voc(request):
-    if not request.method == "POST":
-        return HttpResponseNotAllowed(request.method)
-    user = request.user
-    if not (user and user.is_authenticated):
-        return HttpResponseForbidden("You dont have access to proceed")
-    try:
-        voc_id = request.POST["voc_id"]
-        if "/" in voc_id:
-            return HttpResponseBadRequest("Bad voc id")
-        voc = request.FILES["voc"]
-        if voc.size > MAX_VOC_SIZE:
-            return HttpResponseBadRequest("This voc has exceeded the size limit!")
-        upload_dir = os.path.join(UPLOAD_DIR, str(user.id), voc_id)
-        store_tmp_voc(voc, upload_dir)
-    except Exception as e:
-        traceback.print_exc()
-        return HttpResponseBadRequest(str(e))
-    else:
-        return HttpResponse(f"Uploaded {voc.name} to {upload_dir}")
-
-
-def remove_voc(request):
-    if not request.method == "POST":
-        return HttpResponseNotAllowed(request.method)
-    user = request.user
-    if not (user and user.is_authenticated):
-        return HttpResponseForbidden("You dont have access to proceed")
-    try:
-        voc_id = request.POST["voc_id"]
-        if "/" in voc_id:
-            return HttpResponseBadRequest("Bad voc id")
-        voc_name = request.POST["voc_name"]
-        voc_to_remove = os.path.join(UPLOAD_DIR, str(user.id), voc_id, voc_name)
-        if os.path.exists(voc_to_remove):
-            os.remove(voc_to_remove)
-            return HttpResponse(f"Removed {voc_name}")
+class CustomUploader:
+    @classmethod
+    def upload(cls, request):
+        if not request.method == "POST":
+            return HttpResponseNotAllowed(request.method)
+        user = request.user
+        if not (user and user.is_authenticated):
+            return HttpResponseForbidden("You dont have access to proceed")
+        try:
+            store_id = request.POST[cls.id_name]
+            if "/" in store_id:
+                return HttpResponseBadRequest("Bad id")
+            payload = request.FILES[cls.payload_name]
+            if payload.size > cls.max_file_size:
+                return HttpResponseBadRequest(
+                    f"This file has exceeded the size limit {cls.max_file_size} Byte!"
+                )
+            store_dir = os.path.join(UPLOAD_DIR, str(user.id), store_id)
+            cls.store_tmp(payload, store_dir)
+        except Exception as e:
+            traceback.print_exc()
+            return HttpResponseBadRequest(str(e))
         else:
-            return HttpResponse(f"{voc_name} doesn't exist")
-    except Exception:
-        return HttpResponseBadRequest(f"Error when removing {voc_name}")
+            return HttpResponse(f"Uploaded {payload.name} to {store_dir}")
 
-
-def submit_voc(request):
-    if not request.method == "POST":
-        return HttpResponseNotAllowed(request.method)
-    user = request.user
-    if not (user and user.is_authenticated):
-        return HttpResponseForbidden("You dont have access to proceed")
-    try:
-        voc_id = request.POST["voc_id"]
-        if "/" in voc_id:
-            return HttpResponseBadRequest("Bad voc id")
-        images = []
-        weedcoco_json = voc_to_coco(
-            Path(os.path.join(UPLOAD_DIR, str(user.id), voc_id))
-        )
-        validate(weedcoco_json, schema="coco")
-        for image_reference in weedcoco_json["images"]:
-            images.append(image_reference["file_name"].split("/")[-1])
-        categories = [
-            parse_category_name(category) for category in weedcoco_json["categories"]
-        ]
-        upload_dir, upload_id = setup_upload_dir(os.path.join(UPLOAD_DIR, str(user.id)))
-        store_tmp_voc_coco(weedcoco_json, upload_dir)
-        create_upload_entity(upload_id, user.id)
-    except JsonValidationError as e:
-        traceback.print_exc()
-        return HttpResponseBadRequest(json.dumps(e.get_error_details()))
-    except Exception as e:
-        traceback.print_exc()
-        return HttpResponseBadRequest(str(e))
-    else:
-        return HttpResponse(
-            json.dumps(
-                {"upload_id": upload_id, "images": images, "categories": categories}
+    @classmethod
+    def remove(cls, request):
+        if not request.method == "POST":
+            return HttpResponseNotAllowed(request.method)
+        user = request.user
+        if not (user and user.is_authenticated):
+            return HttpResponseForbidden("You dont have access to proceed")
+        try:
+            store_id = request.POST[cls.id_name]
+            if "/" in store_id:
+                return HttpResponseBadRequest("Bad id")
+            remove_name = request.POST[cls.remove_name]
+            file_to_remove = os.path.join(
+                UPLOAD_DIR, str(user.id), store_id, remove_name
             )
+            if os.path.exists(file_to_remove):
+                os.remove(file_to_remove)
+                return HttpResponse(f"Removed {remove_name}")
+            else:
+                return HttpResponse(f"{remove_name} doesn't exist")
+        except Exception:
+            return HttpResponseBadRequest(f"Error when removing {remove_name}")
+
+    @classmethod
+    def move(cls, request):
+        if not request.method == "POST":
+            return HttpResponseNotAllowed(request.method)
+        user = request.user
+        if not (user and user.is_authenticated):
+            return HttpResponseForbidden("You dont have access to proceed")
+        try:
+            store_id = request.POST[cls.id_name]
+            if "/" in store_id:
+                return HttpResponseBadRequest("Bad id")
+            upload_id = request.POST["upload_id"]
+            store_dir = os.path.join(UPLOAD_DIR, str(user.id), store_id)
+            upload_dir = os.path.join(UPLOAD_DIR, str(user.id), upload_id)
+            move_to_upload(store_dir, upload_dir, cls.mode)
+            return HttpResponse(
+                f"{cls.mode} files of {store_id} has been moved to {upload_dir}"
+            )
+        except Exception as e:
+            return HttpResponseBadRequest(str(e))
+
+    @classmethod
+    def submit(cls, request):
+        if not request.method == "POST":
+            return HttpResponseNotAllowed(request.method)
+        user = request.user
+        if not (user and user.is_authenticated):
+            return HttpResponseForbidden("You dont have access to proceed")
+        try:
+            store_id = request.POST[cls.id_name]
+            if "/" in store_id:
+                return HttpResponseBadRequest("Bad id")
+            images = []
+            coco_json = cls.convert_to_coco(
+                Path(os.path.join(UPLOAD_DIR, str(user.id), store_id)), request
+            )
+            validate(coco_json, schema="coco")
+            for image_reference in coco_json["images"]:
+                images.append(image_reference["file_name"].split("/")[-1])
+            categories = [
+                parse_category_name(category) for category in coco_json["categories"]
+            ]
+            upload_dir, upload_id = setup_upload_dir(
+                os.path.join(UPLOAD_DIR, str(user.id))
+            )
+            store_tmp_voc_coco(coco_json, upload_dir)
+            create_upload_entity(upload_id, user.id)
+        except JsonValidationError as e:
+            traceback.print_exc()
+            return json_validation_response(e)
+        except Exception as e:
+            traceback.print_exc()
+            return HttpResponseBadRequest(str(e))
+        else:
+            return HttpResponse(
+                json.dumps(
+                    {"upload_id": upload_id, "images": images, "categories": categories}
+                )
+            )
+
+
+class VocUploader(CustomUploader):
+    mode = "voc"
+    id_name = "voc_id"
+    payload_name = "voc"
+    remove_name = "voc_name"
+    max_file_size = MAX_VOC_SIZE
+    store_tmp = store_tmp_voc
+
+    @staticmethod
+    def convert_to_coco(store_path, request):
+        return voc_to_coco(store_path)
+
+
+class MaskUploader(CustomUploader):
+    mode = "masks"
+    id_name = "mask_id"
+    payload_name = "upload_image"
+    remove_name = "image_name"
+    max_file_size = MAX_IMAGE_SIZE
+    store_tmp = store_tmp_image
+
+    @staticmethod
+    def convert_to_coco(store_path, request):
+        image_ext = request.POST["image_ext"]
+        return masks_to_coco(
+            generate_paths_from_mask_only(store_path, image_ext),
+            background_if_unmapped="000000",
+            check_consistent_dimensions=False,
         )
-
-
-def move_voc(request):
-    if not request.method == "POST":
-        return HttpResponseNotAllowed(request.method)
-    user = request.user
-    if not (user and user.is_authenticated):
-        return HttpResponseForbidden("You dont have access to proceed")
-    try:
-        voc_id = request.POST["voc_id"]
-        if "/" in voc_id:
-            return HttpResponseBadRequest("Bad voc id")
-        upload_id = request.POST["upload_id"]
-        voc_dir = os.path.join(UPLOAD_DIR, str(user.id), voc_id)
-        upload_dir = os.path.join(UPLOAD_DIR, str(user.id), upload_id)
-        move_voc_to_upload(voc_dir, upload_dir)
-        return HttpResponse(f"VOC files of {voc_id} has been moved to {upload_dir}")
-    except Exception as e:
-        return HttpResponseBadRequest(str(e))
 
 
 def upload_image(request):
@@ -250,9 +298,10 @@ def update_categories(request):
     )
     try:
         updated_weedcoco_json = set_categories(weedcoco_path, categories)
-        validate(updated_weedcoco_json, schema="compatible-coco")
+        validate_json(updated_weedcoco_json, schema="compatible-coco")
     except JsonValidationError as e:
-        return HttpResponseBadRequest(e.message)
+        traceback.print_exc()
+        return json_validation_response(e)
     except Exception as e:
         traceback.print_exc()
         return HttpResponseBadRequest(str(e))
@@ -270,6 +319,11 @@ def upload_agcontexts(request):
         return HttpResponseForbidden("You dont have access to proceed")
     data = json.loads(request.body)
     upload_id, ag_contexts = data["upload_id"], data["ag_contexts"]
+    try:
+        validate_json(ag_contexts, schema="agcontext")
+    except JsonValidationError as e:
+        traceback.print_exc()
+        return json_validation_response(e)
     weedcoco_path = os.path.join(
         UPLOAD_DIR, str(user.id), str(upload_id), "weedcoco.json"
     )
@@ -290,6 +344,11 @@ def upload_metadata(request):
         if user and user.is_authenticated:
             data = json.loads(request.body)
             upload_id, metadata = data["upload_id"], data["metadata"]
+            try:
+                validate_json(metadata, schema="metadata")
+            except JsonValidationError as e:
+                traceback.print_exc()
+                return json_validation_response(e)
             weedcoco_path = os.path.join(
                 UPLOAD_DIR, str(user.id), str(upload_id), "weedcoco.json"
             )
@@ -376,9 +435,11 @@ def dataset_approve(request, dataset_id):
     upload_entity = Dataset.objects.get(upload_id=dataset_id, status="AR")
     if upload_entity:
         weedcoco_path = os.path.join(REPOSITORY_DIR, str(dataset_id), "weedcoco.json")
-        update_index_and_thumbnails(weedcoco_path, dataset_id)
-        review_notification("approved", dataset_id)
-        return HttpResponse("It has been approved")
+        update_index_and_thumbnails.delay(weedcoco_path, dataset_id)
+        upload_entity.status = "P"
+        upload_entity.status_details = "It's now being indexed"
+        upload_entity.save()
+        return HttpResponse("It has been sent to be indexed")
     else:
         return HttpResponseNotAllowed("Dataset to be reviewed doesn't exist")
 

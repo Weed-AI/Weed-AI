@@ -2,7 +2,7 @@ import argparse
 import os
 import json
 import pathlib
-from PIL import Image, ImageDraw
+from PIL import Image
 from weedcoco.utils import (
     check_if_approved_image_format,
     check_if_approved_image_extension,
@@ -10,51 +10,36 @@ from weedcoco.utils import (
 )
 
 
+THUMBNAIL_SIZES = {
+    "": (300, 300),
+    "lg-": (1000, 1000),
+}
+
+
 def _ensure_dir(path):
     if not os.path.isdir(os.path.dirname(str(path))):
         os.mkdir(os.path.dirname(str(path)))
 
 
-def thumbnail_one(coco_image, image_path, thumbnails_dir, thumbnail_size):
+def thumbnail_one(coco_image, image_path, thumbnails_dir, thumbnail_sizes):
     filename = os.path.basename(image_path)
-    thumb_path = thumbnails_dir / filename[:2] / filename
-    bbox_path = thumbnails_dir / ("bbox-" + filename[:2]) / filename
 
     image = Image.open(image_path)
     if not check_if_approved_image_format(image.format):
         # XXX: should this raise an error?
         return
 
-    orig_width, orig_height = image.size
-    image.thumbnail(thumbnail_size)
-    thumb_width, thumb_height = image.size
-    _ensure_dir(thumb_path)
-    image.save(thumb_path)
-
-    for annotation in coco_image["annotations"]:
-        if "bbox" not in annotation:
-            continue
-        bx, by, bw, bh = annotation["bbox"]
-        bx = bx / orig_width * thumb_width
-        bw = bw / orig_width * thumb_width
-        by = by / orig_height * thumb_height
-        bh = bh / orig_height * thumb_height
-        if annotation["category"]["name"].startswith("weed"):
-            color = "#dc3545"
-        elif annotation["category"]["name"].startswith("crop"):
-            color = "#28a745"
-        else:
-            color = "#cccccc"
-
-        draw = ImageDraw.Draw(image)
-        draw.rectangle([bx, by, bx + bw, by + bh], outline=color, width=2)
-
-    _ensure_dir(bbox_path)
-    image.save(bbox_path)
+    for dir_prefix, thumbnail_size in thumbnail_sizes.items():
+        thumb_path = thumbnails_dir / (dir_prefix + filename[:2]) / filename
+        orig_width, orig_height = image.size
+        thumb = image.copy()
+        thumb.thumbnail(thumbnail_size)
+        _ensure_dir(thumb_path)
+        thumb.save(thumb_path)
 
 
 def thumbnailing(
-    thumbnails_dir, repository_dir, weedcoco_path, THUMBNAIL_SIZE=(300, 300)
+    thumbnails_dir, repository_dir, weedcoco_path, thumbnail_sizes=THUMBNAIL_SIZES
 ):
     with open(weedcoco_path) as f:
         coco = json.load(f)
@@ -72,7 +57,7 @@ def thumbnailing(
                 coco_by_filename[filename],
                 f"{dirpath}/{filename}",
                 thumbnails_dir,
-                thumbnail_size=THUMBNAIL_SIZE,
+                thumbnail_sizes=thumbnail_sizes,
             )
 
 

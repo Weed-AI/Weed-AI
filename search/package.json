@@ -34,6 +34,7 @@
     "react-flip-move": "^3.0.4",
     "react-google-login": "^5.2.2",
     "react-helmet": "^6.1.0",
+    "react-image-magnifiers": "^1.4.0",
     "react-markdown": "^5.0.3",
     "react-router-dom": "^5.2.0",
     "react-scripts": "4.0.3",
