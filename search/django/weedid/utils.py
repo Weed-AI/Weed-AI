@@ -46,7 +46,7 @@ def store_tmp_image_from_zip(upload_image_zip, image_dir, full_images):
             for filename in filenames:
                 if filename in full_images and filename not in existing_images:
                     copy(os.path.join(dir, filename), os.path.join(image_dir, filename))
-    return list(set(full_images) - set(os.listdir(image_dir)))
+    return list(set(os.listdir(image_dir)))
 
 
 def store_tmp_weedcoco(weedcoco, upload_dir):

@@ -17,17 +17,6 @@ const UploaderZip  = props => {
                  body
                }
     }
-
-    const syncImageErrorMessage = missingImages => {
-        const missingImagesAmount = missingImages.length;
-        if (missingImagesAmount == 0 && new Set(missingImages).size === 0) {
-            props.handleValidation(true);
-            props.handleErrorMessage("");
-        } else {
-            props.handleValidation(false);
-            props.handleErrorMessage(`${missingImagesAmount} ${missingImagesAmount > 1 ? "images" : "image"} missing`, {error_type: "image", missingImages: missingImages});
-        }
-    }
   
     const handleChangeStatus = ({ meta, file, xhr }, status) => {
         if (status === 'done'){
@@ -37,7 +26,7 @@ const UploaderZip  = props => {
                     props.handleValidation(true)
                     props.handleErrorMessage("")
                 } else {
-                    syncImageErrorMessage(res.missing_images)
+                    props.syncImageErrorMessage(res.missing_images)
                 }
             }
         }

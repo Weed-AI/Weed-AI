@@ -8,8 +8,6 @@ import Typography from '@material-ui/core/Typography';
 import UploaderSingle from './uploader_single';
 import UploaderVoc from './uploader_voc';
 import UploaderMasks from './uploader_masks';
-import UploaderImages from './uploader_images';
-import UploaderZip from './uploader_zip';
 import CategoryMapper from './uploader_category_mapper';
 import ErrorMessage from '../error/display';
 import AgContextForm from '../forms/AgContextForm';
@@ -18,10 +16,8 @@ import MetadataForm from '../forms/MetadataForm';
 import axios from 'axios';
 import Cookies from 'js-cookie';
 import cloneDeep from 'lodash/cloneDeep';
-import MenuItem from '@material-ui/core/MenuItem';
-import FormControl from '@material-ui/core/FormControl';
-import Select from '@material-ui/core/Select';
 import {jsonSchemaTitle} from '../error/utils';
+import ImageOrZipUploader from './uploader_zip_images';
 
 
 const baseURL = new URL(window.location.origin);
@@ -327,7 +323,7 @@ class UploadStepper extends React.Component {
         })
     }
 
-    getStepContent() {
+    getStepContent(imageUploader) {
         const step = stepsByType[this.props.upload_type][this.state.activeStep].type
         switch (step) {
             case "coco-upload":
@@ -360,12 +356,6 @@ class UploadStepper extends React.Component {
                         <UploadJsonButton initialValue={this.state.metadata} downloadName="dataset-meta" onClose={(value) => {this.handleMetadataFormData(value)}} />
                     </React.Fragment>
                 )
-            case "images":
-                return this.state.upload_image_format === "image"
-                       ?
-                       <UploaderImages upload_id={this.state.upload_id} images={this.state.images} handleValidation={this.handleValidation} handleErrorMessage={this.handleErrorMessage}/>
-                       :
-                       <UploaderZip upload_id={this.state.upload_id} images={this.state.images} handleValidation={this.handleValidation} handleErrorMessage={this.handleErrorMessage}/>
             default:
                 return ''
         }
@@ -412,24 +402,9 @@ class UploadStepper extends React.Component {
             </Stepper>
             <div>
                 <div className={classes.instructions}>
-                    {this.getStepContent(stepName)}
+                    {this.getStepContent()}
+                    <ImageOrZipUploader stepName={stepName} upload_id={this.state.upload_id} images={this.state.images} handleValidation={this.handleValidation} handleErrorMessage={this.handleErrorMessage} />
                 </div>
-                {stepName === "images" ?
-                    <FormControl className={classes.imageFormatSelection}>
-                        <Select
-                        value={this.state.upload_image_format}
-                        displayEmpty
-                        onChange={this.handleUploadImageFormat}
-                        >
-                            <MenuItem value="" disabled>
-                                Select upload format
-                            </MenuItem>
-                            <MenuItem value="image">Upload Image Files</MenuItem>
-                            <MenuItem value="zip">Upload Images in Zip</MenuItem>
-                        </Select>
-                    </FormControl>
-                    : ""
-                }
                 <ErrorMessage error={this.state.error_message} details={this.state.error_message_details}/>
                 <div>
                     <Button disabled={this.state.activeStep === 0} onClick={this.handleBack} className={classes.button}>
