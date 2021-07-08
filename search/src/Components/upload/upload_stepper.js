@@ -323,7 +323,7 @@ class UploadStepper extends React.Component {
         })
     }
 
-    getStepContent(imageUploader) {
+    getStepContent() {
         const step = stepsByType[this.props.upload_type][this.state.activeStep].type
         switch (step) {
             case "coco-upload":
