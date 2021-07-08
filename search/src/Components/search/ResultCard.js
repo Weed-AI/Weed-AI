@@ -1,5 +1,6 @@
 import React from 'react';
 import CategoryTooltip from './CategoryTooltip';
+import { parseCategoryName } from '../../Common/weedcocoUtil';
 import Tooltip from '@material-ui/core/Tooltip';
 import {
     ResultCard
@@ -45,7 +46,7 @@ const BBox = ({ classes, item, annot, nCategories, containerWidth, containerHeig
   const thumbScale = aspectRatio >= (containerWidth / containerHeight) ? containerWidth / item.width : containerHeight / item.height;
   const thumbTop = 0 // (containerHeight - item.height * thumbScale) / 2;
   const thumbLeft = 0 // (containerWidth - item.width * thumbScale) / 2;
-  const species = annot.category.name.match(/^([^:]*): (.*)/)[2]
+  const { species } = parseCategoryName(annot.category.name);
   const color = annot.category.name.startsWith("weed") ? "#dc3545" : annot.category.name.startsWith("crop") ? "#28a745" : "#808080";
   return <div className={classes.bbox} style={{
     borderColor: color,
@@ -62,9 +63,9 @@ const BBox = ({ classes, item, annot, nCategories, containerWidth, containerHeig
 }
 
 const AnnotationCategory = ({ categoryName }) => {
-  const [role, species] = categoryName.match(/^([^:]*): (.*)/).slice(1);
+  const { role, species } = parseCategoryName(categoryName);
   return <CategoryTooltip categoryName={categoryName}>
-    <li className={role}>{species}</li>
+    <li className={role}>{species || role}</li>
   </CategoryTooltip>
 };
 
