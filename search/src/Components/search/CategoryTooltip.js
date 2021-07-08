@@ -5,6 +5,7 @@ import Typography from '@material-ui/core/Typography';
 import Link from '@material-ui/core/Link';
 import Tooltip from '@material-ui/core/Tooltip';
 import wssa_vernacular_names from '../../Data/wssa_vernacular_names.json';
+import { parseCategoryName } from '../../Common/weedcocoUtil';
 
 const useStyles = makeStyles((theme) => ({
   taxonomy: {
@@ -52,7 +53,7 @@ export const CategoryCard = (props) => {
     });
   }
   // Workaround for anomalies in GBIF vernacular names: use WSSA names
-  const updatedVernacularName = wssa_vernacular_names[canonicalName.toLowerCase()] || vernacularName;
+  const updatedVernacularName = wssa_vernacular_names[(canonicalName || "").toLowerCase()] || vernacularName;
   return (
     <React.Fragment>
     <Typography variant="body1" className={classes.heading}>{categoryName}</Typography>
@@ -77,7 +78,7 @@ const gbifPromisesCache = {
 
 const CategoryTooltip = ({ categoryName, children }) => {
   const [gbifData, setGbifData] = React.useState({});
-  const species = categoryName.match(/^([^:]*): (.*)/)[2];
+  const { species } = parseCategoryName(categoryName);
   React.useEffect(() => {
     if (species === undefined)
       return;
