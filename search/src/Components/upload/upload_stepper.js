@@ -86,14 +86,12 @@ class UploadStepper extends React.Component {
             stepValid: stepsByType[this.props.upload_type].reduce((steps, step) => {return {...steps, [step.type]: false}}, {}),
             error_message: "",
             error_message_details: "",
-            upload_image_format: "image",
         }
         this.isStepOptional = this.isStepOptional.bind(this);
         this.isStepSkipped = this.isStepSkipped.bind(this);
         this.handleUploadId = this.handleUploadId.bind(this);
         this.handleImageExtension = this.handleImageExtension.bind(this);
         this.handleImages = this.handleImages.bind(this);
-        this.handleUploadImageFormat = this.handleUploadImageFormat.bind(this);
         this.handleCategories = this.handleCategories.bind(this);
         this.handleUpdateCategories = this.handleUpdateCategories.bind(this);
         this.handleAgContextsFormData = this.handleAgContextsFormData.bind(this);
@@ -132,10 +130,6 @@ class UploadStepper extends React.Component {
     handleImages(images) {
         this.setState({images: images});
     }
-
-    handleUploadImageFormat(event){
-        this.setState({upload_image_format: event.target.value})
-    };
 
     handleCategories(categories) {
         this.setState({categories: cloneDeep(categories)});
@@ -356,6 +350,8 @@ class UploadStepper extends React.Component {
                         <UploadJsonButton initialValue={this.state.metadata} downloadName="dataset-meta" onClose={(value) => {this.handleMetadataFormData(value)}} />
                     </React.Fragment>
                 )
+            case "images":
+                return <ImageOrZipUploader stepName={step} upload_id={this.state.upload_id} images={this.state.images} handleValidation={this.handleValidation} handleErrorMessage={this.handleErrorMessage} />
             default:
                 return ''
         }
@@ -403,7 +399,6 @@ class UploadStepper extends React.Component {
             <div>
                 <div className={classes.instructions}>
                     {this.getStepContent()}
-                    <ImageOrZipUploader stepName={stepName} upload_id={this.state.upload_id} images={this.state.images} handleValidation={this.handleValidation} handleErrorMessage={this.handleErrorMessage} />
                 </div>
                 <ErrorMessage error={this.state.error_message} details={this.state.error_message_details}/>
                 <div>
