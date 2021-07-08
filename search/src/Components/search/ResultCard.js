@@ -105,8 +105,7 @@ const WeedAIResultCard = (props) => {
         <ResultCard.Description style={{position: "absolute", bottom: "12px"}}>
             <ul className="annotations">
             {
-                // TODO: make this more idiomatically React
-                Array.from(categoryNames).map(
+                Array.from(new Set(item.annotation__category__name)).map(
                   (annotName) => <AnnotationCategory categoryName={annotName} key={annotName} />)
             }
             </ul>
