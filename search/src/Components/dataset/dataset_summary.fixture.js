@@ -26,9 +26,9 @@ export default <DatasetSummaryWrapper
     }}
     agcontexts={[
         {"n_images": 3, "category_statistics": 
-    {"crop: foo": {"annotation_count": 2, "image_count": 1, "segmentation_count": 2, "bounding_box_count": 2},
-    "weed: bar": {"annotation_count": 3, "image_count": 2, "segmentation_count": 3, "bounding_box_count": 3},
-    "weed: blah": {"annotation_count": 1, "image_count": 1, "segmentation_count": 0, "bounding_box_count": 0}},
+    {"crop: daucus carota sativus": {"annotation_count": 2, "image_count": 1, "segmentation_count": 2, "bounding_box_count": 2},
+    "weed: lolium perenne": {"annotation_count": 3, "image_count": 2, "segmentation_count": 3, "bounding_box_count": 3},
+    "weed: raphanus raphanistrum": {"annotation_count": 1, "image_count": 1, "segmentation_count": 0, "bounding_box_count": 0}},
             "id": 77, "lighting": "natural", "bbch_code": "na", "crop_type": "sorghum", "camera_fov": "variable", "camera_lens": "Telephoto", "camera_make": "Canon", "soil_colour": "dark_brown", "camera_angle": 45, "emr_channels": "visual", "location_lat": 80, "camera_height": 500, "location_long": 80, "surface_cover": "oilseed", "cropped_to_plant": true, "surface_coverage": "0-25", "weather_description": "rainy", "bbch_descriptive_text": "stem elongation", "camera_lens_focallength": 180, "grains_descriptive_text": "emergence", "photography_description": "poor lighting"}]
     }
 />;

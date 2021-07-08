@@ -1,4 +1,5 @@
 import React from 'react';
+import CategoryTooltip from './CategoryTooltip';
 import Tooltip from '@material-ui/core/Tooltip';
 import {
     ResultCard
@@ -60,6 +61,13 @@ const BBox = ({ classes, item, annot, nCategories, containerWidth, containerHeig
   </div>
 }
 
+const AnnotationCategory = ({ categoryName }) => {
+  const [role, species] = categoryName.match(/^([^:]*): (.*)/).slice(1);
+  return <CategoryTooltip categoryName={categoryName}>
+    <li className={role}>{species}</li>
+  </CategoryTooltip>
+};
+
 const WeedAIResultCard = (props) => {
   const [ loadZoom, setLoadZoom ] = React.useState(false); // used to avoid pre-loading too many images
   const {item, baseURL, linkToDataset} = props;
@@ -97,11 +105,8 @@ const WeedAIResultCard = (props) => {
         <ResultCard.Description style={{position: "absolute", bottom: "12px"}}>
             <ul className="annotations">
             {
-                // TODO: make this more idiomatically React
-                Array.from(categoryNames).map((annotName) => {
-                    const annot = annotName.match(/^([^:]*): (.*)/)
-                    return annot.length > 0 ? (<Tooltip title={annotName}><li className={annot[1]}>{annot[2]}</li></Tooltip>) : ""
-                })
+                Array.from(new Set(item.annotation__category__name)).map(
+                  (annotName) => <AnnotationCategory categoryName={annotName} key={annotName} />)
             }
             </ul>
             {
