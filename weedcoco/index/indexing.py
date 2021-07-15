@@ -3,7 +3,9 @@ import os
 import pathlib
 import json
 import sys
-from elasticsearch import Elasticsearch, helpers
+from uuid import uuid4
+import elasticsearch  # using `from elastisearch` breaks elasticmock
+from elasticsearch import helpers
 from weedcoco.utils import (
     denormalise_weedcoco,
     lookup_growth_stage_name,
@@ -46,9 +48,10 @@ class ElasticSearchIndexer:
         if dry_run:
             self.es_client = sys.stdout
         else:
-            self.es_client = Elasticsearch(hosts=hosts)
+            self.es_client = elasticsearch.Elasticsearch(hosts=hosts)
         self.indexes = indexes if indexes is not None else {}
         self.upload_id = upload_id
+        self.version_tag = str(uuid4())
 
     def generate_index_entries(self):
         """
@@ -135,6 +138,7 @@ class ElasticSearchIndexer:
                 "location"
             ] = f'{image["agcontext"]["location_lat"]}, {image["agcontext"]["location_long"]}'
             image["dataset_name"] = coco["info"]["metadata"]["name"]
+            image["version_tag"] = self.version_tag
             yield image
 
     def generate_batches(self):
@@ -166,11 +170,37 @@ class ElasticSearchIndexer:
                 # a file for dry run
                 self.es_client.write(json.dumps(index_batch, indent=2))
 
+    def remove_other_versions(self):
+        # in case other filenames had been submitted with this upload_id
+        if self.upload_id == "#":
+            raise ValueError("remove_other_versions requires upload_id != '#'")
+        assert '"' not in self.upload_id
+        assert "\\" not in self.upload_id
+
+        if not hasattr(self.es_client, "bulk"):
+            return
+        body = f"""
+        {{
+          "query": {{
+            "bool": {{
+              "match": {{
+                "upload_id": "{self.upload_id}"
+              }}
+            }},
+            "must_not": {{
+                "version_tag": "{self.version_tag}"
+            }}
+          }}
+        }}
+        """
+        self.es_client.delete_by_query(self.es_index_name, body)
+
 
 def main(args=None):
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--weedcoco-path", type=pathlib.Path, required=True)
     ap.add_argument("--thumbnail-dir", type=pathlib.Path, required=True)
+    ap.add_argument("--upload-id", required=True)
     ap.add_argument(
         "--dry-run",
         action="store_true",
@@ -178,11 +208,13 @@ def main(args=None):
         help="When set, index entries will be printed to stdout instead of the Elastic server.",
     )
     args = ap.parse_args(args)
-    return ElasticSearchIndexer(
-        args.weedcoco_path, args.thumbnail_dir, dry_run=args.dry_run
-    )
+    ElasticSearchIndexer(
+        args.weedcoco_path,
+        args.thumbnail_dir,
+        dry_run=args.dry_run,
+        upload_id=args.upload_id,
+    ).post_index_entries()
 
 
 if __name__ == "__main__":
-    es_index = main()
-    es_index.post_index_entries()
+    main()

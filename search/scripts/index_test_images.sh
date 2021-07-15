@@ -29,6 +29,6 @@ post() {
 }
 
 (
-	post --thumbnail-dir deepweeds --weedcoco-path "$repo_root/weedcoco/deepweeds_to_json/deepweeds_imageinfo.json"
-	post --thumbnail-dir cwfid --weedcoco-path "$repo_root/weedcoco/cwfid_to_json/cwfid_imageinfo.json"
+	post --thumbnail-dir deepweeds --weedcoco-path "$repo_root/weedcoco/deepweeds_to_json/deepweeds_imageinfo.json" --upload-id deepweeds
+	post --thumbnail-dir cwfid --weedcoco-path "$repo_root/weedcoco/cwfid_to_json/cwfid_imageinfo.json" --upload cwfid
 )
