@@ -1,14 +1,16 @@
 import React from 'react';
 import CategoryTooltip from './CategoryTooltip';
+import { parseCategoryName } from '../../Common/weedcocoUtil';
 import Tooltip from '@material-ui/core/Tooltip';
 import {
     ResultCard
 } from '@appbaseio/reactivesearch';
 
+
 const AnnotationCategory = ({ categoryName }) => {
-  const [role, species] = categoryName.match(/^([^:]*): (.*)/).slice(1);
+  const { role, species } = parseCategoryName(categoryName);
   return <CategoryTooltip categoryName={categoryName}>
-    <li className={role}>{species}</li>
+    <li className={role}>{species || role}</li>
   </CategoryTooltip>
 };
 
