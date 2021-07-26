@@ -13,6 +13,7 @@ api_urlpatterns = [
     path("submit_mask/", views.MaskUploader.submit, name="submit_mask"),
     path("move_mask/", views.MaskUploader.move, name="move_mask"),
     path("upload_image/", views.upload_image, name="upload_image"),
+    path("upload_image_zip/", views.upload_image_zip, name="upload_image_zip"),
     path("update_categories/", views.update_categories, name="update_categories"),
     path("upload_agcontexts/", views.upload_agcontexts, name="upload_agcontexts"),
     path("upload_metadata/", views.upload_metadata, name="upload_metadata"),

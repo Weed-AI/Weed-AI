@@ -8,7 +8,6 @@ import Typography from '@material-ui/core/Typography';
 import UploaderSingle from './uploader_single';
 import UploaderVoc from './uploader_voc';
 import UploaderMasks from './uploader_masks';
-import UploaderImages from './uploader_images';
 import CategoryMapper from './uploader_category_mapper';
 import ErrorMessage from '../error/display';
 import AgContextForm from '../forms/AgContextForm';
@@ -18,6 +17,7 @@ import axios from 'axios';
 import Cookies from 'js-cookie';
 import cloneDeep from 'lodash/cloneDeep';
 import {jsonSchemaTitle} from '../error/utils';
+import ImageOrZipUploader from './uploader_zip_images';
 
 
 const baseURL = new URL(window.location.origin);
@@ -32,6 +32,9 @@ const useStyles = (theme) => ({
   instructions: {
     marginTop: theme.spacing(1),
     marginBottom: theme.spacing(1),
+  },
+  imageFormatSelection: {
+    margin: theme.spacing(1),
   },
 });
 
@@ -348,7 +351,7 @@ class UploadStepper extends React.Component {
                     </React.Fragment>
                 )
             case "images":
-                return <UploaderImages upload_id={this.state.upload_id} images={this.state.images} handleValidation={this.handleValidation} handleErrorMessage={this.handleErrorMessage}/>
+                return <ImageOrZipUploader stepName={step} upload_id={this.state.upload_id} images={this.state.images} handleValidation={this.handleValidation} handleErrorMessage={this.handleErrorMessage} />
             default:
                 return ''
         }
@@ -394,9 +397,9 @@ class UploadStepper extends React.Component {
                 })}
             </Stepper>
             <div>
-                <Typography className={classes.instructions}>
-                    {this.getStepContent(stepName)}
-                </Typography>
+                <div className={classes.instructions}>
+                    {this.getStepContent()}
+                </div>
                 <ErrorMessage error={this.state.error_message} details={this.state.error_message_details}/>
                 <div>
                     <Button disabled={this.state.activeStep === 0} onClick={this.handleBack} className={classes.button}>
