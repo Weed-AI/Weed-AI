@@ -1,10 +1,10 @@
 # Welcome to Weed-AI
 <p align="left">
-<a href="https://img.shields.io/github/contributors/Sydney-Informatics-Hub/Weed-AI" alt="Contributors">
+<a href="https://github.com/Sydney-Informatics-Hub/Weed-AI/graphs/contributors" alt="Contributors">
         <img src="https://img.shields.io/github/contributors/Sydney-Informatics-Hub/Weed-AI"/></a>
-<a href="	https://img.shields.io/github/issues/Sydney-Informatics-Hub/Weed-AI" alt="Issues">
+<a href="https://github.com/Sydney-Informatics-Hub/Weed-AI/issues" alt="Issues">
         <img src="https://img.shields.io/github/issues/Sydney-Informatics-Hub/Weed-AI"/></a>
-<a href="https://img.shields.io/github/license/Sydney-Informatics-Hub/Weed-AI" alt="License">
+<a href="https://github.com/Sydney-Informatics-Hub/Weed-AI/blob/master/LICENSE" alt="License">
         <img src="https://img.shields.io/github/license/Sydney-Informatics-Hub/Weed-AI"/></a>
 </p>
 
