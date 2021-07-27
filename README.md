@@ -2,8 +2,6 @@
 <p align="left">
 <a href="https://img.shields.io/github/contributors/Sydney-Informatics-Hub/Weed-AI" alt="Contributors">
         <img src="https://img.shields.io/github/contributors/Sydney-Informatics-Hub/Weed-AI"/></a>
-<a href="https://img.shields.io/github/contributors/Sydney-Informatics-Hub/Weed-AI" alt="Contributors">
-        <img src="https://img.shields.io/github/contributors/Sydney-Informatics-Hub/Weed-AI"/></a>
 <a href="	https://img.shields.io/github/issues/Sydney-Informatics-Hub/Weed-AI" alt="Issues">
         <img src="https://img.shields.io/github/issues/Sydney-Informatics-Hub/Weed-AI"/></a>
 <a href="https://img.shields.io/github/license/Sydney-Informatics-Hub/Weed-AI" alt="License">
