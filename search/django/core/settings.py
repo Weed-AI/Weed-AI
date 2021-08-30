@@ -1,4 +1,5 @@
 import os
+from celery.schedules import crontab
 
 SITE_BASE_URL = "https://weed-ai.sydney.edu.au"
 
@@ -33,6 +34,7 @@ FILE_UPLOAD_MAX_MEMORY_SIZE = MAX_IMAGE_SIZE
 # Application definition
 
 # SMTP config
+SEND_EMAIL = os.environ.get("SEND_EMAIL", True)
 SMTP_HOST = os.environ.get("SMTP_HOST", "smtp.sydney.edu.au")
 SMTP_PORT = os.environ.get("SMTP_PORT", 25)
 FROM_EMAIL = os.environ.get("FROM_EMAIL", "Weed-AI <weed-ai.app@sydney.edu.au>")
@@ -137,6 +139,15 @@ STATIC_ROOT = os.path.join(BASE_DIR, "mystatic")
 STATIC_URL = "/mystatic/"
 
 CELERY_BROKER_URL = os.environ.get("CELERY_BROKER", "redis://redis:6379/0")
-CELERY_RESULT_BACKEND = os.environ.get("CELERY_BACKEND", "redis://redis:6379/0")
 CELERY_RESULT_BACKEND = "django-db"
 CELERY_CACHE_BACKEND = "django-cache"
+
+GIT_REMOTE_PATH = os.environ.get("GIT_REMOTE_PATH")
+DVC_REMOTE_PATH = os.environ.get("DVC_REMOTE_PATH")
+
+CELERY_BEAT_SCHEDULE = {
+    "regular-versioned-backup": {
+        "task": "weedid.tasks.backup_repository_changes",
+        "schedule": crontab(minute="0", hour="*/3"),
+    },
+}

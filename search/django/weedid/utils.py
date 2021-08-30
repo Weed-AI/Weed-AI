@@ -5,6 +5,9 @@ import re
 from uuid import uuid4
 import smtplib
 from email.message import EmailMessage
+import tempfile
+from zipfile import ZipFile
+from shutil import copy
 from weedcoco.repo.deposit import mkdir_safely
 from weedcoco.utils import set_info, set_licenses
 from weedcoco.stats import WeedCOCOStats
@@ -17,22 +20,44 @@ from core.settings import (
     SMTP_HOST,
     SMTP_PORT,
     FROM_EMAIL,
+    SEND_EMAIL,
 )
 
 
+class OverwriteStorage(FileSystemStorage):
+    def get_available_name(self, name, max_length=None):
+        if self.exists(name):
+            os.remove(name)
+        return name
+
+
 def store_tmp_image(image, image_dir):
-    fs = FileSystemStorage()
+    fs = OverwriteStorage()
     fs.save(os.path.join(image_dir, image.name), image)
 
 
+def store_tmp_image_from_zip(upload_image_zip, image_dir, full_images):
+    if not os.path.isdir(image_dir):
+        mkdir_safely(image_dir)
+    existing_images = os.listdir(image_dir)
+    with tempfile.TemporaryDirectory() as tempdir:
+        ZipFile(upload_image_zip).extractall(tempdir)
+        for dir, _, filenames in os.walk(tempdir):
+            # FIXME: this should reject a zip upload if two filenames are identical
+            for filename in filenames:
+                if filename in full_images and filename not in existing_images:
+                    copy(os.path.join(dir, filename), os.path.join(image_dir, filename))
+    return list(set(os.listdir(image_dir)))
+
+
 def store_tmp_weedcoco(weedcoco, upload_dir):
-    fs = FileSystemStorage()
+    fs = OverwriteStorage()
     weedcoco_path = os.path.join(upload_dir, "weedcoco.json")
     fs.save(weedcoco_path, weedcoco)
 
 
 def store_tmp_voc(voc, voc_dir):
-    fs = FileSystemStorage()
+    fs = OverwriteStorage()
     fs.save(os.path.join(voc_dir, voc.name), voc)
 
 
@@ -42,8 +67,8 @@ def store_tmp_voc_coco(weedcoco, upload_dir):
         weedcoco_file.write(json.dumps(weedcoco))
 
 
-def move_voc_to_upload(voc_dir, upload_dir):
-    move(voc_dir, upload_dir + "/voc")
+def move_to_upload(store_dir, upload_dir, mode=""):
+    move(store_dir, os.path.join(upload_dir, mode))
 
 
 def setup_upload_dir(upload_userid_dir):
@@ -165,12 +190,13 @@ def validate_email_format(email):
 
 
 def send_email(subject, body, recipients):
-    with smtplib.SMTP(SMTP_HOST, SMTP_PORT) as smtp:
-        for recipient in recipients:
-            msg = EmailMessage()
-            msg["Subject"], msg["From"], msg["To"] = subject, FROM_EMAIL, recipient
-            msg.set_content(body)
-            smtp.send_message(msg)
+    if SEND_EMAIL is True:
+        with smtplib.SMTP(SMTP_HOST, SMTP_PORT) as smtp:
+            for recipient in recipients:
+                msg = EmailMessage()
+                msg["Subject"], msg["From"], msg["To"] = subject, FROM_EMAIL, recipient
+                msg.set_content(body)
+                smtp.send_message(msg)
 
 
 def parse_category_name(category):

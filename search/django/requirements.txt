@@ -1,8 +1,9 @@
 django==2.2.20
-psycopg2
-requests
-django-cors-headers
+psycopg2==2.8.6
+requests==2.24.0
+django-cors-headers==3.6.0
 celery==4.4.7
-django-celery-results
-django-celery-beat
-redis
+django-celery-results==2.0.1
+django-celery-beat==2.2.0
+redis==3.5.3
+dvc==2.4.2

@@ -2,9 +2,11 @@ import zipfile
 from collections import defaultdict
 import datetime
 import requests
+import pathlib
 import io
 import os
 from xml.etree import ElementTree
+import joblib
 
 # This uses data from https://data.eppo.int/ in accordance with
 # the EPPO Codes Open Data Licence (https://data.eppo.int/media/Open_Licence.pdf)
@@ -12,6 +14,7 @@ from xml.etree import ElementTree
 # TODO: get non-taxonomic group membership for a list of all crop species (3CRGK), for instance
 
 
+memory = joblib.Memory(pathlib.Path(__file__).parent / "_cache")
 SOURCE_URL = "https://data.eppo.int/files/xmlfull.zip"
 DEFAULT_LANGUAGES = ("en",)
 DEFAULT_TYPES = ("PFL", "SPT")
@@ -62,8 +65,8 @@ class EppoTaxonomy:
                     self._by_lang_name[lang, name.lower()].append(entry)
         self._by_lang_name.default_factory = None
 
-    @staticmethod
-    def _parse_xml(path, cache=False):
+    @classmethod
+    def _parse_xml(cls, path, cache=False, retries=2):
         # TODO: invalidate cache if URL is updated, or after specified period
         if cache:
             if path is None:
@@ -81,13 +84,21 @@ class EppoTaxonomy:
                     cache_file.write(resp.content)
             else:
                 path = io.BytesIO(resp.content)
-        if hasattr(path, "endswith") and path.endswith(".xml"):
-            file = open(path)
-        else:
-            file = zipfile.ZipFile(path).open("fullcodes.xml")
+        try:
+            if hasattr(path, "endswith") and path.endswith(".xml"):
+                file = open(path)
+            else:
+                file = zipfile.ZipFile(path).open("fullcodes.xml")
+            with file:
+                root = ElementTree.parse(file)
+        except Exception:
+            if cache and retries:
+                # retry
+                pathlib.Path(path).unlink()
+                return cls._parse_xml(path=path, cache=cache, retries=retries - 1)
+            else:
+                raise
 
-        with file:
-            root = ElementTree.parse(file)
         return root
 
     @staticmethod
@@ -184,7 +195,7 @@ def get_eppo_singleton(
 ):
     # Note: languages and types should be sorted tuples
     if (languages, types) not in _EPPO_SINGLETON:
-        _EPPO_SINGLETON[languages, types] = EppoTaxonomy(
-            path=path, cache=cache, languages=languages, types=types
+        _EPPO_SINGLETON[languages, types] = memory.cache(EppoTaxonomy)(
+            path=str(path), cache=cache, languages=languages, types=types
         )
     return _EPPO_SINGLETON[languages, types]
