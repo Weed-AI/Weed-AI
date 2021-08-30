@@ -6,7 +6,7 @@ import axios from 'axios';
 import Cookies from 'js-cookie';
 
 
-const voc_max_size = 1024 * 5;
+const voc_max_size = 1024 * 100;
 const UploaderVoc = (props) => {
     const baseURL = new URL(window.location.origin);
 
