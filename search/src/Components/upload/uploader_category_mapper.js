@@ -81,7 +81,7 @@ class CategoryMapper extends React.Component {
                             return (
                                 <li className={category.role && category.name ? classes.row : `${classes.row} ${classes.incomplete}`}>
                                     {/^[0-9A-Fa-f]{6}$/i.test(category.name) ? <div className={classes.color} style={{backgroundColor: '#' + category.name}}></div> : <p>{category.name}</p>}
-                                    <p className={classes.text_field}> is a</p>
+                                    <p className={classes.text_field}>&nbsp;&nbsp;is a</p>
                                     <FormControl className={classes.formControl}>
                                         <InputLabel id="category">Role</InputLabel>
                                         <Select
