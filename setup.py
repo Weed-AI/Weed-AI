@@ -18,7 +18,7 @@ requirements = [
     "pycocotools",
     "imagehash",
     "requests",
-    "elasticsearch",
+    "elasticsearch==7.13.*",
     "joblib",
 ]
 
