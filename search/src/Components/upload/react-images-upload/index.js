@@ -76,7 +76,7 @@ class ReactImageUploadComponent extends React.Component {
         name: file.name,
       };
       // Check for duplication
-      if (!this.props.images.includes(file.name) || filesName.includes(file.name)){
+      if (this.props.images && !this.props.images.includes(file.name) || filesName.includes(file.name)){
         continue;
       }
       // Check for file extension
@@ -110,7 +110,7 @@ class ReactImageUploadComponent extends React.Component {
       const {singleImage} = this.props;
       const body = new FormData()
       body.append('upload_image', newFileData.file)
-      body.append('upload_id', this.props.upload_id)
+      body.append(this.props.idName ? this.props.idName : "upload_id", this.props.upload_id)
       axios({
           method: 'post',
           url: this.props.uploadURL,
