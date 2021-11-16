@@ -27,10 +27,9 @@ jobs:
       - name: Install
         run: |
           pip install .[test]
-          python -c 'import weedcoco; print(weedcoco.__file__)'
           rm -r build
       - name: Test
-        run: pytest --cov=weedcoco/ --cov-report=xml 
+        run: pytest --cov=weedcoco/ --cov-report=xml
       - uses: codecov/codecov-action@v1
         with:
           flags: weedcoco
