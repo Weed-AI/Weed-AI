@@ -26,7 +26,7 @@ AUTH_USER_MODEL = "weedid.WeedidUser"
 
 # Scale file size of upload limit up to 10 MB
 MAX_IMAGE_SIZE = 1024 * 1024 * 10
-MAX_VOC_SIZE = 1024 * 5
+MAX_VOC_SIZE = 1024 * 100
 DATA_UPLOAD_MAX_MEMORY_SIZE = MAX_IMAGE_SIZE
 # Avoid permissions bug, see https://github.com/django-cms/django-filer/issues/1031
 FILE_UPLOAD_MAX_MEMORY_SIZE = MAX_IMAGE_SIZE
