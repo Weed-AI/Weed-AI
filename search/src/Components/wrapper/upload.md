@@ -31,11 +31,13 @@ restrictions made.
 
 ## Data Quality Requirements
 
-Submitted datasets that contain any of the following will be rejected by
+Images submitted should be unedited and of high quality. Submitted datasets that contain any of the following will be rejected by
 dataset reviewers:
 
 * Irrelevant images (such as non-weed or crop imagery)
-*  Poor image quality (over/under exposed, blurry images)
+* Poor image quality (over/under exposed, blurry images)
+* Augmented images (those that have been processed in some manner)
+* Synthetic images (computer-based generation of image data)
 * Unlabelled or poorly labelled data
 * Images with personally identifiable content (such as faces and vehicle details)
 * Images with explicit content

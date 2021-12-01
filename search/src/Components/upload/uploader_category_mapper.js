@@ -25,7 +25,8 @@ const useStyles = (theme) => ({
         minWidth: 120,
     },
     text_field: {
-        marginRight: '1em'
+        marginRight: '1em',
+        marginLeft: '1em',
     },
     applyButton: {
         float: 'right'
