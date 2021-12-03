@@ -1,4 +1,4 @@
-version: "3"
+version: "3.3"
 
 x-logging: 
   &default-logging
@@ -154,7 +154,7 @@ services:
        - ./:/code # for development, unused in production
        - /code/node_modules # an exception from the above volume
     ports:
-      - "8080:80"
+      - "8081:80"
     environment:
       - NODE_ENV=development
     networks:
@@ -163,6 +163,96 @@ services:
     depends_on:
       - elasticsearch
     logging: *default-logging
+
+  cvat_db:
+    container_name: weedai_cvat_db
+    image: postgres:10-alpine
+    restart: always
+    environment:
+      POSTGRES_USER: root
+      POSTGRES_DB: cvat
+      POSTGRES_HOST_AUTH_METHOD: trust
+    volumes:
+      - cvat_db:/var/lib/postgresql/data
+    networks:
+      - elastic
+
+  cvat_redis:
+    container_name: weedai_cvat_redis
+    image: redis:4.0-alpine
+    restart: always
+    networks:
+      - elastic
+
+  cvat:
+    container_name: weedai_cvat
+    image: openvino/cvat_server
+    restart: always
+    depends_on:
+      - cvat_redis
+      - cvat_db
+    environment:
+      DJANGO_MODWSGI_EXTRA_ARGS: ''
+      ALLOWED_HOSTS: '*'
+      CVAT_REDIS_HOST: 'cvat_redis'
+      CVAT_POSTGRES_HOST: 'cvat_db'
+      ADAPTIVE_AUTO_ANNOTATION: 'false'
+    labels:
+      - traefik.enable=true
+      - traefik.http.services.cvat.loadbalancer.server.port=8080
+      - traefik.http.routers.cvat.rule=Host(`${CVAT_HOST:-localhost}`) &&
+          PathPrefix(`/annotation/api/`, `/annotation/git/`, `/annotation/opencv/`, `/annotation/analytics/`, `/annotation/static/`, `/annotation/admin`, `/annotation/documentation/`, `/annotation/django-rq`)
+      - traefik.http.routers.cvat.entrypoints=web
+      - traefik.http.routers.cvat.middlewares=add-cvat
+      - traefik.http.middlewares.add-cvat.stripprefix.prefixes=/annotation
+      - traefik.http.middlewares.add-cvat.stripprefix.forceSlash=true
+    volumes:
+      - cvat_data:/home/django/data
+      - cvat_keys:/home/django/keys
+      - cvat_logs:/home/django/logs
+    networks:
+      - elastic
+
+  cvat_ui:
+    container_name: weedai_cvat_ui
+    image: openvino/cvat_ui
+    restart: always
+    depends_on:
+      - cvat
+    labels:
+      - traefik.enable=true
+      - traefik.http.services.cvat-ui.loadbalancer.server.port=80
+      - traefik.http.routers.cvat-ui.rule=Host(`${CVAT_HOST:-localhost}`)
+      - traefik.http.routers.cvat-ui.entrypoints=web
+      - traefik.http.routers.cvat-ui.middlewares=add-cvat-ui
+      - traefik.http.middlewares.add-cvat-ui.stripprefix.prefixes=/annotation
+      - traefik.http.middlewares.add-cvat-ui.stripprefix.forceSlash=true
+    networks:
+      - elastic
+
+  traefik:
+    image: traefik:v2.4
+    container_name: weedai_traefik
+    restart: always
+    command:
+      - "--providers.docker.exposedByDefault=false"
+      - "--providers.docker.network=elastic"
+      - "--entryPoints.web.address=:8080"
+    # Uncomment to get Traefik dashboard
+    #   - "--entryPoints.dashboard.address=:8090"
+    #   - "--api.dashboard=true"
+    # labels:
+    #   - traefik.enable=true
+    #   - traefik.http.routers.dashboard.entrypoints=dashboard
+    #   - traefik.http.routers.dashboard.service=api@internal
+    #   - traefik.http.routers.dashboard.rule=Host(`${CVAT_HOST:-localhost}`)
+    ports:
+      - 8080:8080
+      - 8090:8090
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    networks:
+      - elastic
 
 networks:
   elastic:
@@ -183,3 +273,7 @@ volumes:
     driver: local
   mystatic_dir:
     driver: local
+  cvat_db:
+  cvat_data:
+  cvat_keys:
+  cvat_logs:
