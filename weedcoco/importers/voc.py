@@ -32,6 +32,7 @@ def generate_coco_annotations(
                 dims["xmax"] - dims["xmin"] + 1,
                 dims["ymax"] - dims["ymin"] + 1,
             ]
+            annotation["segmentation"] = [] # pycocotools requires this
         yield annotation
 
 
