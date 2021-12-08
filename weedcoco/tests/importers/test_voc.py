@@ -2,6 +2,7 @@ import pathlib
 import json
 
 import pytest
+from pycocotools.coco import COCO
 
 from weedcoco.importers.voc import main
 
@@ -162,3 +163,18 @@ def test_category_name_map2(converter):
         assert _get_name_for_annotation(result, annotation) == _get_name_for_annotation(
             COMPLETE_WEEDCOCO, COMPLETE_WEEDCOCO["annotations"][i]
         )
+
+def test_pycocotools_compat(converter):
+    result = converter.run(
+        [
+            "--agcontext-path",
+            TEST_DATA_DIR / "agcontext.yaml",
+            "--metadata-path",
+            TEST_DATA_DIR / "metadata1.json",
+            "--category-name-map",
+            TEST_DATA_DIR / "category_name_map1.yaml",
+            "--validate",
+        ]
+    )
+    coco = COCO()
+    coco.showAnns(result['annotations'])
