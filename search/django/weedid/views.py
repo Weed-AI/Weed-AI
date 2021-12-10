@@ -31,7 +31,7 @@ from weedid.utils import (
 )
 from weedid.notification import review_notification
 from weedid.models import Dataset, WeedidUser
-from weedcoco.validation import validate, validate_json, JsonValidationError
+from weedcoco.validation import validate, validate_json, fix_compatibility_quirks, JsonValidationError
 from weedcoco.importers.voc import voc_to_coco
 from weedcoco.importers.mask import masks_to_coco, generate_paths_from_mask_only
 from django.contrib.auth import login, logout
@@ -84,6 +84,7 @@ def upload(request):
         images = []
         file_weedcoco = request.FILES["weedcoco"]
         weedcoco_json = json.load(file_weedcoco)
+        fix_compatibility_quirks(weedcoco_json)
         # validate(
         #     weedcoco_json,
         #     schema=request.POST["schema"] if request.POST["schema"] else "coco",
@@ -195,6 +196,7 @@ class CustomUploader:
                 Path(os.path.join(UPLOAD_DIR, str(user.id), store_id)), request
             )
             validate(coco_json, schema="coco")
+            fix_compatibility_quirks(coco_json)
             for image_reference in coco_json["images"]:
                 images.append(image_reference["file_name"].split("/")[-1])
             categories = [
