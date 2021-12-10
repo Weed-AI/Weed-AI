@@ -5,6 +5,8 @@ import copy
 import random
 import re
 
+from pycocotools.coco import COCO
+
 import pytest
 
 from weedcoco.validation import (
@@ -13,12 +15,14 @@ from weedcoco.validation import (
     validate_references,
     validate_coordinates,
     validate_image_sizes,
+    fix_compatibility_quirks,
     ValidationError,
     JsonValidationError,
 )
 from .testcases import (
     MINIMAL_WEEDCOCO,
     SMALL_WEEDCOCO,
+    BBOX_ONLY_WEEDCOCO,
     test_missing_required_at_root_expected,
 )
 
@@ -276,3 +280,15 @@ def test_coco_compatible_good(func, coco):
 def test_coco_compatible_bad(func, bad_coco):
     with pytest.raises(JsonValidationError):
         func(bad_coco, schema="compatible-coco")
+
+
+def test_pycocotools_quirks():
+    weedcoco = copy.deepcopy(BBOX_ONLY_WEEDCOCO)
+    with pytest.raises(Exception, match='datasetType not supported'):
+        coco = COCO()
+        coco.showAnns(weedcoco['annotations'])
+    fix_compatibility_quirks(weedcoco)
+    coco.showAnns(weedcoco['annotations'])
+
+
+

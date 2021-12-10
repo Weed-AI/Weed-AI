@@ -2,7 +2,6 @@ import pathlib
 import json
 
 import pytest
-from pycocotools.coco import COCO
 
 from weedcoco.importers.voc import main
 
@@ -31,10 +30,10 @@ AGCONTEXT = {
     "weather_description": "Nothing to note",
 }
 ANNOTATIONS_WITH_RYEGRASS_0 = [
-    {"bbox": [146, 747, 27, 45], "segmentation": [], "category_id": 0, "id": 0, "image_id": 0},
-    {"bbox": [817, 835, 42, 55], "segmentation": [], "category_id": 0, "id": 1, "image_id": 1},
-    {"bbox": [1163, 314, 28, 16], "segmentation": [], "category_id": 1, "id": 2, "image_id": 1},
-    {"bbox": [1511, 208, 21, 31], "segmentation": [], "category_id": 1, "id": 3, "image_id": 1},
+    {"bbox": [146, 747, 27, 45], "category_id": 0, "id": 0, "image_id": 0},
+    {"bbox": [817, 835, 42, 55], "category_id": 0, "id": 1, "image_id": 1},
+    {"bbox": [1163, 314, 28, 16], "category_id": 1, "id": 2, "image_id": 1},
+    {"bbox": [1511, 208, 21, 31], "category_id": 1, "id": 3, "image_id": 1},
 ]
 COMPLETE_WEEDCOCO = {
     "agcontexts": [AGCONTEXT],
@@ -163,22 +162,4 @@ def test_category_name_map2(converter):
         assert _get_name_for_annotation(result, annotation) == _get_name_for_annotation(
             COMPLETE_WEEDCOCO, COMPLETE_WEEDCOCO["annotations"][i]
         )
-
-# pycocotools COCO.showAnns throws an Exception if it gets an annotation with a
-# bbox and no segmentation
-
-def test_pycocotools_compat(converter):
-    result = converter.run(
-        [
-            "--agcontext-path",
-            TEST_DATA_DIR / "agcontext.yaml",
-            "--metadata-path",
-            TEST_DATA_DIR / "metadata1.json",
-            "--category-name-map",
-            TEST_DATA_DIR / "category_name_map1.yaml",
-            "--validate",
-        ]
-    )
-    coco = COCO()
-    coco.showAnns(result['annotations'])
 
