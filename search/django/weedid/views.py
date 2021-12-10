@@ -18,7 +18,6 @@ from weedid.utils import (
     store_tmp_image,
     store_tmp_image_from_zip,
     store_tmp_voc,
-    store_tmp_voc_coco,
     move_to_upload,
     create_upload_entity,
     retrieve_listing_info,
