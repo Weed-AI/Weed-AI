@@ -95,7 +95,7 @@ def upload(request):
             parse_category_name(category) for category in weedcoco_json["categories"]
         ]
         upload_dir, upload_id = setup_upload_dir(os.path.join(UPLOAD_DIR, str(user.id)))
-        store_tmp_weedcoco(file_weedcoco, upload_dir)
+        store_tmp_weedcoco(weedcoco_json, upload_dir)
         create_upload_entity(upload_id, user.id)
     except JsonValidationError as e:
         traceback.print_exc()
@@ -205,7 +205,7 @@ class CustomUploader:
             upload_dir, upload_id = setup_upload_dir(
                 os.path.join(UPLOAD_DIR, str(user.id))
             )
-            store_tmp_voc_coco(coco_json, upload_dir)
+            store_tmp_weedcoco(coco_json, upload_dir)
             create_upload_entity(upload_id, user.id)
         except JsonValidationError as e:
             traceback.print_exc()

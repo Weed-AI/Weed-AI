@@ -6,7 +6,6 @@ from uuid import uuid4
 import smtplib
 from email.message import EmailMessage
 import tempfile
-import logging
 from zipfile import ZipFile
 from shutil import copy
 from weedcoco.repo.deposit import mkdir_safely
@@ -25,7 +24,6 @@ from core.settings import (
 )
 
 
-logger = logging.getLogger(__name__)
 
 class OverwriteStorage(FileSystemStorage):
     def get_available_name(self, name, max_length=None):
@@ -54,10 +52,9 @@ def store_tmp_image_from_zip(upload_image_zip, image_dir, full_images):
 
 
 def store_tmp_weedcoco(weedcoco, upload_dir):
-    fs = OverwriteStorage()
     weedcoco_path = os.path.join(upload_dir, "weedcoco.json")
-    logger.warn(f"saving weedcoco {weedcoco_path} {weedcoco}")
-    fs.save(weedcoco_path, weedcoco)
+    with open(weedcoco_path, "w") as weedcoco_file:
+        weedcoco_file.write(json.dumps(weedcoco))
 
 
 def store_tmp_voc(voc, voc_dir):
