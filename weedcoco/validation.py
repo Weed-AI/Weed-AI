@@ -193,10 +193,9 @@ def validate(weedcoco, images_root=None, schema="weedcoco"):
 
 def fix_compatibility_quirks(weedcoco):
     """Fix minor issues for compatibility with other COCO tools. Operates in-place"""
-    for ann in weedcoco['annotations']:
+    for ann in weedcoco["annotations"]:
         if "bbox" in ann and not "segmentation" in ann:
             ann["segmentation"] = []
-
 
 
 def main():
