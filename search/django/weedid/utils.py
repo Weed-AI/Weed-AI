@@ -24,7 +24,6 @@ from core.settings import (
 )
 
 
-
 class OverwriteStorage(FileSystemStorage):
     def get_available_name(self, name, max_length=None):
         if self.exists(name):

@@ -162,4 +162,3 @@ def test_category_name_map2(converter):
         assert _get_name_for_annotation(result, annotation) == _get_name_for_annotation(
             COMPLETE_WEEDCOCO, COMPLETE_WEEDCOCO["annotations"][i]
         )
-

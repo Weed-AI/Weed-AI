@@ -210,7 +210,6 @@ BBOX_ONLY_WEEDCOCO = {
 }
 
 
-
 test_missing_required_at_root_expected = [
     {
         "error_type": "jsonschema",
@@ -281,4 +280,3 @@ test_missing_required_at_root_expected = [
         ],
     },
 ]
-

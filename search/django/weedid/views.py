@@ -30,7 +30,12 @@ from weedid.utils import (
 )
 from weedid.notification import review_notification
 from weedid.models import Dataset, WeedidUser
-from weedcoco.validation import validate, validate_json, fix_compatibility_quirks, JsonValidationError
+from weedcoco.validation import (
+    validate,
+    validate_json,
+    fix_compatibility_quirks,
+    JsonValidationError,
+)
 from weedcoco.importers.voc import voc_to_coco
 from weedcoco.importers.mask import masks_to_coco, generate_paths_from_mask_only
 from django.contrib.auth import login, logout
