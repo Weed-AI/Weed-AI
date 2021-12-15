@@ -51,7 +51,7 @@ services:
       - upload_dir:/code/upload
       - download_dir:/code/download
       - mystatic_dir:/code/mystatic
-    command: bash -c "python manage.py makemigrations && python manage.py migrate && python manage.py collectstatic <<<yes && gunicorn core.wsgi -b 0.0.0.0:8000"
+    command: bash -c "python manage.py makemigrations && python manage.py migrate && python manage.py collectstatic <<<yes && gunicorn core.wsgi -b 0.0.0.0:8000  -t 1800"
     entrypoint: /entrypoint.sh
     ports:
       - "8000:8000"
