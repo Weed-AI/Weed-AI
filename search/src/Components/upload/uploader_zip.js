@@ -7,9 +7,9 @@ import Cookies from 'js-cookie';
 
 import Uppy from '@uppy/core';
 import '@uppy/core/dist/style.css';
-import '@uppy/drag-drop/dist/style.css';
+import '@uppy/dashboard/dist/style.css';
 import Tus from '@uppy/tus';
-import { DragDrop, useUppy } from '@uppy/react';
+import { Dashboard, useUppy } from '@uppy/react';
 
 
 
@@ -72,16 +72,12 @@ const UploaderZip  = props => {
         }
     }
 
-    const handleUpload = () => {
-        uppy.upload()
-    }
-
 
     return (
-      <React.Fragment>
-        <DragDrop
-            width="100%"
-            height="100%"
+        <Dashboard
+            id="uppy"
+            width="750"
+            height="250"
             uppy={uppy}
             locale={{
                 strings: {
@@ -90,8 +86,6 @@ const UploaderZip  = props => {
                 },
             }}
         />
-        <Button onClick={handleUpload}>Upload zipfile</Button>
-      </React.Fragment>
     )
 
   
