@@ -1,11 +1,39 @@
 import React from 'react';
+import Button from '@material-ui/core/Button';
+
 import 'react-dropzone-uploader/dist/styles.css';
 import Dropzone from 'react-dropzone-uploader';
 import Cookies from 'js-cookie';
 
+import Uppy from '@uppy/core';
+import '@uppy/core/dist/style.css';
+import '@uppy/drag-drop/dist/style.css';
+import Tus from '@uppy/tus';
+import { DragDrop, useUppy } from '@uppy/react';
+
+
+
+
 
 const UploaderZip  = props => {
     const baseURL = new URL(window.location.origin);
+
+    const uppy = useUppy(() => {
+        return new Uppy({
+            id: 'uppy',
+            autoProceed: false,
+            debug: true,
+        }).use(Tus, {
+            endpoint: "http://localhost/api/upload_tus/",
+            headers: {'X-CSRFToken': Cookies.get('csrftoken')},
+            chunkSize: 1024 * 1024 * 10
+        });
+    })
+
+    uppy.on('complete', (result) => {
+        console.log("upload complete")
+    });
+
     const getUploadParams = ({ file, meta }) => {
         const body = new FormData()
         body.append('upload_id', props.upload_id)
@@ -43,19 +71,42 @@ const UploaderZip  = props => {
             props.handleErrorMessage("")
         }
     }
-  
+
+    const handleUpload = () => {
+        uppy.upload()
+    }
+
+
     return (
-      <Dropzone
-        getUploadParams={getUploadParams}
-        onChangeStatus={handleChangeStatus}
-        multiple={false}
-        maxFiles={1}
-        accept=".zip"
-        autoUpload={true}
-        submitButtonContent={null}
-        styles={{ dropzone: { minHeight: 200, maxHeight: 250 } }}
-      />
+      <React.Fragment>
+        <DragDrop
+            width="100%"
+            height="100%"
+            uppy={uppy}
+            locale={{
+                strings: {
+                    dropHereOr: "Drop here or %{browse}",
+                    browse: "browse",
+                },
+            }}
+        />
+        <Button onClick={handleUpload}>Upload zipfile</Button>
+      </React.Fragment>
     )
+
+  
+    // return (
+    //   <Dropzone
+    //     getUploadParams={getUploadParams}
+    //     onChangeStatus={handleChangeStatus}
+    //     multiple={false}
+    //     maxFiles={1}
+    //     accept=".zip"
+    //     autoUpload={true}
+    //     submitButtonContent={null}
+    //     styles={{ dropzone: { minHeight: 200, maxHeight: 250 } }}
+    //   />
+    // )
   }
 
   export default UploaderZip;

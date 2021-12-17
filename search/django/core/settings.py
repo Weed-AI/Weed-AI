@@ -1,5 +1,6 @@
 import os
 from celery.schedules import crontab
+from corsheaders.defaults import default_headers
 
 SITE_BASE_URL = "https://weed-ai.sydney.edu.au"
 
@@ -10,6 +11,10 @@ THUMBNAILS_DIR = os.path.join(BASE_DIR, "thumbnails")
 REPOSITORY_DIR = os.path.join(BASE_DIR, "repository")
 DOWNLOAD_DIR = os.path.join(BASE_DIR, "download")
 
+TUS_UPLOAD_DIR = os.path.join(BASE_DIR, "tus_upload")
+TUS_DESTINATION_DIR = os.path.join(BASE_DIR, "media", "uploads")
+TUS_FILE_NAME_FORMAT = "increment"
+TUS_EXISTING_FILE = "error"
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/2.2/howto/deployment/checklist/
@@ -23,6 +28,26 @@ DEBUG = os.environ.get("ENV", "PROD") == "DEV"
 ALLOWED_HOSTS = ["*"]
 CORS_ORIGIN_ALLOW_ALL = True
 AUTH_USER_MODEL = "weedid.WeedidUser"
+
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",
+    "http://0.0.0.0:3000",
+    "http://120.0.0.1:3000"
+]
+
+# TUS custom headers
+
+CORS_ALLOW_HEADERS = list(default_headers) + [
+    "x-request-id",
+    "x-http-method-override",
+    "upload-length",
+    "upload-offset",
+    "tus-resumable",
+    "upload-metadata",
+    "upload-defer-length",
+    "upload-concat",
+]
+
 
 # Scale file size of upload limit up to 10 MB
 MAX_IMAGE_SIZE = 1024 * 1024 * 10
@@ -50,9 +75,11 @@ INSTALLED_APPS = [
     "weedid",
     "django_celery_results",
     "django_celery_beat",
+    "django_tus",
 ]
 
 MIDDLEWARE = [
+    "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -60,7 +87,6 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
-    "corsheaders.middleware.CorsMiddleware",
 ]
 
 ROOT_URLCONF = "core.urls"

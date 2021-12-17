@@ -1,4 +1,5 @@
 from django.urls import path, re_path, include
+from django_tus.views import TusUpload
 from weedid import views
 
 api_urlpatterns = [
@@ -17,6 +18,8 @@ api_urlpatterns = [
     path("update_categories/", views.update_categories, name="update_categories"),
     path("upload_agcontexts/", views.upload_agcontexts, name="upload_agcontexts"),
     path("upload_metadata/", views.upload_metadata, name="upload_metadata"),
+    path("upload_tus/", TusUpload.as_view(), name="tus_upload"),
+    path("upload_tus/<uuid:resource_id>", TusUpload.as_view(), name="ts_upload_chunks"),
     path("submit_deposit/", views.submit_deposit, name="submit_deposit"),
     path("upload_status/", views.upload_status, name="upload_status"),
     path("upload_info/<str:dataset_id>", views.upload_info, name="upload_info"),

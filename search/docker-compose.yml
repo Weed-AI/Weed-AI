@@ -43,6 +43,7 @@ services:
       - POSTGRES_DB=${POSTGRES_DB}
       - SMTP_HOST=${SMTP_HOST}
       - SMTP_PORT=${SMTP_PORT}
+      - SEND_EMAIL=${SEND_EMAIL}
       - FROM_EMAIL=${FROM_EMAIL}
       - ENV=PROD
     volumes:
@@ -74,6 +75,7 @@ services:
       - POSTGRES_DB=${POSTGRES_DB}
       - SMTP_HOST=${SMTP_HOST}
       - SMTP_PORT=${SMTP_PORT}
+      - SEND_EMAIL=${SEND_EMAIL}
       - FROM_EMAIL=${FROM_EMAIL}
       - GIT_REMOTE_PATH=/mnt/git_remote
       - DVC_REMOTE_PATH=/mnt/dvc_remote
