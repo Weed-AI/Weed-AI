@@ -150,6 +150,7 @@ services:
       - http.cors.allow-credentials=true
       - bootstrap.memory_lock=true
       - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      - LOG4J_FORMAT_MSG_NO_LOOKUPS=true
     volumes:
       - esdata1:/usr/share/elasticsearch/data
     ports:
