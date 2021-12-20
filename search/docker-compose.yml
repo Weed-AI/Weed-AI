@@ -8,8 +8,6 @@ services:
         - django
     build:
         context: ./nginx/reverse-proxy
-    ports:
-      - "80:80"
     networks:
       - elastic
     restart: always
