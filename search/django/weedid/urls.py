@@ -2,6 +2,7 @@ from django.urls import path, re_path, include
 from django_tus.views import TusUpload
 from weedid import views
 
+
 api_urlpatterns = [
     path("upload/", views.upload, name="upload"),
     path("warmup/", views.warmup, name="warmup"),
@@ -14,7 +15,7 @@ api_urlpatterns = [
     path("submit_mask/", views.MaskUploader.submit, name="submit_mask"),
     path("move_mask/", views.MaskUploader.move, name="move_mask"),
     path("upload_image/", views.upload_image, name="upload_image"),
-    path("upload_image_zip/", views.upload_image_zip, name="upload_image_zip"),
+    path("unpack_image_zip_tus/", views.unpack_image_zip_tus, name="unpack_image_zip_tus"),
     path("update_categories/", views.update_categories, name="update_categories"),
     path("upload_agcontexts/", views.upload_agcontexts, name="upload_agcontexts"),
     path("upload_metadata/", views.upload_metadata, name="upload_metadata"),

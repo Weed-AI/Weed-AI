@@ -1,11 +1,17 @@
 from django.http import HttpResponse
 from django.shortcuts import render
+from django.dispatch import receiver
+
 import requests
 import os
 import json
 import traceback
+import time
+import logging
+
 from core.settings import (
     UPLOAD_DIR,
+    TUS_UPLOAD_DIR,
     REPOSITORY_DIR,
     MAX_IMAGE_SIZE,
     MAX_VOC_SIZE,
@@ -45,6 +51,7 @@ from django.http import (
 from django.views.decorators.csrf import ensure_csrf_cookie
 from pathlib import Path
 
+logger = logging.getLogger()
 
 @ensure_csrf_cookie
 def set_csrf(request):
@@ -283,6 +290,28 @@ def upload_image_zip(request):
     return HttpResponse(
         json.dumps({"upload_id": upload_id, "missing_images": missing_images})
     )
+
+def unpack_image_zip_tus(request):
+    """Version of upload_image_zip where the zipfile has come via TUS"""
+    if not request.method == "POST":
+        return HttpResponseNotAllowed(request.method)
+    user = request.user
+    if not (user and user.is_authenticated):
+        return HttpResponseForbidden("You dont have access to proceed")
+    upload_id = request.POST["upload_id"]
+    upload_image_zip = request.POST["upload_image_zip"]
+    logger.info(f"Got TUS upload {upload_image_zip}")
+    # Get list of missing images from frontend to calculate images that are still missing after the current zip being uploaded
+    images = request.POST["images"].split(",")
+    upload_dir = os.path.join(UPLOAD_DIR, str(user.id), upload_id, "images")
+    try:
+        missing_images = store_tmp_image_from_zip_tus(upload_image_zip, upload_dir, images)
+    except Exception as e:
+        return HttpResponseBadRequest(str(e))
+    return HttpResponse(
+        json.dumps({"upload_id": upload_id, "missing_images": missing_images})
+    )
+
 
 
 def update_categories(request):
