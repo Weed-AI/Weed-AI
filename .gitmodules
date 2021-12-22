@@ -1,0 +1,3 @@
+[submodule "search/cvat"]
+	path = search/cvat
+	url = https://github.com/Weed-AI/cvat
