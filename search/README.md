@@ -26,6 +26,9 @@ FROM_EMAIL=Sender Name <sender@host>
 # The following works when they are local directories on the host, which are periodically rsynced to a remote
 GIT_REMOTE_PATH=/path/to/git/remote/on/rds
 DVC_REMOTE_PATH=/path/to/dvc/remote/on/rds
+# The following is to let traefik know which hosts are legit
+HTTP_HOST=<http host>
+HTTPS_HOST=<https host such as weed-ai.sydney.edu.au>
 ```
 
 ### Initialise database, migrate and create superuser
@@ -38,4 +41,12 @@ DVC_REMOTE_PATH=/path/to/dvc/remote/on/rds
 	1. Start Django server: `docker-compose -f docker-compose-dev.yml up db django`
 	2. Enter server container: `docker exec -it django bash`
 	3. Create superuser: `python manage.py createsuperuser` and follow the prompt instruction
+
+### To build cvat image
+```
+# To also download cvat as a submodule
+git clone --recurse-submodules -j8 git@github.com:Weed-AI/Weed-AI.git
+cd cvat
+docker-compose build cvat_ui
+# Then start WeedAI as above
 ```
