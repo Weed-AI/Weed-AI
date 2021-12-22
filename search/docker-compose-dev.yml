@@ -20,7 +20,7 @@ services:
     labels:
       - traefik.enable=true
       - traefik.http.services.nginx.loadbalancer.server.port=80
-      - traefik.http.routers.nginx.rule=Host(`${CVAT_HOST:-localhost}`)
+      - traefik.http.routers.nginx.rule=Host(`${HTTP_HOST:-localhost}`,`${HTTPS_HOST}`)
       - traefik.http.routers.nginx.entrypoints=web
     volumes:
       # Static file service
@@ -203,7 +203,7 @@ services:
     labels:
       - traefik.enable=true
       - traefik.http.services.cvat.loadbalancer.server.port=8080
-      - traefik.http.routers.cvat.rule=Host(`${CVAT_HOST:-localhost}`) &&
+      - traefik.http.routers.cvat.rule=Host(`${HTTP_HOST:-localhost}`,`${HTTPS_HOST}`) &&
           PathPrefix(`/cvat-annotation/api/`, `/cvat-annotation/git/`, `/cvat-annotation/opencv/`, `/cvat-annotation/analytics/`, `/cvat-annotation/static/`, `/cvat-annotation/admin`, `/cvat-annotation/documentation/`, `/cvat-annotation/django-rq`)
       - traefik.http.routers.cvat.entrypoints=web
       - traefik.http.routers.cvat.middlewares=add-cvat
@@ -225,7 +225,7 @@ services:
     labels:
       - traefik.enable=true
       - traefik.http.services.cvat-ui.loadbalancer.server.port=80
-      - traefik.http.routers.cvat-ui.rule=Host(`${CVAT_HOST:-localhost}`) &&
+      - traefik.http.routers.cvat-ui.rule=Host(`${HTTP_HOST:-localhost}`,`${HTTPS_HOST}`) &&
           PathPrefix(`/cvat-annotation`, `/cvat-ui`)
       - traefik.http.routers.cvat-ui.entrypoints=web
       - traefik.http.routers.cvat-ui.middlewares=add-cvat-ui
