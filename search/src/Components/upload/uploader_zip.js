@@ -14,7 +14,7 @@ import { Dashboard, useUppy } from '@uppy/react';
 
 import {jsonSchemaTitle} from '../error/utils';
 
-const TUS_ENDPOINT = 'http://localhost:1080/files/';
+const TUS_ENDPOINT = 'http://localhost/tus/files/';
 
 
 function getTusUploadFile(file) {
@@ -35,6 +35,8 @@ class UploaderUppyZip extends React.Component {
 
     constructor(props) {
         super(props);
+        
+        const baseURL = new URL(window.location.origin);
 
         this.uppy = new Uppy({
             id: 'zipfiles',
