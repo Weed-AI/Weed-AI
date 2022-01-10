@@ -14,7 +14,10 @@ import { Dashboard, useUppy } from '@uppy/react';
 
 import {jsonSchemaTitle} from '../error/utils';
 
-const TUS_ENDPOINT = 'http://localhost/tus/files/';
+const baseURL = new URL(window.location.origin);
+
+
+const TUS_ENDPOINT = 'http://localhost/tus/';
 
 
 function getTusUploadFile(file) {
@@ -22,6 +25,7 @@ function getTusUploadFile(file) {
     console.log(file);
     const url = file.tus.uploadUrl;
     if( url ) {
+        console.log("matching " + url);
         const m = url.match(RegExp('^' + TUS_ENDPOINT + '(.*)$'));
         if( m ) {
             return m[1];
@@ -36,8 +40,6 @@ class UploaderUppyZip extends React.Component {
     constructor(props) {
         super(props);
         
-        const baseURL = new URL(window.location.origin);
-
         this.uppy = new Uppy({
             id: 'zipfiles',
             restrictions: {
@@ -47,34 +49,20 @@ class UploaderUppyZip extends React.Component {
             },
             autoProceed: false,
             debug: true,
-            // onBeforeUpload: (files) => {
-            //     const updatedFiles = {};
-            //     console.log(`onBeforeUpload triggered, prepending upload_id ${props.upload_id}`);
-            //     Object.keys(files).forEach(fileId => {
-            //         console.log(`trying to reset filename for ${fileId}`);
-            //         updatedFiles[fileId] = {
-            //             ...files[fileId],
-            //             meta: {
-            //                 ...files[fileId].meta,
-            //                 name: `${props.upload_id}.${files[fileId].name}`
-            //             }
-            //         }
-            //     });
-            //     return updatedFiles;
-            // }
         }).use(Tus, {
-
             endpoint: TUS_ENDPOINT,
-//            headers: {'X-CSRFToken': Cookies.get('csrftoken')},
+            // withCredentials: true,
+            // headers: {'X-CSRFToken': Cookies.get('csrftoken')},
             chunkSize: 1024 * 1024 * 10
         });
+        console.log(`>>><<<TUS_ENDPOINT = ${TUS_ENDPOINT}`);
     }
 
     componentDidMount() {
-        console.log('/-\ setting event handlers on uppy');
 
         this.uppy.on("upload", (data) => {
             console.log(">> from uppy event: upload");
+            console.log(`TUS_ENDPOINT = ${TUS_ENDPOINT}`);
             console.log(`upload_id = ${this.props.upload_id}`);
             console.log(data);
         })

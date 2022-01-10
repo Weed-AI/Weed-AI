@@ -14,7 +14,7 @@ services:
       - elastic
     restart: always
     logging:
-      driver: "json-file"
+      driver: none
     volumes:
       # Static file service
       - thumbnails_dir:/media/thumbnails
@@ -45,7 +45,9 @@ services:
       - SMTP_PORT=${SMTP_PORT}
       - SEND_EMAIL=${SEND_EMAIL}
       - FROM_EMAIL=${FROM_EMAIL}
+      - TUS_HOST=http://tus:1080/files/
       - ENV=PROD
+      - DJANGO_LOG_LEVEL=DEBUG
     volumes:
       - thumbnails_dir:/code/thumbnails
       - repository_dir:/code/repository
@@ -148,6 +150,7 @@ services:
       - "1080:1080"
     volumes:
       - tus_dir:/srv/tusd-data
+    command: tusd -behind-proxy
 
 
   # search engine

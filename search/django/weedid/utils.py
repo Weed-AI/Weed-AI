@@ -50,6 +50,8 @@ def store_tmp_image_from_zip(upload_image_zip, image_dir, full_images):
     return list(set(os.listdir(image_dir)))
 
 
+
+
 def store_tmp_weedcoco(weedcoco, upload_dir):
     fs = OverwriteStorage()
     weedcoco_path = os.path.join(upload_dir, "weedcoco.json")

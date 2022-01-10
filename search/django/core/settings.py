@@ -12,9 +12,34 @@ REPOSITORY_DIR = os.path.join(BASE_DIR, "repository")
 DOWNLOAD_DIR = os.path.join(BASE_DIR, "download")
 
 TUS_UPLOAD_DIR = os.path.join(BASE_DIR, "tus_upload")
-TUS_DESTINATION_DIR = os.path.join(BASE_DIR, "media", "uploads")
-TUS_FILE_NAME_FORMAT = "increment"
-TUS_EXISTING_FILE = "error"
+TUS_DESTINATION_DIR = os.path.join(BASE_DIR, "tus_dir", "data")       
+TUS_FILE_NAME_FORMAT = "keep"
+TUS_EXISTING_FILE = "overwrite"
+
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'root': {
+        'handlers': ['console'],
+        'level': 'WARNING',
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console'],
+            'level': os.getenv('DJANGO_LOG_LEVEL', 'INFO'),
+            'propagate': False,
+        },
+    },
+}
+
+
+
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/2.2/howto/deployment/checklist/
@@ -64,6 +89,8 @@ SMTP_HOST = os.environ.get("SMTP_HOST", "smtp.sydney.edu.au")
 SMTP_PORT = os.environ.get("SMTP_PORT", 25)
 FROM_EMAIL = os.environ.get("FROM_EMAIL", "Weed-AI <weed-ai.app@sydney.edu.au>")
 
+TUS_HOST = os.environ.get("TUS_HOST", "http://localhost:1080/files/")
+
 INSTALLED_APPS = [
     "django.contrib.admin",
     "django.contrib.auth",
@@ -75,7 +102,6 @@ INSTALLED_APPS = [
     "weedid",
     "django_celery_results",
     "django_celery_beat",
-    "django_tus",
 ]
 
 MIDDLEWARE = [

@@ -2,7 +2,7 @@ django==2.2.20
 psycopg2==2.8.6
 requests==2.24.0
 django-cors-headers==3.6.0
-django-tus==0.5.0
+djproxy==2.3.6
 celery==4.4.7
 django-celery-results==2.0.1
 django-celery-beat==2.2.0

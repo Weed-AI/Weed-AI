@@ -51,6 +51,7 @@ from django.http import (
 from django.views.decorators.csrf import ensure_csrf_cookie
 from pathlib import Path
 
+
 logger = logging.getLogger()
 
 @ensure_csrf_cookie
@@ -394,6 +395,8 @@ def upload_metadata(request):
             return HttpResponseForbidden("You dont have access to proceed")
     else:
         return HttpResponseNotAllowed(request.method)
+
+
 
 
 def submit_deposit(request):

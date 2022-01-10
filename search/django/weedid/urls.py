@@ -1,6 +1,5 @@
 from django.urls import path, re_path, include
-from django_tus.views import TusUpload
-from weedid import views
+from weedid import views, tus
 
 
 api_urlpatterns = [
@@ -19,8 +18,6 @@ api_urlpatterns = [
     path("update_categories/", views.update_categories, name="update_categories"),
     path("upload_agcontexts/", views.upload_agcontexts, name="upload_agcontexts"),
     path("upload_metadata/", views.upload_metadata, name="upload_metadata"),
-    path("upload_tus/", TusUpload.as_view(), name="tus_upload"),
-    path("upload_tus/<uuid:resource_id>", TusUpload.as_view(), name="ts_upload_chunks"),
     path("submit_deposit/", views.submit_deposit, name="submit_deposit"),
     path("upload_status/", views.upload_status, name="upload_status"),
     path("upload_info/<str:dataset_id>", views.upload_info, name="upload_info"),
@@ -46,4 +43,6 @@ urlpatterns = [
     path("api/", include(api_urlpatterns)),
     re_path(r"^elasticsearch", views.elasticsearch_query, name="elasticsearch_query"),
     path("sitemap.xml", views.sitemap_xml),
+    path("upload_tus/<str:resource_id>", tus.upload_tus, name="upload_tus_chunk"),
+    path("upload_tus/", tus.upload_tus, name="upload_tus"),
 ]

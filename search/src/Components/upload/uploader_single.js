@@ -1,5 +1,6 @@
 import React from 'react';
 import 'react-dropzone-uploader/dist/styles.css';
+
 import Dropzone from 'react-dropzone-uploader';
 import Cookies from 'js-cookie';
 import {jsonSchemaTitle} from '../error/utils';
