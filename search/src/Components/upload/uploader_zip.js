@@ -17,7 +17,7 @@ import {jsonSchemaTitle} from '../error/utils';
 const baseURL = new URL(window.location.origin);
 
 
-const TUS_ENDPOINT = 'http://localhost/tus/files/';
+const TUS_ENDPOINT = baseURL + '/tus/files/';
 
 
 function getTusUploadFile(file) {
