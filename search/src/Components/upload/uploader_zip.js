@@ -17,7 +17,8 @@ import {jsonSchemaTitle} from '../error/utils';
 const baseURL = new URL(window.location.origin);
 
 
-const TUS_ENDPOINT = baseURL + '/tus/files/';
+const TUS_ENDPOINT = baseURL + 'tus/files/';
+const TUS_CHUNK_SIZE = 1024 * 1024 * 5;
 
 
 function getTusUploadFile(file) {
@@ -51,11 +52,10 @@ class UploaderUppyZip extends React.Component {
             debug: true,
         }).use(Tus, {
             endpoint: TUS_ENDPOINT,
-            // withCredentials: true,
-            // headers: {'X-CSRFToken': Cookies.get('csrftoken')},
-            chunkSize: 1024 * 1024 * 10
+            withCredentials: true,
+            headers: {'X-CSRFToken': Cookies.get('csrftoken')},
+            chunkSize: TUS_CHUNK_SIZE
         });
-        console.log(`>>><<<TUS_ENDPOINT = ${TUS_ENDPOINT}`);
     }
 
     componentDidMount() {

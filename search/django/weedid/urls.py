@@ -1,6 +1,16 @@
 from django.urls import path, re_path, include
 from weedid import views, tus
 
+from djproxy.views import HttpProxy
+
+
+class TusProxy(HttpProxy):
+    base_url = "http://tus:1080/"
+    proxy_middleware = [
+        'djproxy.proxy_middleware.AddXFH',
+        'djproxy.proxy_middleware.AddXFP'
+    ]
+
 
 api_urlpatterns = [
     path("upload/", views.upload, name="upload"),
@@ -43,6 +53,7 @@ urlpatterns = [
     path("api/", include(api_urlpatterns)),
     re_path(r"^elasticsearch", views.elasticsearch_query, name="elasticsearch_query"),
     path("sitemap.xml", views.sitemap_xml),
-    path("upload_tus/<str:resource_id>", tus.upload_tus, name="upload_tus_chunk"),
-    path("upload_tus/", tus.upload_tus, name="upload_tus"),
+    path("tus/files/<str:resource_id>", tus.upload_tus, name="upload_tus_chunk"),
+    path("tus/files/", tus.upload_tus, name="upload_tus"),
+#    path("tus/<path:url>", TusProxy.as_view(), name="tus_proxy"),
 ]

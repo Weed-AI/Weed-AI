@@ -45,7 +45,7 @@ services:
       - SMTP_PORT=${SMTP_PORT}
       - SEND_EMAIL=${SEND_EMAIL}
       - FROM_EMAIL=${FROM_EMAIL}
-      - TUS_HOST=http://tus:1080/files/
+      - TUS_HOST=http://tus:1080/
       - ENV=PROD
       - DJANGO_LOG_LEVEL=DEBUG
     volumes:

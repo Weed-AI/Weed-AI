@@ -89,7 +89,7 @@ SMTP_HOST = os.environ.get("SMTP_HOST", "smtp.sydney.edu.au")
 SMTP_PORT = os.environ.get("SMTP_PORT", 25)
 FROM_EMAIL = os.environ.get("FROM_EMAIL", "Weed-AI <weed-ai.app@sydney.edu.au>")
 
-TUS_HOST = os.environ.get("TUS_HOST", "http://localhost:1080/files/")
+TUS_HOST = os.environ.get("TUS_HOST")
 
 INSTALLED_APPS = [
     "django.contrib.admin",
