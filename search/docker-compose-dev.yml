@@ -49,6 +49,7 @@ services:
       - SMTP_PORT=${SMTP_PORT}
       - FROM_EMAIL=${FROM_EMAIL}
       - ENV=DEV
+      - TUS_HOST=http://tus:1080/
     command: python manage.py runserver 0.0.0.0:8000
     entrypoint: /entrypoint.sh
     volumes:
@@ -57,6 +58,7 @@ services:
       - repository_dir:/code/repository
       - upload_dir:/code/upload
       - download_dir:/code/download
+      - tus_dir:/code/tus_dir
     ports:
       - "8000:8000"
     networks:
@@ -84,6 +86,7 @@ services:
       - repository_dir:/code/repository
       - upload_dir:/code/upload
       - download_dir:/code/download
+      - tus_dir:/code/tus_dir
     depends_on:
       - django
       - redis
@@ -112,9 +115,20 @@ services:
       - elastic
     logging: *default-logging
 
+  tus:
+    image: tusproject/tusd
+    container_name: tus
+    networks:
+      - elastic
+    ports:
+      - "1080:1080"
+    volumes:
+      - tus_dir:/srv/tusd-data
+    command: -behind-proxy -base-path /tus/files/
+
   # search engine
   elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch-oss:7.16.2
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.16.2
     container_name: elasticsearch
     environment:
       - discovery.type=single-node
@@ -182,4 +196,6 @@ volumes:
   upload_dir:
     driver: local
   mystatic_dir:
+    driver: local
+  tus_dir:
     driver: local

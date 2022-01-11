@@ -150,7 +150,7 @@ services:
       - "1080:1080"
     volumes:
       - tus_dir:/srv/tusd-data
-    command: tusd -behind-proxy
+    command: -behind-proxy -base-path /tus/files/
 
 
   # search engine
