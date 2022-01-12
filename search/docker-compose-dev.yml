@@ -49,7 +49,7 @@ services:
       - SMTP_PORT=${SMTP_PORT}
       - FROM_EMAIL=${FROM_EMAIL}
       - ENV=DEV
-      - TUS_HOST=http://tus:1080/
+      - TUS_SERVER=http://tus:1080/tus/
     command: python manage.py runserver 0.0.0.0:8000
     entrypoint: /entrypoint.sh
     volumes:
