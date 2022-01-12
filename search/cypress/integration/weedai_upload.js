@@ -26,7 +26,7 @@ describe('overall upload workflow', () => {
         cy.findAllByText(/^Upload Image Files$/).click()
         cy.findAllByText(/^Upload Images in Zip$/).click()
         cy.get('input.uppy-Dashboard-input').attachFile('test_weedcoco_zip/weedcoco.zip')
-        cy.wait(10000)
+        cy.wait(2000)
         cy.clickText(/^Submit$/)
     })
 
