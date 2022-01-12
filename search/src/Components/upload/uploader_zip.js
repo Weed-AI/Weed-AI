@@ -46,7 +46,6 @@ class UploaderUppyZip extends React.Component {
                 allowedFileTypes: [ "application/zip" ],
             },
             autoProceed: true,
-            debug: true,
         }).use(Tus, {
             endpoint: TUS_ENDPOINT,
             withCredentials: true,
@@ -62,8 +61,6 @@ class UploaderUppyZip extends React.Component {
             const files = result.successful;
             if( files.length === 1 ) {
                 const filename = getTusUploadFile(files[0]);
-                console.log(`upload file = ${filename}`);
-                console.log(`upload_id = ${this.props.upload_id}`);
                 if( filename ) {
                     const body = new FormData()
                     body.append("upload_id", this.props.upload_id);
@@ -71,7 +68,7 @@ class UploaderUppyZip extends React.Component {
                     body.append("upload_image_zip", filename);
                     axios({
                         method: 'post',
-                        url: baseURL + "api/unpack_image_zip_tus/",
+                        url: baseURL + "api/unpack_image_zip/",
                         data: body,
                         headers: {'X-CSRFToken': Cookies.get('csrftoken') }
                     }).then(res => {

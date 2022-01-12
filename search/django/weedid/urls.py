@@ -5,8 +5,10 @@ from djproxy.views import HttpProxy
 
 from core.settings import TUS_SERVER
 
+
 class TusProxy(HttpProxy):
     base_url = TUS_SERVER
+
 
 api_urlpatterns = [
     path("upload/", views.upload, name="upload"),
@@ -20,7 +22,7 @@ api_urlpatterns = [
     path("submit_mask/", views.MaskUploader.submit, name="submit_mask"),
     path("move_mask/", views.MaskUploader.move, name="move_mask"),
     path("upload_image/", views.upload_image, name="upload_image"),
-    path("unpack_image_zip_tus/", views.unpack_image_zip_tus, name="unpack_image_zip_tus"),
+    path("unpack_image_zip/", views.unpack_image_zip, name="unpack_image_zip"),
     path("update_categories/", views.update_categories, name="update_categories"),
     path("upload_agcontexts/", views.upload_agcontexts, name="upload_agcontexts"),
     path("upload_metadata/", views.upload_metadata, name="upload_metadata"),
