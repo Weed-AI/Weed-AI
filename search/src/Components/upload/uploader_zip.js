@@ -18,15 +18,12 @@ const baseURL = new URL(window.location.origin);
 
 
 const TUS_ENDPOINT = baseURL + 'tus/files/';
-const TUS_CHUNK_SIZE = 1024 * 1024 * 5;
+const TUS_CHUNK_SIZE = 1024 * 1024 * 10;
 
 
 function getTusUploadFile(file) {
-    console.log("getTusUploadFile");
-    console.log(file);
     const url = file.tus.uploadUrl;
     if( url ) {
-        console.log("matching " + url);
         const m = url.match(RegExp('^' + TUS_ENDPOINT + '(.*)$'));
         if( m ) {
             return m[1];
@@ -48,7 +45,7 @@ class UploaderUppyZip extends React.Component {
                 minNumberOfFiles: 1,
                 allowedFileTypes: [ "application/zip" ],
             },
-            autoProceed: false,
+            autoProceed: true,
             debug: true,
         }).use(Tus, {
             endpoint: TUS_ENDPOINT,
@@ -60,19 +57,10 @@ class UploaderUppyZip extends React.Component {
 
     componentDidMount() {
 
-        this.uppy.on("upload", (data) => {
-            console.log(">> from uppy event: upload");
-            console.log(`TUS_ENDPOINT = ${TUS_ENDPOINT}`);
-            console.log(`upload_id = ${this.props.upload_id}`);
-            console.log(data);
-        })
-
         this.uppy.on("complete", (result) => {
             const baseURL = new URL(window.location.origin);
-            console.log(">> from uppy event: complete");
             const files = result.successful;
             if( files.length === 1 ) {
-                console.log("Calling unpack on backend");
                 const filename = getTusUploadFile(files[0]);
                 console.log(`upload file = ${filename}`);
                 console.log(`upload_id = ${this.props.upload_id}`);
@@ -87,8 +75,6 @@ class UploaderUppyZip extends React.Component {
                         data: body,
                         headers: {'X-CSRFToken': Cookies.get('csrftoken') }
                     }).then(res => {
-                        console.log('got response from unpack');
-                        console.log(res.data);
                         if( res.data.upload_id === this.props.upload_id ) {
                             if( res.data.missing_images.length === 0 ) {
                                 this.props.handleValidation(true);
@@ -129,10 +115,13 @@ class UploaderUppyZip extends React.Component {
         return (
             <Dashboard
                 uppy={this.uppy}
+                height={200}
+                proudlyDisplayPoweredByUppy={false}
+                doneButtonHandler={null}
                 locale={{
                     strings: {
-                        dropHereOr: "Drop here or %{browse}",
-                        browse: "browse",
+                        dropPasteFiles: "%{browseFiles}",
+                        browseFiles: "Drag Files or Click to Browse",
                     },
                 }}
             />
