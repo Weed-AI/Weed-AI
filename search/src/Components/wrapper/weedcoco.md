@@ -10,8 +10,8 @@ a few ways to support the agricultural and weed identification context.
 
 As with MS COCO, the WeedCOCO format supports classification, bounding box and
 segmentation labels, which together with a category naming sheme, are used to
-indicate the presence of a specific or unknown species of weed, or presence
-of the crop.
+indicate the presence of a specific or unknown species/genus/family of weed,
+or presence of the crop.
 
 ### Agricultural and Photographic Context
 
@@ -39,12 +39,14 @@ images.
 ### Category Names for Weed ID
 
 Classification, bounding box and segmentation annotations may indicate:
-* the presence of a known species of weed
+* the presence of a known species, genus, or family of weed
 * the presence of an unspecified type of weed
 * the presence of crop
 
 Category names should take the form `crop: <species name>` or `weed: <species
-name>` where _species name_ is the scientific name of the crop or weed species.
+name>` where _species name_ is the lowercased scientific name of the crop or
+weed species.  _species name_ may be substituted with any other plant taxon,
+including genus or family.
 If a weed is identified, but its species is not labelled, the appropriate
 category name is `weed: UNSPECIFIED`. If annotations are used to mark non-weed,
 non-crop spaces in the image, the appropriate category name is `none`.

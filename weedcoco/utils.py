@@ -140,16 +140,16 @@ def get_supercategory_names(name):
     if not name.startswith("weed: "):
         return []
 
-    species = name.split(": ", 1)[1]
+    taxon = name.split(": ", 1)[1]
     out = ["weed"]
-    if species == "UNSPECIFIED":
+    if taxon == "UNSPECIFIED":
         return out
 
     eppo = get_eppo_singleton(EPPO_PATH)
     try:
-        entry = eppo.lookup_preferred_name(species, species_only=False)
+        entry = eppo.lookup_preferred_name(taxon, species_only=False)
     except Exception:
-        warnings.warn(f"Failed to lookup species {repr(species)}")
+        warnings.warn(f"Failed to lookup taxon {repr(taxon)}")
         return out
 
     try:

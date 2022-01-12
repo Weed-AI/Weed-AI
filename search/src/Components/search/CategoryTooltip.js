@@ -78,13 +78,13 @@ const gbifPromisesCache = {
 
 const CategoryTooltip = ({ categoryName, children }) => {
   const [gbifData, setGbifData] = React.useState({});
-  const { species } = parseCategoryName(categoryName);
+  const { taxon } = parseCategoryName(categoryName);
   React.useEffect(() => {
-    if (species === undefined)
+    if (taxon === undefined)
       return;
     gbifPromisesCache[categoryName] = (
       gbifPromisesCache[categoryName] === undefined
-      ? (axios.get("https://api.gbif.org/v1/species?name=" + encodeURIComponent(species) + "&datasetKey=d7dddbf4-2cf0-4f39-9b2a-bb099caae36c&taxonomicStatus=ACCEPTED"))
+      ? (axios.get("https://api.gbif.org/v1/species?name=" + encodeURIComponent(taxon) + "&datasetKey=d7dddbf4-2cf0-4f39-9b2a-bb099caae36c&taxonomicStatus=ACCEPTED"))
       : gbifPromisesCache[categoryName]);
     gbifPromisesCache[categoryName].then(response => {
       if (response.data && response.data.results) {
