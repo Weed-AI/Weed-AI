@@ -1,0 +1,739 @@
+{
+    "info": {
+        "year": 2021,
+        "description": "20201014 - Cobbity Wheat BFLY",
+        "metadata": {
+            "name": "20201014 - Cobbity Wheat BFLY",
+            "@type": "Dataset",
+            "funder": [
+                {
+                    "name": "Grains Research and Development Corporation",
+                    "@type": "Organization",
+                    "sameAs": "https://ror.org/02xwr1996"
+                }
+            ],
+            "creator": [
+                {
+                    "name": "Guy Coleman",
+                    "@type": "Person",
+                    "sameAs": "https://orcid.org/0000-0002-8808-2965",
+                    "givenName": "Guy",
+                    "familyName": "Coleman"
+                }
+            ],
+            "license": "https://creativecommons.org/licenses/by/4.0/legalcode",
+            "description": "Crop photography with weeds annotated.",
+            "datePublished": "2021-02-19"
+        }
+    },
+    "licenses": [
+        {
+            "url": "https://creativecommons.org/licenses/by/4.0/legalcode",
+            "id": 0
+        }
+    ],
+    "agcontexts": [
+        {
+            "id": 0,
+            "lighting": "artificial",
+            "n_images": 101,
+            "crop_type": "wheat",
+            "camera_fov": "variable",
+            "camera_lens": "Tamron Compact 5MP C-Mount 12mm Lens",
+            "camera_make": "FLIR BF 23S6C-C",
+            "soil_colour": "grey",
+            "camera_angle": 90,
+            "ground_speed": 0,
+            "location_lat": -34.020932,
+            "camera_height": 1500,
+            "location_long": 150.664883,
+            "surface_cover": "cereal",
+            "cropped_to_plant": false,
+            "surface_coverage": "0-25",
+            "bbch_growth_range": {
+                "max": 51,
+                "min": 43
+            },
+            "category_statistics": {
+                "weed: lolium rigidum": {
+                    "image_count": 55,
+                    "annotation_count": 94,
+                    "bounding_box_count": 94,
+                    "segmentation_count": 0
+                },
+                "weed: rapistrum rugosum": {
+                    "image_count": 71,
+                    "annotation_count": 174,
+                    "bounding_box_count": 174,
+                    "segmentation_count": 0
+                }
+            },
+            "weather_description": "night time",
+            "camera_lens_focallength": 12,
+            "photography_description": "Images of turnipweed and annual ryegrass in wheat in sandy, grey soils at night time with artificial illumination"
+        }
+    ],
+    "images": [
+        {
+            "agcontext_id": 0,
+            "license": 0,
+            "file_name": "images/b1f60d9d105c40650cdf.jpg",
+            "height": 1200,
+            "width": 1920,
+            "id": 0
+        },
+        {
+            "agcontext_id": 0,
+            "license": 0,
+            "file_name": "images/9bd1005f24fab74051d7.jpg",
+            "height": 1200,
+            "width": 1920,
+            "id": 1
+        },
+        {
+            "agcontext_id": 0,
+            "license": 0,
+            "file_name": "images/b2e2211cc1db515efa15.jpg",
+            "height": 1200,
+            "width": 1920,
+            "id": 2
+        },
+        {
+            "agcontext_id": 0,
+            "license": 0,
+            "file_name": "images/effc626b48aa5d4d8cdd.jpg",
+            "height": 1200,
+            "width": 1920,
+            "id": 3
+        },
+        {
+            "agcontext_id": 0,
+            "license": 0,
+            "file_name": "images/d5cb0f257e2eb5244ad8.jpg",
+            "height": 1200,
+            "width": 1920,
+            "id": 4
+        },
+        {
+            "agcontext_id": 0,
+            "license": 0,
+            "file_name": "images/0296c40af1b9f4a591dc.jpg",
+            "height": 1200,
+            "width": 1920,
+            "id": 5
+        },
+        {
+            "agcontext_id": 0,
+            "license": 0,
+            "file_name": "images/d8da0abdd3720a1a3131.jpg",
+            "height": 1200,
+            "width": 1920,
+            "id": 6
+        },
+        {
+            "agcontext_id": 0,
+            "license": 0,
+            "file_name": "images/9c05209b1cea2fd215c3.jpg",
+            "height": 1200,
+            "width": 1920,
+            "id": 7
+        },
+        {
+            "agcontext_id": 0,
+            "license": 0,
+            "file_name": "images/516f187e24443c5f12a3.jpg",
+            "height": 1200,
+            "width": 1920,
+            "id": 8
+        },
+        {
+            "agcontext_id": 0,
+            "license": 0,
+            "file_name": "images/98cdf92cd6304fd166ee.jpg",
+            "height": 1200,
+            "width": 1920,
+            "id": 9
+        },
+        {
+            "agcontext_id": 0,
+            "license": 0,
+            "file_name": "images/c5bd01807949e4923eff.jpg",
+            "height": 1200,
+            "width": 1920,
+            "id": 10
+        },
+        {
+            "agcontext_id": 0,
+            "license": 0,
+            "file_name": "images/358cc3736c8a3a315bfe.jpg",
+            "height": 1200,
+            "width": 1920,
+            "id": 11
+        },
+        {
+            "agcontext_id": 0,
+            "license": 0,
+            "file_name": "images/ed3834ac8f7fd86b7331.jpg",
+            "height": 1200,
+            "width": 1920,
+            "id": 12
+        },
+        {
+            "agcontext_id": 0,
+            "license": 0,
+            "file_name": "images/4b486df428a3416638a4.jpg",
+            "height": 1200,
+            "width": 1920,
+            "id": 13
+        },
+        {
+            "agcontext_id": 0,
+            "license": 0,
+            "file_name": "images/8c617911244c713b35ae.jpg",
+            "height": 1200,
+            "width": 1920,
+            "id": 14
+        },
+        {
+            "agcontext_id": 0,
+            "license": 0,
+            "file_name": "images/c42d4387bb27b6233e20.jpg",
+            "height": 1200,
+            "width": 1920,
+            "id": 15
+        },
+        {
+            "agcontext_id": 0,
+            "license": 0,
+            "file_name": "images/fbc0c21eb4c31ef2fa56.jpg",
+            "height": 1200,
+            "width": 1920,
+            "id": 16
+        },
+        {
+            "agcontext_id": 0,
+            "license": 0,
+            "file_name": "images/478e2f1eacb793ce16ac.jpg",
+            "height": 1200,
+            "width": 1920,
+            "id": 17
+        },
+        {
+            "agcontext_id": 0,
+            "license": 0,
+            "file_name": "images/87e7c1e37e67f4267824.jpg",
+            "height": 1200,
+            "width": 1920,
+            "id": 18
+        },
+        {
+            "agcontext_id": 0,
+            "license": 0,
+            "file_name": "images/d190fc6aba06d3b7a056.jpg",
+            "height": 1200,
+            "width": 1920,
+            "id": 19
+        }
+    ],
+    "annotations": [
+        {
+            "image_id": 0,
+            "category_id": 0,
+            "id": 0,
+            "bbox": [
+                311,
+                33,
+                226,
+                247
+            ]
+        },
+        {
+            "image_id": 0,
+            "category_id": 0,
+            "id": 1,
+            "bbox": [
+                667,
+                9,
+                208,
+                200
+            ]
+        },
+        {
+            "image_id": 1,
+            "category_id": 0,
+            "id": 2,
+            "bbox": [
+                377,
+                377,
+                109,
+                124
+            ]
+        },
+        {
+            "image_id": 1,
+            "category_id": 0,
+            "id": 3,
+            "bbox": [
+                742,
+                392,
+                106,
+                113
+            ]
+        },
+        {
+            "image_id": 1,
+            "category_id": 0,
+            "id": 4,
+            "bbox": [
+                22,
+                331,
+                89,
+                111
+            ]
+        },
+        {
+            "image_id": 2,
+            "category_id": 0,
+            "id": 5,
+            "bbox": [
+                341,
+                876,
+                248,
+                239
+            ]
+        },
+        {
+            "image_id": 2,
+            "category_id": 0,
+            "id": 6,
+            "bbox": [
+                711,
+                75,
+                194,
+                153
+            ]
+        },
+        {
+            "image_id": 2,
+            "category_id": 0,
+            "id": 7,
+            "bbox": [
+                705,
+                775,
+                245,
+                336
+            ]
+        },
+        {
+            "image_id": 2,
+            "category_id": 0,
+            "id": 8,
+            "bbox": [
+                1099,
+                77,
+                261,
+                278
+            ]
+        },
+        {
+            "image_id": 3,
+            "category_id": 0,
+            "id": 9,
+            "bbox": [
+                637,
+                705,
+                77,
+                136
+            ]
+        },
+        {
+            "image_id": 3,
+            "category_id": 0,
+            "id": 10,
+            "bbox": [
+                1080,
+                818,
+                99,
+                109
+            ]
+        },
+        {
+            "image_id": 4,
+            "category_id": 0,
+            "id": 11,
+            "bbox": [
+                320,
+                162,
+                93,
+                75
+            ]
+        },
+        {
+            "image_id": 5,
+            "category_id": 0,
+            "id": 12,
+            "bbox": [
+                318,
+                835,
+                109,
+                106
+            ]
+        },
+        {
+            "image_id": 5,
+            "category_id": 0,
+            "id": 13,
+            "bbox": [
+                1239,
+                214,
+                150,
+                104
+            ]
+        },
+        {
+            "image_id": 6,
+            "category_id": 1,
+            "id": 14,
+            "bbox": [
+                448,
+                128,
+                74,
+                33
+            ]
+        },
+        {
+            "image_id": 6,
+            "category_id": 0,
+            "id": 15,
+            "bbox": [
+                227,
+                632,
+                120,
+                225
+            ]
+        },
+        {
+            "image_id": 6,
+            "category_id": 0,
+            "id": 16,
+            "bbox": [
+                791,
+                757,
+                275,
+                114
+            ]
+        },
+        {
+            "image_id": 7,
+            "category_id": 0,
+            "id": 17,
+            "bbox": [
+                838,
+                309,
+                192,
+                199
+            ]
+        },
+        {
+            "image_id": 7,
+            "category_id": 0,
+            "id": 18,
+            "bbox": [
+                543,
+                780,
+                137,
+                153
+            ]
+        },
+        {
+            "image_id": 8,
+            "category_id": 1,
+            "id": 19,
+            "bbox": [
+                792,
+                996,
+                118,
+                123
+            ]
+        },
+        {
+            "image_id": 8,
+            "category_id": 1,
+            "id": 20,
+            "bbox": [
+                1611,
+                580,
+                149,
+                117
+            ]
+        },
+        {
+            "image_id": 9,
+            "category_id": 0,
+            "id": 21,
+            "bbox": [
+                314,
+                141,
+                179,
+                124
+            ]
+        },
+        {
+            "image_id": 9,
+            "category_id": 0,
+            "id": 22,
+            "bbox": [
+                1709,
+                706,
+                64,
+                73
+            ]
+        },
+        {
+            "image_id": 10,
+            "category_id": 0,
+            "id": 23,
+            "bbox": [
+                455,
+                380,
+                252,
+                221
+            ]
+        },
+        {
+            "image_id": 11,
+            "category_id": 0,
+            "id": 24,
+            "bbox": [
+                789,
+                585,
+                30,
+                63
+            ]
+        },
+        {
+            "image_id": 11,
+            "category_id": 0,
+            "id": 25,
+            "bbox": [
+                426,
+                958,
+                94,
+                94
+            ]
+        },
+        {
+            "image_id": 12,
+            "category_id": 0,
+            "id": 26,
+            "bbox": [
+                157,
+                594,
+                98,
+                135
+            ]
+        },
+        {
+            "image_id": 13,
+            "category_id": 0,
+            "id": 27,
+            "bbox": [
+                416,
+                207,
+                195,
+                241
+            ]
+        },
+        {
+            "image_id": 14,
+            "category_id": 0,
+            "id": 28,
+            "bbox": [
+                255,
+                382,
+                160,
+                175
+            ]
+        },
+        {
+            "image_id": 14,
+            "category_id": 0,
+            "id": 29,
+            "bbox": [
+                642,
+                411,
+                111,
+                139
+            ]
+        },
+        {
+            "image_id": 14,
+            "category_id": 0,
+            "id": 30,
+            "bbox": [
+                999,
+                463,
+                114,
+                150
+            ]
+        },
+        {
+            "image_id": 14,
+            "category_id": 0,
+            "id": 31,
+            "bbox": [
+                323,
+                1112,
+                138,
+                89
+            ]
+        },
+        {
+            "image_id": 15,
+            "category_id": 0,
+            "id": 32,
+            "bbox": [
+                191,
+                940,
+                192,
+                111
+            ]
+        },
+        {
+            "image_id": 15,
+            "category_id": 0,
+            "id": 33,
+            "bbox": [
+                564,
+                1012,
+                134,
+                82
+            ]
+        },
+        {
+            "image_id": 15,
+            "category_id": 0,
+            "id": 34,
+            "bbox": [
+                913,
+                1065,
+                133,
+                105
+            ]
+        },
+        {
+            "image_id": 16,
+            "category_id": 0,
+            "id": 35,
+            "bbox": [
+                382,
+                282,
+                187,
+                175
+            ]
+        },
+        {
+            "image_id": 17,
+            "category_id": 0,
+            "id": 36,
+            "bbox": [
+                431,
+                926,
+                101,
+                123
+            ]
+        },
+        {
+            "image_id": 18,
+            "category_id": 0,
+            "id": 37,
+            "bbox": [
+                333,
+                361,
+                89,
+                61
+            ]
+        },
+        {
+            "image_id": 18,
+            "category_id": 0,
+            "id": 38,
+            "bbox": [
+                781,
+                402,
+                79,
+                62
+            ]
+        },
+        {
+            "image_id": 19,
+            "category_id": 0,
+            "id": 39,
+            "bbox": [
+                744,
+                781,
+                95,
+                148
+            ]
+        },
+        {
+            "image_id": 19,
+            "category_id": 0,
+            "id": 40,
+            "bbox": [
+                313,
+                791,
+                82,
+                97
+            ]
+        },
+        {
+            "image_id": 19,
+            "category_id": 0,
+            "id": 41,
+            "bbox": [
+                274,
+                706,
+                60,
+                84
+            ]
+        }
+    ],
+    "categories": [
+        {
+            "id": 0,
+            "name": "weed: lolium rigidum"
+        },
+        {
+            "id": 1,
+            "name": "weed: rapistrum rugosum"
+        },
+        {
+            "id": 2,
+            "name": "weed: sonchus oleraceus"
+        }
+    ],
+    "metadata": {
+        "name": "20201014 - Cobbity Wheat BFLY",
+        "@type": "Dataset",
+        "funder": [
+            {
+                "name": "Grains Research and Development Corporation",
+                "@type": "Organization",
+                "sameAs": "https://ror.org/02xwr1996"
+            }
+        ],
+        "creator": [
+            {
+                "name": "Guy Coleman",
+                "@type": "Person",
+                "sameAs": "https://orcid.org/0000-0002-8808-2965",
+                "givenName": "Guy",
+                "familyName": "Coleman"
+            }
+        ],
+        "license": "https://creativecommons.org/licenses/by/4.0/legalcode",
+        "description": "Crop photography with weeds annotated.",
+        "datePublished": "2021-02-19"
+    }
+}

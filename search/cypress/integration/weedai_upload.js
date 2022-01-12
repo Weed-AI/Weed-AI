@@ -18,6 +18,19 @@ describe('overall upload workflow', () => {
         cy.clickText(/^Submit$/)
     })
 
+    it('Test Weedcoco Zip Upload', () => {
+        cy.findAllByText(/^Select annotation format$/).should('have.length', 1).type('weedcoco{enter}')
+        cy.clickText(/^Begin upload$/)
+        cy.get('.dzu-input').attachFile('test_weedcoco_zip/weedcoco.json')
+        cy.clickText(/^Next$/)
+        cy.findAllByText(/^Upload Image Files$/).click()
+        cy.findAllByText(/^Upload Images in Zip$/).click()
+        cy.get('input.uppy-Dashboard-input').attachFile('test_weedcoco_zip/weedcoco.zip')
+        cy.wait(10000)
+        cy.clickText(/^Submit$/)
+    })
+
+
     it('Test Coco Upload', () => {
         cy.findByText(/^Select annotation format$/).click()
         cy.findByText("COCO").click()
