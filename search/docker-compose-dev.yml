@@ -60,6 +60,7 @@ services:
       - repository_dir:/code/repository
       - upload_dir:/code/upload
       - download_dir:/code/download
+      - mystatic_dir:/code/mystatic
     ports:
       - "8000:8000"
     networks:
@@ -200,6 +201,8 @@ services:
       CVAT_REDIS_HOST: 'cvat_redis'
       CVAT_POSTGRES_HOST: 'cvat_db'
       ADAPTIVE_AUTO_ANNOTATION: 'false'
+    ports:
+      - "8080:8080"
     labels:
       - traefik.enable=true
       - traefik.http.services.cvat.loadbalancer.server.port=8080
