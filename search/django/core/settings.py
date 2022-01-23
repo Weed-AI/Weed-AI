@@ -9,6 +9,7 @@ UPLOAD_DIR = os.path.join(BASE_DIR, "upload")
 THUMBNAILS_DIR = os.path.join(BASE_DIR, "thumbnails")
 REPOSITORY_DIR = os.path.join(BASE_DIR, "repository")
 DOWNLOAD_DIR = os.path.join(BASE_DIR, "download")
+CVAT_DIR = os.path.join(BASE_DIR, "cvat_data")
 
 
 # Quick-start development settings - unsuitable for production

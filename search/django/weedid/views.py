@@ -4,9 +4,11 @@ import requests
 import os
 import json
 import traceback
+import shutil
 from core.settings import (
     UPLOAD_DIR,
     REPOSITORY_DIR,
+    CVAT_DIR,
     MAX_IMAGE_SIZE,
     MAX_VOC_SIZE,
     SITE_BASE_URL,
@@ -366,6 +368,35 @@ def upload_metadata(request):
     else:
         return HttpResponseNotAllowed(request.method)
 
+
+def copy_cvat(request):
+    """Copy the images for a CVAT task from the CVAT volume to the upload dir"""
+    if not request.method == "POST":
+        return HttpResponseNotAllowed(request.method)
+    user = request.user
+    if not (user and user.is_authenticated):
+        return HttpResponseForbidden("You dont have access to proceed")
+    data = json.loads(request.body)
+    upload_id = data["upload_id"]
+    cvat_task_id = data["task_id"]
+    dest_path = os.path.join(UPLOAD_DIR, str(user.id), str(upload_id))
+    weedcoco_path = os.path.join(dest_path, "weedcoco.json")
+    try:
+        weedcoco = json.load(weedcoco_path)
+        missing = []
+        for img in weedcoco["images"]:
+            fn = img["file_name"]
+            cvat_image = os.path.join(CVAT_DIR, str(cvat_task_id), 'raw', fn)
+            try:
+                shutil.copy(cvat_image, os.path.join(weedcoco_path, fn))
+            except Exception:
+                missing.append(img["image_id"])
+        return HttpResponse(
+            json.dumps({"upload_id": upload_id, "missing_images": missing})
+        )
+    except Exception:
+        return HttpResponseServerError("Server error")
+    
 
 def submit_deposit(request):
     if not request.method == "POST":
