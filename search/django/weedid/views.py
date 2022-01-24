@@ -47,6 +47,9 @@ from django.http import (
 from django.views.decorators.csrf import ensure_csrf_cookie
 from pathlib import Path
 
+import logging
+
+logger = logging.getLogger(__name__)
 
 @ensure_csrf_cookie
 def set_csrf(request):
@@ -387,6 +390,7 @@ def copy_cvat(request):
         for img in weedcoco["images"]:
             fn = img["file_name"]
             cvat_image = os.path.join(CVAT_DIR, str(cvat_task_id), 'raw', fn)
+            logger.warn(f"trying to copy {cvat_image} -> {fn}")
             try:
                 shutil.copy(cvat_image, os.path.join(weedcoco_path, fn))
             except Exception:
@@ -394,8 +398,9 @@ def copy_cvat(request):
         return HttpResponse(
             json.dumps({"upload_id": upload_id, "missing_images": missing})
         )
-    except Exception:
-        return HttpResponseServerError("Server error")
+    except Exception as e:
+        logger.error(f"error copying files: {e}")
+        return HttpResponseServerError(e)
     
 
 def submit_deposit(request):
