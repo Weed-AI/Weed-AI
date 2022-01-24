@@ -95,9 +95,18 @@ DATABASES = {
         "PASSWORD": os.environ.get("POSTGRES_PASSWORD", "postgres"),
         "HOST": "db",
         "PORT": "5432",
-    }
+    },
+    "auth_db": {
+        "ENGINE": "django.db.backends.postgresql_psycopg2",
+        "NAME": os.environ.get("POSTGRES_DB", "reactivesearch"),
+        "USER": os.environ.get("POSTGRES_USER", "postgres"),
+        "PASSWORD": os.environ.get("POSTGRES_PASSWORD", "postgres"),
+        "HOST": "auth-db",
+        "PORT": "5432",
+    },
 }
 
+DATABASE_ROUTERS = ['db_routers.auth_router.AuthRouter', 'db_routers.default_router.DefaultRouter']
 
 # Password validation
 # https://docs.djangoproject.com/en/2.2/ref/settings/#auth-password-validators
