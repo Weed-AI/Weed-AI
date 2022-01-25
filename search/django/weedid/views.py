@@ -7,6 +7,7 @@ import traceback
 from core.settings import (
     UPLOAD_DIR,
     REPOSITORY_DIR,
+    CVAT_DATA_DIR,
     MAX_IMAGE_SIZE,
     MAX_VOC_SIZE,
     SITE_BASE_URL,
@@ -44,6 +45,7 @@ from django.http import (
 )
 from django.views.decorators.csrf import ensure_csrf_cookie
 from pathlib import Path
+from zipfile import ZipFile
 
 
 @ensure_csrf_cookie
@@ -74,6 +76,24 @@ def elasticsearch_query(request):
     return HttpResponse(elasticsearch_response)
 
 
+def upload_helper(file_weedcoco, user_id, schema='coco'):
+    images = []
+    weedcoco_json = json.load(file_weedcoco)
+    validate(
+        weedcoco_json,
+        schema=schema,
+    )
+    for image_reference in weedcoco_json["images"]:
+        images.append(image_reference["file_name"].split("/")[-1])
+    categories = [
+        parse_category_name(category) for category in weedcoco_json["categories"]
+    ]
+    upload_dir, upload_id = setup_upload_dir(os.path.join(UPLOAD_DIR, str(user_id)))
+    store_tmp_weedcoco(file_weedcoco, upload_dir)
+    create_upload_entity(upload_id, user_id)
+    return upload_id, images, categories
+
+
 def upload(request):
     if not request.method == "POST":
         return HttpResponseNotAllowed(request.method)
@@ -81,21 +101,30 @@ def upload(request):
     if not (user and user.is_authenticated):
         return HttpResponseForbidden("You dont have access to proceed")
     try:
-        images = []
         file_weedcoco = request.FILES["weedcoco"]
-        weedcoco_json = json.load(file_weedcoco)
-        # validate(
-        #     weedcoco_json,
-        #     schema=request.POST["schema"] if request.POST["schema"] else "coco",
-        # )
-        for image_reference in weedcoco_json["images"]:
-            images.append(image_reference["file_name"].split("/")[-1])
-        categories = [
-            parse_category_name(category) for category in weedcoco_json["categories"]
-        ]
-        upload_dir, upload_id = setup_upload_dir(os.path.join(UPLOAD_DIR, str(user.id)))
-        store_tmp_weedcoco(file_weedcoco, upload_dir)
-        create_upload_entity(upload_id, user.id)
+        upload_id, images, categories = upload_helper(file_weedcoco, user.id, request.POST["schema"])
+    except JsonValidationError as e:
+        traceback.print_exc()
+        return json_validation_response(e)
+    except Exception as e:
+        traceback.print_exc()
+        return HttpResponseBadRequest(str(e))
+    else:
+        return HttpResponse(
+            json.dumps(
+                {"upload_id": upload_id, "images": images, "categories": categories}
+            )
+        )
+
+
+def retrieve_cvat_task(request, task_id):
+    user = request.user
+    if not (user and user.is_authenticated):
+        return HttpResponseForbidden("You dont have access to proceed")
+    try:
+        with ZipFile(os.path.join(CVAT_DATA_DIR, 'tasks', task_id, 'export_cache/annotations_coco-10.ZIP')) as cvat_zip:
+            with cvat_zip.open('annotations/instances_default.json') as cvat_task_coco:
+                upload_id, images, categories = upload_helper(cvat_task_coco, user.id)
     except JsonValidationError as e:
         traceback.print_exc()
         return json_validation_response(e)

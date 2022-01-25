@@ -61,6 +61,7 @@ services:
       - upload_dir:/code/upload
       - download_dir:/code/download
       - mystatic_dir:/code/mystatic
+      - cvat_data:/code/cvat_data
     ports:
       - "8000:8000"
     networks:

@@ -9,6 +9,7 @@ UPLOAD_DIR = os.path.join(BASE_DIR, "upload")
 THUMBNAILS_DIR = os.path.join(BASE_DIR, "thumbnails")
 REPOSITORY_DIR = os.path.join(BASE_DIR, "repository")
 DOWNLOAD_DIR = os.path.join(BASE_DIR, "download")
+CVAT_DATA_DIR = os.path.join(BASE_DIR, "cvat_data")
 
 
 # Quick-start development settings - unsuitable for production
@@ -23,6 +24,7 @@ DEBUG = os.environ.get("ENV", "PROD") == "DEV"
 ALLOWED_HOSTS = ["*"]
 CORS_ORIGIN_ALLOW_ALL = True
 AUTH_USER_MODEL = "weedid.WeedidUser"
+SESSION_COOKIE_NAME = 'weedai_sessionid'
 
 # Scale file size of upload limit up to 10 MB
 MAX_IMAGE_SIZE = 1024 * 1024 * 10

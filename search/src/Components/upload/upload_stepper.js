@@ -9,6 +9,7 @@ import UploaderSingle from './uploader_single';
 import UploaderVoc from './uploader_voc';
 import UploaderMasks from './uploader_masks';
 import CategoryMapper from './uploader_category_mapper';
+import CvatRetriever from './uploader_cvat';
 import ErrorMessage from '../error/display';
 import AgContextForm from '../forms/AgContextForm';
 import UploadJsonButton from '../forms/UploadJsonButton';
@@ -63,6 +64,12 @@ const stepsByType = {
         {title: "Add Agcontext", type: "agcontext"},
         {title: "Add Metadata", type: "metadata"},
         {title: "Upload Images", type: "images"}
+    ],
+    "cvat": [
+        {title: "Select CVAT Task", type: "cvat"},
+        {title: "Categories", type: "categories"},
+        {title: "Add Agcontext", type: "agcontext"},
+        {title: "Add Metadata", type: "metadata"}
     ]
 }
 
@@ -352,6 +359,8 @@ class UploadStepper extends React.Component {
                 )
             case "images":
                 return <ImageOrZipUploader stepName={step} upload_id={this.state.upload_id} images={this.state.images} handleValidation={this.handleValidation} handleErrorMessage={this.handleErrorMessage} />
+            case "cvat":
+                return <CvatRetriever handleUploadId={this.handleUploadId} handleImages={this.handleImages} handleCategories={this.handleCategories} handleValidation={this.handleValidation} handleErrorMessage={this.handleErrorMessage}></CvatRetriever>
             default:
                 return ''
         }

@@ -141,6 +141,7 @@ class UploadComponent extends Component {
                             <MenuItem value="coco">COCO</MenuItem>
                             <MenuItem value="voc">VOC</MenuItem>
                             <MenuItem value="masks">Segmentation masks</MenuItem>
+                            <MenuItem value="cvat">Annotation</MenuItem>
                         </Select>
                     </FormControl>
                     <UploadDialog handleUploadStatus={this.retrieveUploadStatus} upload_type={this.state.upload_type}/>
