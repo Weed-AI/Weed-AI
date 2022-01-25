@@ -4,7 +4,6 @@ import FormControl from '@material-ui/core/FormControl';
 import Select from '@material-ui/core/Select';
 import UploaderImages from './uploader_images';
 import UploaderZip from './uploader_zip';
-import UploaderCvat from './uploader_cvat';
 
 
 const ImageOrZipUploader = (props) => {
@@ -30,10 +29,7 @@ const ImageOrZipUploader = (props) => {
                     uploadImageFormat == "image" ?
                     <UploaderImages upload_id={upload_id} images={images} handleValidation={handleValidation} handleErrorMessage={handleErrorMessage} syncImageErrorMessage={syncImageErrorMessage}/>
                     :
-                    uploadImageFormat == "zip" ?
                     <UploaderZip upload_id={upload_id} images={images} handleValidation={handleValidation} handleErrorMessage={handleErrorMessage} syncImageErrorMessage={syncImageErrorMessage}/>
-                    :
-                    <UploaderCvat upload_id={upload_id} images={images} handleValidation={handleValidation} handleErrorMessage={handleErrorMessage} syncImageErrorMessage={syncImageErrorMessage}/>
     const select = stepName === "images" ?
                     <FormControl>
                         <Select
