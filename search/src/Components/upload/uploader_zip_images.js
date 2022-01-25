@@ -42,7 +42,6 @@ const ImageOrZipUploader = (props) => {
                             </MenuItem>
                             <MenuItem value="image">Upload Image Files</MenuItem>
                             <MenuItem value="zip">Upload Images in Zip</MenuItem>
-                            <MenuItem value="cvat">Load images from CVAT</MenuItem>
                         </Select>
                     </FormControl>
                     : ""
