@@ -283,5 +283,6 @@ volumes:
     driver: local
   cvat_db:
   cvat_data:
+    driver: local
   cvat_keys:
   cvat_logs:

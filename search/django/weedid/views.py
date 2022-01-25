@@ -4,6 +4,7 @@ import requests
 import os
 import json
 import traceback
+import shutil
 from core.settings import (
     UPLOAD_DIR,
     REPOSITORY_DIR,
@@ -47,6 +48,9 @@ from django.views.decorators.csrf import ensure_csrf_cookie
 from pathlib import Path
 from zipfile import ZipFile
 
+import logging
+
+logger = logging.getLogger(__name__)
 
 @ensure_csrf_cookie
 def set_csrf(request):
@@ -395,6 +399,39 @@ def upload_metadata(request):
     else:
         return HttpResponseNotAllowed(request.method)
 
+
+def copy_cvat(request):
+    """Copy the images for a CVAT task from the CVAT volume to the upload dir"""
+    if not request.method == "POST":
+        return HttpResponseNotAllowed(request.method)
+    user = request.user
+    if not (user and user.is_authenticated):
+        return HttpResponseForbidden("You dont have access to proceed")
+    upload_id = request.POST["upload_id"]
+    cvat_task_id = request.POST["task_id"]
+    dest_path = os.path.join(UPLOAD_DIR, str(user.id), str(upload_id))
+    weedcoco_path = os.path.join(dest_path, "weedcoco.json")
+    try:
+        with open(weedcoco_path, "r") as weedcoco_file:
+            weedcoco = json.load(weedcoco_file)
+            missing = []
+            for img in weedcoco["images"]:
+                fn = img["file_name"]
+                cvat_image = os.path.join(CVAT_DATA_DIR, 'data', str(cvat_task_id), 'raw', fn)
+                weedai_image = os.path.join(dest_path, fn)
+                logger.warn(f"copy {cvat_image} -> {weedai_image}")
+                try:
+                    shutil.copy(cvat_image, weedai_image)
+                except Exception as e:
+                    logger.error(f"error in copy: {e}")
+                    missing.append(img["image_id"])
+            return HttpResponse(
+                json.dumps({"upload_id": upload_id, "missing_images": missing})
+            )
+    except Exception as e:
+        logger.error(f"error copying files: {e}")
+        return HttpResponseServerError(f"error copying files: {e}")
+    
 
 def submit_deposit(request):
     if not request.method == "POST":

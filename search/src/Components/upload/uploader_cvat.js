@@ -92,8 +92,10 @@ class CvatRetriever extends React.Component {
                             onChange={(_, value) => {
                                 if (value == null) {
                                     this.state.selected_task_id = 0
+                                    this.props.handleCvatTaskId(0)
                                 } else {
                                     this.state.selected_task_id = value.id
+                                    this.props.handleCvatTaskId(value.id)
                                 }
                             }}
                     />

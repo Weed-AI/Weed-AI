@@ -4,10 +4,14 @@ import FormControl from '@material-ui/core/FormControl';
 import Select from '@material-ui/core/Select';
 import UploaderImages from './uploader_images';
 import UploaderZip from './uploader_zip';
+import Button from '@material-ui/core/Button';
+import axios from 'axios';
+import Cookies from 'js-cookie';
 
 
 const ImageOrZipUploader = (props) => {
-    const { stepName, upload_id, images, handleValidation, handleErrorMessage } = props;
+    const baseURL = new URL(window.location.origin);
+    const { stepName, upload_id, cvat_task_id, images, handleValidation, handleErrorMessage } = props;
     const [uploadImageFormat, setUploadImageFormat] = React.useState("image")
     const handleUploadImageFormat = (event) => {
         setUploadImageFormat(event.target.value)
@@ -22,6 +26,31 @@ const ImageOrZipUploader = (props) => {
             handleValidation(false);
             handleErrorMessage(`${missingImagesAmount} ${missingImagesAmount > 1 ? "images" : "image"} missing`, {error_type: "image", missingImages: missingImages});
         }
+    }
+    const copyCvatImage = () => {
+        const body = new FormData()
+        body.append('upload_id', upload_id)
+        body.append('task_id', cvat_task_id)
+        axios({
+            method: 'post',
+            url: baseURL + "api/copy_cvat/",
+            data: body,
+            headers: {'Content-Type': 'multipart/form-data', 'X-CSRFToken': Cookies.get('csrftoken') }
+        }).then(res => {
+            const data = res.data
+            if (data.upload_id === upload_id) {
+                if (data.missing_images.length === 0) {
+                    handleValidation(true)
+                    handleErrorMessage("")
+                } else {
+                    syncImageErrorMessage(data.missing_images)
+                }
+            }
+        })
+        .catch(err => {
+            handleErrorMessage(err.responseText);
+            handleValidation(false)
+        })
     }
     const uploader = stepName !== "images" ?
                     ""
@@ -45,6 +74,15 @@ const ImageOrZipUploader = (props) => {
                         </Select>
                     </FormControl>
                     : ""
-    return [uploader, select];
+    const copy_cvat = cvat_task_id !== 0 ?
+                    <Button 
+                        variant="contained"
+                        color="primary"
+                        style={{float: 'right'}}
+                        onClick={copyCvatImage}>
+                    Copy from CVAT
+                    </Button>
+                    : ""
+    return [uploader, select, copy_cvat];
 }
 export default ImageOrZipUploader;

@@ -69,7 +69,8 @@ const stepsByType = {
         {title: "Select CVAT Task", type: "cvat"},
         {title: "Categories", type: "categories"},
         {title: "Add Agcontext", type: "agcontext"},
-        {title: "Add Metadata", type: "metadata"}
+        {title: "Add Metadata", type: "metadata"},
+        {title: "Upload Images", type: "images"}
     ]
 }
 
@@ -83,6 +84,7 @@ class UploadStepper extends React.Component {
             skipped: new Set(),
             steps: stepsByType[this.props.upload_type].map(step => step.title),
             upload_id: 0,
+            cvat_task_id: 0,
             voc_id: Math.random().toString(36).slice(-8),
             mask_id: Math.random().toString(36).slice(-8),
             image_ext: '',
@@ -97,6 +99,7 @@ class UploadStepper extends React.Component {
         this.isStepOptional = this.isStepOptional.bind(this);
         this.isStepSkipped = this.isStepSkipped.bind(this);
         this.handleUploadId = this.handleUploadId.bind(this);
+        this.handleCvatTaskId = this.handleCvatTaskId.bind(this);
         this.handleImageExtension = this.handleImageExtension.bind(this);
         this.handleImages = this.handleImages.bind(this);
         this.handleCategories = this.handleCategories.bind(this);
@@ -128,6 +131,10 @@ class UploadStepper extends React.Component {
 
     handleUploadId(upload_id) {
         this.setState({upload_id: upload_id});
+    }
+
+    handleCvatTaskId(cvat_task_id) {
+        this.setState({cvat_task_id: cvat_task_id});
     }
 
     handleImageExtension(image_ext) {
@@ -358,9 +365,9 @@ class UploadStepper extends React.Component {
                     </React.Fragment>
                 )
             case "images":
-                return <ImageOrZipUploader stepName={step} upload_id={this.state.upload_id} images={this.state.images} handleValidation={this.handleValidation} handleErrorMessage={this.handleErrorMessage} />
+                return <ImageOrZipUploader stepName={step} upload_id={this.state.upload_id} cvat_task_id={this.state.cvat_task_id} images={this.state.images} handleValidation={this.handleValidation} handleErrorMessage={this.handleErrorMessage} />
             case "cvat":
-                return <CvatRetriever handleUploadId={this.handleUploadId} handleImages={this.handleImages} handleCategories={this.handleCategories} handleValidation={this.handleValidation} handleErrorMessage={this.handleErrorMessage}></CvatRetriever>
+                return <CvatRetriever handleUploadId={this.handleUploadId} handleCvatTaskId={this.handleCvatTaskId} handleImages={this.handleImages} handleCategories={this.handleCategories} handleValidation={this.handleValidation} handleErrorMessage={this.handleErrorMessage}></CvatRetriever>
             default:
                 return ''
         }
