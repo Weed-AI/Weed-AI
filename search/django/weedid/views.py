@@ -381,8 +381,13 @@ def copy_cvat(request):
         return HttpResponseForbidden("You dont have access to proceed")
     upload_id = request.POST["upload_id"]
     cvat_task_id = request.POST["task_id"]
-    dest_path = os.path.join(UPLOAD_DIR, str(user.id), str(upload_id))
-    weedcoco_path = os.path.join(dest_path, "weedcoco.json")
+    upload_dir = os.path.join(UPLOAD_DIR, str(user.id), str(upload_id))
+    if not os.path.isdir(upload_dir):
+        return HttpResponseServerError(f"upload directory {upload_id} not found")
+    image_dir = os.path.join(image_dir, "images")
+    if not os.path.isdir(image_dir):
+        mkdir_safely(image_dir)
+    weedcoco_path = os.path.join(upload_dir, "weedcoco.json")
     try:
         with open(weedcoco_path, "r") as weedcoco_file:
             weedcoco = json.load(weedcoco_file)
@@ -390,12 +395,11 @@ def copy_cvat(request):
             for img in weedcoco["images"]:
                 fn = img["file_name"]
                 cvat_image = os.path.join(CVAT_DIR, str(cvat_task_id), 'raw', fn)
-                weedai_image = os.path.join(dest_path, fn)
-                logger.warn(f"copy {cvat_image} -> {weedai_image}")
+                weedai_image = os.path.join(image_dir, fn)
                 try:
                     shutil.copy(cvat_image, weedai_image)
                 except Exception as e:
-                    logger.error(f"error in copy: {e}")
+                    logger.error(f"error copying {cvat_image} to {weedai_image}: {e}")
                     missing.append(img["image_id"])
             return HttpResponse(
                 json.dumps({"upload_id": upload_id, "missing_images": missing})
