@@ -3,14 +3,14 @@ import pathlib
 import os
 import warnings
 import hashlib
+import requests
 
+import joblib
 import PIL.Image
 import yaml
 import imagehash
 
-from .species_utils import get_eppo_singleton
-
-EPPO_PATH = "_eppo_xmlfull.zip"
+memory = joblib.Memory(pathlib.Path(__file__).parent / "_cache")
 
 
 def set_info(coco, metadata):
@@ -136,34 +136,54 @@ def get_task_types(annotations):
     return out
 
 
+@memory.cache
+def get_gbif_record(canonical_name):
+    results = requests.get(
+        f"https://api.gbif.org/v1/species",
+        params={
+            "name": canonical_name,
+            "datasetKey": "d7dddbf4-2cf0-4f39-9b2a-bb099caae36c",
+        },
+    ).json()
+    # assert results["endOfRecords"]  # TODO?: pagination
+    try:
+        gbif_record = next(
+            record
+            for record in results["results"]
+            if record["canonicalName"].lower() == canonical_name.lower()
+            and record["taxonomicStatus"] == "ACCEPTED"
+        )
+    except StopIteration:
+        raise ValueError(f"No accepted GBIF entries for {repr(canonical_name)}")
+    return gbif_record
+
+
 def get_supercategory_names(name):
     if not name.startswith("weed: "):
         return []
 
-    species = name.split(": ", 1)[1]
+    taxon = name.split(": ", 1)[1]
     out = ["weed"]
-    if species == "UNSPECIFIED":
-        return out
-
-    eppo = get_eppo_singleton(EPPO_PATH)
-    try:
-        entry = eppo.lookup_preferred_name(species, species_only=False)
-    except Exception:
-        warnings.warn(f"Failed to lookup species {repr(species)}")
+    if taxon == "UNSPECIFIED":
         return out
 
     try:
-        family = next(
-            code for code in entry["ancestors"] if code.endswith(eppo.FAMILY_SUFFIX)
-        )
-    except StopIteration:
-        family = None
-    if family != "1GRAF":
+        record = get_gbif_record(taxon)
+    except ValueError:
+        warnings.warn(f"Failed to lookup species/taxon {repr(taxon)}")
+        return out
+
+    ancestors = {
+        rank: record[rank]
+        for rank in ["kingdom", "phylum", "order", "family", "genus", "species"]
+        if rank in record
+    }
+    family = ancestors.get("family", None)
+    if family != "Poaceae":
         out.append("weed: non-poaceae")
 
     if family is not None:
-        family_entry = eppo.entries[family]
-        out.append(f"weed: {family_entry['preferred_name'].lower()}")
+        out.append(f"weed: {family.lower()}")
     return out
 
 

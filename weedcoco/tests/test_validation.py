@@ -113,7 +113,7 @@ def test_bad_category_name(func, bad_name, messages):
         "pasture",
         "fallow",
         "daucus carota",
-        "brassica oleracea var. alboglabra",
+        # "brassica oleracea var. alboglabra",  not supported by GBIF
     ],
 )
 def test_crop_type(func, name):

@@ -11,7 +11,7 @@ from jsonschema import FormatChecker
 from jsonschema.validators import Draft7Validator, RefResolver
 import yaml
 
-from .species_utils import get_eppo_singleton
+from .utils import get_gbif_record
 
 SCHEMA_DIR = pathlib.Path(__file__).parent / "schema"
 MAIN_SCHEMAS = {
@@ -45,10 +45,9 @@ def check_date_missing_parts_format(value):
 def check_plant_species_format(value):
     if not value.islower():
         return False
-    eppo = get_eppo_singleton(EPPO_CACHE_PATH)
     try:
-        return eppo.lookup_preferred_name(value, species_only=False)
-    except KeyError:
+        return get_gbif_record(value)
+    except ValueError:
         return False
 
 
