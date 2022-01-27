@@ -388,11 +388,19 @@ def upload_status(request):
         return HttpResponse("You havent been logged in")
     user_id = request.user.id
     upload_entity = WeedidUser.objects.get(id=user_id).latest_upload
+
+    if upload_entity is not None:
+        status = upload_entity.status
+        details = upload_entity.status_details
+    else:
+        status = "N"
+        details = ""
+
     return HttpResponse(
         json.dumps(
             {
-                "upload_status": upload_entity.status,
-                "upload_status_details": upload_entity.status_details,
+                "upload_status": status,
+                "upload_status_details": details,
             }
         )
     )
