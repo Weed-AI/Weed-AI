@@ -342,8 +342,8 @@ class UploadStepper extends React.Component {
                     </React.Fragment>
                 )
             case "metadata":
+				console.log('*****', 'Rendering with', JSON.stringify(this.state.metadata))
                 return (
-                	console.log('*****', 'Rendering with', JSON.stringify(this.state.metadata))
                     <React.Fragment>
                         <MetadataForm formData={this.state.metadata} handleValidation={this.handleValidation} onChange={e => {
                             this.handleMetadataFormData(e.formData)
