@@ -191,7 +191,7 @@ services:
 
   cvat:
     container_name: weedai_cvat
-    image: openvino/cvat_server
+    image: cvat_cvat
     restart: always
     depends_on:
       - cvat_redis
