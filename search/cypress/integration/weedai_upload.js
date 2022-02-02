@@ -1,3 +1,5 @@
+const waitAfterSetForm = 2000;
+
 describe('overall upload workflow', () => {
 
     beforeEach(() => {
@@ -30,12 +32,12 @@ describe('overall upload workflow', () => {
         cy.clickText(/^Next$/)
         cy.clickText(/^Upload and Download Form Contents$/)
         cy.get('.dzu-input').attachFile('test_coco/agcontext.json')
-        cy.wait(1000)
+        cy.wait(waitAfterSetForm)
         cy.clickText(/^Set Form$/)
         cy.clickText(/^Next$/)
         cy.clickText(/^Upload and Download Form Contents$/)
         cy.get('.dzu-input').attachFile('test_coco/metadata.json')
-        cy.wait(1000)
+        cy.wait(waitAfterSetForm)
         cy.clickText(/^Set Form$/)
         cy.clickText(/^Next$/)
         cy.get('div.fileContainer > input').attachFile('test_coco/images/002_image.png')
@@ -54,12 +56,12 @@ describe('overall upload workflow', () => {
         cy.clickText(/^Next$/)
         cy.clickText(/^Upload and Download Form Contents$/)
         cy.get('.dzu-input').attachFile('test_voc/agcontext.json')
-        cy.wait(1000)
+        cy.wait(waitAfterSetForm)
         cy.clickText(/^Set Form$/)
         cy.clickText(/^Next$/)
         cy.clickText(/^Upload and Download Form Contents$/)
         cy.get('.dzu-input').attachFile('test_voc/metadata.json')
-        cy.wait(1000)
+        cy.wait(waitAfterSetForm)
         cy.clickText(/^Set Form$/)
         cy.clickText(/^Next$/)
         cy.get('div.fileContainer > input').attachFile('test_voc/images/resizeC1_PLOT_20190728_175852.jpg')
