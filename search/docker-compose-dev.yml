@@ -51,6 +51,7 @@ services:
       - SMTP_HOST=${SMTP_HOST}
       - SMTP_PORT=${SMTP_PORT}
       - FROM_EMAIL=${FROM_EMAIL}
+      - SEND_EMAIL=${SEND_EMAIL}
       - ENV=DEV
     command: python manage.py runserver 0.0.0.0:8000
     entrypoint: /entrypoint.sh
@@ -119,7 +120,7 @@ services:
 
   # search engine
   elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch-oss:7.8.1
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.16.2
     container_name: elasticsearch
     environment:
       - discovery.type=single-node
@@ -191,7 +192,7 @@ services:
 
   cvat:
     container_name: weedai_cvat
-    image: openvino/cvat_server
+    image: cvat_cvat
     restart: always
     depends_on:
       - cvat_redis

@@ -177,7 +177,7 @@ export default function NavbarComponent(props) {
     <Box pt={4}>
       <footer className={classes.footer}>
         <Typography paragraph={true}>Site Copyright &copy; 2021 The University of Sydney. <a href="https://github.com/Sydney-Informatics-Hub/Weed-ID-Interchange/">Contribute on GitHub</a> (MIT Licensed). See our <a href="/privacy">Privacy Policy</a>.</Typography>
-        <Typography paragraph={true}>Images and annotations are licensed under <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>. See <a href="/datasets">Dataset</a> pages for attribution.</Typography>
+        <Typography paragraph={true}>Images and annotations are owned and copyright held by their respective contributors, and are licensed under <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>. See <a href="/datasets">Dataset</a> pages for attribution.</Typography>
       </footer>
     </Box>
   );
