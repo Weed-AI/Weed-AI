@@ -23,7 +23,7 @@ describe('overall upload workflow', () => {
         cy.clickText(/^Begin upload$/)
         cy.get('.dzu-input').attachFile('test_weedcoco_zip/weedcoco.json')
         cy.clickText(/^Next$/)
-        cy.findAllByText(/^Upload Image Files$/).click()
+        cy.findAllByText(/^Upload Image Files$/).click()  // select other option in dropdown
         cy.findAllByText(/^Upload Images in Zip$/).click()
         cy.get('input.uppy-Dashboard-input').attachFile('test_weedcoco_zip/weedcoco.zip')
         cy.wait(2000)
