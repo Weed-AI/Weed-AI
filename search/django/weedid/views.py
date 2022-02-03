@@ -1,13 +1,10 @@
 from django.http import HttpResponse
 from django.shortcuts import render
-from django.dispatch import receiver
 
 import requests
 import os
 import json
 import traceback
-import time
-import logging
 
 from core.settings import (
     UPLOAD_DIR,
@@ -50,9 +47,6 @@ from django.http import (
 )
 from django.views.decorators.csrf import ensure_csrf_cookie
 from pathlib import Path
-
-
-logger = logging.getLogger()
 
 
 @ensure_csrf_cookie
