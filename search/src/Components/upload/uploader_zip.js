@@ -12,7 +12,7 @@ import '@uppy/dashboard/dist/style.css';
 import Tus from '@uppy/tus';
 import { Dashboard, useUppy } from '@uppy/react';
 
-import {jsonSchemaTitle} from '../error/utils';
+import { jsonSchemaTitle } from '../error/utils';
 
 const baseURL = new URL(window.location.origin);
 
