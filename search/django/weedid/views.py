@@ -69,8 +69,7 @@ def elasticsearch_query(request):
         return HttpResponseNotAllowed(request.method)
     elasticsearch_response = requests.post(
         url=f"http://elasticsearch:9200/{elasticsearch_url}",
-        data=request.body,
-        headers=request.headers,
+        data=request.body, headers=request.headers,
     )
     return HttpResponse(elasticsearch_respons)
 
