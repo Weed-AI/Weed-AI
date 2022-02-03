@@ -7,6 +7,7 @@ import hashlib
 import PIL.Image
 import yaml
 import imagehash
+import sys
 
 from .species_utils import get_eppo_singleton
 
