@@ -22,7 +22,6 @@ import ImageOrZipUploader from './uploader_zip_images';
 
 const baseURL = new URL(window.location.origin);
 
-
 const useStyles = (theme) => ({
   root: {
     width: '100%',
