@@ -72,7 +72,7 @@ def elasticsearch_query(request):
         data=request.body,
         headers=request.headers,
     )
-    return HttpResponse(elasticsearch_response)
+    return HttpResponse(elasticsearch_respons)
 
 
 def upload(request):
