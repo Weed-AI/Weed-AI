@@ -44,6 +44,7 @@ from django.http import (
 )
 from django.views.decorators.csrf import ensure_csrf_cookie
 from pathlib import Path
+from django.dispatch import receiver
 
 
 @ensure_csrf_cookie
