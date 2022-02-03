@@ -52,13 +52,7 @@ ALLOWED_HOSTS = ["*"]
 CORS_ORIGIN_ALLOW_ALL = True
 AUTH_USER_MODEL = "weedid.WeedidUser"
 
-CORS_ALLOWED_ORIGINS = [
-    "http://localhost:3000",
-    "http://0.0.0.0:3000",
-    "http://120.0.0.1:3000",
-]
-
-# TUS custom headers
+# TUS headers
 
 CORS_ALLOW_HEADERS = list(default_headers) + [
     "x-request-id",
