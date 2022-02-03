@@ -7,6 +7,7 @@ describe('overall upload workflow', () => {
         cy.visit('http://localhost/upload', {failOnStatusCode: false})
         cy.register(test_username, test_email, test_password)
         cy.login(test_username, test_password)
+        cy.findAllByRole('button', 'BEGIN UPLOAD').should('have.length', 1)
     })
 
     it('Test Weedcoco Upload', () => {
@@ -64,6 +65,50 @@ describe('overall upload workflow', () => {
         cy.clickText(/^Next$/)
         cy.get('div.fileContainer > input').attachFile('test_voc/images/resizeC1_PLOT_20190728_175852.jpg')
         cy.get('div.fileContainer > input').attachFile('test_voc/images/resizeC1_PLOT_20190728_180135.jpg')
+        cy.clickText(/^Submit$/)
+    })
+
+    it('Test Cvat Upload', () => {
+        const cvat_username = 'admin'
+        const cvat_password = 'password'
+        const task_name = 'Cobbity-2020-winter'
+        const label_1 = 'Turniweed'
+        const label_2 = 'Wild Radish'
+        cy.visit('http://localhost/cvat-annotation', {failOnStatusCode: false})
+        cy.get('#username')
+        .type(cvat_username)
+        .should('have.value', cvat_username)
+        cy.get('#password')
+        .type(cvat_password)
+        .should('have.value', cvat_password)
+        cy.findAllByRole('button', /^Sign In$/).should('have.length', 1).click()
+        cy.findAllByText(task_name).its('length').should('be.gte', 1)
+
+        cy.visit('http://localhost/upload', {failOnStatusCode: false})
+        cy.login(cvat_username, cvat_password)
+        cy.findByText(/^Select annotation format$/).click()
+        cy.findByText("Annotation").click()
+        cy.clickText(/^Begin upload$/)
+        cy.get('.MuiAutocomplete-endAdornment').click()
+        cy.findAllByText(task_name).first().click()
+        cy.clickText(/^Apply$/)
+        cy.wait(5000)
+        cy.clickText(/^Next$/)
+        cy.findByDisplayValue(label_1).click().clear().type('rapistrum rugosum{enter}')
+        cy.findByDisplayValue(label_2).click().clear().type('UNSPECIFIED{enter}')
+        cy.clickText(/^Apply$/)
+        cy.clickText(/^Next$/)
+        cy.clickText(/^Upload and Download Form Contents$/)
+        cy.get('.dzu-input').attachFile('test_coco/agcontext.json')
+        cy.wait(10000)
+        cy.clickText(/^Set Form$/)
+        cy.clickText(/^Next$/)
+        cy.clickText(/^Upload and Download Form Contents$/)
+        cy.get('.dzu-input').attachFile('test_coco/metadata.json')
+        cy.wait(10000)
+        cy.clickText(/^Set Form$/)
+        cy.clickText(/^Next$/)
+        cy.wait(5000)
         cy.clickText(/^Submit$/)
     })
 
