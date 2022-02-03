@@ -59,47 +59,47 @@ class UploaderUppyZip extends React.Component {
         this.uppy.on("complete", (result) => {
             const baseURL = new URL(window.location.origin);
             const files = result.successful;
-            if( files.length === 1 ) {
-                const filename = getTusUploadFile(files[0]);
-                if( filename ) {
-                    const body = new FormData()
-                    body.append("upload_id", this.props.upload_id);
-                    body.append("images", this.props.images);
-                    body.append("upload_image_zip", filename);
-                    axios({
-                        method: 'post',
-                        url: baseURL + "api/unpack_image_zip/",
-                        data: body,
-                        headers: {'X-CSRFToken': Cookies.get('csrftoken') }
-                    }).then(res => {
-                        if( res.data.upload_id === this.props.upload_id ) {
-                            if( res.data.missing_images.length === 0 ) {
-                                this.props.handleValidation(true);
-                                this.props.handleErrorMessage("");
-                            } else {
-                                this.props.handleValidation(false);
-                                this.props.syncImageErrorMessage(res.data.missing_images)
-                            }
-                        } else {
-                            this.props.handleValidation(false);
-                            this.props.handleErrorMessage("Upload server error");
-                        }
-                    }).catch(err => {
-                        this.props.handleValidation(false)
-                        const data = err.response.data
-                        if (typeof data === "object") this.props.handleErrorMessage(jsonSchemaTitle(data), data);
-                        else this.props.handleErrorMessage(data || "Server error unpacking zipfile")
-                    });
-                } else {
-                    console.log("Couldn't get filename from Uppy return value")
-                    this.props.handleValidation(false);
-                    this.props.handleErrorMessage("Upload zipfile failed");
-                }
-            } else {
+            if( files.length !== 1 ) {
                 console.log("Got wrong number of successful uploaded files");
                 this.props.handleValidation(false);
                 this.props.handleErrorMessage("Upload zipfile failed");
+                return;
             }
+            const filename = getTusUploadFile(files[0]);
+            if( !filename ) {
+                console.log("Couldn't get filename from Uppy return value")
+                this.props.handleValidation(false);
+                this.props.handleErrorMessage("Upload zipfile failed");
+                return;
+            }
+            const body = new FormData()
+            body.append("upload_id", this.props.upload_id);
+            body.append("images", this.props.images);
+            body.append("upload_image_zip", filename);
+            axios({
+                method: 'post',
+                url: baseURL + "api/unpack_image_zip/",
+                data: body,
+                headers: {'X-CSRFToken': Cookies.get('csrftoken') }
+            }).then(res => {
+                if( res.data.upload_id === this.props.upload_id ) {
+                    if( res.data.missing_images.length === 0 ) {
+                        this.props.handleValidation(true);
+                        this.props.handleErrorMessage("");
+                    } else {
+                        this.props.handleValidation(false);
+                        this.props.syncImageErrorMessage(res.data.missing_images)
+                    }
+                } else {
+                    this.props.handleValidation(false);
+                    this.props.handleErrorMessage("Upload server error");
+                }
+            }).catch(err => {
+                this.props.handleValidation(false)
+                const data = err.response.data
+                if (typeof data === "object") this.props.handleErrorMessage(jsonSchemaTitle(data), data);
+                else this.props.handleErrorMessage(data || "Server error unpacking zipfile")
+            });
         })
     }
 
