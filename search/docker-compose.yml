@@ -47,7 +47,6 @@ services:
       - FROM_EMAIL=${FROM_EMAIL}
       - TUS_SERVER=http://tus:1080/tus/
       - ENV=PROD
-      - DJANGO_LOG_LEVEL=DEBUG
     volumes:
       - thumbnails_dir:/code/thumbnails
       - repository_dir:/code/repository

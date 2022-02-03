@@ -50,6 +50,7 @@ services:
       - FROM_EMAIL=${FROM_EMAIL}
       - ENV=DEV
       - TUS_SERVER=http://tus:1080/tus/
+      - DJANGO_LOG_LEVEL=DEBUG
     command: python manage.py runserver 0.0.0.0:8000
     entrypoint: /entrypoint.sh
     volumes:
