@@ -48,6 +48,7 @@ services:
       - SMTP_HOST=${SMTP_HOST}
       - SMTP_PORT=${SMTP_PORT}
       - FROM_EMAIL=${FROM_EMAIL}
+      - SEND_EMAIL=${SEND_EMAIL}
       - ENV=DEV
     command: python manage.py runserver 0.0.0.0:8000
     entrypoint: /entrypoint.sh

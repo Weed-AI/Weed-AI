@@ -190,7 +190,7 @@ def validate_email_format(email):
 
 
 def send_email(subject, body, recipients):
-    if SEND_EMAIL is True:
+    if SEND_EMAIL and SMTP_HOST and SMTP_PORT:
         with smtplib.SMTP(SMTP_HOST, SMTP_PORT) as smtp:
             for recipient in recipients:
                 msg = EmailMessage()

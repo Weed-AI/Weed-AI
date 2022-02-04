@@ -34,7 +34,10 @@ FILE_UPLOAD_MAX_MEMORY_SIZE = MAX_IMAGE_SIZE
 # Application definition
 
 # SMTP config
-SEND_EMAIL = os.environ.get("SEND_EMAIL", True)
+
+# Default for SEND_EMAIL is true - set it to false iff it's the
+# string "false" (case insensitive)
+SEND_EMAIL = os.environ.get("SEND_EMAIL", "").lower() != "false"
 SMTP_HOST = os.environ.get("SMTP_HOST", "smtp.sydney.edu.au")
 SMTP_PORT = os.environ.get("SMTP_PORT", 25)
 FROM_EMAIL = os.environ.get("FROM_EMAIL", "Weed-AI <weed-ai.app@sydney.edu.au>")
