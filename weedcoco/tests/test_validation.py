@@ -15,10 +15,10 @@ from weedcoco.validation import (
     validate_references,
     validate_coordinates,
     validate_image_sizes,
-    fix_compatibility_quirks,
     ValidationError,
     JsonValidationError,
 )
+from weedcoco.utils import fix_compatibility_quirks
 from .testcases import (
     MINIMAL_WEEDCOCO,
     SMALL_WEEDCOCO,

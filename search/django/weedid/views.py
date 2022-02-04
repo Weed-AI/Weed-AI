@@ -33,11 +33,11 @@ from weedid.models import Dataset, WeedidUser
 from weedcoco.validation import (
     validate,
     validate_json,
-    fix_compatibility_quirks,
     JsonValidationError,
 )
 from weedcoco.importers.voc import voc_to_coco
 from weedcoco.importers.mask import masks_to_coco, generate_paths_from_mask_only
+from weedcoco.utils import fix_compatibility_quirks
 from django.contrib.auth import login, logout
 from django.contrib.auth.hashers import check_password
 from django.http import (

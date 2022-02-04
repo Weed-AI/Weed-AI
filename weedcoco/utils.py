@@ -188,3 +188,12 @@ def denormalise_weedcoco(weedcoco):
     for image in weedcoco["images"]:
         if "agcontext_id" in image:
             image["agcontext"] = id_lookup["agcontexts", image["agcontext_id"]]
+
+
+def fix_compatibility_quirks(weedcoco):
+    """Fix minor issues for compatibility with other COCO tools. Operates in-place"""
+    for ann in weedcoco["annotations"]:
+        if "bbox" in ann and not "segmentation" in ann:
+            ann["segmentation"] = []
+
+

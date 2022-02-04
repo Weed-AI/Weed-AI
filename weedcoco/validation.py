@@ -191,13 +191,6 @@ def validate(weedcoco, images_root=None, schema="weedcoco"):
         validate_image_sizes(weedcoco, images_root)
 
 
-def fix_compatibility_quirks(weedcoco):
-    """Fix minor issues for compatibility with other COCO tools. Operates in-place"""
-    for ann in weedcoco["annotations"]:
-        if "bbox" in ann and not "segmentation" in ann:
-            ann["segmentation"] = []
-
-
 def main():
     ap = argparse.ArgumentParser("WeedCOCO Validator")
     ap.add_argument("paths", nargs="+", type=argparse.FileType("r"))
