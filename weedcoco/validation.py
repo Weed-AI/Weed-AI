@@ -181,11 +181,16 @@ def validate_image_sizes(weedcoco, images_root):
     # TODO
 
 
-def validate(weedcoco, images_root=None, schema="weedcoco"):
+def validate(
+    weedcoco,
+    images_root=None,
+    schema="weedcoco",
+    require_reference=("image", "agcontext"),
+):
     if hasattr(weedcoco, "read"):
         weedcoco = json.load(weedcoco)
     validate_json(weedcoco, schema=schema)
-    validate_references(weedcoco)
+    validate_references(weedcoco, require_reference=require_reference)
     validate_coordinates(weedcoco)
     if images_root is not None:
         validate_image_sizes(weedcoco, images_root)

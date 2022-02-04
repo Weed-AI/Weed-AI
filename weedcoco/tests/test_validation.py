@@ -230,6 +230,7 @@ def _make_unreferenced(weedcoco, section, new_id=1000):
 def test_id_not_referenced(func, bad_weedcoco):
     with pytest.raises(ValidationError, match="is unreferenced"):
         func(bad_weedcoco)
+    func(bad_weedcoco, require_reference=())  # no reference validation
 
 
 def _weedcoco_to_coco(weedcoco):
