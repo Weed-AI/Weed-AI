@@ -283,12 +283,14 @@ def test_coco_compatible_bad(func, bad_coco):
 
 
 def test_pycocotools_quirks():
-    weedcoco = copy.deepcopy(BBOX_ONLY_WEEDCOCO)
+    weedcoco = copy.deepcopy(SMALL_WEEDCOCO)
+    weedcoco["annotations"][0]["bbox"] = [100, 100, 200, 200]
+    weedcoco["annotations"][0].pop("segmentation")
     with pytest.raises(Exception, match="datasetType not supported"):
         coco = COCO()
         coco.showAnns(weedcoco["annotations"])
     fix_compatibility_quirks(weedcoco)
+    print(weedcoco)
     coco.showAnns(weedcoco["annotations"])
     for ann in weedcoco["annotations"]:
         assert "segmentation" in ann
-    print(weedcoco)
