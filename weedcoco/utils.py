@@ -193,7 +193,5 @@ def denormalise_weedcoco(weedcoco):
 def fix_compatibility_quirks(weedcoco):
     """Fix minor issues for compatibility with other COCO tools. Operates in-place"""
     for ann in weedcoco["annotations"]:
-        if "bbox" in ann and not "segmentation" in ann:
+        if "bbox" in ann and "segmentation" not in ann:
             ann["segmentation"] = []
-
-
