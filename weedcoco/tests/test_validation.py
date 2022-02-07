@@ -18,7 +18,10 @@ from weedcoco.validation import (
     ValidationError,
     JsonValidationError,
 )
-from weedcoco.utils import fix_compatibility_quirks
+from weedcoco.utils import (
+    fix_compatibility_quirks,
+    get_task_types,
+)
 from .testcases import (
     MINIMAL_WEEDCOCO,
     SMALL_WEEDCOCO,
@@ -292,3 +295,7 @@ def test_pycocotools_quirks():
     coco.showAnns(weedcoco["annotations"])
     for ann in weedcoco["annotations"]:
         assert "segmentation" in ann
+    # check that empty segmentations are ignored for indexing
+    no_segmentations = [a for a in weedcoco["annotations"] if not a.get("segmentation")]
+    ttypes = get_task_types(no_segmentations)
+    assert "segmentation" not in ttypes
