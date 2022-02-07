@@ -39,7 +39,7 @@ SMALL_WEEDCOCO = {
             "id": 0,
             "image_id": 46,
             "category_id": 0,
-            "segmentation": [[596, 207, 521]],
+            "segmentation": [[596, 207, 521, 201]],
             "iscrowd": 0,
         },
         {
@@ -53,7 +53,7 @@ SMALL_WEEDCOCO = {
             "id": 2,
             "image_id": 46,
             "category_id": 1,
-            "segmentation": [[486, 335, 399]],
+            "segmentation": [[486, 335, 399, 102]],
             "iscrowd": 0,
         },
         {

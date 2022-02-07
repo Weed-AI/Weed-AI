@@ -290,7 +290,6 @@ def test_pycocotools_quirks():
         coco = COCO()
         coco.showAnns(weedcoco["annotations"])
     fix_compatibility_quirks(weedcoco)
-    print(weedcoco)
     coco.showAnns(weedcoco["annotations"])
     for ann in weedcoco["annotations"]:
         assert "segmentation" in ann
