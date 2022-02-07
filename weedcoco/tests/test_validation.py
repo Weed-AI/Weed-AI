@@ -22,7 +22,6 @@ from weedcoco.utils import fix_compatibility_quirks
 from .testcases import (
     MINIMAL_WEEDCOCO,
     SMALL_WEEDCOCO,
-    BBOX_ONLY_WEEDCOCO,
     test_missing_required_at_root_expected,
 )
 
