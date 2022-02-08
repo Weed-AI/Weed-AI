@@ -41,8 +41,8 @@ def check_date_missing_parts_format(value):
     return datetime.datetime.strptime(value, "%Y-%m-%d")
 
 
-@FORMAT_CHECKER.checks("plant_species")
-def check_plant_species_format(value):
+@FORMAT_CHECKER.checks("plant_taxon")
+def check_plant_taxon_format(value):
     if not value.islower():
         return False
     eppo = get_eppo_singleton(EPPO_CACHE_PATH)
@@ -54,7 +54,7 @@ def check_plant_species_format(value):
 
 @FORMAT_CHECKER.checks("weedcoco_category")
 def check_weedcoco_category_format(value):
-    prefix, colon, species = value.partition(": ")
+    prefix, colon, taxon = value.partition(": ")
     if not colon:
         # Category must begin with weed, crop or none
         return prefix in {"weed", "crop", "none"}
@@ -63,12 +63,12 @@ def check_weedcoco_category_format(value):
     if prefix not in {"weed", "crop"}:
         return False
 
-    if species == "UNSPECIFIED":
+    if taxon == "UNSPECIFIED":
         # crop: UNSPECIFIED is not a valid category
         return prefix == "weed"
 
-    # Species name should be lowercase in category
-    return check_plant_species_format(species)
+    # Taxon name should be lowercase in category
+    return check_plant_taxon_format(taxon)
 
 
 class ValidationError(Exception):

@@ -46,7 +46,7 @@ This "AgContext" includes:
 - Lighting  
 
 The format may also be applicable to related agricultural purposes.
-As with MS COCO, the format supports classification, bounding box and segmentation labels indicating the presence of a specific or unknown species of weed.
+As with MS COCO, the format supports classification, bounding box and segmentation labels indicating the presence of a specific or unspecified type of weed, expressed at species or other taxonomic level.
 Reporting these details will help ensure consistency in published datasets for ease of comparison and use in further research and development.
 
 
