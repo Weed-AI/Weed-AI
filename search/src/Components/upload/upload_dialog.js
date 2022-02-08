@@ -45,7 +45,8 @@ const DialogTitle = withStyles(styles)((props) => {
 const DialogContent = withStyles((theme) => ({
   root: {
     padding: theme.spacing(2),
-    width: '40vw'
+    width: '40vw',
+    minWidth: '32em',
   },
 }))(MuiDialogContent);
 
@@ -66,7 +67,7 @@ export default function UploadDialog(props) {
       <Button disabled={!props.upload_type} className={classes.uploadButton} variant="contained" onClick={handleClickOpen}>
         Begin upload
       </Button>
-      <Dialog maxWidth='md' onClose={handleClose} aria-labelledby="upload-dialog-title" open={open}>
+      <Dialog maxWidth='md' onClose={handleClose} aria-labelledby="upload-dialog-title" open={open} disableBackdropClick={true}>
         <DialogTitle id="upload-dialog-title" onClose={handleClose}>
         </DialogTitle>
         <DialogContent>

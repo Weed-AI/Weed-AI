@@ -93,7 +93,8 @@ def test_basic(executor, rewrite_deposit_truth):
 
 def test_duplicate_images(executor):
     with pytest.raises(
-        ValidationError, match="There are identical images in the image directory."
+        ValidationError,
+        match="There are identical images in the image directory. Identical image sets are: 001_image.png <-> 002_image.png",
     ):
         executor.run(
             TEST_DUPLICATE_DIR / "weedcoco.json", TEST_DUPLICATE_DIR / "images"

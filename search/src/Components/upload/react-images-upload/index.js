@@ -3,7 +3,9 @@ import PropTypes from 'prop-types';
 import './index.css';
 import FlipMove from 'react-flip-move';
 import axios from 'axios';
-import Cookies from 'js-cookie'
+import Cookies from 'js-cookie';
+import http from 'http';
+import https from 'https';
 
 
 const styles = {
@@ -18,6 +20,8 @@ const ERROR = {
   NOT_SUPPORTED_EXTENSION: 'NOT_SUPPORTED_EXTENSION',
   FILESIZE_TOO_LARGE: 'FILESIZE_TOO_LARGE'
 }
+
+const preview_maximum = 100;
 
 class ReactImageUploadComponent extends React.Component {
   constructor(props) {
@@ -62,8 +66,8 @@ class ReactImageUploadComponent extends React.Component {
    */
   onDropFile(e) {
     const files = e.target.files;
-    const allFilePromises = [];
     const fileErrors = [];
+    const filesName = (this.state.files || []).map(file => file.name);
 
     // Iterate over all uploaded files
     for (let i = 0; i < files.length; i++) {
@@ -71,6 +75,10 @@ class ReactImageUploadComponent extends React.Component {
       let fileError = {
         name: file.name,
       };
+      // Check for duplication
+      if (this.props.images && !this.props.images.includes(file.name) || filesName.includes(file.name)){
+        continue;
+      }
       // Check for file extension
       if (!this.hasExtension(file.name)) {
         fileError = Object.assign(fileError, {
@@ -87,53 +95,41 @@ class ReactImageUploadComponent extends React.Component {
         fileErrors.push(fileError);
         continue;
       }
-
-      allFilePromises.push(this.readFile(file));
-    }
-
-    this.setState({
-      fileErrors
-    });
-
-    const {singleImage} = this.props;
-
-    Promise.all(allFilePromises).then(newFilesData => {
-      const dataURLs = singleImage?[]:this.state.pictures.slice();
-      const files = singleImage?[]:this.state.files.slice();
-
-      newFilesData.forEach(newFileData => {
-        this.uploadFileToServer(dataURLs, files, newFileData);
+      this.readFile(file).then(newFileData => {
+        this.uploadFileToServer(newFileData);
       });
-    });
+    }
+    this.setState({fileErrors});
   }
 
   /*
      Customised function modified on original codebase
      Copyright (c) 2020 Zheng Li
    */
-  uploadFileToServer(dataURLs, files, newFileData) {
-    const filesName = files.map(file => file.name);
-    if (!this.props.images.includes(newFileData.file.name) || filesName.includes(newFileData.file.name)){
-        return
-    }
-    else {
-        const body = new FormData()
-        body.append('upload_image', newFileData.file)
-        body.append('upload_id', this.props.upload_id)
-        axios({
-            method: 'post',
-            url: this.props.uploadURL,
-            data: body,
-            headers: {'Content-Type': 'multipart/form-data', 'X-CSRFToken': Cookies.get('csrftoken') }
-        }).then(res => {
-            if(res.status === 200){
+  uploadFileToServer(newFileData) {
+      const {singleImage} = this.props;
+      const body = new FormData()
+      body.append('upload_image', newFileData.file)
+      body.append(this.props.idName ? this.props.idName : "upload_id", this.props.upload_id)
+      axios({
+          method: 'post',
+          url: this.props.uploadURL,
+          data: body,
+          headers: {'Content-Type': 'multipart/form-data', 'X-CSRFToken': Cookies.get('csrftoken') }
+      }).then(res => {
+          if(res.status === 200){
+            const dataURLs = singleImage?[]:this.state.pictures.slice();
+            const files = singleImage?[]:this.state.files.slice();
+            const filesName = files.map(file => file.name);
+            if (!filesName.includes(newFileData.file.name)){
                 dataURLs.push(newFileData.dataURL);
                 files.push(newFileData.file);
                 this.setState({pictures: dataURLs, files: files});
-                this.props.handleUploaded(files.map(file => file.name));
+                if (this.props.handleUploaded) this.props.handleUploaded(files.map(file => file.name));
             }
-        })
-    }
+          }
+      })
+      
   }
 
   onUploadClick(e) {
@@ -165,13 +161,27 @@ class ReactImageUploadComponent extends React.Component {
    */
   removeImage(picture) {
     const removeIndex = this.state.pictures.findIndex(e => e === picture);
+    const removeImageName = this.state.files[removeIndex].name;
     const filteredPictures = this.state.pictures.filter((e, index) => index !== removeIndex);
     const filteredFiles = this.state.files.filter((e, index) => index !== removeIndex);
 
     this.setState({pictures: filteredPictures, files: filteredFiles}, () => {
       this.props.onChange(this.state.files, this.state.pictures);
     });
-    this.props.handleUploaded(filteredFiles.map(file => file.name));
+    if (this.props.handleUploaded) this.props.handleUploaded(filteredFiles.map(file => file.name));
+    if (this.props.removeURL) {
+      const body = new FormData()
+      body.append('image_name', removeImageName)
+      body.append(this.props.idName ? this.props.idName : "upload_id", this.props.upload_id)
+      axios({
+          method: 'post',
+          url: this.props.removeURL,
+          data: body,
+          headers: {'Content-Type': 'multipart/form-data', 'X-CSRFToken': Cookies.get('csrftoken')}
+      }).then(() => {
+          this.props.handleErrorMessage("")
+      })
+    }
   }
 
   /*
@@ -182,7 +192,7 @@ class ReactImageUploadComponent extends React.Component {
     return fileErrors.map((fileError, index) => {
       return (
         <div className={'errorMessage ' + this.props.errorClass} key={index} style={this.props.errorStyle}>
-          * {fileError.name} {fileError.type === ERROR.FILESIZE_TOO_LARGE ? this.props.fileSizeError: this.props.fileTypeError}
+          * {fileError.name} {fileError.type === ERROR.FILESIZE_TOO_LARGE ? this.props.fileSizeError : fileError.type === ERROR.NOT_SUPPORTED_EXTENSION ? this.props.fileTypeError : this.props.fileDuplicateError}
         </div>
       );
     });
@@ -211,7 +221,8 @@ class ReactImageUploadComponent extends React.Component {
   }
 
   renderPreviewPictures() {
-    return this.state.pictures.map((picture, index) => {
+    return this.state.pictures.length <= preview_maximum ?
+    this.state.pictures.map((picture, index) => {
       return (
         <div key={index} className="uploadPictureContainer">
           <div className="deleteImage" onClick={() => this.removeImage(picture)}>X</div>
@@ -221,7 +232,9 @@ class ReactImageUploadComponent extends React.Component {
           </div>
         </div>
       );
-    });
+    })
+    :
+    <p>No preview for images more than {preview_maximum}</p>
   }
 
   /*
@@ -286,6 +299,7 @@ ReactImageUploadComponent.defaultProps = {
   maxFileSize: 5242880,
   fileSizeError: " file size is too big",
   fileTypeError: " is not a supported file extension",
+  fileDuplicateError: " is a duplicate file",
   errorClass: "",
   style: {},
   errorStyle: {},
@@ -316,6 +330,7 @@ ReactImageUploadComponent.propTypes = {
   maxFileSize: PropTypes.number,
   fileSizeError: PropTypes.string,
   fileTypeError: PropTypes.string,
+  fileDuplicateError: PropTypes.string,
   errorClass: PropTypes.string,
   errorStyle: PropTypes.object,
   singleImage: PropTypes.bool,

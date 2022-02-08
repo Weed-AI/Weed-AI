@@ -19,6 +19,8 @@ jobs:
 #      - uses: satackey/action-docker-layer-caching@v0.0.11
 #        continue-on-error: true
       - name: Bring system up
+        env:
+          MERGE_SHA: ${{ github.sha }}
         run: |
             set -x
             cd search
@@ -28,7 +30,12 @@ jobs:
             POSTGRES_USER=postgres
             POSTGRES_PASSWORD=postgres
             POSTGRES_DB=weedai
+            WEEDCOCO_VERSION=$MERGE_SHA
+            SEND_EMAIL=False
+            GIT_REMOTE_PATH=/tmp/git_remote
+            DVC_REMOTE_PATH=/tmp/dvc_remote
             HERE
+            cat .env
             # TODO The following could be a separate GitHub action
             docker-compose up -d --build
             sleep 1
@@ -53,10 +60,20 @@ jobs:
         uses: cypress-io/github-action@v2
         with:
           working-directory: search
+      - uses: actions/upload-artifact@v2
+        if: failure()
+        with:
+          name: cypress-screenshots
+          path: search/cypress/screenshots
+      - uses: actions/upload-artifact@v2
+        if: always()
+        with:
+          name: cypress-videos
+          path: search/cypress/videos
       - name: Check logs upon failure
         run: |
             cd search
-            docker-compose logs --tail 80
+            docker-compose logs --tail="all"
             docker-compose ps
         if: ${{ failure() }}
       - name: Shutdown

@@ -5,6 +5,8 @@ import copy
 import random
 import re
 
+from pycocotools.coco import COCO
+
 import pytest
 
 from weedcoco.validation import (
@@ -15,6 +17,10 @@ from weedcoco.validation import (
     validate_image_sizes,
     ValidationError,
     JsonValidationError,
+)
+from weedcoco.utils import (
+    fix_compatibility_quirks,
+    get_task_types,
 )
 from .testcases import (
     MINIMAL_WEEDCOCO,
@@ -106,7 +112,7 @@ def test_bad_category_name(func, bad_name, messages):
 
 @pytest.mark.parametrize("func", [validate, validate_json])
 @pytest.mark.parametrize(
-    "bad_name",
+    "name",
     [
         "wheat",
         "oats",
@@ -116,9 +122,9 @@ def test_bad_category_name(func, bad_name, messages):
         "brassica oleracea var. alboglabra",
     ],
 )
-def test_crop_type(func, bad_name):
+def test_crop_type(func, name):
     weedcoco = copy.deepcopy(SMALL_WEEDCOCO)
-    weedcoco["agcontexts"][0]["crop_type"] = bad_name
+    weedcoco["agcontexts"][0]["crop_type"] = name
     func(weedcoco)
 
 
@@ -128,6 +134,7 @@ def test_crop_type(func, bad_name):
     [
         "weet",
         "daugus carota",
+        "",
     ],
 )
 def test_bad_crop_type(func, bad_name):
@@ -229,6 +236,7 @@ def _make_unreferenced(weedcoco, section, new_id=1000):
 def test_id_not_referenced(func, bad_weedcoco):
     with pytest.raises(ValidationError, match="is unreferenced"):
         func(bad_weedcoco)
+    func(bad_weedcoco, require_reference=())  # no reference validation
 
 
 def _weedcoco_to_coco(weedcoco):
@@ -277,5 +285,22 @@ def test_coco_compatible_bad(func, bad_coco):
         func(bad_coco, schema="compatible-coco")
 
 
+def test_pycocotools_quirks():
+    weedcoco = copy.deepcopy(SMALL_WEEDCOCO)
+    weedcoco["annotations"][0]["bbox"] = [100, 100, 200, 200]
+    weedcoco["annotations"][0].pop("segmentation")
+    with pytest.raises(Exception, match="datasetType not supported"):
+        coco = COCO()
+        coco.showAnns(weedcoco["annotations"])
+    fix_compatibility_quirks(weedcoco)
+    coco.showAnns(weedcoco["annotations"])
+    for ann in weedcoco["annotations"]:
+        assert "segmentation" in ann
+    # check that empty segmentations are ignored for indexing
+    no_segmentations = [a for a in weedcoco["annotations"] if not a.get("segmentation")]
+    ttypes = get_task_types(no_segmentations)
+    assert "segmentation" not in ttypes
+
+    
 # TODO: Test invalid bbox coordinates and boundary cases
 # TODO: Test invalid polygon coordinates

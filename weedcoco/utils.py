@@ -2,6 +2,7 @@ import json
 import pathlib
 import os
 import warnings
+import hashlib
 
 import PIL.Image
 import yaml
@@ -74,9 +75,14 @@ def add_metadata_from_file(coco, metadata_path):
     return coco
 
 
-def get_image_average_hash(path, hash_size=8):
-    """Return an average hash of an image"""
-    return str(imagehash.average_hash(PIL.Image.open(path), hash_size=hash_size))
+def get_image_hash(path, image_hash_size=8, digest_size=20):
+    """Return an average hash of an image, rehashed to compress it"""
+    md5 = hashlib.md5()
+    img_hash = str(
+        imagehash.average_hash(PIL.Image.open(path), hash_size=image_hash_size)
+    )
+    md5.update(img_hash.encode("utf8"))
+    return md5.hexdigest()[:digest_size]
 
 
 def check_if_approved_image_extension(image_name):
@@ -182,3 +188,10 @@ def denormalise_weedcoco(weedcoco):
     for image in weedcoco["images"]:
         if "agcontext_id" in image:
             image["agcontext"] = id_lookup["agcontexts", image["agcontext_id"]]
+
+
+def fix_compatibility_quirks(weedcoco):
+    """Fix minor issues for compatibility with other COCO tools. Operates in-place"""
+    for ann in weedcoco["annotations"]:
+        if "bbox" in ann and "segmentation" not in ann:
+            ann["segmentation"] = []
