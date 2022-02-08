@@ -5,6 +5,8 @@ import copy
 import random
 import re
 
+from pycocotools.coco import COCO
+
 import pytest
 
 from weedcoco.validation import (
@@ -15,6 +17,10 @@ from weedcoco.validation import (
     validate_image_sizes,
     ValidationError,
     JsonValidationError,
+)
+from weedcoco.utils import (
+    fix_compatibility_quirks,
+    get_task_types,
 )
 from .testcases import (
     MINIMAL_WEEDCOCO,
@@ -277,3 +283,20 @@ def test_coco_compatible_good(func, coco):
 def test_coco_compatible_bad(func, bad_coco):
     with pytest.raises(JsonValidationError):
         func(bad_coco, schema="compatible-coco")
+
+
+def test_pycocotools_quirks():
+    weedcoco = copy.deepcopy(SMALL_WEEDCOCO)
+    weedcoco["annotations"][0]["bbox"] = [100, 100, 200, 200]
+    weedcoco["annotations"][0].pop("segmentation")
+    with pytest.raises(Exception, match="datasetType not supported"):
+        coco = COCO()
+        coco.showAnns(weedcoco["annotations"])
+    fix_compatibility_quirks(weedcoco)
+    coco.showAnns(weedcoco["annotations"])
+    for ann in weedcoco["annotations"]:
+        assert "segmentation" in ann
+    # check that empty segmentations are ignored for indexing
+    no_segmentations = [a for a in weedcoco["annotations"] if not a.get("segmentation")]
+    ttypes = get_task_types(no_segmentations)
+    assert "segmentation" not in ttypes

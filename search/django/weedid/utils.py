@@ -51,20 +51,14 @@ def store_tmp_image_from_zip(upload_image_zip, image_dir, full_images):
 
 
 def store_tmp_weedcoco(weedcoco, upload_dir):
-    fs = OverwriteStorage()
     weedcoco_path = os.path.join(upload_dir, "weedcoco.json")
-    fs.save(weedcoco_path, weedcoco)
+    with open(weedcoco_path, "w") as weedcoco_file:
+        weedcoco_file.write(json.dumps(weedcoco))
 
 
 def store_tmp_voc(voc, voc_dir):
     fs = OverwriteStorage()
     fs.save(os.path.join(voc_dir, voc.name), voc)
-
-
-def store_tmp_voc_coco(weedcoco, upload_dir):
-    weedcoco_path = os.path.join(upload_dir, "weedcoco.json")
-    with open(weedcoco_path, "w") as weedcoco_file:
-        weedcoco_file.write(json.dumps(weedcoco))
 
 
 def move_to_upload(store_dir, upload_dir, mode=""):
