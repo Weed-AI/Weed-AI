@@ -42,7 +42,7 @@ class CvatRetriever extends React.Component {
                     current_tasks_list.push({name: task.name, id: task.id, })
                 }
                 current_page = current_page + 1
-                if (data.count < 10) {
+                if (data.results.length < 10) {
                     this.setState({cvat_tasks: current_tasks_list})
                     break
                 }
