@@ -106,7 +106,6 @@ class MetadataForm extends Component {
               cells={materialCells}
               ajv = {createAjv({useDefaults: true})}
               onChange={e => {
-                  console.log("onChange of MetadataForm", "Errors:", JSON.stringify(e.errors), "Data:", JSON.stringify(e.data))
                   if (this.props.handleValidation){
                     this.props.handleValidation(e.errors.length === 0);
                   }
