@@ -1,11 +1,14 @@
 from django.http import HttpResponse
 from django.shortcuts import render
+
 import requests
 import os
 import json
 import traceback
+
 from core.settings import (
     UPLOAD_DIR,
+    TUS_DESTINATION_DIR,
     REPOSITORY_DIR,
     MAX_IMAGE_SIZE,
     MAX_VOC_SIZE,
@@ -271,19 +274,21 @@ def upload_image(request):
     return HttpResponse(f"Uploaded {upload_image.name} to {upload_dir}")
 
 
-def upload_image_zip(request):
+def unpack_image_zip(request):
+    """Unpack a zipfile which has been uploaded via tus"""
     if not request.method == "POST":
         return HttpResponseNotAllowed(request.method)
     user = request.user
     if not (user and user.is_authenticated):
         return HttpResponseForbidden("You dont have access to proceed")
     upload_id = request.POST["upload_id"]
-    upload_image_zip = request.FILES["upload_image_zip"]
+    upload_image_zip = request.POST["upload_image_zip"]
     # Get list of missing images from frontend to calculate images that are still missing after the current zip being uploaded
     images = request.POST["images"].split(",")
+    zipfile = os.path.join(TUS_DESTINATION_DIR, upload_image_zip)
     upload_dir = os.path.join(UPLOAD_DIR, str(user.id), upload_id, "images")
     try:
-        missing_images = store_tmp_image_from_zip(upload_image_zip, upload_dir, images)
+        missing_images = store_tmp_image_from_zip(zipfile, upload_dir, images)
     except Exception as e:
         return HttpResponseBadRequest(str(e))
     return HttpResponse(
