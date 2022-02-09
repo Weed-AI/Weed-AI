@@ -41,8 +41,8 @@ def check_date_missing_parts_format(value):
     return datetime.datetime.strptime(value, "%Y-%m-%d")
 
 
-@FORMAT_CHECKER.checks("plant_species")
-def check_plant_species_format(value):
+@FORMAT_CHECKER.checks("plant_taxon")
+def check_plant_taxon_format(value):
     if not value.islower():
         return False
     try:
@@ -53,7 +53,7 @@ def check_plant_species_format(value):
 
 @FORMAT_CHECKER.checks("weedcoco_category")
 def check_weedcoco_category_format(value):
-    prefix, colon, species = value.partition(": ")
+    prefix, colon, taxon = value.partition(": ")
     if not colon:
         # Category must begin with weed, crop or none
         return prefix in {"weed", "crop", "none"}
@@ -62,12 +62,12 @@ def check_weedcoco_category_format(value):
     if prefix not in {"weed", "crop"}:
         return False
 
-    if species == "UNSPECIFIED":
+    if taxon == "UNSPECIFIED":
         # crop: UNSPECIFIED is not a valid category
         return prefix == "weed"
 
-    # Species name should be lowercase in category
-    return check_plant_species_format(species)
+    # Taxon name should be lowercase in category
+    return check_plant_taxon_format(taxon)
 
 
 class ValidationError(Exception):
@@ -180,11 +180,16 @@ def validate_image_sizes(weedcoco, images_root):
     # TODO
 
 
-def validate(weedcoco, images_root=None, schema="weedcoco"):
+def validate(
+    weedcoco,
+    images_root=None,
+    schema="weedcoco",
+    require_reference=("image", "agcontext"),
+):
     if hasattr(weedcoco, "read"):
         weedcoco = json.load(weedcoco)
     validate_json(weedcoco, schema=schema)
-    validate_references(weedcoco)
+    validate_references(weedcoco, require_reference=require_reference)
     validate_coordinates(weedcoco)
     if images_root is not None:
         validate_image_sizes(weedcoco, images_root)

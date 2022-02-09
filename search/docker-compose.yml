@@ -14,7 +14,7 @@ services:
       - elastic
     restart: always
     logging:
-      driver: "json-file"
+      driver: none
     volumes:
       # Static file service
       - thumbnails_dir:/media/thumbnails
@@ -43,7 +43,9 @@ services:
       - POSTGRES_DB=${POSTGRES_DB}
       - SMTP_HOST=${SMTP_HOST}
       - SMTP_PORT=${SMTP_PORT}
+      - SEND_EMAIL=${SEND_EMAIL}
       - FROM_EMAIL=${FROM_EMAIL}
+      - TUS_SERVER=http://tus:1080/tus/
       - ENV=PROD
     volumes:
       - thumbnails_dir:/code/thumbnails
@@ -51,6 +53,7 @@ services:
       - upload_dir:/code/upload
       - download_dir:/code/download
       - mystatic_dir:/code/mystatic
+      - tus_dir:/code/tus_dir
     command: bash -c "python manage.py makemigrations && python manage.py migrate && python manage.py collectstatic <<<yes && gunicorn core.wsgi -b 0.0.0.0:8000"
     entrypoint: /entrypoint.sh
     ports:
@@ -74,6 +77,7 @@ services:
       - POSTGRES_DB=${POSTGRES_DB}
       - SMTP_HOST=${SMTP_HOST}
       - SMTP_PORT=${SMTP_PORT}
+      - SEND_EMAIL=${SEND_EMAIL}
       - FROM_EMAIL=${FROM_EMAIL}
       - GIT_REMOTE_PATH=/mnt/git_remote
       - DVC_REMOTE_PATH=/mnt/dvc_remote
@@ -135,6 +139,18 @@ services:
     restart: always
     logging:
       driver: "json-file"
+
+  tus:
+    image: tusproject/tusd
+    container_name: tus
+    networks:
+      - elastic
+    ports:
+      - "1080:1080"
+    volumes:
+      - tus_dir:/srv/tusd-data
+    command: -behind-proxy -base-path /tus/files/
+
 
   # search engine
   elasticsearch:
@@ -219,4 +235,6 @@ volumes:
   upload_dir:
     driver: local
   mystatic_dir:
+    driver: local
+  tus_dir:
     driver: local

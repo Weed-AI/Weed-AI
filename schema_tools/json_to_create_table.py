@@ -58,7 +58,7 @@ def convert_json_to_create_table(json_paths):
                     f"FOREIGN KEY ({k}) " f"REFERENCES {pluralise(k[:-3])} (id)"
                 )
         out += "    " + ",\n    ".join(clauses) + "\n"
-        out += f");\n"
+        out += ");\n"
     return out
 
 
