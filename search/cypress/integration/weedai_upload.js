@@ -1,3 +1,12 @@
+
+const safeSetForm = () => {
+	cy.wait(1000)
+	// hack needed due to textarea risizing upredictably
+	cy.clickText(/JSON data/)
+	cy.focused().blur()
+	cy.clickText(/^Set Form$/)
+}
+
 describe('overall upload workflow', () => {
 
     beforeEach(() => {
@@ -43,13 +52,11 @@ describe('overall upload workflow', () => {
         cy.clickText(/^Next$/)
         cy.clickText(/^Upload and Download Form Contents$/)
         cy.get('.dzu-input').attachFile('test_coco/agcontext.json')
-        cy.wait(10000)
-        cy.clickText(/^Set Form$/)
+        safeSetForm()
         cy.clickText(/^Next$/)
         cy.clickText(/^Upload and Download Form Contents$/)
         cy.get('.dzu-input').attachFile('test_coco/metadata.json')
-        cy.wait(10000)
-        cy.clickText(/^Set Form$/)
+        safeSetForm()
         cy.clickText(/^Next$/)
         cy.get('div.fileContainer > input').attachFile('test_coco/images/002_image.png')
         cy.clickText(/^Submit$/)
@@ -67,13 +74,11 @@ describe('overall upload workflow', () => {
         cy.clickText(/^Next$/)
         cy.clickText(/^Upload and Download Form Contents$/)
         cy.get('.dzu-input').attachFile('test_voc/agcontext.json')
-        cy.wait(10000)
-        cy.clickText(/^Set Form$/)
+        safeSetForm()
         cy.clickText(/^Next$/)
         cy.clickText(/^Upload and Download Form Contents$/)
         cy.get('.dzu-input').attachFile('test_voc/metadata.json')
-        cy.wait(10000)
-        cy.clickText(/^Set Form$/)
+        safeSetForm()
         cy.clickText(/^Next$/)
         cy.get('div.fileContainer > input').attachFile('test_voc/images/resizeC1_PLOT_20190728_175852.jpg')
         cy.get('div.fileContainer > input').attachFile('test_voc/images/resizeC1_PLOT_20190728_180135.jpg')
