@@ -1,12 +1,15 @@
 from django.http import HttpResponse
 from django.shortcuts import render
+
 import requests
 import os
 import json
 import traceback
 import shutil
+
 from core.settings import (
     UPLOAD_DIR,
+    TUS_DESTINATION_DIR,
     REPOSITORY_DIR,
     CVAT_DATA_DIR,
     MAX_IMAGE_SIZE,
@@ -20,7 +23,6 @@ from weedid.utils import (
     store_tmp_image,
     store_tmp_image_from_zip,
     store_tmp_voc,
-    store_tmp_voc_coco,
     move_to_upload,
     create_upload_entity,
     retrieve_listing_info,
@@ -33,10 +35,15 @@ from weedid.utils import (
 )
 from weedid.notification import review_notification
 from weedid.models import Dataset, WeedidUser
-from weedcoco.validation import validate, validate_json, JsonValidationError
+from weedcoco.validation import (
+    validate,
+    validate_json,
+    JsonValidationError,
+)
 from weedcoco.importers.voc import voc_to_coco
 from weedcoco.importers.mask import masks_to_coco, generate_paths_from_mask_only
 from weedcoco.repo.deposit import mkdir_safely
+from weedcoco.utils import fix_compatibility_quirks
 from django.contrib.auth import login, logout
 from django.contrib.auth.hashers import check_password
 from django.http import (
@@ -107,7 +114,20 @@ def upload(request):
         return HttpResponseForbidden("You dont have access to proceed")
     try:
         file_weedcoco = request.FILES["weedcoco"]
-        upload_id, images, categories = upload_helper(file_weedcoco, user.id, request.POST["schema"])
+        weedcoco_json = json.load(file_weedcoco)
+        fix_compatibility_quirks(weedcoco_json)
+        # validate(
+        #     weedcoco_json,
+        #     schema=request.POST["schema"] if request.POST["schema"] else "coco",
+        # )
+        for image_reference in weedcoco_json["images"]:
+            images.append(image_reference["file_name"].split("/")[-1])
+        categories = [
+            parse_category_name(category) for category in weedcoco_json["categories"]
+        ]
+        upload_dir, upload_id = setup_upload_dir(os.path.join(UPLOAD_DIR, str(user.id)))
+        store_tmp_weedcoco(weedcoco_json, upload_dir)
+        create_upload_entity(upload_id, user.id)
     except JsonValidationError as e:
         traceback.print_exc()
         return json_validation_response(e)
@@ -121,7 +141,7 @@ def upload(request):
             )
         )
 
-
+      
 def retrieve_cvat_task(request, task_id):
     user = request.user
     if not (user and user.is_authenticated):
@@ -143,7 +163,7 @@ def retrieve_cvat_task(request, task_id):
             )
         )
 
-
+      
 class CustomUploader:
     @classmethod
     def upload(cls, request):
@@ -229,6 +249,7 @@ class CustomUploader:
                 Path(os.path.join(UPLOAD_DIR, str(user.id), store_id)), request
             )
             validate(coco_json, schema="coco")
+            fix_compatibility_quirks(coco_json)
             for image_reference in coco_json["images"]:
                 images.append(image_reference["file_name"].split("/")[-1])
             categories = [
@@ -237,7 +258,7 @@ class CustomUploader:
             upload_dir, upload_id = setup_upload_dir(
                 os.path.join(UPLOAD_DIR, str(user.id))
             )
-            store_tmp_voc_coco(coco_json, upload_dir)
+            store_tmp_weedcoco(coco_json, upload_dir)
             create_upload_entity(upload_id, user.id)
         except JsonValidationError as e:
             traceback.print_exc()
@@ -299,19 +320,21 @@ def upload_image(request):
     return HttpResponse(f"Uploaded {upload_image.name} to {upload_dir}")
 
 
-def upload_image_zip(request):
+def unpack_image_zip(request):
+    """Unpack a zipfile which has been uploaded via tus"""
     if not request.method == "POST":
         return HttpResponseNotAllowed(request.method)
     user = request.user
     if not (user and user.is_authenticated):
         return HttpResponseForbidden("You dont have access to proceed")
     upload_id = request.POST["upload_id"]
-    upload_image_zip = request.FILES["upload_image_zip"]
+    upload_image_zip = request.POST["upload_image_zip"]
     # Get list of missing images from frontend to calculate images that are still missing after the current zip being uploaded
     images = request.POST["images"].split(",")
+    zipfile = os.path.join(TUS_DESTINATION_DIR, upload_image_zip)
     upload_dir = os.path.join(UPLOAD_DIR, str(user.id), upload_id, "images")
     try:
-        missing_images = store_tmp_image_from_zip(upload_image_zip, upload_dir, images)
+        missing_images = store_tmp_image_from_zip(zipfile, upload_dir, images)
     except Exception as e:
         return HttpResponseBadRequest(str(e))
     return HttpResponse(

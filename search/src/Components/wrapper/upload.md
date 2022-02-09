@@ -50,7 +50,7 @@ The uploading process is a five-step process:
 
 1. Select the data annotation format above.
 2. Upload the annotation file. Please check that your images and annotations.
-3. If not WeedCOCO, confirm a mapping from the entered category labels to role (weed or crop) and species.
+3. If not WeedCOCO, confirm a mapping from the entered category labels to role (weed or crop) and species/taxon.
 4. If not WeedCOCO, upload the AgContext file or generate a new one by completing the online form.
 5. Enter publication-level metadata about the dataset and how to attribute it.
 6. Finally, upload the relevant images for the dataset

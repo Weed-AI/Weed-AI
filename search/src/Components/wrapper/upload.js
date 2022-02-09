@@ -103,7 +103,7 @@ class UploadComponent extends Component {
         const isLoggedIn = await this.retrieveLoginStatus()
         if(isLoggedIn){
             this.retrieveUploadStatus()
-            setInterval(this.retrieveUploadStatus, 5000)
+            setInterval(this.retrieveUploadStatus, 50000)
         }
     }
 

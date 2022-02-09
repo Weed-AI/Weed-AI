@@ -1,5 +1,6 @@
 import os
 from celery.schedules import crontab
+from corsheaders.defaults import default_headers
 
 SITE_BASE_URL = "https://weed-ai.sydney.edu.au"
 
@@ -10,6 +11,33 @@ THUMBNAILS_DIR = os.path.join(BASE_DIR, "thumbnails")
 REPOSITORY_DIR = os.path.join(BASE_DIR, "repository")
 DOWNLOAD_DIR = os.path.join(BASE_DIR, "download")
 CVAT_DATA_DIR = os.path.join(BASE_DIR, "cvat_data")
+
+TUS_UPLOAD_DIR = os.path.join(BASE_DIR, "tus_upload")
+TUS_DESTINATION_DIR = os.path.join(BASE_DIR, "tus_dir", "data")
+TUS_FILE_NAME_FORMAT = "keep"
+TUS_EXISTING_FILE = "overwrite"
+
+
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "handlers": {
+        "console": {
+            "class": "logging.StreamHandler",
+        },
+    },
+    "root": {
+        "handlers": ["console"],
+        "level": "WARNING",
+    },
+    "loggers": {
+        "django": {
+            "handlers": ["console"],
+            "level": os.getenv("DJANGO_LOG_LEVEL", "INFO"),
+            "propagate": False,
+        },
+    },
+}
 
 
 # Quick-start development settings - unsuitable for production
@@ -25,6 +53,20 @@ ALLOWED_HOSTS = ["*"]
 CORS_ORIGIN_ALLOW_ALL = True
 AUTH_USER_MODEL = "weedid.WeedidUser"
 SESSION_COOKIE_NAME = 'weedai_sessionid'
+
+# TUS headers
+
+CORS_ALLOW_HEADERS = list(default_headers) + [
+    "x-request-id",
+    "x-http-method-override",
+    "upload-length",
+    "upload-offset",
+    "tus-resumable",
+    "upload-metadata",
+    "upload-defer-length",
+    "upload-concat",
+]
+
 
 # Scale file size of upload limit up to 10 MB
 MAX_IMAGE_SIZE = 1024 * 1024 * 10
@@ -44,6 +86,13 @@ SMTP_HOST = os.environ.get("SMTP_HOST", "smtp.sydney.edu.au")
 SMTP_PORT = os.environ.get("SMTP_PORT", 25)
 FROM_EMAIL = os.environ.get("FROM_EMAIL", "Weed-AI <weed-ai.app@sydney.edu.au>")
 
+# The tus upload endpoint is http://tus:1080/tus/files, but for it to work we
+# need to proxy the level above that, so TUS_SERVER is http://tus:1080/tus/
+# Note that this requires tusd to be launched with -base-path /tus/files as the
+# default is /files
+
+TUS_SERVER = os.environ.get("TUS_SERVER", "http://tus:1080/tus/")
+
 INSTALLED_APPS = [
     "django.contrib.admin",
     "django.contrib.auth",
@@ -58,6 +107,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -65,7 +115,6 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
-    "corsheaders.middleware.CorsMiddleware",
 ]
 
 ROOT_URLCONF = "core.urls"

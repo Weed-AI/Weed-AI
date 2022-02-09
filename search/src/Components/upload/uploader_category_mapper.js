@@ -95,7 +95,7 @@ class CategoryMapper extends React.Component {
                                             <MenuItem value={"weed"}>weed</MenuItem>
                                         </Select>
                                     </FormControl>
-                                    <p className={classes.text_field}>of species</p>
+                                    <p className={classes.text_field}>of type</p>
                                     <TextField className={classes.sci_name} label="Scientific name or UNSPECIFIED" value={category.scientific_name} onChange={e => {e.persist(); this.changeSciName(e, index)}}/>
                                 </li>
                             )

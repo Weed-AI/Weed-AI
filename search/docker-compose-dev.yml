@@ -53,6 +53,8 @@ services:
       - FROM_EMAIL=${FROM_EMAIL}
       - SEND_EMAIL=${SEND_EMAIL}
       - ENV=DEV
+      - TUS_SERVER=http://tus:1080/tus/
+      - DJANGO_LOG_LEVEL=DEBUG
     command: python manage.py runserver 0.0.0.0:8000
     entrypoint: /entrypoint.sh
     volumes:
@@ -63,6 +65,7 @@ services:
       - download_dir:/code/download
       - mystatic_dir:/code/mystatic
       - cvat_data:/code/cvat_data
+      - tus_dir:/code/tus_dir
     ports:
       - "8000:8000"
     networks:
@@ -90,6 +93,7 @@ services:
       - repository_dir:/code/repository
       - upload_dir:/code/upload
       - download_dir:/code/download
+      - tus_dir:/code/tus_dir
     depends_on:
       - django
       - redis
@@ -117,6 +121,17 @@ services:
     networks:
       - elastic
     logging: *default-logging
+
+  tus:
+    image: tusproject/tusd
+    container_name: tus
+    networks:
+      - elastic
+    ports:
+      - "1080:1080"
+    volumes:
+      - tus_dir:/srv/tusd-data
+    command: -behind-proxy -base-path /tus/files/
 
   # search engine
   elasticsearch:
@@ -297,3 +312,5 @@ volumes:
     driver: local
   cvat_keys:
   cvat_logs:
+  tus_dir:
+    driver: local

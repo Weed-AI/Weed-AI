@@ -117,6 +117,7 @@ class UploadStepper extends React.Component {
         this.handleMoveVoc = this.handleMoveVoc.bind(this);
         this.handleMoveMask = this.handleMoveMask.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
+        this.handleTusUpload = this.handleTusUpload.bind(this);
         this.nextHandler = this.nextHandler.bind(this);
         this.handleValidation = this.handleValidation.bind(this);
         this.getStepContent = this.getStepContent.bind(this);
@@ -330,6 +331,11 @@ class UploadStepper extends React.Component {
             newState.stepValid[currentStep] = status
             return newState
         })
+    }
+
+    handleTusUpload(files){
+        console.log(`handleTusUpload ${files}`);
+
     }
 
     getStepContent() {
