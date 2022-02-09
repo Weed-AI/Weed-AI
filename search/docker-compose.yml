@@ -226,8 +226,11 @@ services:
 
   cvat:
     container_name: weedai_cvat
-    image: openvino/cvat_server
+    image: cvat_server
     restart: always
+    build:
+      context: cvat
+      dockerfile: Dockerfile
     depends_on:
       - cvat_redis
       - cvat_db
@@ -256,6 +259,9 @@ services:
   cvat_ui:
     container_name: weedai_cvat_ui
     image: cvat_cvat_ui
+    build:
+      context: cvat
+      dockerfile: Dockerfile.ui
     restart: always
     depends_on:
       - cvat

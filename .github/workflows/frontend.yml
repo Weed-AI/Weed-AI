@@ -36,6 +36,7 @@ jobs:
             DVC_REMOTE_PATH=/tmp/dvc_remote
             HERE
             cat .env
+            git submodule update --init --recursive
             # TODO The following could be a separate GitHub action
             docker-compose up -d --build
             sleep 1
