@@ -10,6 +10,7 @@ import UploaderVoc from './uploader_voc';
 import UploaderMasks from './uploader_masks';
 import CategoryMapper from './uploader_category_mapper';
 import CvatRetriever from './uploader_cvat';
+import CopyCvatUploader from './uploader_copy_cvat';
 import ErrorMessage from '../error/display';
 import AgContextForm from '../forms/AgContextForm';
 import UploadJsonButton from '../forms/UploadJsonButton';
@@ -70,7 +71,7 @@ const stepsByType = {
         {title: "Categories", type: "categories"},
         {title: "Add Agcontext", type: "agcontext"},
         {title: "Add Metadata", type: "metadata"},
-        {title: "Upload Images", type: "images"}
+        {title: "Copy CVAT Images", type: "copy_cvat"}
     ]
 }
 
@@ -367,7 +368,9 @@ class UploadStepper extends React.Component {
             case "images":
                 return <ImageOrZipUploader stepName={step} upload_id={this.state.upload_id} cvat_task_id={this.state.cvat_task_id} images={this.state.images} handleValidation={this.handleValidation} handleErrorMessage={this.handleErrorMessage} />
             case "cvat":
-                return <CvatRetriever handleUploadId={this.handleUploadId} handleCvatTaskId={this.handleCvatTaskId} handleImages={this.handleImages} handleCategories={this.handleCategories} handleValidation={this.handleValidation} handleErrorMessage={this.handleErrorMessage}></CvatRetriever>
+                return <CvatRetriever handleUploadId={this.handleUploadId} handleCvatTaskId={this.handleCvatTaskId} handleImages={this.handleImages} handleCategories={this.handleCategories} handleValidation={this.handleValidation} handleErrorMessage={this.handleErrorMessage} />
+            case "copy_cvat":
+                return <CopyCvatUploader upload_id={this.state.upload_id} cvat_task_id={this.state.cvat_task_id} images={this.state.images} handleValidation={this.handleValidation} handleErrorMessage={this.handleErrorMessage} />
             default:
                 return ''
         }
