@@ -25,7 +25,7 @@ class AboutComponent extends Component {
             <title>About - Weed-AI</title>
             <meta
               name="description"
-              content="Weed-AI is a repository of weed imagery in crops. Find and download datasets of annotated weed imagery. Search by crop and weed species, crop growth stage, location, photography attributes, annotation task type and more. Collect and upload your own!"
+              content="Weed-AI is a repository of weed imagery in crops. Find and download datasets of annotated weed imagery. Search by crop and weed species/genus, crop growth stage, location, photography attributes, annotation task type and more. Collect and upload your own!"
             />
         </Helmet>
         <img src="/weedai-logo-small.png" title="Weed-AI" alt="Weed-AI logo" style={{float: "right", marginBottom: "1rem", marginLeft: "1rem"}} />

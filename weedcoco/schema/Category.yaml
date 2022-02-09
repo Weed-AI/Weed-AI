@@ -15,12 +15,12 @@ allOf:
           used to indicate that no weed or crop is identified in the image.
 
           Annotations should be labelled with the most specific category possible,
-          usually "weed: <species name>", but super categories may be more general.
+          usually "weed: <species name>".
           Biological names should be lowercase.
-          For an unspecified species of weed, "weed: UNSPECIFIED" may be used.
-          If categories are coarser than the species level but label a
-          taxonomic group, a non-species scientific name may be used, such as
+          Categories labelling a higher-level taxonomic grouping are also
+          permitted, also using their lowercase scientific name, such as
           "weed: poaceae" for grasses.
+          For an unspecified species of weed, "weed: UNSPECIFIED" may be used.
 
           For example, to label an oat crop in an image, the category name would be
           "crop: avena sativa". Its super categories may include "crop: poaceae"

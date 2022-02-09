@@ -8,9 +8,9 @@ import {
 
 
 const AnnotationCategory = ({ categoryName }) => {
-  const { role, species } = parseCategoryName(categoryName);
+  const { role, taxon } = parseCategoryName(categoryName);
   return <CategoryTooltip categoryName={categoryName}>
-    <li className={role}>{species || role}</li>
+    <li className={role}>{taxon || role}</li>
   </CategoryTooltip>
 };
 
