@@ -139,7 +139,7 @@ def get_task_types(annotations):
 @memory.cache
 def get_gbif_record(canonical_name):
     results = requests.get(
-        f"https://api.gbif.org/v1/species",
+        "https://api.gbif.org/v1/species",
         params={
             "name": canonical_name,
             "datasetKey": "d7dddbf4-2cf0-4f39-9b2a-bb099caae36c",
