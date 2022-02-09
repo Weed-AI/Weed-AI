@@ -56,6 +56,7 @@ services:
       - upload_dir:/code/upload
       - download_dir:/code/download
       - mystatic_dir:/code/mystatic
+      - cvat_data:/code/cvat_data
       - tus_dir:/code/tus_dir
     command: bash -c "python manage.py makemigrations && python manage.py migrate && python manage.py collectstatic <<<yes && gunicorn core.wsgi -b 0.0.0.0:8000"
     entrypoint: /entrypoint.sh
@@ -256,6 +257,8 @@ services:
       CVAT_REDIS_HOST: 'cvat_redis'
       CVAT_POSTGRES_HOST: 'cvat_db'
       ADAPTIVE_AUTO_ANNOTATION: 'false'
+      BASENAME: ${CVAT_BASEPATH}
+      DJANGO_AUTH_DEFAULT_GROUPS: ${CVAT_AUTH_DEFAULT_GROUPS}
     labels:
       - traefik.enable=true
       - traefik.http.services.cvat.loadbalancer.server.port=8080
@@ -281,6 +284,8 @@ services:
     restart: always
     depends_on:
       - cvat
+    environment:
+      BASENAME: ${CVAT_BASEPATH}
     labels:
       - traefik.enable=true
       - traefik.http.services.cvat-ui.loadbalancer.server.port=80
