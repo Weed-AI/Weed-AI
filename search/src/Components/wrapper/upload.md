@@ -73,4 +73,4 @@ dataset reviewers:
 * Images with personally identifiable content (such as faces and vehicle details)
 * Images with explicit content
 
-Currently only new images to the repository will be accepted.
+Currently only images that are new to the repository will be accepted.
