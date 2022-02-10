@@ -36,6 +36,8 @@ jobs:
             CVAT_AUTH_DEFAULT_GROUPS=USER
             GIT_REMOTE_PATH=/tmp/git_remote
             DVC_REMOTE_PATH=/tmp/dvc_remote
+            HTTPS_HOST=localhost
+            CVAT_HOST=localhost
             HERE
             cat .env
             git submodule update --init --recursive
