@@ -76,7 +76,7 @@ class DatasetComponent extends Component {
 
     render() {
         const editingToggle = 
-        this.state.editing_id_list.length > 0
+        this.state.editing_id_list.length > 0 && this.state.upload_id === "*"
         ?
         (
             <FormControlLabel
