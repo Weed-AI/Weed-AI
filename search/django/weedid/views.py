@@ -81,6 +81,23 @@ def elasticsearch_query(request):
     return HttpResponse(elasticsearch_response)
 
 
+def upload_helper(weedcoco_json, user_id, schema='coco'):
+    images = []
+    validate(
+        weedcoco_json,
+        schema=schema,
+    )
+    for image_reference in weedcoco_json["images"]:
+        images.append(image_reference["file_name"].split("/")[-1])
+    categories = [
+        parse_category_name(category) for category in weedcoco_json["categories"]
+    ]
+    upload_dir, upload_id = setup_upload_dir(os.path.join(UPLOAD_DIR, str(user_id)))
+    store_tmp_weedcoco(weedcoco_json, upload_dir)
+    create_upload_entity(upload_id, user_id)
+    return upload_id, images, categories
+
+
 def upload(request):
     if not request.method == "POST":
         return HttpResponseNotAllowed(request.method)
@@ -92,18 +109,7 @@ def upload(request):
         file_weedcoco = request.FILES["weedcoco"]
         weedcoco_json = json.load(file_weedcoco)
         fix_compatibility_quirks(weedcoco_json)
-        # validate(
-        #     weedcoco_json,
-        #     schema=request.POST["schema"] if request.POST["schema"] else "coco",
-        # )
-        for image_reference in weedcoco_json["images"]:
-            images.append(image_reference["file_name"].split("/")[-1])
-        categories = [
-            parse_category_name(category) for category in weedcoco_json["categories"]
-        ]
-        upload_dir, upload_id = setup_upload_dir(os.path.join(UPLOAD_DIR, str(user.id)))
-        store_tmp_weedcoco(weedcoco_json, upload_dir)
-        create_upload_entity(upload_id, user.id)
+        upload_id, images, categories = upload_helper(weedcoco_json, user.id, 'weedcoco')
     except JsonValidationError as e:
         traceback.print_exc()
         return json_validation_response(e)
