@@ -432,12 +432,28 @@ def awaiting_list(request):
     user = request.user
     if not (user and user.is_authenticated and user.is_staff):
         return HttpResponseForbidden("You dont have access to proceed")
-    awaiting_list = [
-        retrieve_listing_info(dataset, awaiting_review=True)
-        for dataset in Dataset.objects.filter(status="AR")
-    ]
-    return HttpResponse(json.dumps(awaiting_list))
+    try:
+        awaiting_list = [
+            retrieve_listing_info(dataset, awaiting_review=True)
+            for dataset in Dataset.objects.filter(status="AR")
+        ]
+        return HttpResponse(json.dumps(awaiting_list))
+    except Exception:
+        return HttpResponseNotAllowed("Awaiting list is not able to retrieve")
 
+
+def editing_list(request):
+    user = request.user
+    if not (user and user.is_authenticated):
+        return HttpResponseForbidden("You dont have access to proceed")
+    try:
+        editing_list = [
+            retrieve_listing_info(dataset, awaiting_review=False)
+            for dataset in Dataset.objects.filter(status="C", user=WeedidUser.objects.get(id=user.id))
+        ]
+        return HttpResponse(json.dumps(editing_list))
+    except Exception:
+        return HttpResponseNotAllowed("There is no dataset to edit for this user")
 
 def dataset_approve(request, dataset_id):
     user = request.user
