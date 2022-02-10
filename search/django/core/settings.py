@@ -52,7 +52,7 @@ DEBUG = os.environ.get("ENV", "PROD") == "DEV"
 ALLOWED_HOSTS = ["*"]
 CORS_ORIGIN_ALLOW_ALL = True
 AUTH_USER_MODEL = "weedid.WeedidUser"
-SESSION_COOKIE_NAME = 'weedai_sessionid'
+SESSION_COOKIE_NAME = "weedai_sessionid"
 
 # TUS headers
 
