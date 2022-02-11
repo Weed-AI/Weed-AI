@@ -102,7 +102,7 @@ describe('overall upload workflow', () => {
         cy.get('.MuiAutocomplete-endAdornment').click()
         cy.findAllByText(task.name).first().click()
         cy.clickText(/^Apply$/)
-        cy.wait(5000)
+        cy.wait(20000)
         cy.clickText(/^Next$/)
         cy.findByText(task.label.split(': ')[0]).type('weed{enter}')
         cy.findByDisplayValue(task.label.split(': ')[1]).click().clear().type('rapistrum rugosum{enter}')
