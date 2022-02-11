@@ -119,7 +119,7 @@ describe('overall upload workflow', () => {
         cy.wait(3000)
         
         cy.visit('http://localhost/upload', {failOnStatusCode: false})
-        cy.login(this.test_username, this.test_password)
+        //cy.login(this.test_username, this.test_password) -- already logged in
         cy.findByText(/^Select annotation format$/).click()
         cy.findByText("Annotation").click()
         cy.clickText(/^Begin upload$/)
