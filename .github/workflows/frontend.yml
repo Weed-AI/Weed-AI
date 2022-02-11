@@ -65,6 +65,8 @@ jobs:
         uses: cypress-io/github-action@v2
         with:
           working-directory: search
+        env:
+          ELECTRON_ENABLE_LOGGING: 1
       - uses: actions/upload-artifact@v2
         if: failure()
         with:

@@ -84,6 +84,7 @@ describe('overall upload workflow', () => {
         }
 
         cy.visit('http://localhost/cvat-annotation/auth/register', {failOnStatusCode: false})
+        cy.get('#firstName', { timeout: 30000 }).should('be.visible')
         cy.cvat_userRegistration('cvat_firstname', 'cvat_lastname', this.test_username, this.test_email, this.test_password)
         // cy.cvat_login(cvat_username, cvat_password)
 
@@ -94,7 +95,7 @@ describe('overall upload workflow', () => {
         cy.wait(3000)
         
         cy.visit('http://localhost/upload', {failOnStatusCode: false})
-        cy.login(this.test_username, this.test_password)
+        //cy.login(this.test_username, this.test_password) -- already logged in
         cy.findByText(/^Select annotation format$/).click()
         cy.findByText("Annotation").click()
         cy.clickText(/^Begin upload$/)
