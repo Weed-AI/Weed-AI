@@ -221,4 +221,23 @@ Cypress.Commands.add('createRectangle', (createRectangleParams) => {
     cy.checkObjectParameters(createRectangleParams, 'RECTANGLE');
 });
 
+Cypress.Commands.add('safeSetForm', () => {
+    cy.wait(1000)
+    // hack needed due to textarea risizing upredictably
+    cy.clickText(/JSON data/)
+    cy.focused().blur()
+    cy.clickText(/^Set Form$/)
+})
 
+Cypress.Commands.add('setAgAndMeta', () => {
+    cy.clickText(/^Upload and Download Form Contents$/)
+    cy.get('.dzu-input').attachFile('test_coco/agcontext.json')
+    cy.safeSetForm()
+    cy.clickText(/^Next$/)
+
+    cy.findByText(/Dataset Name/i) // Ensure we have proceeded to metadata
+    cy.clickText(/^Upload and Download Form Contents$/)
+    cy.get('.dzu-input').attachFile('test_coco/metadata.json')
+    cy.safeSetForm()
+    cy.clickText(/^Next$/)
+})
