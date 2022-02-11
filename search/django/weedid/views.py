@@ -118,7 +118,7 @@ def upload(request):
         weedcoco_json = json.load(file_weedcoco)
         fix_compatibility_quirks(weedcoco_json)
         upload_id, images, categories = upload_helper(
-            weedcoco_json, user.id, "weedcoco"
+            weedcoco_json, user.id, request.POST["schema"]
         )
     except JsonValidationError as e:
         traceback.print_exc()
