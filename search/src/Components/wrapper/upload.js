@@ -19,6 +19,9 @@ const useStyles = (theme) => ({
         margin: theme.spacing(2),
         minWidth: 200,
     },
+    logout: {
+        marginBottom: theme.spacing(2),
+    },
 })
 
 const baseURL = new URL(window.location.origin);
@@ -124,7 +127,7 @@ class UploadComponent extends Component {
                 <div>
                     <h2>Current upload status: {this.state.upload_status}</h2>
                     <p style={{color: "#f0983a"}}>{this.state.upload_status_details}</p>
-                    <Button variant="outlined" color="primary" onClick={this.handleLogout}>
+                    <Button variant="outlined" color="primary" onClick={this.handleLogout} className={classes.logout}>
                         Log out
                     </Button>
                 </div>
