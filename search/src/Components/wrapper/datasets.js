@@ -109,7 +109,7 @@ class DatasetComponent extends Component {
                 }
             }
             else {
-                datasetSection = <DatasetList title={""} handleUploadid={this.handleUploadid} upload_list={this.state.editing_list} />;
+                datasetSection = <DatasetList title={""} handleUploadid={this.handleUploadid} upload_list={this.state.editing_list} inEdit={true}/>;
             }
        } else {
             datasetSection = <DatasetSummaryPage upload_id={this.state.upload_id} handleUploadid={this.handleUploadid}/>;

@@ -10,6 +10,7 @@ import content from './upload.md'
 import { Helmet } from "react-helmet";
 import { useArticleStyles } from '../../styles/common'
 import Markdown from "../../Common/Markdown";
+import UploadSelect from '../upload/upload_select';
 
 const PaddedPaper = withStyles((theme) => ({
     root: {

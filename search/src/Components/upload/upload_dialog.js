@@ -59,13 +59,13 @@ export default function UploadDialog(props) {
   };
   const handleClose = () => {
     setOpen(false);
-    props.handleUploadStatus();
+    if (props.upload_mode === 'upload') props.handleUploadStatus();
   };
 
   return (
     <React.Fragment>
-      <Button className={classes.uploadButton} variant="contained" onClick={handleClickOpen}>
-        Begin upload
+      <Button disabled={!props.upload_type} className={classes.uploadButton} variant="contained" onClick={handleClickOpen}>
+        {`Begin ${props.upload_mode}`}
       </Button>
       <Dialog maxWidth='md' onClose={handleClose} aria-labelledby="upload-dialog-title" open={open} disableBackdropClick={true}>
         <DialogTitle id="upload-dialog-title" onClose={handleClose}>
