@@ -12,7 +12,7 @@ const useStyles = makeStyles((theme) => ({
         alignItems: 'center',
     },
     formControl: {
-        margin: theme.spacing(2),
+        marginRight: theme.spacing(2),
         minWidth: 200,
     }
 }))
