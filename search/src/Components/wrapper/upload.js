@@ -11,6 +11,7 @@ import content from './upload.md'
 import { Helmet } from "react-helmet";
 import { useArticleStyles } from '../../styles/common'
 import Markdown from "../../Common/Markdown";
+import UploadSelect from '../upload/upload_select';
 
 const useStyles = (theme) => ({
 	...useArticleStyles(theme),
@@ -127,25 +128,7 @@ class UploadComponent extends Component {
                         Log out
                     </Button>
                 </div>
-                <div style={{ display: 'flex', alignItems: 'center' }}>
-                    <FormControl className={classes.formControl}>
-                        <Select
-                        value={this.state.upload_type}
-                        displayEmpty
-                        onChange={this.handleChange}
-                        >
-                            <MenuItem value="" disabled>
-                                Select annotation format
-                            </MenuItem>
-                            <MenuItem value="weedcoco">WeedCOCO</MenuItem>
-                            <MenuItem value="coco">COCO</MenuItem>
-                            <MenuItem value="voc">VOC</MenuItem>
-                            <MenuItem value="masks">Segmentation masks</MenuItem>
-                            <MenuItem value="cvat">Annotation</MenuItem>
-                        </Select>
-                    </FormControl>
-                    <UploadDialog handleUploadStatus={this.retrieveUploadStatus} upload_type={this.state.upload_type}/>
-                </div>
+                <UploadSelect upload_mode={'upload'} retrieveUploadStatus={this.retrieveUploadStatus} />
                 </React.Fragment>
                 :
                 <AuthPrompt handleLogin={this.handleLogin} handleLogout={this.handleLogout}/> }
