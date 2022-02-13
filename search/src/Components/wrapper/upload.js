@@ -25,6 +25,9 @@ const useStyles = (theme) => ({
         margin: theme.spacing(2),
         minWidth: 200,
     },
+    logout: {
+        marginBottom: theme.spacing(2),
+    },
 })
 
 const baseURL = new URL(window.location.origin);

@@ -81,7 +81,7 @@ def elasticsearch_query(request):
     return HttpResponse(elasticsearch_response)
 
 
-def upload_helper(weedcoco_json, user_id, schema='coco'):
+def upload_helper(weedcoco_json, user_id, schema="coco"):
     images = []
     validate(
         weedcoco_json,
@@ -109,7 +109,9 @@ def upload(request):
         file_weedcoco = request.FILES["weedcoco"]
         weedcoco_json = json.load(file_weedcoco)
         fix_compatibility_quirks(weedcoco_json)
-        upload_id, images, categories = upload_helper(weedcoco_json, user.id, 'weedcoco')
+        upload_id, images, categories = upload_helper(
+            weedcoco_json, user.id, "weedcoco"
+        )
     except JsonValidationError as e:
         traceback.print_exc()
         return json_validation_response(e)
