@@ -7,7 +7,8 @@ import MuiDialogContent from '@material-ui/core/DialogContent';
 import IconButton from '@material-ui/core/IconButton';
 import CloseIcon from '@material-ui/icons/Close';
 import Typography from '@material-ui/core/Typography';
-import UploadSteper from './upload_stepper'
+import UploadSteper from './upload_stepper';
+import axios from 'axios';
 
 const styles = (theme) => ({
   root: {
@@ -52,9 +53,16 @@ const DialogContent = withStyles((theme) => ({
 
 export default function UploadDialog(props) {
   const classes = styles;
+  const upload_mode = props.upload_mode;
   const [open, setOpen] = React.useState(false);
+  const baseURL = new URL(window.location.origin);
+  const [preset, setPreset] = React.useState({});
 
-  const handleClickOpen = () => {
+  const handleClickOpen = async () => {
+    if (upload_mode == "edit") {
+      let res = await axios.get(baseURL + `api/editing_init/${props.upload_id}`)
+      setPreset(res.data)
+    }
     setOpen(true);
   };
   const handleClose = () => {
@@ -65,13 +73,13 @@ export default function UploadDialog(props) {
   return (
     <React.Fragment>
       <Button disabled={!props.upload_type} className={classes.uploadButton} variant="contained" onClick={handleClickOpen}>
-        {`Begin ${props.upload_mode}`}
+        {`Begin ${upload_mode}`}
       </Button>
       <Dialog maxWidth='md' onClose={handleClose} aria-labelledby="upload-dialog-title" open={open} disableBackdropClick={true}>
         <DialogTitle id="upload-dialog-title" onClose={handleClose}>
         </DialogTitle>
         <DialogContent>
-            <UploadSteper handleClose={handleClose} upload_type={props.upload_type}/>
+            <UploadSteper handleClose={handleClose} upload_type={props.upload_type} payload={preset} upload_mode={upload_mode}/>
         </DialogContent>
       </Dialog>
     </React.Fragment>

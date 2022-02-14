@@ -12,6 +12,7 @@ class TusProxy(HttpProxy):
 
 api_urlpatterns = [
     path("upload/", views.upload, name="upload"),
+    path("editing_init/<str:dataset_id>", views.editing_init, name="editing_init"),
     path("warmup/", views.warmup, name="warmup"),
     path("upload_voc/", views.VocUploader.upload, name="upload_voc"),
     path("remove_voc/", views.VocUploader.remove, name="remove_voc"),

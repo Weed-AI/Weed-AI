@@ -108,7 +108,7 @@ export default function DatasetList(props) {
                 {!inEdit ? <TableCell><IconButton href={"/explore?dataset_name_filter=%5B%22" + row.name + "%22%5D"}><PhotoIcon /></IconButton></TableCell> : ""}
                 {inEdit
                   ?<TableCell>
-                    <UploadSelect upload_mode={'edit'}/>
+                    <UploadSelect upload_id={row.upload_id} upload_mode={'edit'}/>
                   </TableCell>
                   : ""}
                 {inReview

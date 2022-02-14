@@ -134,6 +134,26 @@ def upload(request):
         )
 
 
+def editing_init(request, dataset_id):
+    user = request.user
+    if not (user and user.is_authenticated):
+        return HttpResponseForbidden("You dont have access to proceed")
+    dataset = Dataset.objects.get(upload_id=dataset_id, status="C")
+    if dataset.user.id != user.id:
+        return HttpResponseForbidden("You dont have access to edit")
+    dataset_weedcoco_path = os.path.join(REPOSITORY_DIR, str(dataset.upload_id), 'weedcoco.json')
+    with open(dataset_weedcoco_path) as f:
+        weedcoco_json = json.load(f)
+        categories = [
+            parse_category_name(category) for category in weedcoco_json["categories"]
+        ]
+    return HttpResponse(
+                json.dumps(
+                    {"agcontext": dataset.agcontext, "metadata": dataset.metadata, "categories": categories}
+                )
+            )
+
+
 def retrieve_cvat_task(request, task_id):
     user = request.user
     if not (user and user.is_authenticated):
