@@ -60,6 +60,7 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+
 @ensure_csrf_cookie
 def set_csrf(request):
     return HttpResponse("Success")
@@ -88,7 +89,7 @@ def elasticsearch_query(request):
     return HttpResponse(elasticsearch_response)
 
 
-def upload_helper(weedcoco_json, user_id, schema='coco'):
+def upload_helper(weedcoco_json, user_id, schema="coco"):
     images = []
     validate(
         weedcoco_json,
@@ -112,10 +113,13 @@ def upload(request):
     if not (user and user.is_authenticated):
         return HttpResponseForbidden("You dont have access to proceed")
     try:
+        images = []
         file_weedcoco = request.FILES["weedcoco"]
         weedcoco_json = json.load(file_weedcoco)
         fix_compatibility_quirks(weedcoco_json)
-        upload_id, images, categories = upload_helper(weedcoco_json, user.id, 'weedcoco')
+        upload_id, images, categories = upload_helper(
+            weedcoco_json, user.id, request.POST["schema"]
+        )
     except JsonValidationError as e:
         traceback.print_exc()
         return json_validation_response(e)
@@ -129,14 +133,18 @@ def upload(request):
             )
         )
 
-      
+
 def retrieve_cvat_task(request, task_id):
     user = request.user
     if not (user and user.is_authenticated):
         return HttpResponseForbidden("You dont have access to proceed")
     try:
-        with ZipFile(os.path.join(CVAT_DATA_DIR, 'tasks', task_id, 'export_cache/annotations_coco-10.ZIP')) as cvat_zip:
-            with cvat_zip.open('annotations/instances_default.json') as cvat_task_coco:
+        with ZipFile(
+            os.path.join(
+                CVAT_DATA_DIR, "tasks", task_id, "export_cache/annotations_coco-10.ZIP"
+            )
+        ) as cvat_zip:
+            with cvat_zip.open("annotations/instances_default.json") as cvat_task_coco:
                 coco_json = json.load(cvat_task_coco)
                 upload_id, images, categories = upload_helper(coco_json, user.id)
     except JsonValidationError as e:
@@ -152,7 +160,7 @@ def retrieve_cvat_task(request, task_id):
             )
         )
 
-      
+
 class CustomUploader:
     @classmethod
     def upload(cls, request):
@@ -435,7 +443,9 @@ def copy_cvat(request):
             missing = []
             for img in weedcoco["images"]:
                 fn = img["file_name"]
-                cvat_image = os.path.join(CVAT_DATA_DIR, 'data', str(cvat_task_id), 'raw', fn)
+                cvat_image = os.path.join(
+                    CVAT_DATA_DIR, "data", str(cvat_task_id), "raw", fn
+                )
                 weedai_image = os.path.join(image_dir, fn)
                 logger.warn(f"copy {cvat_image} -> {weedai_image}")
                 try:
@@ -449,7 +459,7 @@ def copy_cvat(request):
     except Exception as e:
         logger.error(f"error copying files: {e}")
         return HttpResponseServerError(f"error copying files: {e}")
-    
+
 
 def submit_deposit(request):
     if not request.method == "POST":
