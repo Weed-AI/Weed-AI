@@ -16,6 +16,7 @@ jobs:
         python-version: [3.7]
     steps:
       - uses: actions/checkout@v2
+        submodules: recursive
 #      - uses: satackey/action-docker-layer-caching@v0.0.11
 #        continue-on-error: true
       - name: Bring system up
@@ -40,7 +41,6 @@ jobs:
             CVAT_HOST=localhost
             HERE
             cat .env
-            git submodule update --init --recursive
             # TODO The following could be a separate GitHub action
             docker-compose up -d --build
             sleep 1
