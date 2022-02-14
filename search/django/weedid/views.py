@@ -89,9 +89,8 @@ def elasticsearch_query(request):
     return HttpResponse(elasticsearch_response)
 
 
-def upload_helper(file_weedcoco, user_id, schema="coco"):
+def upload_helper(weedcoco_json, user_id, schema="coco"):
     images = []
-    weedcoco_json = json.load(file_weedcoco)
     validate(
         weedcoco_json,
         schema=schema,
@@ -102,7 +101,7 @@ def upload_helper(file_weedcoco, user_id, schema="coco"):
         parse_category_name(category) for category in weedcoco_json["categories"]
     ]
     upload_dir, upload_id = setup_upload_dir(os.path.join(UPLOAD_DIR, str(user_id)))
-    store_tmp_weedcoco(file_weedcoco, upload_dir)
+    store_tmp_weedcoco(weedcoco_json, upload_dir)
     create_upload_entity(upload_id, user_id)
     return upload_id, images, categories
 
@@ -118,18 +117,9 @@ def upload(request):
         file_weedcoco = request.FILES["weedcoco"]
         weedcoco_json = json.load(file_weedcoco)
         fix_compatibility_quirks(weedcoco_json)
-        # validate(
-        #     weedcoco_json,
-        #     schema=request.POST["schema"] if request.POST["schema"] else "coco",
-        # )
-        for image_reference in weedcoco_json["images"]:
-            images.append(image_reference["file_name"].split("/")[-1])
-        categories = [
-            parse_category_name(category) for category in weedcoco_json["categories"]
-        ]
-        upload_dir, upload_id = setup_upload_dir(os.path.join(UPLOAD_DIR, str(user.id)))
-        store_tmp_weedcoco(weedcoco_json, upload_dir)
-        create_upload_entity(upload_id, user.id)
+        upload_id, images, categories = upload_helper(
+            weedcoco_json, user.id, request.POST["schema"]
+        )
     except JsonValidationError as e:
         traceback.print_exc()
         return json_validation_response(e)
@@ -155,7 +145,8 @@ def retrieve_cvat_task(request, task_id):
             )
         ) as cvat_zip:
             with cvat_zip.open("annotations/instances_default.json") as cvat_task_coco:
-                upload_id, images, categories = upload_helper(cvat_task_coco, user.id)
+                coco_json = json.load(cvat_task_coco)
+                upload_id, images, categories = upload_helper(coco_json, user.id)
     except JsonValidationError as e:
         traceback.print_exc()
         return json_validation_response(e)
