@@ -16,7 +16,8 @@ jobs:
         python-version: [3.7]
     steps:
       - uses: actions/checkout@v2
-        submodules: recursive
+        with:
+          submodules: recursive
 #      - uses: satackey/action-docker-layer-caching@v0.0.11
 #        continue-on-error: true
       - name: Bring system up
