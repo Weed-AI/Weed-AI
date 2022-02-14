@@ -43,7 +43,7 @@ export default function DatasetList(props) {
                 <MenuItem value="cvat">Annotation</MenuItem>
             </Select>
         </FormControl>
-        <UploadDialog handleUploadStatus={props.retrieveUploadStatus} upload_type={upload_type} upload_mode={props.upload_mode}/>
+        <UploadDialog handleUploadStatus={props.retrieveUploadStatus} upload_id={props.upload_id} upload_type={upload_type} upload_mode={props.upload_mode}/>
     </div>
   )
 }

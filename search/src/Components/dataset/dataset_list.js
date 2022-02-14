@@ -97,7 +97,7 @@ export default function DatasetList(props) {
           </TableHead>
           <TableBody>
             {props.upload_list.map((row) => (
-              <TableRow key={row.name}>
+              <TableRow key={row.upload_id}>
                 <TableCell component="th" scope="row">
                 <Link href={baseURL + 'datasets/' + row.upload_id} color='blue'>
                   {row.name}
@@ -108,7 +108,7 @@ export default function DatasetList(props) {
                 {!inEdit ? <TableCell><IconButton href={"/explore?dataset_name_filter=%5B%22" + row.name + "%22%5D"}><PhotoIcon /></IconButton></TableCell> : ""}
                 {inEdit
                   ?<TableCell>
-                    <UploadSelect upload_mode={'edit'}/>
+                    <UploadSelect upload_id={row.upload_id} upload_mode={'edit'}/>
                   </TableCell>
                   : ""}
                 {inReview
