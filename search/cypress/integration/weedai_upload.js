@@ -2,7 +2,8 @@ describe('overall upload workflow', () => {
 
     beforeEach(() => {
         const test_username = `test_${Math.random().toString(36).slice(-4)}`
-        const test_password = `P${Math.random().toString(36).slice(-8)}`
+        // cvat requires at least one number in passwords
+        const test_password = `P${Math.random().toString(36).slice(-8) + Math.random().toString().slice(-2)}`
         const test_email = `${test_username}@weed-ai.com`
         cy.wrap(test_username).as('test_username')
         cy.wrap(test_password).as('test_password')
