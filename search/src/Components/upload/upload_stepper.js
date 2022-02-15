@@ -81,15 +81,15 @@ class UploadStepper extends React.Component {
         super(props);
         this.state = {
             activeStep: 0,
-            skip_mapping: this.props.upload_mode == 'edit' ? Object.keys(stepsByType).reduce((a, v) => ({ ...a, [v]: [...Array(stepsByType[v].length).keys()]}), {}) : {},
+            skip_mapping: this.props.upload_mode == 'edit' ? Object.keys(stepsByType).reduce((a, v) => ({ ...a, [v]: [0]}), {}) : {},
             skipped: new Set(),
             steps: stepsByType[this.props.upload_type].map(step => step.title),
-            upload_id: 0,
+            upload_id: !props.payload ? 0 : props.payload.upload_id,
             cvat_task_id: 0,
             voc_id: Math.random().toString(36).slice(-8),
             mask_id: Math.random().toString(36).slice(-8),
             image_ext: '',
-            images: [],
+            images: !props.payload ? [] : props.payload.images,
             categories: !props.payload ? [] : props.payload.categories,
             ag_context: !props.payload ? {} : props.payload.agcontext[0],
             metadata: !props.payload ? {} : props.payload.metadata,
