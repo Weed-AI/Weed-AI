@@ -18,7 +18,7 @@ import Cookies from 'js-cookie';
 import cloneDeep from 'lodash/cloneDeep';
 import {jsonSchemaTitle} from '../error/utils';
 import ImageOrZipUploader from './uploader_zip_images';
-import TypeSelector from './type_selector';
+import CardSelector from '../generic/card_selector';
 
 
 const baseURL = new URL(window.location.origin);
@@ -39,9 +39,31 @@ const useStyles = (theme) => ({
   },
 });
 
+const typeData = [
+  {
+    "id": "weedcoco",
+    "name": "WeedCOCO",
+    "description": <Typography>Weed-AI's custom extension of MS COCO with everything included.</Typography>
+  },
+  {
+    "id": "coco",
+    "name": "MS COCO",
+    "description": <Typography>MS COCO format for classification, bounding boxes or segmentation.</Typography>
+  },
+  {
+    "id": "voc",
+    "name": "Pascal VOC",
+    "description": <Typography>Pascal VOC's XML annotation format for bounding boxes.</Typography>
+  },
+  {
+    "id": "masks",
+    "name": "Mask PNGs",
+    "description": <Typography>Colour coded mask images for segmentation.</Typography>
+  },
+]
 const stepsByType = {
     "coco": [
-        {title: "Select Annotation Type", type: "select-type"},
+        {title: "Select Format", type: "select-type"},
         {title: "Upload Coco", type: "coco-upload"},
         {title: "Categories", type: "categories"},
         {title: "Add Agcontext", type: "agcontext"},
@@ -49,12 +71,12 @@ const stepsByType = {
         {title: "Upload Images", type: "images"}
     ],
     "weedcoco": [
-        {title: "Select Annotation Type", type: "select-type"},
+        {title: "Select Format", type: "select-type"},
         {title: "Upload Weedcoco", type: "weedcoco-upload"},
         {title: "Upload Images", type: "images"}
     ],
     "voc": [
-        {title: "Select Annotation Type", type: "select-type"},
+        {title: "Select Format", type: "select-type"},
         {title: "Upload VOC", type: "voc-upload"},
         {title: "Categories", type: "categories"},
         {title: "Add Agcontext", type: "agcontext"},
@@ -62,8 +84,8 @@ const stepsByType = {
         {title: "Upload Images", type: "images"}
     ],
     "masks": [
-        {title: "Select Annotation Type", type: "select-type"},
-        {title: "Upload Segmentation Masks", type: "masks-upload"},
+        {title: "Select Format", type: "select-type"},
+        {title: "Upload Masks", type: "masks-upload"},
         {title: "Categories", type: "categories"},
         {title: "Add Agcontext", type: "agcontext"},
         {title: "Add Metadata", type: "metadata"},
@@ -348,7 +370,12 @@ class UploadStepper extends React.Component {
         const step = stepsByType[this.state.upload_type][this.state.activeStep].type
         switch (step) {
             case "select-type":
-                return <TypeSelector uploadType={this.state.upload_type} handleSelect={(upload_type) => this.setUploadType(upload_type)} />
+                return <div>
+                    <Typography gutterBottom variant="subtitle1" component="div">
+                      Select an input annotation format:
+                    </Typography>
+                    <CardSelector cardData={typeData} selected={this.state.upload_type} handleSelect={(upload_type) => this.setUploadType(upload_type)} />
+                  </div>
             case "coco-upload":
             case "weedcoco-upload":
                 const schema = step == "coco-upload" ? "coco" : "weedcoco"
