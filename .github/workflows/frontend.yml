@@ -35,11 +35,9 @@ jobs:
             WEEDCOCO_VERSION=$MERGE_SHA
             SEND_EMAIL=False
             CVAT_BASEPATH='/cvat-annotation'
-            CVAT_AUTH_DEFAULT_GROUPS=USER
             GIT_REMOTE_PATH=/tmp/git_remote
             DVC_REMOTE_PATH=/tmp/dvc_remote
             HTTPS_HOST=localhost
-            CVAT_HOST=localhost
             HERE
             cat .env
             # TODO The following could be a separate GitHub action
