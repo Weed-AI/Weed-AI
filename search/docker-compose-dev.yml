@@ -279,7 +279,7 @@ services:
       - traefik.enable=true
       - traefik.http.routers.dashboard.entrypoints=dashboard
       - traefik.http.routers.dashboard.service=api@internal
-      - traefik.http.routers.dashboard.rule=Host(`${CVAT_HOST:-localhost}`)
+      - traefik.http.routers.dashboard.rule=Host(`${HTTP_HOST:-localhost}`)
     ports:
       - 80:80
       - 8090:8090

@@ -29,6 +29,7 @@ DVC_REMOTE_PATH=/path/to/dvc/remote/on/rds
 # The following is to let traefik know which hosts are legit
 HTTP_HOST=<http host>
 HTTPS_HOST=<https host such as weed-ai.sydney.edu.au>
+CVAT_BASEPATH='/cvat-annotation'
 ```
 
 ### Initialise database, migrate and create superuser
