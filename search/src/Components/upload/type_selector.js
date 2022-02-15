@@ -12,10 +12,6 @@ const useStyles = (theme) => ({
         backgroundColor: theme.palette.primary.light,
       },
       cursor: "pointer",
-      display: 'flex',
-      flexDirection: 'column',
-      alignItems: 'center',
-      height: "100%",
     },
     selected: {
       backgroundColor: theme.palette.secondary.light,
@@ -58,7 +54,13 @@ const TypeSelector = ({ classes, uploadType, handleSelect }) => {
       <Grid container spacing={2}>
         {typeData.map(type => (
           <Grid item key={type.id} xs={12} md={4}>
-            <Card onClick={() => { handleSelect(type.id) }} className={classes.card + " " + (type.id == uploadType ? classes.selected : "")}>
+            <Card
+              onClick={() => { handleSelect(type.id) }}
+              role="button"
+              aria-pressed={type.id == uploadType ? "true" : "false"}
+              aria-label={type.name}
+              className={classes.card + " " + (type.id == uploadType ? classes.selected : "")}
+            >
               <CardContent>
                 <Typography variant="h5" component="div">
                  {type.name}
