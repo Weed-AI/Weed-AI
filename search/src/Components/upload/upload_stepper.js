@@ -18,6 +18,7 @@ import Cookies from 'js-cookie';
 import cloneDeep from 'lodash/cloneDeep';
 import {jsonSchemaTitle} from '../error/utils';
 import ImageOrZipUploader from './uploader_zip_images';
+import TypeSelector from './type_selector';
 
 
 const baseURL = new URL(window.location.origin);
@@ -40,6 +41,7 @@ const useStyles = (theme) => ({
 
 const stepsByType = {
     "coco": [
+        {title: "Select Annotation Type", type: "select-type"},
         {title: "Upload Coco", type: "coco-upload"},
         {title: "Categories", type: "categories"},
         {title: "Add Agcontext", type: "agcontext"},
@@ -47,10 +49,12 @@ const stepsByType = {
         {title: "Upload Images", type: "images"}
     ],
     "weedcoco": [
+        {title: "Select Annotation Type", type: "select-type"},
         {title: "Upload Weedcoco", type: "weedcoco-upload"},
         {title: "Upload Images", type: "images"}
     ],
     "voc": [
+        {title: "Select Annotation Type", type: "select-type"},
         {title: "Upload VOC", type: "voc-upload"},
         {title: "Categories", type: "categories"},
         {title: "Add Agcontext", type: "agcontext"},
@@ -58,6 +62,7 @@ const stepsByType = {
         {title: "Upload Images", type: "images"}
     ],
     "masks": [
+        {title: "Select Annotation Type", type: "select-type"},
         {title: "Upload Segmentation Masks", type: "masks-upload"},
         {title: "Categories", type: "categories"},
         {title: "Add Agcontext", type: "agcontext"},
@@ -70,11 +75,11 @@ class UploadStepper extends React.Component {
 
     constructor(props) {
         super(props);
+        const upload_type = props.upload_type || "weedcoco";
         this.state = {
             activeStep: 0,
             skip_mapping: {'weedcoco': -1, 'coco': -1},
             skipped: new Set(),
-            steps: stepsByType[this.props.upload_type].map(step => step.title),
             upload_id: 0,
             voc_id: Math.random().toString(36).slice(-8),
             mask_id: Math.random().toString(36).slice(-8),
@@ -83,9 +88,9 @@ class UploadStepper extends React.Component {
             categories: [],
             ag_context: {},
             metadata: {},
-            stepValid: stepsByType[this.props.upload_type].reduce((steps, step) => {return {...steps, [step.type]: false}}, {}),
             error_message: "",
             error_message_details: "",
+            ... this.getUploadTypeState(upload_type),
         }
         this.isStepOptional = this.isStepOptional.bind(this);
         this.isStepSkipped = this.isStepSkipped.bind(this);
@@ -110,6 +115,22 @@ class UploadStepper extends React.Component {
         this.nextHandler = this.nextHandler.bind(this);
         this.handleValidation = this.handleValidation.bind(this);
         this.getStepContent = this.getStepContent.bind(this);
+    }
+
+    setUploadType(upload_type) {
+        this.setState(this.getUploadTypeState(upload_type));
+    }
+
+    getUploadTypeState(upload_type) {
+        return {
+            upload_type: upload_type,
+            steps: stepsByType[upload_type].map(step => step.title),
+            stepValid: stepsByType[upload_type].reduce(
+                (steps, step) => {
+                    return {...steps, [step.type]: step.type == "select-type"}
+                }, {}
+            ),
+        }
     }
 
     isStepOptional(step, upload_type) {
@@ -173,7 +194,7 @@ class UploadStepper extends React.Component {
     };
 
     handleSkip(){
-        if (!this.isStepOptional(this.state.activeStep, this.props.upload_type)) {
+        if (!this.isStepOptional(this.state.activeStep, this.state.upload_type)) {
             // You probably want to guard against something like this,
             // it should never occur unless someone's actively trying to break something.
             throw new Error("You can't skip a step that isn't optional.");
@@ -310,7 +331,7 @@ class UploadStepper extends React.Component {
     }
 
     handleValidation(status){
-        const currentStep = stepsByType[this.props.upload_type][this.state.activeStep].type
+        const currentStep = stepsByType[this.state.upload_type][this.state.activeStep].type
         this.setState(prevState => {
             const newState = {stepValid: {...prevState.stepValid}}
             newState.stepValid[currentStep] = status
@@ -324,8 +345,10 @@ class UploadStepper extends React.Component {
     }
 
     getStepContent() {
-        const step = stepsByType[this.props.upload_type][this.state.activeStep].type
+        const step = stepsByType[this.state.upload_type][this.state.activeStep].type
         switch (step) {
+            case "select-type":
+                return <TypeSelector uploadType={this.state.upload_type} handleSelect={(upload_type) => this.setUploadType(upload_type)} />
             case "coco-upload":
             case "weedcoco-upload":
                 const schema = step == "coco-upload" ? "coco" : "weedcoco"
@@ -382,14 +405,14 @@ class UploadStepper extends React.Component {
 
     render(){
         const { classes } = this.props;
-        const stepName = stepsByType[this.props.upload_type][this.state.activeStep].type;
+        const stepName = stepsByType[this.state.upload_type][this.state.activeStep].type;
         return (
             <div className={classes.root}>
             <Stepper activeStep={this.state.activeStep}>
                 {this.state.steps.map((label, index) => {
                 const stepProps = {};
                 const labelProps = {};
-                if (this.isStepOptional(index, this.props.upload_type)) {
+                if (this.isStepOptional(index, this.state.upload_type)) {
                     labelProps.optional = <Typography variant="caption">Optional</Typography>;
                 }
                 if (this.isStepSkipped(index)) {
@@ -411,7 +434,7 @@ class UploadStepper extends React.Component {
                     <Button disabled={this.state.activeStep === 0} onClick={this.handleBack} className={classes.button}>
                         Back
                     </Button>
-                    {this.isStepOptional(this.state.activeStep, this.props.upload_type)
+                    {this.isStepOptional(this.state.activeStep, this.state.upload_type)
                     && (
                         <Button
                         variant="contained"

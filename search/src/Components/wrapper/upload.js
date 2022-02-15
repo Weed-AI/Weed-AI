@@ -37,17 +37,11 @@ class UploadComponent extends Component {
             isLoggedIn: false,
             upload_status: "None",
             upload_status_details: "",
-            upload_type: "",
         }
-        this.handleChange = this.handleChange.bind(this);
         this.retrieveUploadStatus = this.retrieveUploadStatus.bind(this);
         this.handleLogin = this.handleLogin.bind(this);
         this.handleLogout = this.handleLogout.bind(this);
     }
-
-    handleChange(event){
-        this.setState({upload_type: event.target.value})
-    };
 
     handleLogin(){
         this.setState({isLoggedIn: true})
@@ -128,22 +122,7 @@ class UploadComponent extends Component {
                     </Button>
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center' }}>
-                    <FormControl className={classes.formControl}>
-                        <Select
-                        value={this.state.upload_type}
-                        displayEmpty
-                        onChange={this.handleChange}
-                        >
-                            <MenuItem value="" disabled>
-                                Select annotation format
-                            </MenuItem>
-                            <MenuItem value="weedcoco">WeedCOCO</MenuItem>
-                            <MenuItem value="coco">COCO</MenuItem>
-                            <MenuItem value="voc">VOC</MenuItem>
-                            <MenuItem value="masks">Segmentation masks</MenuItem>
-                        </Select>
-                    </FormControl>
-                    <UploadDialog handleUploadStatus={this.retrieveUploadStatus} upload_type={this.state.upload_type}/>
+                    <UploadDialog handleUploadStatus={this.retrieveUploadStatus}/>
                 </div>
                 </React.Fragment>
                 :
