@@ -133,15 +133,25 @@ def editing_init(request, dataset_id):
     dataset = Dataset.objects.get(upload_id=dataset_id, status="C")
     if dataset.user.id != user.id:
         return HttpResponseForbidden("You dont have access to edit")
-    dataset_weedcoco_path = os.path.join(REPOSITORY_DIR, str(dataset.upload_id), 'weedcoco.json')
-    with open(dataset_weedcoco_path) as f:
+    dataset_path = os.path.join(REPOSITORY_DIR, dataset_id)
+    upload_path = os.path.join(UPLOAD_DIR, str(user.id), dataset_id)
+    if os.path.isdir(dataset_path):
+        if os.path.isdir(upload_path):
+            shutil.rmtree(upload_path)
+        shutil.copytree(dataset_path, upload_path)
+    with open(os.path.join(upload_path, 'weedcoco.json')) as f:
+        images = []
         weedcoco_json = json.load(f)
         categories = [
             parse_category_name(category) for category in weedcoco_json["categories"]
         ]
+        for image_reference in weedcoco_json["images"]:
+            image_file_name = image_reference["file_name"].split("/")[-1]
+            if not os.path.isfile(os.path.join(upload_path, 'images', image_file_name)):
+                images.append(image_file_name)
     return HttpResponse(
                 json.dumps(
-                    {"agcontext": dataset.agcontext, "metadata": dataset.metadata, "categories": categories}
+                    {"upload_id": dataset_id, "agcontext": dataset.agcontext, "metadata": dataset.metadata, "categories": categories, "images": images}
                 )
             )
 
