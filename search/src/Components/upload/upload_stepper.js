@@ -81,7 +81,7 @@ class UploadStepper extends React.Component {
         super(props);
         this.state = {
             activeStep: 0,
-            skip_mapping: this.props.upload_mode == 'edit' ? Object.keys(stepsByType).reduce((a, v) => ({ ...a, [v]: [0]}), {}) : {},
+            skip_mapping: this.props.upload_mode == 'edit' ? Object.keys(stepsByType).reduce((a, v) => ({ ...a, [v]: [0]}), {}) : Object.keys(stepsByType).reduce((a, v) => ({ ...a, [v]: []}), {}),
             skipped: new Set(),
             steps: stepsByType[this.props.upload_type].map(step => step.title),
             upload_id: !props.payload ? 0 : props.payload.upload_id,
@@ -89,10 +89,10 @@ class UploadStepper extends React.Component {
             voc_id: Math.random().toString(36).slice(-8),
             mask_id: Math.random().toString(36).slice(-8),
             image_ext: '',
-            images: !props.payload ? [] : props.payload.images,
-            categories: !props.payload ? [] : props.payload.categories,
-            ag_context: !props.payload ? {} : props.payload.agcontext[0],
-            metadata: !props.payload ? {} : props.payload.metadata,
+            images: !props.payload || !props.payload.images ? [] : props.payload.images,
+            categories: !props.payload || !props.payload.categories ? [] : props.payload.categories,
+            ag_context: !props.payload || !props.payload.agcontext ? {} : props.payload.agcontext[0],
+            metadata: !props.payload || !props.payload.metadata ? {} : props.payload.metadata,
             stepValid: stepsByType[this.props.upload_type].reduce((steps, step) => {return {...steps, [step.type]: false}}, {}),
             error_message: "",
             error_message_details: "",
