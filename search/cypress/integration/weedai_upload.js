@@ -94,9 +94,12 @@ describe('overall upload workflow', () => {
         cy.createRectangle(task.createRectangleShape2Points)
         cy.saveJob()
         cy.wait(3000)
-        
+
+        cy.clearCookie('weedai_sessionid')        
         cy.visit('http://localhost/upload', {failOnStatusCode: false})
-        //cy.login(this.test_username, this.test_password) -- already logged in
+        cy.wait(3000)
+
+        cy.login(this.test_username, this.test_password) 
         cy.findByText(/^Select annotation format$/).click()
         cy.findByText("Annotation").click()
         cy.clickText(/^Begin upload$/)
