@@ -85,7 +85,7 @@ describe('overall upload workflow', () => {
         }
 
         cy.visit('http://localhost/cvat-annotation/auth/register', {failOnStatusCode: false})
-        cy.get('#firstName', { timeout: 30000 }).should('be.visible')
+        cy.get('#firstName', { timeout: 60000 }).should('be.visible')
         cy.cvat_userRegistration('cvat_firstname', 'cvat_lastname', this.test_username, this.test_email, this.test_password)
         // cy.cvat_login(cvat_username, cvat_password)
 
@@ -106,6 +106,11 @@ describe('overall upload workflow', () => {
         cy.get('.MuiAutocomplete-endAdornment').click()
         cy.findAllByText(task.name).first().click()
         cy.findAllByText(/^Apply$/).first().should('not.be.disabled', { timeout: 3000})
+        cy.wait(5000)
+        // very bad but I don't understand why the first couple of clicks fail in cypress
+        cy.clickText(/^Apply$/)
+        cy.wait(5000)
+        cy.clickText(/^Apply$/)
         cy.wait(5000)
         cy.clickText(/^Apply$/)
         cy.wait(5000)
