@@ -105,8 +105,10 @@ describe('overall upload workflow', () => {
         cy.clickText(/^Begin upload$/)
         cy.get('.MuiAutocomplete-endAdornment').click()
         cy.findAllByText(task.name).first().click()
+        cy.findAllByText(/^Apply$/).first().should('not.be.disabled', { timeout: 3000})
+        cy.wait(5000)
         cy.clickText(/^Apply$/)
-        cy.wait(20000)
+        cy.wait(5000)
         cy.clickText(/^Next$/)
         cy.findByText(task.label.split(': ')[0]).type('weed{enter}')
         cy.findByDisplayValue(task.label.split(': ')[1]).click().clear().type('rapistrum rugosum{enter}')
@@ -117,6 +119,7 @@ describe('overall upload workflow', () => {
     })
 
     afterEach(() => {
+        cy.wait(1000)
         cy.findAllByText(/^Log out$/).should('have.length', 1).click()
     })
 })
