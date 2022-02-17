@@ -2,9 +2,6 @@ import React, {Component} from 'react';
 import UploadDialog from '../upload/upload_dialog';
 import AuthPrompt from '../auth/auth_prompt';
 import { withStyles } from '@material-ui/core/styles';
-import MenuItem from '@material-ui/core/MenuItem';
-import FormControl from '@material-ui/core/FormControl';
-import Select from '@material-ui/core/Select';
 import axios from 'axios';
 import Button from '@material-ui/core/Button';
 import content from './upload.md'
