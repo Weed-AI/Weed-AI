@@ -114,7 +114,7 @@ class UploadComponent extends Component {
                 <div>
                     <h2>Current upload status: {this.state.upload_status}</h2>
                     <p style={{color: "#f0983a"}}>{this.state.upload_status_details}</p>
-					<UploadDialog handleUploadStatus={this.retrieveUploadStatus}/>
+                    <UploadDialog handleUploadStatus={this.retrieveUploadStatus}/>
                     <Button variant="outlined" color="primary" onClick={this.handleLogout}>
                         Log out
                     </Button>
