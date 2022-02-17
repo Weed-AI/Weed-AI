@@ -110,7 +110,6 @@ class UploadComponent extends Component {
                 <p>We welcome new contributions of datasets of images with weeds already annotated.</p>
                 { this.state.isLoggedIn
                 ?
-                <React.Fragment>
                 <div>
                     <h2>Current upload status: {this.state.upload_status}</h2>
                     <p style={{color: "#f0983a"}}>{this.state.upload_status_details}</p>
@@ -119,7 +118,6 @@ class UploadComponent extends Component {
                         Log out
                     </Button>
                 </div>
-                </React.Fragment>
                 :
                 <AuthPrompt handleLogin={this.handleLogin} handleLogout={this.handleLogout}/> }
 
