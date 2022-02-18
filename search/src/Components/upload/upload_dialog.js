@@ -25,7 +25,7 @@ const styles = (theme) => ({
     height: '3em',
     fontWeight: 600,
     backgroundColor: '#4490db',
-    color: 'white'
+    color: 'white',
   }
 });
 
@@ -72,14 +72,14 @@ export default function UploadDialog(props) {
 
   return (
     <React.Fragment>
-      <Button disabled={!props.upload_type} className={classes.uploadButton} variant="contained" onClick={handleClickOpen}>
+      <Button className={classes.uploadButton} variant="contained" onClick={handleClickOpen}>
         {`Begin ${upload_mode}`}
       </Button>
       <Dialog maxWidth='md' onClose={handleClose} aria-labelledby="upload-dialog-title" open={open} disableBackdropClick={true}>
         <DialogTitle id="upload-dialog-title" onClose={handleClose}>
         </DialogTitle>
         <DialogContent>
-            <UploadSteper handleClose={handleClose} upload_type={props.upload_type} payload={preset} upload_mode={upload_mode}/>
+            <UploadSteper handleClose={handleClose} preset={preset} upload_mode={upload_mode}/>
         </DialogContent>
       </Dialog>
     </React.Fragment>

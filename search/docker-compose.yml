@@ -214,7 +214,7 @@ services:
     user: root
     image: fluent/fluentd:v1.11-debian
     volumes:
-      - /var/lib/docker/containers:/fluentd/log/containers
+      - /data/docker/containers:/fluentd/log/containers
       - ./fluent.conf:/fluentd/etc/fluent.conf
       - ${FLUENTD_LOGS_PATH:-/data/logs}:/output/
     logging:

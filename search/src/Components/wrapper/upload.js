@@ -2,16 +2,12 @@ import React, {Component} from 'react';
 import UploadDialog from '../upload/upload_dialog';
 import AuthPrompt from '../auth/auth_prompt';
 import { withStyles } from '@material-ui/core/styles';
-import MenuItem from '@material-ui/core/MenuItem';
-import FormControl from '@material-ui/core/FormControl';
-import Select from '@material-ui/core/Select';
 import axios from 'axios';
 import Button from '@material-ui/core/Button';
 import content from './upload.md'
 import { Helmet } from "react-helmet";
 import { useArticleStyles } from '../../styles/common'
 import Markdown from "../../Common/Markdown";
-import UploadSelect from '../upload/upload_select';
 
 const useStyles = (theme) => ({
 	...useArticleStyles(theme),
@@ -41,17 +37,11 @@ class UploadComponent extends Component {
             isLoggedIn: false,
             upload_status: "None",
             upload_status_details: "",
-            upload_type: "",
         }
-        this.handleChange = this.handleChange.bind(this);
         this.retrieveUploadStatus = this.retrieveUploadStatus.bind(this);
         this.handleLogin = this.handleLogin.bind(this);
         this.handleLogout = this.handleLogout.bind(this);
     }
-
-    handleChange(event){
-        this.setState({upload_type: event.target.value})
-    };
 
     handleLogin(){
         this.setState({isLoggedIn: true})
@@ -123,16 +113,14 @@ class UploadComponent extends Component {
                 <p>We welcome new contributions of datasets of images with weeds already annotated.</p>
                 { this.state.isLoggedIn
                 ?
-                <React.Fragment>
                 <div>
                     <h2>Current upload status: {this.state.upload_status}</h2>
                     <p style={{color: "#f0983a"}}>{this.state.upload_status_details}</p>
-                    <Button variant="outlined" color="primary" onClick={this.handleLogout} className={classes.logout}>
+                    <UploadDialog upload_mode={'upload'} handleUploadStatus={this.retrieveUploadStatus}/>
+                    <Button variant="outlined" color="primary" onClick={this.handleLogout}>
                         Log out
                     </Button>
                 </div>
-                <UploadSelect upload_mode={'upload'} retrieveUploadStatus={this.retrieveUploadStatus} />
-                </React.Fragment>
                 :
                 <AuthPrompt handleLogin={this.handleLogin} handleLogout={this.handleLogout}/> }
 

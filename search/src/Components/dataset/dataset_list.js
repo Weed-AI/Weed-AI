@@ -13,7 +13,7 @@ import CircularProgress from '@material-ui/core/CircularProgress';
 import PhotoIcon from '@material-ui/icons/Photo';
 import IconButton from '@material-ui/core/IconButton';
 import axios from 'axios';
-import UploadSelect from '../upload/upload_select';
+import UploadDialog from '../upload/upload_dialog'
 
 
 const useStyles = makeStyles((theme) => ({
@@ -108,7 +108,7 @@ export default function DatasetList(props) {
                 {!inEdit ? <TableCell><IconButton href={"/explore?dataset_name_filter=%5B%22" + row.name + "%22%5D"}><PhotoIcon /></IconButton></TableCell> : ""}
                 {inEdit
                   ?<TableCell>
-                    <UploadSelect upload_id={row.upload_id} upload_mode={'edit'}/>
+                    <UploadDialog upload_mode={'edit'} upload_id={row.upload_id}/>
                   </TableCell>
                   : ""}
                 {inReview
