@@ -147,7 +147,7 @@ def editing_init(request, dataset_id):
         if os.path.isdir(upload_path):
             shutil.rmtree(upload_path)
         shutil.copytree(dataset_path, upload_path)
-    with open(os.path.join(upload_path, 'weedcoco.json')) as f:
+    with open(os.path.join(upload_path, "weedcoco.json")) as f:
         images = []
         weedcoco_json = json.load(f)
         categories = [
@@ -155,13 +155,19 @@ def editing_init(request, dataset_id):
         ]
         for image_reference in weedcoco_json["images"]:
             image_file_name = image_reference["file_name"].split("/")[-1]
-            if not os.path.isfile(os.path.join(upload_path, 'images', image_file_name)):
+            if not os.path.isfile(os.path.join(upload_path, "images", image_file_name)):
                 images.append(image_file_name)
     return HttpResponse(
-                json.dumps(
-                    {"upload_id": dataset_id, "agcontext": dataset.agcontext, "metadata": dataset.metadata, "categories": categories, "images": images}
-                )
-            )
+        json.dumps(
+            {
+                "upload_id": dataset_id,
+                "agcontext": dataset.agcontext,
+                "metadata": dataset.metadata,
+                "categories": categories,
+                "images": images,
+            }
+        )
+    )
 
 
 def retrieve_cvat_task(request, task_id):
@@ -562,11 +568,14 @@ def editing_list(request):
     try:
         editing_list = [
             retrieve_listing_info(dataset, awaiting_review=False)
-            for dataset in Dataset.objects.filter(status="C", user=WeedidUser.objects.get(id=user.id))
+            for dataset in Dataset.objects.filter(
+                status="C", user=WeedidUser.objects.get(id=user.id)
+            )
         ]
         return HttpResponse(json.dumps(editing_list))
     except Exception:
         return HttpResponseNotAllowed("There is no dataset to edit for this user")
+
 
 def dataset_approve(request, dataset_id):
     user = request.user
