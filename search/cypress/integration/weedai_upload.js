@@ -15,7 +15,7 @@ describe('overall upload workflow', () => {
 
     it('Test Weedcoco Upload', () => {
         cy.clickText(/^Begin upload$/)
-        cy.findByRole('dialog').findByRole('button', {name: /WeedCOCO/i}).click()
+        cy.findByRole('dialog').findByRole('option', {name: /WeedCOCO/i}).click()
         cy.clickText(/^Next$/)
         cy.get('.dzu-input').attachFile('test_weedcoco/weedcoco.json')
         cy.clickText(/^Next$/)
@@ -25,7 +25,7 @@ describe('overall upload workflow', () => {
 
     it('Test Weedcoco Zip Upload', () => {
         cy.clickText(/^Begin upload$/)
-        cy.findByRole('dialog').findByRole('button', {name: /WeedCOCO/i}).click()
+        cy.findByRole('dialog').findByRole('option', {name: /WeedCOCO/i}).click()
         cy.clickText(/^Next$/)
         cy.get('.dzu-input').attachFile('test_weedcoco_zip/weedcoco.json')
         cy.clickText(/^Next$/)
@@ -38,7 +38,7 @@ describe('overall upload workflow', () => {
 
     it('Test Coco Upload', () => {
         cy.clickText(/^Begin upload$/)
-        cy.findByRole('dialog').findByRole('button', {name: /MS COCO/i}).click()
+        cy.findByRole('dialog').findByRole('option', {name: /MS COCO/i}).click()
         cy.clickText(/^Next$/)
         cy.get('.dzu-input').attachFile('test_coco/coco.json')
         cy.clickText(/^Next$/)
@@ -53,7 +53,7 @@ describe('overall upload workflow', () => {
 
     it('Test Voc Upload', () => {
         cy.clickText(/^Begin upload$/)
-        cy.findByRole('dialog').findByRole('button', {name: /VOC/i}).click()
+        cy.findByRole('dialog').findByRole('option', {name: /VOC/i}).click()
         cy.clickText(/^Next$/)
         cy.get('.dzu-input').attachFile('test_voc/voc/resizeC1_PLOT_20190728_175852.xml')
         cy.get('.dzu-input').attachFile('test_voc/voc/resizeC1_PLOT_20190728_180135.xml')

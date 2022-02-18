@@ -23,12 +23,12 @@ const useStyles = (theme) => ({
 
 const CardSelector = ({ classes, cardData, selected, handleSelect }) => {
   return (
-    <Grid container spacing={2}>
+    <Grid container spacing={2} role="listbox">
       {cardData.map(card => (
         <Grid item key={card.id} xs={12} md={4}>
           <Card
             onClick={() => { handleSelect(card.id) }}
-            role="button"
+            role="option"
             aria-pressed={card.id == selected ? "true" : "false"}
             aria-label={card.name}
             className={classes.card + " " + (card.id == selected ? classes.selected : "")}
