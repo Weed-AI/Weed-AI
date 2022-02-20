@@ -1,13 +1,5 @@
 from django.urls import path, re_path, include
-from weedid import views
-
-from djproxy.views import HttpProxy
-
-from core.settings import TUS_SERVER
-
-
-class TusProxy(HttpProxy):
-    base_url = TUS_SERVER
+from weedid import views, tus
 
 
 api_urlpatterns = [
@@ -51,5 +43,5 @@ urlpatterns = [
     path("api/", include(api_urlpatterns)),
     re_path(r"^elasticsearch", views.elasticsearch_query, name="elasticsearch_query"),
     path("sitemap.xml", views.sitemap_xml),
-    path("tus/<path:url>", TusProxy.as_view(), name="tus_proxy"),
+    path("tus/<path:url>", tus.TusProxy.as_view(), name="tus_proxy"),
 ]
