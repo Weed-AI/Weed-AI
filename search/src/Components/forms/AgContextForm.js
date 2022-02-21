@@ -137,7 +137,7 @@ class AgContextForm extends Component {
               ajv = {createAjv({
                 useDefaults: true,
                 formats: {
-                  'plant_species': {test: x => true},  // bypass validation for now
+                  'plant_taxon': {test: x => true},  // bypass validation for now
                 },
               })}
               onChange={e => {

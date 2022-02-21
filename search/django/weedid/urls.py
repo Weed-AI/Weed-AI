@@ -1,5 +1,6 @@
 from django.urls import path, re_path, include
-from weedid import views
+from weedid import views, tus
+
 
 api_urlpatterns = [
     path("upload/", views.upload, name="upload"),
@@ -13,7 +14,7 @@ api_urlpatterns = [
     path("submit_mask/", views.MaskUploader.submit, name="submit_mask"),
     path("move_mask/", views.MaskUploader.move, name="move_mask"),
     path("upload_image/", views.upload_image, name="upload_image"),
-    path("upload_image_zip/", views.upload_image_zip, name="upload_image_zip"),
+    path("unpack_image_zip/", views.unpack_image_zip, name="unpack_image_zip"),
     path("update_categories/", views.update_categories, name="update_categories"),
     path("upload_agcontexts/", views.upload_agcontexts, name="upload_agcontexts"),
     path("upload_metadata/", views.upload_metadata, name="upload_metadata"),
@@ -42,4 +43,5 @@ urlpatterns = [
     path("api/", include(api_urlpatterns)),
     re_path(r"^elasticsearch", views.elasticsearch_query, name="elasticsearch_query"),
     path("sitemap.xml", views.sitemap_xml),
+    path("tus/<path:url>", tus.TusProxy.as_view(), name="tus_proxy"),
 ]
