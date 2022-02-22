@@ -3,11 +3,20 @@ import UploadDialog from '../upload/upload_dialog';
 import AuthPrompt from '../auth/auth_prompt';
 import { withStyles } from '@material-ui/core/styles';
 import axios from 'axios';
+import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
+import Paper from '@material-ui/core/Paper';
 import content from './upload.md'
 import { Helmet } from "react-helmet";
 import { useArticleStyles } from '../../styles/common'
 import Markdown from "../../Common/Markdown";
+
+const PaddedPaper = withStyles((theme) => ({
+    root: {
+        padding: 8,
+        marginBottom: 8,
+    }
+}))(Paper);
 
 const useStyles = (theme) => ({
 	...useArticleStyles(theme),
@@ -110,14 +119,18 @@ class UploadComponent extends Component {
                 <p>We welcome new contributions of datasets of images with weeds already annotated.</p>
                 { this.state.isLoggedIn
                 ?
+                <React.Fragment>
+                <PaddedPaper elevation={2}>
+                    <Typography gutterBottom variant="h6">Current upload status: {this.state.upload_status}</Typography>
+                    <Typography variant="body1" style={{color: "#f0983a"}}>{this.state.upload_status_details}</Typography>
+                </PaddedPaper>
                 <div>
-                    <h2>Current upload status: {this.state.upload_status}</h2>
-                    <p style={{color: "#f0983a"}}>{this.state.upload_status_details}</p>
                     <UploadDialog handleUploadStatus={this.retrieveUploadStatus}/>
                     <Button variant="outlined" color="primary" onClick={this.handleLogout}>
                         Log out
                     </Button>
                 </div>
+                </React.Fragment>
                 :
                 <AuthPrompt handleLogin={this.handleLogin} handleLogout={this.handleLogout}/> }
 
