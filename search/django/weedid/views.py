@@ -81,7 +81,6 @@ from weedid.utils import (
 )
 
 logger = logging.getLogger(__name__)
->>>>>>> 922d002 (keep upload_id for editing)
 
 
 @ensure_csrf_cookie
@@ -479,7 +478,12 @@ def submit_deposit(request):
         UPLOAD_DIR, str(user.id), str(upload_id), "weedcoco.json"
     )
     images_dir = os.path.join(UPLOAD_DIR, str(user.id), str(upload_id), "images")
-    submit_upload_task.delay(weedcoco_path, images_dir, upload_id)
+    submit_upload_task.delay(
+        weedcoco_path,
+        images_dir,
+        upload_id,
+        new_upload=request.POST["upload_mode"] != "edit",
+    )
     return HttpResponse(f"Work on user {user.id}'s upload{upload_id}")
 
 
