@@ -39,6 +39,7 @@ def submit_upload_task(weedcoco_path, image_dir, upload_id, new_upload=True):
     if new_upload:
         upload_entity.status = "P"
         upload_entity.status_details = ""
+        upload_entity.save()
         # Update fields in database
         # XXX: maybe this should be delayed
         with open(weedcoco_path) as f:
