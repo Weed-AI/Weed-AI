@@ -62,6 +62,11 @@ const typeData = [
     "name": "Mask PNGs",
     "description": <Typography>Colour coded mask images for segmentation.</Typography>
   },
+  {
+    "id": "cvat",
+    "name": "Annotation Project",
+    "description" <Typography>Import from Weed-AI's CVAT annotation server</Typography>
+  },
 ]
 const stepsByType = {
     "coco": [
