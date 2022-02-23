@@ -65,7 +65,7 @@ const typeData = [
   {
     "id": "cvat",
     "name": "Annotation Project",
-    "description" <Typography>Import from Weed-AI's CVAT annotation server</Typography>
+    "description": <Typography>Import from Weed-AI's CVAT annotation server</Typography>
   },
 ]
 const stepsByType = {
