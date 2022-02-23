@@ -14,7 +14,7 @@ services:
       - elastic
     restart: always
     logging:
-      driver: none
+      driver: json-file
     volumes:
       # Static file service
       - thumbnails_dir:/media/thumbnails
