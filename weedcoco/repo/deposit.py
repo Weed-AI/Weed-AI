@@ -4,6 +4,7 @@ import json
 import os
 import re
 import tempfile
+import ocfl
 from shutil import copy, move
 from zipfile import ZipFile
 from PIL import Image
@@ -11,6 +12,8 @@ from collections import defaultdict
 from weedcoco.utils import get_image_hash, check_if_approved_image_extension
 from weedcoco.validation import ValidationError, validate
 
+
+# image hash calculation methods
 
 def validate_duplicate_images(image_hash):
     if len(get_hashset_from_image_name(image_hash)) != len(image_hash):
@@ -43,12 +46,22 @@ def get_hashset_from_image_name(image_hash):
     return {os.path.splitext(image_name)[0] for image_name in image_hash.values()}
 
 
+# FIXME - can get all images hashes of the HEAD version of each dataset
+# in the repository by fetching the inventories from OCFL
 def get_all_existing_hash(repository_dir):
     return {
         os.path.splitext(filename)[0]
         for dirpath, dirnames, filenames in os.walk(repository_dir)
         if os.path.basename(dirpath) == "images"
         for filename in filenames
+    }
+
+
+def create_image_hash(image_dir):
+    return {
+        image_name: f"{get_image_hash(image_dir / image_name, 16)}{os.path.splitext(image_name)[-1]}"
+        for image_name in os.listdir(image_dir)
+        if check_if_approved_image_extension(image_name)
     }
 
 
@@ -60,42 +73,24 @@ def mkdir_safely(local_dir):
             raise RuntimeError(f"{local_dir} exists but is not a directory") from e
 
 
-def setup_dataset_dir(repository_dir, temp_dir, upload_id=None):
-    if not repository_dir.is_dir():
-        mkdir_safely(repository_dir)
-    if upload_id is None:
-        if not temp_dir.is_dir():
-            mkdir_safely(temp_dir)
-            deposit_id = "dataset_1"
-        else:
-            latest_dataset_dir_index = max(
-                [
-                    int(dir.split("_")[-1])
-                    for dir in os.listdir(repository_dir)
-                    if re.fullmatch(r"^dataset_\d+$", dir)
-                ],
-                default=0,
-            )
-            deposit_id = f"dataset_{latest_dataset_dir_index + 1}"
-    else:
-        deposit_id = upload_id
-    dataset_dir = temp_dir / deposit_id
-    try:
-        os.mkdir(dataset_dir)
-    except FileExistsError:
-        if upload_id is not None:
-            raise
-        return setup_dataset_dir(temp_dir, upload_id=None)
-    return dataset_dir, deposit_id
+class RepositoryError(Exception):
+    pass
 
 
-def create_image_hash(image_dir):
-    return {
-        image_name: f"{get_image_hash(image_dir / image_name, 16)}{os.path.splitext(image_name)[-1]}"
-        for image_name in os.listdir(image_dir)
-        if check_if_approved_image_extension(image_name)
-    }
+class RepositoryDataset(Object):
+    """
+    Class representing a dataset to be added to the repository
+    """
 
+    def __init__(self, upload_id=None)
+        self.upload_id = upload_id_dir
+
+    def validate(self):
+        """Called before attempting to deposit."""
+        pass
+
+
+    def build(self, dataset_dir)
 
 def migrate_images(dataset_dir, raw_dir, image_hash):
     image_dir = dataset_dir / "images"
@@ -144,25 +139,93 @@ def compress_to_download(dataset_dir, deposit_id, download_dir):
         copy(zip_path, download_path)
 
 
-def atomic_copy(repository_dir, download_dir, temp_dir, deposit_id):
-    dataset_path = temp_dir / deposit_id
-    zip_path = temp_dir / f"{deposit_id}.zip"
-    repository_dir = repository_dir / deposit_id
-    try:
-        if os.path.isfile(zip_path):
-            move(str(zip_path), str(download_dir))
-        if os.path.isdir(dataset_path):
-            move(str(dataset_path), str(repository_dir))
-    except Exception:
-        # roll back to leave a clean repository
-        (download_dir / zip_path).unlink(missing_ok=True)
-        for path in (repository_dir / deposit_id).glob("*"):
-            path.unlink(missing_ok=True)
-        (repository_dir / deposit_id).rmdir()
-        raise
 
 
-def deposit(weedcoco_path, image_dir, repository_dir, download_dir, upload_id=None):
+
+class Repository(Object):
+    """
+    Class representing the repository.
+
+    In 
+    """
+
+    def __init__(self, root=None, disposition='pairtree'):
+        self.root = root
+        self.ocfl = ocfl.Store(root=str(self.root), disposition=disposition)
+
+
+    def setup_deposit(self, temp_dir, upload_id=None)
+        # TODO - the latest_dataset stuff seems to be only used by tests and I'd be
+        # happy to take it out
+        if not self.root.is_dir:
+            self.ocfl.initialize()
+        if upload_id is None:
+            if not temp_dir.is_dir():
+                mkdir_safely(temp_dir)
+                deposit_id = "dataset_1"
+            else:               
+                latest_dataset_dir_index = self.latest_dataset()
+                deposit_id = f"dataset_{latest_dataset_dir_index + 1}"
+        else:
+            deposit_id = upload_id
+        dataset_dir = temp_dir / deposit_id
+        try:
+            os.mkdir(dataset_dir)
+        except FileExistsError:
+            if upload_id is not None:
+                raise
+            return setup_dataset_dir(temp_dir, upload_id=None)
+        return dataset_dir, deposit_id
+
+
+    def latest_dataset(self):
+        ids = [ op.replace('/', '') for op in self.ocfl.object_paths() ]
+        return max(
+            [
+                int(id.split("_")[-1])
+                for id in ids
+                if re.fullmatch(r"^dataset_\d+$", id)
+            ],
+            default=0,
+        )
+
+
+    def deposit(self, upload_id, dataset):
+        """dataset is a RepositoryDataset"""
+        if not upload_id:
+            raise RepositoryError("Can't deposit without an upload_id")
+        dataset.validate()
+        with tempfile.TemporaryDirectory() as temp_dir:
+            temp_dir = pathlib.Path(temp_dir)
+            ocfl_object_dir = temp_dir / pathlib.Path(upload_id + ".ocfl")
+            dataset_dir, deposit_id = self.setup_deposit(temp_dir, upload_id)
+            dataset.build(dataset_dir)
+            ocfl_object = ocfl.Object(id=upload_id)
+            ocfl_object.create(srcdir=dataset_dir, objdir=ocfl_object_dir)
+            self.ocfl.add(object_path=ocfl_object_dir) # check atomicity of this
+        return str(self.root)
+
+
+
+# def atomic_copy(repository_dir, download_dir, temp_dir, deposit_id):
+#     dataset_path = temp_dir / deposit_id
+#     zip_path = temp_dir / f"{deposit_id}.zip"
+#     repository_dir = repository_dir / deposit_id
+#     try:
+#         if os.path.isfile(zip_path):
+#             move(str(zip_path), str(download_dir))
+#         if os.path.isdir(dataset_path):
+#             move(str(dataset_path), str(repository_dir))
+#     except Exception:
+#         # roll back to leave a clean repository
+#         (download_dir / zip_path).unlink(missing_ok=True)
+#         for path in (repository_dir / deposit_id).glob("*"):
+#             path.unlink(missing_ok=True)
+#         (repository_dir / deposit_id).rmdir()
+#         raise
+
+
+def deposit_orig(weedcoco_path, image_dir, repository_dir, download_dir, upload_id=None):
     image_hash = create_image_hash(image_dir)
     validate_duplicate_images(image_hash)
     validate_existing_images(repository_dir, image_hash)
@@ -176,6 +239,7 @@ def deposit(weedcoco_path, image_dir, repository_dir, download_dir, upload_id=No
     return str(repository_dir)
 
 
+
 def main(args=None):
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument(
@@ -185,12 +249,15 @@ def main(args=None):
     ap.add_argument("--repository-dir", default="repository", type=pathlib.Path)
     ap.add_argument("--download-dir", default="download", type=pathlib.Path)
     args = ap.parse_args(args)
-    deposit(
-        args.weedcoco_path,
-        args.image_dir,
-        args.repository_dir,
-        args.download_dir,
-    )
+    repository = Repository(args.repository_dir, args.download_dir)
+    dataset = RepoObject(args.weedcoco_path, args.image_dir)
+    repository.deposit(dataset)
+    # deposit(
+    #     args.weedcoco_path,
+    #     args.image_dir,
+    #     args.repository_dir,
+    #     args.download_dir,
+    # )
 
 
 if __name__ == "__main__":
