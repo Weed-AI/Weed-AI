@@ -99,6 +99,7 @@ const stepsByType = {
         {title: "Upload Images", type: "images"}
     ],
     "cvat": [
+        {title: "Select Format", type: "select-type"},
         {title: "Select CVAT Task", type: "cvat"},
         {title: "Categories", type: "categories"},
         {title: "Add Agcontext", type: "agcontext"},
