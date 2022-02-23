@@ -15,8 +15,9 @@ describe('overall upload workflow', () => {
     })
 
     it('Test Weedcoco Upload', () => {
-        cy.findAllByText(/^Select annotation format$/).should('have.length', 1).type('weedcoco{enter}')
         cy.clickText(/^Begin upload$/)
+        cy.findByRole('dialog').findByRole('option', {name: /WeedCOCO/i}).click()
+        cy.clickText(/^Next$/)
         cy.get('.dzu-input').attachFile('test_weedcoco/weedcoco.json')
         cy.clickText(/^Next$/)
         cy.get('div.fileContainer > input').attachFile('test_weedcoco/images/001_image.png')
@@ -24,8 +25,9 @@ describe('overall upload workflow', () => {
     })
 
     it('Test Weedcoco Zip Upload', () => {
-        cy.findAllByText(/^Select annotation format$/).should('have.length', 1).type('weedcoco{enter}')
         cy.clickText(/^Begin upload$/)
+        cy.findByRole('dialog').findByRole('option', {name: /WeedCOCO/i}).click()
+        cy.clickText(/^Next$/)
         cy.get('.dzu-input').attachFile('test_weedcoco_zip/weedcoco.json')
         cy.clickText(/^Next$/)
         cy.findAllByText(/^Upload Image Files$/).click()  // select other option in dropdown
@@ -36,9 +38,9 @@ describe('overall upload workflow', () => {
     })
 
     it('Test Coco Upload', () => {
-        cy.findByText(/^Select annotation format$/).click()
-        cy.findByText("COCO").click()
         cy.clickText(/^Begin upload$/)
+        cy.findByRole('dialog').findByRole('option', {name: /MS COCO/i}).click()
+        cy.clickText(/^Next$/)
         cy.get('.dzu-input').attachFile('test_coco/coco.json')
         cy.clickText(/^Next$/)
         cy.findByText("crop").type('weed{enter}')
@@ -51,9 +53,9 @@ describe('overall upload workflow', () => {
     })
 
     it('Test Voc Upload', () => {
-        cy.findByText(/^Select annotation format$/).click()
-        cy.findByText("VOC").click()
         cy.clickText(/^Begin upload$/)
+        cy.findByRole('dialog').findByRole('option', {name: /VOC/i}).click()
+        cy.clickText(/^Next$/)
         cy.get('.dzu-input').attachFile('test_voc/voc/resizeC1_PLOT_20190728_175852.xml')
         cy.get('.dzu-input').attachFile('test_voc/voc/resizeC1_PLOT_20190728_180135.xml')
         cy.get('.dzu-submitButton').click()

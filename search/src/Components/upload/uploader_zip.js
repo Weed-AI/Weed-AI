@@ -1,11 +1,7 @@
-import React, { useEffect } from 'react';
-
+import React from 'react';
 import 'react-dropzone-uploader/dist/styles.css';
-import Dropzone from 'react-dropzone-uploader';
 import Cookies from 'js-cookie';
-
 import axios from 'axios';
-
 import Uppy from '@uppy/core';
 import '@uppy/core/dist/style.css';
 import '@uppy/dashboard/dist/style.css';
