@@ -376,6 +376,7 @@ class UploadStepper extends React.Component {
         const baseURL = new URL(window.location.origin);
         const body = new FormData()
         body.append('upload_id', this.state.upload_id)
+        body.append('upload_mode', this.props.upload_mode)
         axios({
             method: 'post',
             url: baseURL + "api/submit_deposit/",
