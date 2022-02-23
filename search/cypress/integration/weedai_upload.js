@@ -102,9 +102,9 @@ describe('overall upload workflow', () => {
         cy.wait(3000)
 
         cy.login(this.test_username, this.test_password) 
-        cy.findByText(/^Select annotation format$/).click()
-        cy.findByText("Annotation").click()
         cy.clickText(/^Begin upload$/)
+        cy.findByRole('dialog').findByRole('option', {name: /Annotation Project/i}).click()
+        cy.clickText(/^Next$/)
         cy.get('.MuiAutocomplete-endAdornment').click()
         cy.findAllByText(task.name).first().click()
         cy.findAllByText(/^Apply$/).first().should('not.be.disabled', { timeout: 3000})
