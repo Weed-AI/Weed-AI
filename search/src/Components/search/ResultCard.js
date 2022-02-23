@@ -2,6 +2,8 @@ import React from 'react';
 import CategoryTooltip from './CategoryTooltip';
 import { parseCategoryName } from '../../Common/weedcocoUtil';
 import Tooltip from '@material-ui/core/Tooltip';
+import CardActions from '@material-ui/core/CardActions';
+import Button from '@material-ui/core/Button';
 import {
     ResultCard
 } from '@appbaseio/reactivesearch';
@@ -49,7 +51,10 @@ const WeedAIResultCard = (props) => {
                 : "") +
               "."
             }
-            {linkToDataset === false ? [] : <div><Tooltip title={item.dataset_name}><a title={item.dataset_name} href={`${baseURL}datasets/${item.upload_id}`}>See Dataset</a></Tooltip></div>}
+            <CardActions>
+              {linkToDataset === false ? []
+                : <Tooltip title={item.dataset_name}><Button size="small" variant="outlined" color="primary" href={`${baseURL}datasets/${item.upload_id}`}>See Dataset</Button></Tooltip>}
+            </CardActions>
         </ResultCard.Description>
     </ResultCard>
   );
