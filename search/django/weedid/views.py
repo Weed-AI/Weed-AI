@@ -1,62 +1,57 @@
-from django.http import HttpResponse
-from django.shortcuts import render
+import json
+import logging
+import os
+import shutil
+import traceback
+from pathlib import Path
+from zipfile import ZipFile
 
 import requests
-import os
-import json
-import traceback
-import shutil
-
 from core.settings import (
-    UPLOAD_DIR,
-    TUS_DESTINATION_DIR,
-    REPOSITORY_DIR,
     CVAT_DATA_DIR,
     MAX_IMAGE_SIZE,
     MAX_VOC_SIZE,
+    REPOSITORY_DIR,
     SITE_BASE_URL,
+    TUS_DESTINATION_DIR,
+    UPLOAD_DIR,
 )
+from django.contrib.auth import login, logout
+from django.contrib.auth.hashers import check_password
+from django.http import (
+    HttpResponse,
+    HttpResponseBadRequest,
+    HttpResponseForbidden,
+    HttpResponseNotAllowed,
+    HttpResponseServerError,
+)
+from django.shortcuts import render
+from django.views.decorators.csrf import ensure_csrf_cookie
+from weedcoco.importers.mask import generate_paths_from_mask_only, masks_to_coco
+from weedcoco.importers.voc import voc_to_coco
+from weedcoco.repo.deposit import mkdir_safely
+from weedcoco.utils import fix_compatibility_quirks
+from weedcoco.validation import JsonValidationError, validate, validate_json
+
+from weedid.models import Dataset, WeedidUser
+from weedid.notification import review_notification
 from weedid.tasks import submit_upload_task, update_index_and_thumbnails
 from weedid.utils import (
-    store_tmp_weedcoco,
+    add_agcontexts,
+    add_metadata,
+    create_upload_entity,
+    move_to_upload,
+    parse_category_name,
+    remove_entity_local_record,
+    retrieve_listing_info,
+    set_categories,
     setup_upload_dir,
     store_tmp_image,
     store_tmp_image_from_zip,
     store_tmp_voc,
-    move_to_upload,
-    create_upload_entity,
-    retrieve_listing_info,
-    remove_entity_local_record,
-    set_categories,
-    add_agcontexts,
-    add_metadata,
+    store_tmp_weedcoco,
     validate_email_format,
-    parse_category_name,
 )
-from weedid.notification import review_notification
-from weedid.models import Dataset, WeedidUser
-from weedcoco.validation import (
-    validate,
-    validate_json,
-    JsonValidationError,
-)
-from weedcoco.importers.voc import voc_to_coco
-from weedcoco.importers.mask import masks_to_coco, generate_paths_from_mask_only
-from weedcoco.repo.deposit import mkdir_safely
-from weedcoco.utils import fix_compatibility_quirks
-from django.contrib.auth import login, logout
-from django.contrib.auth.hashers import check_password
-from django.http import (
-    HttpResponseForbidden,
-    HttpResponseNotAllowed,
-    HttpResponseBadRequest,
-    HttpResponseServerError,
-)
-from django.views.decorators.csrf import ensure_csrf_cookie
-from pathlib import Path
-from zipfile import ZipFile
-
-import logging
 
 logger = logging.getLogger(__name__)
 
@@ -89,7 +84,7 @@ def elasticsearch_query(request):
     return HttpResponse(elasticsearch_response)
 
 
-def upload_helper(weedcoco_json, user_id, schema="coco"):
+def upload_helper(weedcoco_json, user_id, schema="coco", upload_id=None):
     images = []
     validate(
         weedcoco_json,
@@ -100,9 +95,12 @@ def upload_helper(weedcoco_json, user_id, schema="coco"):
     categories = [
         parse_category_name(category) for category in weedcoco_json["categories"]
     ]
-    upload_dir, upload_id = setup_upload_dir(os.path.join(UPLOAD_DIR, str(user_id)))
+    if not upload_id:
+        upload_dir, upload_id = setup_upload_dir(os.path.join(UPLOAD_DIR, str(user_id)))
+        create_upload_entity(upload_id, user_id)
+    else:
+        upload_dir = os.path.join(UPLOAD_DIR, str(user_id), upload_id)
     store_tmp_weedcoco(weedcoco_json, upload_dir)
-    create_upload_entity(upload_id, user_id)
     return upload_id, images, categories
 
 
@@ -117,9 +115,17 @@ def upload(request):
         file_weedcoco = request.FILES["weedcoco"]
         weedcoco_json = json.load(file_weedcoco)
         fix_compatibility_quirks(weedcoco_json)
-        upload_id, images, categories = upload_helper(
-            weedcoco_json, user.id, request.POST["schema"]
-        )
+        if request.POST["upload_mode"] == "edit":
+            upload_id, images, categories = upload_helper(
+                weedcoco_json,
+                user.id,
+                request.POST["schema"],
+                request.POST["upload_id"],
+            )
+        else:
+            upload_id, images, categories = upload_helper(
+                weedcoco_json, user.id, request.POST["schema"]
+            )
     except JsonValidationError as e:
         traceback.print_exc()
         return json_validation_response(e)
@@ -129,7 +135,11 @@ def upload(request):
     else:
         return HttpResponse(
             json.dumps(
-                {"upload_id": upload_id, "images": images, "categories": categories}
+                {
+                    "upload_id": upload_id,
+                    "images": images,
+                    "categories": categories,
+                }
             )
         )
 
@@ -699,7 +709,7 @@ def sitemap_xml(request):
 
 
 def warmup(request):
-    from weedcoco.validation import get_eppo_singleton, EPPO_CACHE_PATH
+    from weedcoco.validation import EPPO_CACHE_PATH, get_eppo_singleton
 
     get_eppo_singleton(EPPO_CACHE_PATH)
     return HttpResponse("Success")
