@@ -6,6 +6,11 @@ import InputLabel from '@material-ui/core/InputLabel';
 import MenuItem from '@material-ui/core/MenuItem';
 import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
+import Accordion from '@material-ui/core/Accordion';
+import Typography from '@material-ui/core/Typography';
+import AccordionSummary from '@material-ui/core/AccordionSummary';
+import AccordionDetails from '@material-ui/core/AccordionDetails';
+import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import cloneDeep from 'lodash/cloneDeep';
 
 
@@ -14,8 +19,12 @@ const useStyles = (theme) => ({
         marginLeft: '2.5em'
     },
     row: {
-        display: 'flex',
-        alignItems: 'baseline'
+        backgroundColor: theme.palette.grey[50],
+    },
+    categoryList: {
+        overflow: "scroll",
+        maxHeight: "15em",
+        margin: theme.spacing(2),
     },
     incomplete: {
         color: 'red'
@@ -35,9 +44,36 @@ const useStyles = (theme) => ({
         height: '1.2em',
         width: '1.2em',
         borderRadius: '50%',
-        margin: '1em'
+        marginRight: "1em",
     }
 });
+
+const isComplete = (category) => (category.role && category.scientific_name);
+
+const CategoryEditor = ({ category, classes, isColor, changeRole, changeSciName }) => {
+    const complete = isComplete(category);
+    return (<Accordion className={complete ? classes.row : `${classes.row} ${classes.incomplete}`} defaultExpanded={!complete}>
+        <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+            {isColor ? <div className={classes.color} style={{backgroundColor: '#' + category.name}}></div> : []}
+            <Typography>{isColor ? '#' : ''}{category.name}</Typography>
+        </AccordionSummary>
+        <AccordionDetails>
+            <FormControl fullWidth={true} className={classes.formControl}>
+                <InputLabel id="category">Role</InputLabel>
+                <Select
+                labelId="category"
+                id="category"
+                value={category.role}
+                onChange={e => {changeRole(e)}}
+                >
+                    <MenuItem value={"crop"}>crop</MenuItem>
+                    <MenuItem value={"weed"}>weed</MenuItem>
+                </Select>
+            </FormControl>
+            <TextField fullWidth={true} className={classes.sci_name} label="Scientific name or UNSPECIFIED" value={category.scientific_name} onChange={e => {e.persist(); changeSciName(e)}}/>
+        </AccordionDetails>
+    </Accordion>);
+}
 
 class CategoryMapper extends React.Component {
     
@@ -72,36 +108,22 @@ class CategoryMapper extends React.Component {
     render() {
         const { classes } = this.props;
         const nCategories = this.state.categories.length;
-        const nComplete = this.state.categories.filter(category => category.role && category.scientific_name).length;
+        const nComplete = this.state.categories.filter(isComplete).length;
         return (
             <React.Fragment>
                 <p className={classes.summary}>{nCategories - nComplete} of {nCategories} {nCategories != 1 ? 'categories' : 'category'} need mapping to weedcoco categories</p>
-                <ol>
+                <div className={classes.categoryList}>
                     {
                         this.state.categories.map((category, index) => {
-                            return (
-                                <li className={category.role && category.name ? classes.row : `${classes.row} ${classes.incomplete}`}>
-                                    {/^[0-9A-Fa-f]{6}$/i.test(category.name) ? <div className={classes.color} style={{backgroundColor: '#' + category.name}}></div> : <p>{category.name}</p>}
-                                    <p className={classes.text_field}> is a</p>
-                                    <FormControl className={classes.formControl}>
-                                        <InputLabel id="category">Role</InputLabel>
-                                        <Select
-                                        labelId="category"
-                                        id="category"
-                                        value={category.role}
-                                        onChange={e => {this.changeRole(e, index)}}
-                                        >
-                                            <MenuItem value={"crop"}>crop</MenuItem>
-                                            <MenuItem value={"weed"}>weed</MenuItem>
-                                        </Select>
-                                    </FormControl>
-                                    <p className={classes.text_field}>of type</p>
-                                    <TextField className={classes.sci_name} label="Scientific name or UNSPECIFIED" value={category.scientific_name} onChange={e => {e.persist(); this.changeSciName(e, index)}}/>
-                                </li>
-                            )
+                            return <CategoryEditor
+                                key={index} classes={classes}
+                                category={category} isColor={/^[0-9A-Fa-f]{6}$/i.test(category.name)}
+                                changeRole={(e) => this.changeRole(e, index)}
+                                changeSciName={(e) => this.changeSciName(e, index)}
+                            />
                         })
                     }
-                </ol>
+                </div>
                 <Button variant="contained"
                         color="primary"
                         className={classes.applyButton}

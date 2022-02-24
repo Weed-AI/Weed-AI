@@ -38,7 +38,10 @@ describe('overall upload workflow', () => {
         cy.clickText(/^Next$/)
         cy.get('.dzu-input').attachFile('test_coco/coco.json')
         cy.clickText(/^Next$/)
+        cy.clickText(/crop: daucus/)  // expand accordion
         cy.findByText("crop").type('weed{enter}')
+        cy.clickText(/crop: daucus/)  // collapse accordion
+        cy.clickText(/weed: UNSPECIFIED/)  // expand accordion
         cy.findByDisplayValue(/^UNSPECIFIED$/).click().clear().type('rapistrum rugosum{enter}')
         cy.clickText(/^Apply$/)
         cy.clickText(/^Next$/)
