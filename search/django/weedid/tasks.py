@@ -92,7 +92,7 @@ def submit_upload_task(weedcoco_path, image_dir, upload_id, new_upload=True):
             if upload_entity.status == "C":
                 reindex_dataset.delay(upload_id)
             return
-        # upload_notification(upload_id)
+        upload_notification(upload_id)
         upload_entity.status = "AR"
         upload_entity.status_details = "It is currently under review."
         upload_entity.save()
@@ -145,7 +145,7 @@ def update_index_and_thumbnails(
             return
         upload_entity.status = "C"
         upload_entity.status_details = "It has been successfully indexed."
-        # review_notification("approved and indexed", upload_id)
+        review_notification("approved and indexed", upload_id)
     finally:
         upload_entity.save()
 

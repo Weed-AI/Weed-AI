@@ -4,8 +4,6 @@ import os
 import shutil
 import traceback
 from pathlib import Path
-from zipfile import ZipFile
-
 import requests
 from core.settings import (
     MAX_IMAGE_SIZE,
@@ -15,33 +13,6 @@ from core.settings import (
     TUS_DESTINATION_DIR,
     UPLOAD_DIR,
 )
-from weedid.tasks import submit_upload_task, update_index_and_thumbnails
-from weedid.utils import (
-    store_tmp_weedcoco,
-    setup_upload_dir,
-    store_tmp_image,
-    store_tmp_image_from_zip,
-    store_tmp_voc,
-    move_to_upload,
-    create_upload_entity,
-    retrieve_listing_info,
-    remove_entity_local_record,
-    set_categories,
-    add_agcontexts,
-    add_metadata,
-    validate_email_format,
-    parse_category_name,
-)
-from weedid.notification import review_notification
-from weedid.models import Dataset, WeedidUser
-from weedcoco.validation import (
-    validate,
-    validate_json,
-    JsonValidationError,
-)
-from weedcoco.importers.voc import voc_to_coco
-from weedcoco.importers.mask import masks_to_coco, generate_paths_from_mask_only
-from weedcoco.utils import fix_compatibility_quirks
 from django.contrib.auth import login, logout
 from django.contrib.auth.hashers import check_password
 from django.http import (
@@ -53,10 +24,8 @@ from django.http import (
 )
 from django.shortcuts import render
 from django.views.decorators.csrf import ensure_csrf_cookie
-from pathlib import Path
 from weedcoco.importers.mask import generate_paths_from_mask_only, masks_to_coco
 from weedcoco.importers.voc import voc_to_coco
-from weedcoco.repo.deposit import mkdir_safely
 from weedcoco.utils import fix_compatibility_quirks
 from weedcoco.validation import JsonValidationError, validate, validate_json
 
@@ -79,6 +48,7 @@ from weedid.utils import (
     store_tmp_weedcoco,
     validate_email_format,
 )
+
 
 logger = logging.getLogger(__name__)
 
