@@ -1,9 +1,9 @@
-import UploadDialog from '../upload/upload_dialog';
-import MenuItem from '@material-ui/core/MenuItem';
 import FormControl from '@material-ui/core/FormControl';
+import MenuItem from '@material-ui/core/MenuItem';
 import Select from '@material-ui/core/Select';
-import React, { useState } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
+import React, { useState } from 'react';
+import UploadDialog from '../upload/upload_dialog';
 
 
 const useStyles = makeStyles((theme) => ({
@@ -40,7 +40,6 @@ export default function DatasetList(props) {
                 <MenuItem value="coco">COCO</MenuItem>
                 <MenuItem value="voc">VOC</MenuItem>
                 <MenuItem value="masks">Segmentation masks</MenuItem>
-                <MenuItem value="cvat">Annotation</MenuItem>
             </Select>
         </FormControl>
         <UploadDialog handleUploadStatus={props.retrieveUploadStatus} upload_id={props.upload_id} upload_type={upload_type} upload_mode={props.upload_mode}/>

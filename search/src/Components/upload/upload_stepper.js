@@ -15,8 +15,6 @@ import MetadataForm from '../forms/MetadataForm';
 import UploadJsonButton from '../forms/UploadJsonButton';
 import CardSelector from '../generic/card_selector';
 import CategoryMapper from './uploader_category_mapper';
-import CopyCvatUploader from './uploader_copy_cvat';
-import CvatRetriever from './uploader_cvat';
 import UploaderMasks from './uploader_masks';
 import UploaderSingle from './uploader_single';
 import UploaderVoc from './uploader_voc';
