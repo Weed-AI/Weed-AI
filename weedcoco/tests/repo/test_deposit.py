@@ -16,12 +16,14 @@ TEST_BASIC_DIR_2 = TEST_DATA_DIR / "basic_2"
 TEST_COMPLETE_DIR = TEST_DATA_DIR / "complete"
 TEST_DUPLICATE_DIR = TEST_DATA_DIR / "duplicate"
 
+TEST_NAME = "weed.ai"
+TEST_ADDRESS = "weed@weed.ai.org"
+TEST_MESSAGE = "Test commit"
 
 @pytest.fixture
 def executor(tmpdir):
     test_repo_dir = tmpdir / "test_repo"
     test_download_dir = tmpdir / "test_download"
-
     class Executor:
         def run(
             self,
@@ -39,6 +41,12 @@ def executor(tmpdir):
                 repository_dir,
                 "--download-dir",
                 download_dir,
+                "--name",
+                TEST_NAME,
+                "--address",
+                TEST_ADDRESS,
+                "--message",
+                TEST_MESSAGE,
             ]
             args = [str(arg) for arg in args]
             main(args)
