@@ -102,7 +102,7 @@ def rewrite_outputs(repo, expected_dir):
     mkdir_safely(expected_dir)
     repo.connnect()
     for path in repo.object_paths():
-        obj_id = path.replace('/', '')
+        obj_id = path.replace("/", "")
         obj = RepositoryDataset(repo, obj_id)
         obj.extract(str(expected_dir / pathlib.Path(obj_id)))
     # shutil.copytree(actual_dir, expected_dir, symlinks=True) # symlinks? maybe fixme
@@ -110,7 +110,7 @@ def rewrite_outputs(repo, expected_dir):
 
 def test_basic(executor, rewrite_deposit_truth):
     test_extract_dir, repo, dataset = executor.run(
-        'dataset_1',
+        "dataset_1",
         TEST_BASIC_DIR_1 / "weedcoco.json",
         TEST_BASIC_DIR_1 / "images"
     )
@@ -122,14 +122,15 @@ def test_basic(executor, rewrite_deposit_truth):
     assert_weedcoco_equal(test_extract_dir, TEST_DATA_SAMPLE_DIR / "basic")
 
 
-@pytest.mark.skip(reason="wip")
 def test_duplicate_images(executor):
     with pytest.raises(
         ValidationError,
         match="There are identical images in the image directory. Identical image sets are: 001_image.png <-> 002_image.png",
     ):
         executor.run(
-            TEST_DUPLICATE_DIR / "weedcoco.json", TEST_DUPLICATE_DIR / "images"
+            "dataset1",
+            TEST_DUPLICATE_DIR / "weedcoco.json",
+            TEST_DUPLICATE_DIR / "images"
         )
 
 
@@ -144,12 +145,12 @@ def test_existing_images(executor):
 
 def test_multiple_datasets(executor, rewrite_deposit_truth):
     test_extract_dir, repo, dataset1 = executor.run(
-        'dataset_1',
+        "dataset_1",
         TEST_BASIC_DIR_1 / "weedcoco.json",
         TEST_BASIC_DIR_1 / "images"
     )
     _, _, dataset2 = executor.run(
-        'dataset_2',
+        "dataset_2",
         TEST_BASIC_DIR_2 / "weedcoco.json",
         TEST_BASIC_DIR_2 / "images"
     )
