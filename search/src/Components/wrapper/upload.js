@@ -1,16 +1,16 @@
-import React, {Component} from 'react';
-import UploadDialog from '../upload/upload_dialog';
-import AuthPrompt from '../auth/auth_prompt';
-import { withStyles } from '@material-ui/core/styles';
-import axios from 'axios';
-import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
 import Paper from '@material-ui/core/Paper';
-import content from './upload.md'
+import { withStyles } from '@material-ui/core/styles';
+import Typography from '@material-ui/core/Typography';
+import axios from 'axios';
+import React, { Component } from 'react';
 import { Helmet } from "react-helmet";
-import { useArticleStyles } from '../../styles/common'
 import Markdown from "../../Common/Markdown";
-import UploadSelect from '../upload/upload_select';
+import { useArticleStyles } from '../../styles/common';
+import AuthPrompt from '../auth/auth_prompt';
+import UploadDialog from '../upload/upload_dialog';
+import content from './upload.md';
+
 
 const PaddedPaper = withStyles((theme) => ({
     root: {
@@ -26,7 +26,7 @@ const useStyles = (theme) => ({
         minWidth: 200,
     },
     logout: {
-        marginBottom: theme.spacing(2),
+        marginLeft: theme.spacing(1),
     },
 })
 
@@ -129,8 +129,8 @@ class UploadComponent extends Component {
                     <Typography variant="body1" style={{color: "#f0983a"}}>{this.state.upload_status_details}</Typography>
                 </PaddedPaper>
                 <div>
-                    <UploadDialog handleUploadStatus={this.retrieveUploadStatus}/>
-                    <Button variant="outlined" color="primary" onClick={this.handleLogout}>
+                    <UploadDialog upload_mode={'upload'} handleUploadStatus={this.retrieveUploadStatus}/>
+                    <Button variant="outlined" color="primary" onClick={this.handleLogout} className={classes.logout}>
                         Log out
                     </Button>
                 </div>

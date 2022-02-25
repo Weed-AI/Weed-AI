@@ -1,5 +1,7 @@
-import React, { useState } from 'react';
-import { Helmet } from "react-helmet";
+import CircularProgress from '@material-ui/core/CircularProgress';
+import IconButton from '@material-ui/core/IconButton';
+import Link from '@material-ui/core/Link';
+import Paper from '@material-ui/core/Paper';
 import { makeStyles } from '@material-ui/core/styles';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
@@ -7,13 +9,11 @@ import TableCell from '@material-ui/core/TableCell';
 import TableContainer from '@material-ui/core/TableContainer';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
-import Paper from '@material-ui/core/Paper';
-import Link from '@material-ui/core/Link';
-import CircularProgress from '@material-ui/core/CircularProgress';
 import PhotoIcon from '@material-ui/icons/Photo';
-import IconButton from '@material-ui/core/IconButton';
 import axios from 'axios';
-import UploadSelect from '../upload/upload_select';
+import React, { useState } from 'react';
+import { Helmet } from "react-helmet";
+import UploadDialog from '../upload/upload_dialog';
 
 
 const useStyles = makeStyles((theme) => ({
@@ -108,9 +108,9 @@ export default function DatasetList(props) {
                 {!inEdit ? <TableCell><IconButton href={"/explore?dataset_name_filter=%5B%22" + row.name + "%22%5D"}><PhotoIcon /></IconButton></TableCell> : ""}
                 {inEdit
                   ?<TableCell>
-                    <UploadSelect upload_id={row.upload_id} upload_mode={'edit'}/>
+                    <UploadDialog upload_mode={'edit'} upload_id={row.upload_id}/>
                   </TableCell>
-                  : ""}
+                  : ""} 
                 {inReview
                   ?<TableCell className={classes.commandCol}>
                     <button className={`${classes.command} ${classes.approval}`} onClick={() => handleApprove(row.upload_id)}>Approve</button>
