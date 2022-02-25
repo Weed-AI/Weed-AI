@@ -68,7 +68,10 @@ class RepositoryDataset:
         Write out a version of this object to dest_dir
         """
         self._ocfl()
-        self.ocfl.extract(objdir=str(self.path), version=version, dstdir=dest_dir)
+        dest_dir = pathlib.Path(dest_dir)
+        if not dest_dir.is_dir():
+            raise RepositoryError(f"Extract dest dir {dest_dir} not found")
+        self.ocfl.extract(objdir=str(self.path), version=version, dstdir=str(dest_dir))
 
 
     def validate(self, repository):

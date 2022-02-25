@@ -25,16 +25,23 @@ TEST_MESSAGE = "Test commit"
 def executor(tmpdir):
     test_repo_dir = tmpdir / "test_repo"
     test_download_dir = tmpdir / "test_download"
-    shutil.rmtree(TEST_EXTRACT_DIR)
+    if pathlib.Path(TEST_EXTRACT_DIR).is_dir():
+        shutil.rmtree(TEST_EXTRACT_DIR)
     class Executor:
         def run(
             self,
+            identifier,
             weedcoco_path,
             image_dir,
             repository_dir=test_repo_dir,
             download_dir=test_download_dir,
+            name=TEST_NAME,
+            address=TEST_ADDRESS,
+            message=TEST_MESSAGE
         ):
             args = [
+                "--identifier",
+                identifier,
                 "--weedcoco-path",
                 weedcoco_path,
                 "--image-dir",
@@ -44,11 +51,11 @@ def executor(tmpdir):
                 "--download-dir",
                 download_dir,
                 "--name",
-                TEST_NAME,
+                name,
                 "--address",
-                TEST_ADDRESS,
+                address,
                 "--message",
-                TEST_MESSAGE,
+                message,
             ]
             args = [str(arg) for arg in args]
             return main(args)
@@ -92,12 +99,14 @@ def rewrite_outputs(actual_dir, expected_dir):
 
 def test_basic(executor, rewrite_deposit_truth):
     repo, dataset = executor.run(
-        TEST_BASIC_DIR_1 / "weedcoco.json", TEST_BASIC_DIR_1 / "images"
+        'dataset_1',
+        TEST_BASIC_DIR_1 / "weedcoco.json",
+        TEST_BASIC_DIR_1 / "images"
     )
 
     if rewrite_deposit_truth:
-        rewrite_outputs(test_repo_dir, TEST_DATA_SAMPLE_DIR / "basic")
-    dataset.extract(str(TEST_EXTRACT_DIR))
+        rewrite_outputs(TEST_BASIC_DIR_1, TEST_DATA_SAMPLE_DIR / "basic")
+    dataset.extract(str(TEST_EXTRACT_DIR / pathlib.Path('dataset_1')))
     assert_files_equal(TEST_EXTRACT_DIR, TEST_DATA_SAMPLE_DIR / "basic")
     assert_weedcoco_equal(TEST_EXTRACT_DIR, TEST_DATA_SAMPLE_DIR / "basic")
 
