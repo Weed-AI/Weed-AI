@@ -72,9 +72,7 @@ class RepositoryDataset:
 
     def validate(self, repository):
         """Run checks which need to pass before deposit"""
-        self.image_hash = {} # FIXME
-        pass
-        # self.image_hash = self.create_image_hash(self.image_dir)
+        self.create_image_hash()
         # self.validate_duplicate_images()
         # self.validate_existing_images(repository)
 
@@ -152,10 +150,10 @@ class RepositoryDataset:
         }
 
 
-    def create_image_hash(image_dir):
-        return {
-            image_name: f"{get_image_hash(image_dir / image_name, 16)}{os.path.splitext(image_name)[-1]}"
-            for image_name in os.listdir(image_dir)
+    def create_image_hash(self):
+        self.image_hash = {
+            image_name: f"{get_image_hash(self.image_dir / image_name, 16)}{os.path.splitext(image_name)[-1]}"
+            for image_name in os.listdir(self.image_dir)
             if check_if_approved_image_extension(image_name)
         }
 
