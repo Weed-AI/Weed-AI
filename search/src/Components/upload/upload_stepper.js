@@ -5,6 +5,7 @@ import Step from '@material-ui/core/Step';
 import StepLabel from '@material-ui/core/StepLabel';
 import Button from '@material-ui/core/Button';
 import Typography from '@material-ui/core/Typography';
+import CircularProgress from '@material-ui/core/CircularProgress';
 import UploaderSingle from './uploader_single';
 import UploaderVoc from './uploader_voc';
 import UploaderMasks from './uploader_masks';
@@ -100,6 +101,7 @@ class UploadStepper extends React.Component {
         const upload_type = props.upload_type || "weedcoco";
         this.state = {
             activeStep: 0,
+            nextProcessing: false,
             skip_mapping: {'weedcoco': -1, 'coco': -1},
             skipped: new Set(),
             upload_id: 0,
@@ -124,7 +126,7 @@ class UploadStepper extends React.Component {
         this.handleAgContextsFormData = this.handleAgContextsFormData.bind(this);
         this.handleMetadataFormData = this.handleMetadataFormData.bind(this);
         this.handleErrorMessage = this.handleErrorMessage.bind(this);
-        this.handleNext = this.handleNext.bind(this);
+        this.progressToNext = this.progressToNext.bind(this);
         this.handleBack = this.handleBack.bind(this);
         this.handleSkip = this.handleSkip.bind(this);
         this.handleReset = this.handleReset.bind(this);
@@ -134,7 +136,7 @@ class UploadStepper extends React.Component {
         this.handleMoveMask = this.handleMoveMask.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
         this.handleTusUpload = this.handleTusUpload.bind(this);
-        this.nextHandler = this.nextHandler.bind(this);
+        this.handleNext = this.handleNext.bind(this);
         this.handleValidation = this.handleValidation.bind(this);
         this.getStepContent = this.getStepContent.bind(this);
     }
@@ -188,10 +190,11 @@ class UploadStepper extends React.Component {
     }
 
     handleErrorMessage(message, details="") {
+        this.setState({nextProcessing: false})  // cancel spinner if Next had been pushed
         this.setState({error_message: message, error_message_details: details});
     }
 
-    handleNext() {
+    progressToNext() {
         if (this.state.activeStep === this.state.steps.length - 1){
             this.handleSubmit();
             this.props.handleClose();
@@ -204,8 +207,13 @@ class UploadStepper extends React.Component {
                 newSkipped = new Set(newSkipped.values());
                 newSkipped.delete(activeStep);
             }
-            this.setState(prevState => {return {activeStep: prevState.activeStep + 1}});
-            this.setState({skipped: newSkipped});
+            this.setState(prevState => {
+                return {
+                    nextProcessing: false,
+                    activeStep: prevState.activeStep + 1,
+                    skipped: newSkipped,
+                }
+            })
             this.handleErrorMessage("")
         }
     };
@@ -245,7 +253,7 @@ class UploadStepper extends React.Component {
         }).then(res => {
             console.log(res)
             this.handleErrorMessage("")
-            this.handleNext()
+            this.progressToNext()
         })
         .catch(err => {
             this.handleValidation(false)
@@ -267,7 +275,7 @@ class UploadStepper extends React.Component {
         }).then(res => {
             console.log(res)
             this.handleErrorMessage("")
-            this.handleNext()
+            this.progressToNext()
         })
         .catch(err => {
             console.log(err)
@@ -289,7 +297,7 @@ class UploadStepper extends React.Component {
         }).then(res => {
             console.log(res)
             this.handleErrorMessage("")
-            this.handleNext()
+            this.progressToNext()
         })
         .catch(err => {
             console.log(err)
@@ -310,7 +318,7 @@ class UploadStepper extends React.Component {
         }).then(res => {
             console.log(res)
             this.handleErrorMessage("")
-            this.handleNext()
+            this.progressToNext()
         })
         .catch(err => {
             console.log(err)
@@ -331,7 +339,7 @@ class UploadStepper extends React.Component {
         }).then(res => {
             console.log(res)
             this.handleErrorMessage("")
-            this.handleNext()
+            this.progressToNext()
         })
         .catch(err => {
             console.log(err)
@@ -413,21 +421,25 @@ class UploadStepper extends React.Component {
         }
     }
 
-    nextHandler(step) {
-        switch (step) {
-            case "voc-upload":
-                return this.handleMoveVoc
-            case "masks-upload":
-                return this.handleMoveMask
-            case "categories":
-                return this.handleUpdateCategories
-            case "agcontext":
-                return this.handleUploadAgcontexts
-            case "metadata":
-                return this.handleUploadMetadata
-            default:
-                return this.handleNext
+    handleNext(step) {
+        this.setState({nextProcessing: true})
+        const getNextHandler = () => {
+            switch (step) {
+                case "voc-upload":
+                    return this.handleMoveVoc
+                case "masks-upload":
+                    return this.handleMoveMask
+                case "categories":
+                    return this.handleUpdateCategories
+                case "agcontext":
+                    return this.handleUploadAgcontexts
+                case "metadata":
+                    return this.handleUploadMetadata
+                default:
+                    return this.progressToNext
+            }
         }
+        getNextHandler()()
     }
 
     render(){
@@ -477,11 +489,15 @@ class UploadStepper extends React.Component {
                     <Button
                         variant="contained"
                         color="primary"
-                        onClick={this.nextHandler(stepName)}
+                        onClick={() => this.handleNext(stepName)}
                         className={classes.button}
-                        disabled={!this.state.stepValid[stepName]}
+                        disabled={!this.state.stepValid[stepName] || this.state.nextProcessing}
                     >
-                        {this.state.activeStep === this.state.steps.length - 1 ? 'Submit' : 'Next'}
+                        {this.state.nextProcessing ?
+                            <CircularProgress color="secondary" size={25} />
+                            :
+                            this.state.activeStep === this.state.steps.length - 1 ? 'Submit' : 'Next'
+                        }
                     </Button>
                 </div>
             </div>
@@ -491,4 +507,3 @@ class UploadStepper extends React.Component {
 };
 
 export default withStyles(useStyles)(UploadStepper);
-
