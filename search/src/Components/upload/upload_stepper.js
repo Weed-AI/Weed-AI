@@ -100,19 +100,16 @@ class UploadStepper extends React.Component {
         const upload_type = props.upload_type || this.props.upload_mode == "edit" ? "coco": "weedcoco";
         this.state = {
             activeStep: 0,
-            skip_mapping: this.props.upload_mode == 'edit' ? Object.keys(stepsByType).reduce((a, v) => ({ ...a, [v]: [1]}), {}) : Object.keys(stepsByType).reduce((a, v) => ({ ...a, [v]: []}), {}),
+            skip_mapping: this.props.upload_mode == "edit" ? Object.keys(stepsByType).reduce((a, v) => ({ ...a, [v]: [1]}), {}) : Object.keys(stepsByType).reduce((a, v) => ({ ...a, [v]: []}), {}),
             skipped: new Set(),
-            upload_id: !props.payload ? 0 : props.payload.upload_id,
+            cvat_task_id: 0,
             voc_id: Math.random().toString(36).slice(-8),
             mask_id: Math.random().toString(36).slice(-8),
             image_ext: '',
-            images: !props.payload || !props.payload.images ? [] : props.payload.images,
-            categories: !props.payload || !props.payload.categories ? [] : props.payload.categories,
-            ag_context: !props.payload || !props.payload.agcontext ? {} : props.payload.agcontext[0],
-            metadata: !props.payload || !props.payload.metadata ? {} : props.payload.metadata,
             error_message: "",
             error_message_details: "",
-            ... this.getUploadTypeState(upload_type),
+            ...this.getUploadTypeState(upload_type),
+            ...this.getPresetData(),
         }
         this.isStepOptional = this.isStepOptional.bind(this);
         this.isStepSkipped = this.isStepSkipped.bind(this);
@@ -152,6 +149,26 @@ class UploadStepper extends React.Component {
                     return {...steps, [step.type]: step.type == "select-type"}
                 }, {}
             ),
+        }
+    }
+
+    getPresetData() {
+        if (!this.props.preset) {
+            return {
+                upload_id: 0,
+                categories: [],
+                ag_context: {},
+                metadata: {},
+                images: [],
+            }
+        } else {
+            return {
+                upload_id: !this.props.preset.upload_id ? 0 : this.props.preset.upload_id,
+                categories: !this.props.preset.categories ? [] : this.props.preset.categories,
+                ag_context: !this.props.preset.agcontext ? {} : this.props.preset.agcontext[0],
+                metadata: !this.props.preset.metadata ? {} : this.props.preset.metadata,
+                images: !this.props.preset.images ? [] : this.props.preset.images,
+            }
         }
     }
 
