@@ -93,7 +93,10 @@ def assert_weedcoco_equal(dir1, dir2):
 
 def rewrite_outputs(repo, expected_dir):
     """Copies the content in test_repo to the fixtures directory.
+
     Has to be a bit more complicated with an ocfl repo
+
+    TODO - hasn't been tested!
     """
     shutil.rmtree(expected_dir)
     mkdir_safely(expected_dir)
@@ -114,7 +117,7 @@ def test_basic(executor, rewrite_deposit_truth):
 
     if rewrite_deposit_truth:
         rewrite_outputs(repo, TEST_DATA_SAMPLE_DIR / "basic")
-    dataset.extract(str(test_extract_dir / pathlib.Path('dataset_1')))
+    dataset.extract(str(test_extract_dir / pathlib.Path("dataset_1")))
     assert_files_equal(test_extract_dir, TEST_DATA_SAMPLE_DIR / "basic")
     assert_weedcoco_equal(test_extract_dir, TEST_DATA_SAMPLE_DIR / "basic")
 
@@ -139,13 +142,20 @@ def test_existing_images(executor):
         executor.run(TEST_BASIC_DIR_1 / "weedcoco.json", TEST_BASIC_DIR_1 / "images")
 
 
-@pytest.mark.skip(reason="wip")
 def test_multiple_datasets(executor, rewrite_deposit_truth):
-    executor.run(TEST_BASIC_DIR_1 / "weedcoco.json", TEST_BASIC_DIR_1 / "images")
-    test_repo_dir = executor.run(
-        TEST_BASIC_DIR_2 / "weedcoco.json", TEST_BASIC_DIR_2 / "images"
+    test_extract_dir, repo, dataset1 = executor.run(
+        'dataset_1',
+        TEST_BASIC_DIR_1 / "weedcoco.json",
+        TEST_BASIC_DIR_1 / "images"
+    )
+    _, _, dataset2 = executor.run(
+        'dataset_2',
+        TEST_BASIC_DIR_2 / "weedcoco.json",
+        TEST_BASIC_DIR_2 / "images"
     )
     if rewrite_deposit_truth:
-        rewrite_outputs(test_repo_dir, TEST_DATA_SAMPLE_DIR / "multiple")
-    assert_files_equal(test_repo_dir, TEST_DATA_SAMPLE_DIR / "multiple")
-    assert_weedcoco_equal(test_repo_dir, TEST_DATA_SAMPLE_DIR / "multiple")
+        rewrite_outputs(repo, TEST_DATA_SAMPLE_DIR / "multiple")
+    dataset1.extract(str(test_extract_dir / pathlib.Path("dataset_1")))
+    dataset2.extract(str(test_extract_dir / pathlib.Path("dataset_2")))
+    assert_files_equal(test_extract_dir, TEST_DATA_SAMPLE_DIR / "multiple")
+    assert_weedcoco_equal(test_extract_dir, TEST_DATA_SAMPLE_DIR / "multiple")
