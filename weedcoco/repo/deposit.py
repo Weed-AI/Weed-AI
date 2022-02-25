@@ -24,7 +24,7 @@ def mkdir_safely(local_dir):
             raise RuntimeError(f"{local_dir} exists but is not a directory") from e
 
 
-def get_hashset_from_image_name(self, image_hash):
+def get_hashset_from_image_name(image_hash):
     return {os.path.splitext(image_name)[0] for image_name in image_hash.values()}
 
 
@@ -73,7 +73,7 @@ class RepositoryDataset:
     def validate(self, repository):
         """Run checks which need to pass before deposit"""
         self.create_image_hash()
-        # self.validate_duplicate_images()
+        self.validate_duplicate_images()
         # self.validate_existing_images(repository)
 
 
