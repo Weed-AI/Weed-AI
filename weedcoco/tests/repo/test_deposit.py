@@ -6,7 +6,7 @@ import filecmp
 import re
 import subprocess
 import shutil
-from weedcoco.repo.deposit import main, Repository, RepositoryDataset
+from weedcoco.repo.deposit import main, Repository, RepositoryDataset, mkdir_safely
 from weedcoco.validation import ValidationError
 
 TEST_DATA_DIR = pathlib.Path(__file__).parent / "deposit_data"
@@ -15,7 +15,6 @@ TEST_BASIC_DIR_1 = TEST_DATA_DIR / "basic_1"
 TEST_BASIC_DIR_2 = TEST_DATA_DIR / "basic_2"
 TEST_COMPLETE_DIR = TEST_DATA_DIR / "complete"
 TEST_DUPLICATE_DIR = TEST_DATA_DIR / "duplicate"
-TEST_EXTRACT_DIR = TEST_DATA_DIR / "extract"
 
 TEST_NAME = "weed.ai"
 TEST_ADDRESS = "weed@weed.ai.org"
@@ -25,8 +24,8 @@ TEST_MESSAGE = "Test commit"
 def executor(tmpdir):
     test_repo_dir = tmpdir / "test_repo"
     test_download_dir = tmpdir / "test_download"
-    if pathlib.Path(TEST_EXTRACT_DIR).is_dir():
-        shutil.rmtree(TEST_EXTRACT_DIR)
+    test_extract_dir = tmpdir / "test_extract"
+    mkdir_safely(test_extract_dir)
     class Executor:
         def run(
             self,
@@ -58,13 +57,13 @@ def executor(tmpdir):
                 message,
             ]
             args = [str(arg) for arg in args]
-            return main(args)
+            repo, dataset = main(args)
+            return test_extract_dir, repo, dataset
 
     return Executor()
 
 
 def assert_files_equal(dir1, dir2):
-    print(f'Assert_files_equal {dir1} {dir2}')
     dirs_cmp = filecmp.dircmp(dir1, dir2, ignore=[".DS_Store"])
     assert len(dirs_cmp.left_only) == 0
     assert len(dirs_cmp.right_only) == 0
@@ -92,23 +91,32 @@ def assert_weedcoco_equal(dir1, dir2):
             )
 
 
-def rewrite_outputs(actual_dir, expected_dir):
+def rewrite_outputs(repo, expected_dir):
+    """Copies the content in test_repo to the fixtures directory.
+    Has to be a bit more complicated with an ocfl repo
+    """
     shutil.rmtree(expected_dir)
-    shutil.copytree(actual_dir, expected_dir, symlinks=True)
+    mkdir_safely(expected_dir)
+    repo.connnect()
+    for path in repo.object_paths():
+        obj_id = path.replace('/', '')
+        obj = RepositoryDataset(repo, obj_id)
+        obj.extract(str(expected_dir / pathlib.Path(obj_id)))
+    # shutil.copytree(actual_dir, expected_dir, symlinks=True) # symlinks? maybe fixme
 
 
 def test_basic(executor, rewrite_deposit_truth):
-    repo, dataset = executor.run(
+    test_extract_dir, repo, dataset = executor.run(
         'dataset_1',
         TEST_BASIC_DIR_1 / "weedcoco.json",
         TEST_BASIC_DIR_1 / "images"
     )
 
     if rewrite_deposit_truth:
-        rewrite_outputs(TEST_BASIC_DIR_1, TEST_DATA_SAMPLE_DIR / "basic")
-    dataset.extract(str(TEST_EXTRACT_DIR / pathlib.Path('dataset_1')))
-    assert_files_equal(TEST_EXTRACT_DIR, TEST_DATA_SAMPLE_DIR / "basic")
-    assert_weedcoco_equal(TEST_EXTRACT_DIR, TEST_DATA_SAMPLE_DIR / "basic")
+        rewrite_outputs(repo, TEST_DATA_SAMPLE_DIR / "basic")
+    dataset.extract(str(test_extract_dir / pathlib.Path('dataset_1')))
+    assert_files_equal(test_extract_dir, TEST_DATA_SAMPLE_DIR / "basic")
+    assert_weedcoco_equal(test_extract_dir, TEST_DATA_SAMPLE_DIR / "basic")
 
 
 @pytest.mark.skip(reason="wip")

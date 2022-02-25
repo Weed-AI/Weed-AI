@@ -45,7 +45,6 @@ class RepositoryDataset:
 
     def _ocfl(self):
         self.path = self.repo.root / pathlib.Path(self.repo.ocfl.object_path(self.identifier))
-        print(f"Object ID {self.identifier} path {self.path}")
         self.ocfl = ocfl.Object(identifier=self.identifier)
 
 
@@ -68,10 +67,7 @@ class RepositoryDataset:
         Write out a version of this object to dest_dir
         """
         self._ocfl()
-        dest_dir = pathlib.Path(dest_dir)
-        if not dest_dir.is_dir():
-            raise RepositoryError(f"Extract dest dir {dest_dir} not found")
-        self.ocfl.extract(objdir=str(self.path), version=version, dstdir=str(dest_dir))
+        self.ocfl.extract(objdir=str(self.path), version=version, dstdir=dest_dir)
 
 
     def validate(self, repository):
@@ -197,7 +193,6 @@ class Repository:
 
     def __init__(self, root=None, disposition='pairtree'):
         self.root = pathlib.Path(root)
-        print(f"$$$$ {root}")
         self.disposition = disposition
         if self.root.is_dir():
             self.connect()
@@ -207,15 +202,17 @@ class Repository:
         if not self.root.is_dir():
             # use a separate ocfl.Store because it will create an invalid
             # ocfl_layout.json if we initialise with a disposition
-            print(f"*** creating ocfl store at {self.root}")
             ocfl_store = ocfl.Store(root=str(self.root))
             ocfl_store.initialize()
-        else:
-            print(f"*** directory {self.root} already exists, not initializing")
 
 
     def connect(self):
         self.ocfl = ocfl.Store(root=str(self.root), disposition=self.disposition)
+
+
+    def object_paths(self):
+        for path in self.ocfl.object_paths():
+            yield path
 
 
     def setup_deposit(self, temp_dir, deposit_id):
