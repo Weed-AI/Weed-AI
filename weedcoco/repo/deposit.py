@@ -35,13 +35,40 @@ class RepositoryError(Exception):
 
 class RepositoryDataset:
     """
-    Class representing a dataset to be added to the repository
+    Class representing a dataset in the repository
     """
 
-    def __init__(self, deposit_id, weedcoco_path, image_dir):
-        self.identifier = deposit_id
+    def __init__(self, repo, identifier):
+        self.repo = repo
+        self.identifier = identifier
+        self.ocfl = None
+
+    def _ocfl(self):
+        self.path = self.repo.root / pathlib.Path(self.repo.ocfl.object_path(self.identifier))
+        print(f"Object ID {self.identifier} path {self.path}")
+        self.ocfl = ocfl.Object(identifier=self.identifier)
+
+
+    def sources(self, weedcoco_path, image_dir):
+        """Set the weedcoco_path and images_dir for the build"""
         self.weedcoco_path = weedcoco_path
         self.image_dir = image_dir
+
+    def inventory(self, version='head'):
+        """Return the JSON inventory for a specified version or the HEAD"""
+        self._ocfl()
+        self.inventory = self.ocfl.parse_inventory()
+        v = version
+        if v == 'head':
+            v = self.inventory["head"]
+        return self.inventory["versions"][v]
+
+    def extract(self, dest_dir, version='head'):
+        """
+        Write out a version of this object to dest_dir
+        """
+        self._ocfl()
+        self.ocfl.extract(objdir=str(self.path), version=version, dstdir=dest_dir)
 
 
     def validate(self, repository):
@@ -54,7 +81,7 @@ class RepositoryDataset:
 
 
     def build(self, dataset_dir):
-        """Build the dataset to be deposited in ocfl"""
+        """Build a dataset to be deposited"""
         self.write_weedcoco(dataset_dir)
         self.migrate_images(dataset_dir)
 
@@ -166,8 +193,11 @@ class Repository:
     """
 
     def __init__(self, root=None, disposition='pairtree'):
-        self.root = root
+        self.root = pathlib.Path(root)
+        print(f"$$$$ {root}")
         self.disposition = disposition
+        if self.root.is_dir():
+            self.connect()
 
 
     def initialize(self):
@@ -191,15 +221,19 @@ class Repository:
         return dataset_dir
 
 
-    def deposit(self, identifier, metadata, dataset):
-        """Validate and deposit a RepositoryDataset in the Repository
+    def deposit(self, identifier, dataset, metadata):
+        """Validate and deposit a RepositoryDataset in the Repository.  Creates a new
+        dataset for identifier if it does not already exist.
         --------
-        identifier - the dataset's unique ID
+        identifier - the dataset's unique ID. If empty, a uuid is used
         metadata - a dict-like with name, address and message
         dataset - a RepositoryDataset
+
+        Returns the id of the object
         """
         if not identifier:
             identifier = str(uuid4())
+            dataset.identifier = identifier
         dataset.validate(self)
         ocfl_metadata = ocfl.VersionMetadata(
             identifier=identifier,
@@ -219,7 +253,8 @@ class Repository:
                 objdir=str(ocfl_object_dir),
             )
             self.ocfl.add(object_path=str(ocfl_object_dir)) # check atomicity of this
-        return str(self.root)
+        return dataset
+
 
 
 
@@ -243,18 +278,18 @@ class Repository:
 #         raise
 
 
-def deposit_orig(weedcoco_path, image_dir, repository_dir, download_dir, upload_id=None):
-    image_hash = create_image_hash(image_dir)
-    validate_duplicate_images(image_hash)
-    validate_existing_images(repository_dir, image_hash)
-    with tempfile.TemporaryDirectory() as temp_dir:
-        temp_dir = pathlib.Path(temp_dir)
-        dataset_dir, deposit_id = setup_dataset_dir(repository_dir, temp_dir, upload_id)
-        deposit_weedcoco(weedcoco_path, dataset_dir, image_dir, image_hash)
-        migrate_images(dataset_dir, image_dir, image_hash)
-        compress_to_download(dataset_dir, deposit_id, temp_dir)
-        atomic_copy(repository_dir, download_dir, temp_dir, deposit_id)
-    return str(repository_dir)
+# def deposit_orig(weedcoco_path, image_dir, repository_dir, download_dir, upload_id=None):
+#     image_hash = create_image_hash(image_dir)
+#     validate_duplicate_images(image_hash)
+#     validate_existing_images(repository_dir, image_hash)
+#     with tempfile.TemporaryDirectory() as temp_dir:
+#         temp_dir = pathlib.Path(temp_dir)
+#         dataset_dir, deposit_id = setup_dataset_dir(repository_dir, temp_dir, upload_id)
+#         deposit_weedcoco(weedcoco_path, dataset_dir, image_dir, image_hash)
+#         migrate_images(dataset_dir, image_dir, image_hash)
+#         compress_to_download(dataset_dir, deposit_id, temp_dir)
+#         atomic_copy(repository_dir, download_dir, temp_dir, deposit_id)
+#     return str(repository_dir)
 
 
 def main(args=None):
@@ -273,9 +308,10 @@ def main(args=None):
     repository = Repository(args.repository_dir)
     repository.initialize()
     repository.connect()
-    dataset = RepositoryDataset(args.identifier, args.weedcoco_path, args.image_dir)
-    repository.deposit(args.identifier, args, dataset)
-
+    dataset = RepositoryDataset(repository, args.identifier)
+    dataset.sources(args.weedcoco_path, args.image_dir)
+    repository.deposit(args.identifier, dataset, args)
+    return repository, dataset
 
 if __name__ == "__main__":
     main()
