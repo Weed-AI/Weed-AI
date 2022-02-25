@@ -9,7 +9,12 @@ import tempfile
 from zipfile import ZipFile
 from shutil import copy
 from weedcoco.repo.deposit import mkdir_safely
-from weedcoco.utils import set_info, set_licenses
+from weedcoco.utils import (
+    set_info,
+    set_licenses,
+    parse_category_name,
+    format_category_name,
+)
 from weedcoco.stats import WeedCOCOStats
 from django.core.files.storage import FileSystemStorage
 from weedid.models import Dataset, WeedidUser
@@ -77,18 +82,18 @@ def setup_upload_dir(upload_userid_dir):
 def set_categories(weedcoco_path, categories):
     with open(weedcoco_path, "r") as jsonFile:
         data = json.load(jsonFile)
-    new_categories = []
-    for category in categories:
-        if category["role"] and category["scientific_name"]:
-            new_categories.append(
-                {
-                    "id": category["id"],
-                    "name": ": ".join((category["role"], category["scientific_name"])),
-                }
-            )
-        else:
-            new_categories.append({"id": category["id"], "name": category["name"]})
-    data["categories"] = new_categories
+    # TODO: should we only update category name?
+    data["categories"] = [
+        {
+            "id": category["id"],
+            "name": format_category_name(
+                role=category["role"],
+                taxon=category.get("scientific_name"),
+                subcategory=category.get("subcategory"),
+            ),
+        }
+        for category in categories
+    ]
     with open(weedcoco_path, "w") as jsonFile:
         json.dump(data, jsonFile)
     return data
@@ -193,18 +198,20 @@ def send_email(subject, body, recipients):
                 smtp.send_message(msg)
 
 
-def parse_category_name(category):
-    if re.fullmatch(r"(crop|weed): .+", category["name"]):
-        return {
-            "id": category["id"],
-            "name": category["name"],
-            "role": category["name"].split(": ", maxsplit=1)[0],
-            "scientific_name": category["name"].split(": ", maxsplit=1)[1],
-        }
-    else:
+def parse_category_for_mapper(category):
+    parsed = parse_category_name(category["name"])
+    if parsed is None:
         return {
             "id": category["id"],
             "name": category["name"],
             "role": "",
             "scientific_name": "",
+            "subcategory": "",
         }
+    return {
+        "id": category["id"],
+        "name": category["name"],
+        "role": parsed["role"],
+        "scientific_name": parsed["taxon"],
+        "subcategory": parsed["subcategory"],
+    }

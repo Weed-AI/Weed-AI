@@ -29,7 +29,7 @@ from weedid.utils import (
     add_agcontexts,
     add_metadata,
     validate_email_format,
-    parse_category_name,
+    parse_category_for_mapper,
 )
 from weedid.notification import review_notification
 from weedid.models import Dataset, WeedidUser
@@ -99,7 +99,8 @@ def upload(request):
         for image_reference in weedcoco_json["images"]:
             images.append(image_reference["file_name"].split("/")[-1])
         categories = [
-            parse_category_name(category) for category in weedcoco_json["categories"]
+            parse_category_for_mapper(category)
+            for category in weedcoco_json["categories"]
         ]
         upload_dir, upload_id = setup_upload_dir(os.path.join(UPLOAD_DIR, str(user.id)))
         store_tmp_weedcoco(weedcoco_json, upload_dir)
@@ -207,7 +208,8 @@ class CustomUploader:
             for image_reference in coco_json["images"]:
                 images.append(image_reference["file_name"].split("/")[-1])
             categories = [
-                parse_category_name(category) for category in coco_json["categories"]
+                parse_category_for_mapper(category)
+                for category in coco_json["categories"]
             ]
             upload_dir, upload_id = setup_upload_dir(
                 os.path.join(UPLOAD_DIR, str(user.id))

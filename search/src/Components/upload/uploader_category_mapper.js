@@ -12,6 +12,9 @@ import AccordionSummary from '@material-ui/core/AccordionSummary';
 import AccordionDetails from '@material-ui/core/AccordionDetails';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import cloneDeep from 'lodash/cloneDeep';
+import { FormHelperText } from '@material-ui/core';
+import { formatCategoryName } from '../../Common/weedcocoUtil';
+import CategoryTooltip from '../search/CategoryTooltip';
 
 
 const useStyles = (theme) => ({
@@ -19,19 +22,19 @@ const useStyles = (theme) => ({
         marginLeft: '2.5em'
     },
     row: {
-        backgroundColor: theme.palette.grey[50],
+        backgroundColor: theme.palette.primary.light,
+    },
+    rowDetails: {
+        backgroundColor: theme.palette.grey[100],
+        display: "block",
     },
     categoryList: {
         overflow: "scroll",
-        maxHeight: "15em",
+        maxHeight: "20em",
         margin: theme.spacing(2),
     },
     incomplete: {
         color: 'red'
-    },
-    formControl: {
-        margin: theme.spacing(1),
-        minWidth: 120,
     },
     text_field: {
         marginRight: '1em',
@@ -45,20 +48,28 @@ const useStyles = (theme) => ({
         width: '1.2em',
         borderRadius: '50%',
         marginRight: "1em",
-    }
+    },
+	formControl: {
+		marginBottom: theme.spacing(3),
+	}
 });
 
 const isComplete = (category) => (category.role && category.scientific_name);
 
-const CategoryEditor = ({ category, classes, isColor, changeRole, changeSciName }) => {
+const CategoryEditor = ({ category, classes, isColor, changeRole, changeSciName, changeSubcategory }) => {
     const complete = isComplete(category);
-    return (<Accordion className={complete ? classes.row : `${classes.row} ${classes.incomplete}`} defaultExpanded={!complete}>
-        <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+    return (<Accordion className={classes.row} defaultExpanded={!complete}>
+        <AccordionSummary expandIcon={<ExpandMoreIcon />} className={complete ? "" : classes.incomplete}>
             {isColor ? <div className={classes.color} style={{backgroundColor: '#' + category.name}}></div> : []}
-            <Typography>{isColor ? '#' : ''}{category.name}</Typography>
+            <Typography>
+                {isColor ? '#' : ''}{category.name} → <em>
+                    {formatCategoryName({role: category.role, taxon: category.scientific_name, subcategory: category.subcategory})}
+                </em>
+            </Typography>
         </AccordionSummary>
-        <AccordionDetails>
-            <FormControl fullWidth={true} className={classes.formControl}>
+        <AccordionDetails className={classes.rowDetails}>
+            <Typography></Typography>
+            <FormControl size="small" fullWidth className={classes.formControl}>
                 <InputLabel id="category">Role</InputLabel>
                 <Select
                 labelId="category"
@@ -69,8 +80,17 @@ const CategoryEditor = ({ category, classes, isColor, changeRole, changeSciName 
                     <MenuItem value={"crop"}>crop</MenuItem>
                     <MenuItem value={"weed"}>weed</MenuItem>
                 </Select>
+                <FormHelperText>Does this category indicate a weed or a crop in this dataset?</FormHelperText>
             </FormControl>
-            <TextField fullWidth={true} className={classes.sci_name} label="Scientific name or UNSPECIFIED" value={category.scientific_name} onChange={e => {e.persist(); changeSciName(e)}}/>
+            <TextField size="small" fullWidth className={classes.sci_name}
+                label="Species or other taxon"
+                value={category.scientific_name} onChange={e => {e.persist(); changeSciName(e)}}
+                helperText="Either 'UNSPECIFIED' or lowercase scientific name (family, genus, species depending on level of annotation)."
+                />
+            <TextField size="small" fullWidth
+                label="Subcategory (optional)"
+                value={category.subcategory} onChange={e => {e.persist(); changeSubcategory(e)}}
+                helperText="Use this arbitrary label to distinguish among growth stages or plant parts within a species." />
         </AccordionDetails>
     </Accordion>);
 }
@@ -105,6 +125,12 @@ class CategoryMapper extends React.Component {
         this.props.handleErrorMessage("");
     }
 
+    changeSubcategory(e, index) {
+        this.modifyCategories(index, "subcategory", e.target.value);
+        this.props.handleValidation(false);
+        this.props.handleErrorMessage("");
+    }
+
     render() {
         const { classes } = this.props;
         const nCategories = this.state.categories.length;
@@ -120,6 +146,7 @@ class CategoryMapper extends React.Component {
                                 category={category} isColor={/^[0-9A-Fa-f]{6}$/i.test(category.name)}
                                 changeRole={(e) => this.changeRole(e, index)}
                                 changeSciName={(e) => this.changeSciName(e, index)}
+                                changeSubcategory={(e) => this.changeSubcategory(e, index)}
                             />
                         })
                     }

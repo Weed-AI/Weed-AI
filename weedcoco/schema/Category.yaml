@@ -7,12 +7,15 @@ allOf:
       name:
         type: string
         format: weedcoco_category
-        pattern: "^((crop|weed): ([a-z][a-z. ]+|UNSPECIFIED)|crop|weed|none)$"
+        pattern: "^((crop|weed): ([a-z][a-z. ]+|UNSPECIFIED)|crop|weed|none)(?: \\([^)]+\\))?$"
         description: |-
           A category for an annotation, consisting of an agricultural role and
-          optionally a biological name, separated by ": ". Currently allowed
+          optionally a scientific name, separated by ": ". Currently allowed
           agricultural roles are "weed" and "crop".  The "none" category may be
           used to indicate that no weed or crop is identified in the image.
+
+          An arbitrary subcategory may also be appended in parentheses. This may be used
+          to indicate, for instance, the growth stage or plant part being annotated.
 
           Annotations should be labelled with the most specific category possible,
           usually "weed: <species name>".

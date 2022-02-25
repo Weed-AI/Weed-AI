@@ -3,6 +3,7 @@ import pathlib
 import os
 import warnings
 import hashlib
+import re
 
 import PIL.Image
 import yaml
@@ -136,20 +137,44 @@ def get_task_types(annotations):
     return out
 
 
-def get_supercategory_names(name):
-    if not name.startswith("weed: "):
-        return []
+def parse_category_name(name):
+    match = re.fullmatch(r"(crop|weed|none)(?:: ([^(]+))?(?: \((.*)\))?", name)
+    if match:
+        return {
+            "name": name,
+            "role": match.group(1),
+            "taxon": match.group(2),
+            "subcategory": match.group(3),
+        }
 
-    taxon = name.split(": ", 1)[1]
-    out = ["weed"]
-    if taxon == "UNSPECIFIED":
+
+def format_category_name(role, taxon=None, subcategory=None):
+    out = role
+    if taxon:
+        out += f": {taxon}"
+    if subcategory:
+        out += f": ({subcategory})"
+    return out
+
+
+def get_supercategory_names(name):
+    parsed = parse_category_name(name)
+    out = []
+
+    if parsed["subcategory"]:
+        out.append(format_category_name(role=parsed["role"], taxon=parsed["taxon"]))
+    if parsed is None or parsed["role"] != "weed":
+        return out
+
+    out.append("weed")
+    if parsed["taxon"] == "UNSPECIFIED":
         return out
 
     eppo = get_eppo_singleton(EPPO_PATH)
     try:
-        entry = eppo.lookup_preferred_name(taxon, species_only=False)
+        entry = eppo.lookup_preferred_name(parsed["taxon"], species_only=False)
     except Exception:
-        warnings.warn(f"Failed to lookup taxon {repr(taxon)}")
+        warnings.warn(f"Failed to lookup taxon {repr(parsed['taxon'])}")
         return out
 
     try:
@@ -159,11 +184,16 @@ def get_supercategory_names(name):
     except StopIteration:
         family = None
     if family != "1GRAF":
-        out.append("weed: non-poaceae")
+        out.append(format_category_name(role="weed", taxon="non-poaceae"))
 
     if family is not None:
         family_entry = eppo.entries[family]
-        out.append(f"weed: {family_entry['preferred_name'].lower()}")
+        out.append(
+            format_category_name(
+                role="weed", taxon=family_entry["preferred_name"].lower()
+            )
+        )
+
     return out
 
 

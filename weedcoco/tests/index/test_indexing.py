@@ -63,8 +63,13 @@ def test_annotation_and_category():
             },
         },
         3: {
-            "name": "weed: lolium perenne",
-            "taxo_names": {"weed: lolium perenne", "weed: poaceae", "weed"},
+            "name": "weed: lolium perenne (growing point)",
+            "taxo_names": {
+                "weed: lolium perenne (growing point)",
+                "weed: lolium perenne",
+                "weed: poaceae",
+                "weed",
+            },
         },
     }
     for entry in indexer.generate_index_entries():
