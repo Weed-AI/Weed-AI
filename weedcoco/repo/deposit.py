@@ -2,18 +2,15 @@ import argparse
 import pathlib
 import json
 import os
-import re
 import tempfile
 import ocfl
-from shutil import copy, move
+from shutil import copy
 from zipfile import ZipFile
 from PIL import Image
 from collections import defaultdict
 from uuid import uuid4
 from weedcoco.utils import get_image_hash, check_if_approved_image_extension
 from weedcoco.validation import ValidationError, validate
-
-
 
 
 def mkdir_safely(local_dir):
@@ -26,7 +23,6 @@ def mkdir_safely(local_dir):
 
 def get_hashset_from_image_name(image_hash):
     return {os.path.splitext(image_name)[0] for image_name in image_hash.values()}
-
 
 
 class RepositoryError(Exception):
@@ -44,44 +40,49 @@ class RepositoryDataset:
         self.ocfl = None
 
     def _ocfl(self):
-        self.path = self.repo.root / pathlib.Path(self.repo.ocfl.object_path(self.identifier))
+        obj_path = self.repo.ocfl.object_path(identifier=self.identifier)
+        self.path = self.repo.root / pathlib.Path(obj_path)
         self.ocfl = ocfl.Object(identifier=self.identifier)
-
+        self.ocfl.open_fs(str(self.path))
 
     def sources(self, weedcoco_path, image_dir):
         """Set the weedcoco_path and images_dir for the build"""
         self.weedcoco_path = weedcoco_path
         self.image_dir = image_dir
 
-    def inventory(self, version='head'):
+    def inventory(self, version="head"):
         """Return the JSON inventory for a specified version or the HEAD"""
         self._ocfl()
         self.inventory = self.ocfl.parse_inventory()
         v = version
-        if v == 'head':
+        if v == "head":
             v = self.inventory["head"]
         return self.inventory["versions"][v]
 
-    def extract(self, dest_dir, version='head'):
+    def paths(self, version="head"):
+        """Iterate over the paths of all the content in a version"""
+        inventory = self.inventory(version)
+        for paths in inventory["state"].values():
+            for path in paths:
+                yield path
+
+    def extract(self, dest_dir, version="head"):
         """
         Write out a version of this object to dest_dir
         """
         self._ocfl()
         self.ocfl.extract(objdir=str(self.path), version=version, dstdir=dest_dir)
 
-
     def validate(self, repository):
         """Run checks which need to pass before deposit"""
         self.create_image_hash()
         self.validate_duplicate_images()
-        # self.validate_existing_images(repository)
-
+        self.validate_existing_images(repository)
 
     def build(self, dataset_dir):
         """Build a dataset to be deposited"""
         self.write_weedcoco(dataset_dir)
         self.migrate_images(dataset_dir)
-
 
     def write_weedcoco(self, dataset_dir):
         with open(self.weedcoco_path) as f:
@@ -95,7 +96,6 @@ class RepositoryDataset:
         with (new_weedcoco).open("w") as out:
             json.dump(weedcoco, out, indent=4)
 
-
     def migrate_images(self, dataset_dir):
         new_image_dir = dataset_dir / "images"
         mkdir_safely(new_image_dir)
@@ -105,10 +105,11 @@ class RepositoryDataset:
                     image_path = new_image_dir / self.image_hash[image_name_origin]
                     if not os.path.isfile(image_path):
                         image_origin = Image.open(self.image_dir / image_name_origin)
-                        image_without_exif = Image.new(image_origin.mode, image_origin.size)
+                        image_without_exif = Image.new(
+                            image_origin.mode, image_origin.size
+                        )
                         image_without_exif.putdata(image_origin.getdata())
                         image_without_exif.save(image_path)
-
 
     def validate_duplicate_images(self):
         if len(get_hashset_from_image_name(self.image_hash)) != len(self.image_hash):
@@ -127,7 +128,6 @@ class RepositoryDataset:
                 + image_pairs
             )
 
-
     def validate_existing_images(self, repository):
         addition_hash = get_hashset_from_image_name(self.image_hash)
         all_existing_hash = self.get_all_existing_hash(repository)
@@ -136,19 +136,22 @@ class RepositoryDataset:
         ):
             raise ValidationError("There are identical images in the repository.")
 
+    # def get_all_existing_hash_orig(self, repository):
+    #     return {
+    #         os.path.splitext(filename)[0]
+    #         for dirpath, dirnames, filenames in os.walk(repository_dir)
+    #         if os.path.basename(dirpath) == "images"
+    #         for filename in filenames
+    #     }
 
-
-
-    # FIXME - can get all images hashes of the HEAD version of each dataset
-    # in the repository by fetching the inventories from OCFL
     def get_all_existing_hash(self, repository):
         return {
-            os.path.splitext(filename)[0]
-            for dirpath, dirnames, filenames in os.walk(repository_dir)
-            if os.path.basename(dirpath) == "images"
-            for filename in filenames
+            os.path.splitext(path.split("/")[-1])[0]
+            for dataset in repository.datasets()
+            if dataset.identifier != self.identifier
+            for path in dataset.paths()
+            if path.split("/")[0] == "images"
         }
-
 
     def create_image_hash(self):
         self.image_hash = {
@@ -157,31 +160,28 @@ class RepositoryDataset:
             if check_if_approved_image_extension(image_name)
         }
 
-
-
     # FIXME
-    def retrieve_image_paths(images_path):
-        for root, directories, files in os.walk(images_path):
+    def retrieve_image_paths(self, images_path):
+        for root, directories, files in os.walk(self.images_path):
             for filename in files:
                 yield (os.path.join(root, filename), filename)
 
-    # FIXME - making zipfiles should be separated from the ocfl stuff as 
+    # FIXME - making zipfiles should be separated from the ocfl stuff as
     # we only want do do it for a published version
-    def compress_to_download(dataset_dir, deposit_id, download_dir):
+    def compress_to_download(self, dataset_dir, deposit_id, download_dir):
         mkdir_safely(download_dir)
         download_path = (download_dir / deposit_id).with_suffix(".zip")
         with tempfile.TemporaryDirectory() as tmpdir:
             zip_path = pathlib.Path(tmpdir) / "bundle.zip"
             with ZipFile(zip_path, "w") as zip:
                 zip.write(dataset_dir / "weedcoco.json", "weedcoco.json")
-                for image, image_name in retrieve_image_paths(dataset_dir / "images"):
+                for image, image_name in self.retrieve_image_paths(
+                    dataset_dir / "images"
+                ):
                     zip.write(image, "images/" + image_name)
-        # XXX: this should be move() not copy(), but move resulted in files
-        #      that we could not delete or move in the Docker volume.
+            # XXX: this should be move() not copy(), but move resulted in files
+            #      that we could not delete or move in the Docker volume.
             copy(zip_path, download_path)
-
-
-
 
 
 class Repository:
@@ -189,12 +189,11 @@ class Repository:
     Class representing the repository.
     """
 
-    def __init__(self, root=None, disposition='pairtree'):
+    def __init__(self, root=None, disposition="pairtree"):
         self.root = pathlib.Path(root)
         self.disposition = disposition
         if self.root.is_dir():
             self.connect()
-
 
     def initialize(self):
         if not self.root.is_dir():
@@ -203,21 +202,19 @@ class Repository:
             ocfl_store = ocfl.Store(root=str(self.root))
             ocfl_store.initialize()
 
-
     def connect(self):
         self.ocfl = ocfl.Store(root=str(self.root), disposition=self.disposition)
 
-
-    def object_paths(self):
+    def datasets(self):
+        self.ocfl.open_root_fs()
+        self.ocfl.check_root_structure()
         for path in self.ocfl.object_paths():
-            yield path
-
+            yield RepositoryDataset(self, path.split("/")[-1])
 
     def setup_deposit(self, temp_dir, deposit_id):
         dataset_dir = temp_dir / deposit_id
         os.mkdir(dataset_dir)
         return dataset_dir
-
 
     def deposit(self, identifier, dataset, metadata):
         """Validate and deposit a RepositoryDataset in the Repository.  Creates a new
@@ -250,12 +247,8 @@ class Repository:
                 srcdir=str(dataset_dir),
                 objdir=str(ocfl_object_dir),
             )
-            self.ocfl.add(object_path=str(ocfl_object_dir)) # check atomicity of this
+            self.ocfl.add(object_path=str(ocfl_object_dir))  # check atomicity of this
         return dataset
-
-
-
-
 
 
 # def atomic_copy(repository_dir, download_dir, temp_dir, deposit_id):
@@ -310,6 +303,7 @@ def main(args=None):
     dataset.sources(args.weedcoco_path, args.image_dir)
     repository.deposit(args.identifier, dataset, args)
     return repository, dataset
+
 
 if __name__ == "__main__":
     main()
