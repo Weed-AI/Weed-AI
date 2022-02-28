@@ -20,6 +20,7 @@ requirements = [
     "requests",
     "elasticsearch==7.13.*",
     "joblib",
+    "ocfl-py",
 ]
 
 setup(
