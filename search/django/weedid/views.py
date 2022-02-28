@@ -14,12 +14,15 @@ from core.settings import (
     MAX_VOC_SIZE,
     SITE_BASE_URL,
 )
-from weedid.tasks import submit_upload_task, update_index_and_thumbnails
+from weedid.tasks import (
+    submit_upload_task,
+    update_index_and_thumbnails,
+    store_tmp_image_from_zip,
+)
 from weedid.utils import (
     store_tmp_weedcoco,
     setup_upload_dir,
     store_tmp_image,
-    store_tmp_image_from_zip,
     store_tmp_voc,
     move_to_upload,
     create_upload_entity,
@@ -287,13 +290,16 @@ def unpack_image_zip(request):
     images = request.POST["images"].split(",")
     zipfile = os.path.join(TUS_DESTINATION_DIR, upload_image_zip)
     upload_dir = os.path.join(UPLOAD_DIR, str(user.id), upload_id, "images")
-    try:
-        missing_images = store_tmp_image_from_zip(zipfile, upload_dir, images)
-    except Exception as e:
-        return HttpResponseBadRequest(str(e))
-    return HttpResponse(
-        json.dumps({"upload_id": upload_id, "missing_images": missing_images})
-    )
+    celery_task = store_tmp_image_from_zip.delay(upload_id, zipfile, upload_dir, images)
+    return HttpResponse(json.dumps({"task_id": celery_task.id}))
+
+
+def check_image_zip(request):
+    task_id = request.GET["task_id"]
+    result = store_tmp_image_from_zip.AsyncResult(task_id)
+    if not result.ready():
+        return HttpResponse("wait", status_code=202)
+    return HttpResponse(json.dumps(result.get(propagate=True)))
 
 
 def update_categories(request):
