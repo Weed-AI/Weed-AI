@@ -4,7 +4,7 @@ import json
 import os
 import tempfile
 import ocfl
-from shutil import copy
+from shutil import copy, move, rmtree
 from zipfile import ZipFile
 from PIL import Image
 from collections import defaultdict
@@ -59,10 +59,6 @@ class RepositoryDataset:
         if not self.open():
             raise RepositoryError(f"Object {self.identifier} not found in repository")
         return self.ocfl.parse_inventory()
-        # v = version
-        # if v == "head":
-        #     v = self.inventory["head"]
-        # return self.inventory["versions"][v]
 
     def paths(self, version="head"):
         """Iterate over the paths of all the content in a version"""
@@ -93,14 +89,16 @@ class RepositoryDataset:
         self.migrate_images(dataset_dir)
 
     def rollback(self, dataset_dir, last_version):
-        """Undo any changes in the event of error. Uses the ocfl.obj_fs for ocfl edits"""
+        """Undo any changes in the event of error. This uses the ocfl object's obj_fs
+        for file operations, so that it works on s3 objects as well as traditional fileystems"""
         if last_version:
             inventory = self.inventory()
             if inventory["head"] != last_version:
                 vi = int(last_version[1:])
                 for version in self.path.glob("v*"):
-                    if version[1:] > vi:
-                        self.ocfl.obj_fs.rmdir(str(self.path / version), True)
+                    if int(version.name[1:]) > vi:
+                        rmtree(str(self.path / version))
+                    # self.ocfl.obj_fs.removedir(str(self.path / version), True, True)
                 copy(
                     str(self.path / last_version / "inventory.json"),
                     str(self.path / "inventory.json"),
@@ -112,7 +110,9 @@ class RepositoryDataset:
         else:
             # no last_version means a create failed, so remove the whole objext
             if self.path.is_dir():
-                self.ocfl.obj_fs.rmdir(str(self.path), True)
+                rmtree(str(self.path))
+                # self.ocfl.open_fs(str(self.path))
+                # self.ocfl.obj_fs.removedir(str(self.path), True, True)
 
     def write_weedcoco(self, dataset_dir):
         with open(self.weedcoco_path) as f:
@@ -182,28 +182,24 @@ class RepositoryDataset:
             if check_if_approved_image_extension(image_name)
         }
 
-    # FIXME
-    def retrieve_image_paths(self, images_path):
-        for root, directories, files in os.walk(self.images_path):
+    def retrieve_image_paths(self):
+        for root, directories, files in os.walk(self.image_dir):
             for filename in files:
                 yield (os.path.join(root, filename), filename)
 
-    # FIXME - making zipfiles should be separated from the ocfl stuff as
-    # we only want do do it for a published version
-    def compress_to_download(self, dataset_dir, deposit_id, download_dir):
-        mkdir_safely(download_dir)
-        download_path = (download_dir / deposit_id).with_suffix(".zip")
+    def compress_to_download(self, temp_dir):
+        mkdir_safely(temp_dir)
+        download_path = (temp_dir / self.identifier).with_suffix(".zip")
         with tempfile.TemporaryDirectory() as tmpdir:
             zip_path = pathlib.Path(tmpdir) / "bundle.zip"
             with ZipFile(zip_path, "w") as zip:
-                zip.write(dataset_dir / "weedcoco.json", "weedcoco.json")
-                for image, image_name in self.retrieve_image_paths(
-                    dataset_dir / "images"
-                ):
+                zip.write(self.weedcoco_path, "weedcoco.json")
+                for image, image_name in self.retrieve_image_paths():
                     zip.write(image, "images/" + image_name)
             # XXX: this should be move() not copy(), but move resulted in files
             #      that we could not delete or move in the Docker volume.
             copy(zip_path, download_path)
+        return download_path
 
 
 class Repository:
@@ -238,7 +234,7 @@ class Repository:
         os.mkdir(dataset_dir)
         return dataset_dir
 
-    def deposit(self, identifier, dataset, metadata):
+    def deposit(self, identifier, dataset, metadata, download_dir):
         """Validate and deposit a RepositoryDataset in the Repository.  Creates a new
         dataset for identifier if it does not already exist.
         --------
@@ -246,7 +242,7 @@ class Repository:
         metadata - a dict-like with name, address and message
         dataset - a RepositoryDataset
 
-        Returns the id of the object
+        Returns the id of the object.
         """
         if not identifier:
             identifier = str(uuid4())
@@ -267,15 +263,16 @@ class Repository:
             temp_dir = pathlib.Path(temp_dir)
             dataset_dir = self.setup_deposit(temp_dir, identifier)
             dataset.build(dataset_dir)
+            zip_file = dataset.compress_to_download(temp_dir)
             try:
                 if obj_dir:
                     dataset.ocfl.update(
-                        objdir=obj_dir,
-                        srcdir=dataset_dir,
+                        objdir=str(obj_dir),
+                        srcdir=str(dataset_dir),
                         metadata=ocfl_metadata,
                     )
                 else:
-                    new_object_dir = temp_dir / pathlib.Path(identifier + ".ocfl")
+                    new_object_dir = temp_dir / pathlib.Path(identifier + "_ocfl")
                     new_object = ocfl.Object(identifier=identifier)
                     new_object.create(
                         objdir=str(new_object_dir),
@@ -283,41 +280,18 @@ class Repository:
                         metadata=ocfl_metadata,
                     )
                     self.ocfl.add(object_path=str(new_object_dir))
+                if zip_file.is_file():
+                    old_zip = download_dir / zip_file.name
+                    if old_zip.is_file():
+                        old_zip.unlink()
+                    move(str(zip_file), str(download_dir))
             except Exception:
                 dataset.rollback(dataset_dir, last_version)
+                zip_file = download_dir / zip_file.name
+                if zip_file.is_file():
+                    zip_file.unlink()  # missing_ok is not in 3.7
+                raise
         return dataset
-
-
-# def atomic_copy(repository_dir, download_dir, temp_dir, deposit_id):
-#     dataset_path = temp_dir / deposit_id
-#     zip_path = temp_dir / f"{deposit_id}.zip"
-#     repository_dir = repository_dir / deposit_id
-#     try:
-#         if os.path.isfile(zip_path):
-#             move(str(zip_path), str(download_dir))
-#         if os.path.isdir(dataset_path):
-#             move(str(dataset_path), str(repository_dir))
-#     except Exception:
-#         # roll back to leave a clean repository
-#         (download_dir / zip_path).unlink(missing_ok=True)
-#         for path in (repository_dir / deposit_id).glob("*"):
-#             path.unlink(missing_ok=True)
-#         (repository_dir / deposit_id).rmdir()
-#         raise
-
-
-# def deposit_orig(weedcoco_path, image_dir, repository_dir, download_dir, upload_id=None):
-#     image_hash = create_image_hash(image_dir)
-#     validate_duplicate_images(image_hash)
-#     validate_existing_images(repository_dir, image_hash)
-#     with tempfile.TemporaryDirectory() as temp_dir:
-#         temp_dir = pathlib.Path(temp_dir)
-#         dataset_dir, deposit_id = setup_dataset_dir(repository_dir, temp_dir, upload_id)
-#         deposit_weedcoco(weedcoco_path, dataset_dir, image_dir, image_hash)
-#         migrate_images(dataset_dir, image_dir, image_hash)
-#         compress_to_download(dataset_dir, deposit_id, temp_dir)
-#         atomic_copy(repository_dir, download_dir, temp_dir, deposit_id)
-#     return str(repository_dir)
 
 
 def main(args=None):
@@ -338,7 +312,7 @@ def main(args=None):
     repository.connect()
     dataset = RepositoryDataset(repository, args.identifier)
     dataset.sources(args.weedcoco_path, args.image_dir)
-    repository.deposit(args.identifier, dataset, args)
+    repository.deposit(args.identifier, dataset, args, args.download_dir)
     return repository, dataset
 
 

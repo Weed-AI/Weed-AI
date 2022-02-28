@@ -27,6 +27,7 @@ def executor(tmpdir):
     test_download_dir = tmpdir / "test_download"
     test_extract_dir = tmpdir / "test_extract"
     mkdir_safely(test_extract_dir)
+    mkdir_safely(test_download_dir)
 
     class Executor:
         def run(
