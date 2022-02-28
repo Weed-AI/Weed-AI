@@ -146,6 +146,15 @@ def test_existing_images(executor):
         )
 
 
+def test_existing_no_self_match(executor):
+    executor.run(
+        "dataset1", TEST_BASIC_DIR_1 / "weedcoco.json", TEST_BASIC_DIR_1 / "images"
+    )
+    executor.run(
+        "dataset1", TEST_BASIC_DIR_1 / "weedcoco.json", TEST_BASIC_DIR_1 / "images"
+    )
+
+
 def test_multiple_datasets(executor, rewrite_deposit_truth):
     test_extract_dir, repo, dataset1 = executor.run(
         "dataset_1", TEST_BASIC_DIR_1 / "weedcoco.json", TEST_BASIC_DIR_1 / "images"

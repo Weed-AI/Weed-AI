@@ -39,30 +39,37 @@ class RepositoryDataset:
         self.identifier = identifier
         self.ocfl = None
 
-    def _ocfl(self):
+    def open(self):
         obj_path = self.repo.ocfl.object_path(identifier=self.identifier)
         self.path = self.repo.root / pathlib.Path(obj_path)
         self.ocfl = ocfl.Object(identifier=self.identifier)
-        self.ocfl.open_fs(str(self.path))
+        if self.path.is_dir():
+            self.ocfl.open_fs(str(self.path))
+            return self.path
+        else:
+            return None
 
     def sources(self, weedcoco_path, image_dir):
         """Set the weedcoco_path and images_dir for the build"""
         self.weedcoco_path = weedcoco_path
         self.image_dir = image_dir
 
-    def inventory(self, version="head"):
-        """Return the JSON inventory for a specified version or the HEAD"""
-        self._ocfl()
-        self.inventory = self.ocfl.parse_inventory()
-        v = version
-        if v == "head":
-            v = self.inventory["head"]
-        return self.inventory["versions"][v]
+    def inventory(self):
+        """Return the object's inventory"""
+        if not self.open():
+            raise RepositoryError(f"Object {self.identifier} not found in repository")
+        return self.ocfl.parse_inventory()
+        # v = version
+        # if v == "head":
+        #     v = self.inventory["head"]
+        # return self.inventory["versions"][v]
 
     def paths(self, version="head"):
         """Iterate over the paths of all the content in a version"""
-        inventory = self.inventory(version)
-        for paths in inventory["state"].values():
+        inventory = self.inventory()
+        if version == "head":
+            version = inventory["head"]
+        for paths in inventory["versions"][version]["state"].values():
             for path in paths:
                 yield path
 
@@ -70,7 +77,8 @@ class RepositoryDataset:
         """
         Write out a version of this object to dest_dir
         """
-        self._ocfl()
+        if not self.open():
+            raise RepositoryError(f"Object {self.identifier} not found in repository")
         self.ocfl.extract(objdir=str(self.path), version=version, dstdir=dest_dir)
 
     def validate(self, repository):
@@ -83,6 +91,28 @@ class RepositoryDataset:
         """Build a dataset to be deposited"""
         self.write_weedcoco(dataset_dir)
         self.migrate_images(dataset_dir)
+
+    def rollback(self, dataset_dir, last_version):
+        """Undo any changes in the event of error. Uses the ocfl.obj_fs for ocfl edits"""
+        if last_version:
+            inventory = self.inventory()
+            if inventory["head"] != last_version:
+                vi = int(last_version[1:])
+                for version in self.path.glob("v*"):
+                    if version[1:] > vi:
+                        self.ocfl.obj_fs.rmdir(str(self.path / version), True)
+                copy(
+                    str(self.path / last_version / "inventory.json"),
+                    str(self.path / "inventory.json"),
+                )
+                copy(
+                    str(self.path / last_version / "inventory.json.sha512"),
+                    str(self.path / "inventory.json.sha512"),
+                )
+        else:
+            # no last_version means a create failed, so remove the whole objext
+            if self.path.is_dir():
+                self.ocfl.obj_fs.rmdir(str(self.path), True)
 
     def write_weedcoco(self, dataset_dir):
         with open(self.weedcoco_path) as f:
@@ -135,14 +165,6 @@ class RepositoryDataset:
             addition_hash
         ):
             raise ValidationError("There are identical images in the repository.")
-
-    # def get_all_existing_hash_orig(self, repository):
-    #     return {
-    #         os.path.splitext(filename)[0]
-    #         for dirpath, dirnames, filenames in os.walk(repository_dir)
-    #         if os.path.basename(dirpath) == "images"
-    #         for filename in filenames
-    #     }
 
     def get_all_existing_hash(self, repository):
         return {
@@ -236,18 +258,33 @@ class Repository:
             address=metadata.address,
             name=metadata.name,
         )
+        obj_dir = dataset.open()
+        last_version = None
+        if obj_dir:
+            inventory = dataset.inventory()
+            last_version = inventory["head"]
         with tempfile.TemporaryDirectory() as temp_dir:
             temp_dir = pathlib.Path(temp_dir)
             dataset_dir = self.setup_deposit(temp_dir, identifier)
-            ocfl_object_dir = temp_dir / pathlib.Path(identifier + ".ocfl")
             dataset.build(dataset_dir)
-            ocfl_object = ocfl.Object(identifier=identifier)
-            ocfl_object.create(
-                metadata=ocfl_metadata,
-                srcdir=str(dataset_dir),
-                objdir=str(ocfl_object_dir),
-            )
-            self.ocfl.add(object_path=str(ocfl_object_dir))  # check atomicity of this
+            try:
+                if obj_dir:
+                    dataset.ocfl.update(
+                        objdir=obj_dir,
+                        srcdir=dataset_dir,
+                        metadata=ocfl_metadata,
+                    )
+                else:
+                    new_object_dir = temp_dir / pathlib.Path(identifier + ".ocfl")
+                    new_object = ocfl.Object(identifier=identifier)
+                    new_object.create(
+                        objdir=str(new_object_dir),
+                        srcdir=str(dataset_dir),
+                        metadata=ocfl_metadata,
+                    )
+                    self.ocfl.add(object_path=str(new_object_dir))
+            except Exception:
+                dataset.rollback(dataset_dir, last_version)
         return dataset
 
 
