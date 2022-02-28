@@ -250,9 +250,9 @@ class Repository:
         dataset.validate(self)
         ocfl_metadata = ocfl.VersionMetadata(
             identifier=identifier,
-            message=metadata.message,
-            address=metadata.address,
-            name=metadata.name,
+            message=metadata["message"],
+            address=metadata["address"],
+            name=metadata["name"],
         )
         obj_dir = dataset.open()
         last_version = None
@@ -294,6 +294,18 @@ class Repository:
         return dataset
 
 
+def deposit(
+    weedcoco_path, image_dir, repository_dir, download_dir, metadata, upload_id=None
+):
+    repository = Repository(repository_dir)
+    repository.initialize()
+    repository.connect()
+    dataset = RepositoryDataset(repository, upload_id)
+    dataset.sources(weedcoco_path, image_dir)
+    repository.deposit(upload_id, dataset, metadata, download_dir)
+    return repository, dataset
+
+
 def main(args=None):
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument(
@@ -312,7 +324,12 @@ def main(args=None):
     repository.connect()
     dataset = RepositoryDataset(repository, args.identifier)
     dataset.sources(args.weedcoco_path, args.image_dir)
-    repository.deposit(args.identifier, dataset, args, args.download_dir)
+    metadata = {
+        "name": args.name,
+        "address": args.address,
+        "message": args.message,
+    }
+    repository.deposit(args.identifier, dataset, metadata, args.download_dir)
     return repository, dataset
 
 

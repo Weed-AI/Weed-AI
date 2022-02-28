@@ -7,7 +7,7 @@ from celery import shared_task
 from weedcoco.repo.deposit import deposit, compress_to_download
 from weedcoco.index.indexing import ElasticSearchIndexer
 from weedcoco.index.thumbnailing import thumbnailing
-from weedid.models import Dataset
+from weedid.models import Dataset, WeedidUser
 from weedid.utils import make_upload_entity_fields
 from weedid.notification import upload_notification, review_notification
 from core.settings import (
@@ -54,12 +54,19 @@ def submit_upload_task(weedcoco_path, image_dir, upload_id, new_upload=True):
             json.dump(weedcoco, f)
 
     upload_entity.save()
+    user = WeedidUser.objects.get(user_id=upload_entity.user_id)
+    metadata = {
+        "name": user.username,
+        "address": user.email,
+        "comment": "WeedAI upload",
+    }
     try:
         deposit(
             Path(weedcoco_path),
             Path(image_dir),
             Path(REPOSITORY_DIR),
             Path(DOWNLOAD_DIR),
+            metadata,
             upload_id,
         )
     except Exception as e:
