@@ -367,7 +367,6 @@ def submit_deposit(request):
 
 @login_required
 def upload_status(request):
-    user = request.user
     user_id = request.user.id
     upload_entity = WeedidUser.objects.get(id=user_id).latest_upload
     return HttpResponse(
@@ -401,7 +400,6 @@ def upload_list(request):
 @login_required
 @staff_member_required
 def awaiting_list(request):
-    user = request.user
     awaiting_list = [
         retrieve_listing_info(dataset, awaiting_review=True)
         for dataset in Dataset.objects.filter(status="AR")
@@ -412,7 +410,6 @@ def awaiting_list(request):
 @login_required
 @staff_member_required
 def dataset_approve(request, dataset_id):
-    user = request.user
     upload_entity = Dataset.objects.get(upload_id=dataset_id, status="AR")
     if upload_entity:
         weedcoco_path = os.path.join(REPOSITORY_DIR, str(dataset_id), "weedcoco.json")
@@ -428,7 +425,6 @@ def dataset_approve(request, dataset_id):
 @login_required
 @staff_member_required
 def dataset_reject(request, dataset_id):
-    user = request.user
     upload_entity = Dataset.objects.get(upload_id=dataset_id, status="AR")
     if upload_entity:
         try:
