@@ -270,6 +270,8 @@ class Repository:
         if not identifier:
             identifier = str(uuid4())
             dataset.identifier = identifier
+        else:
+            assert "/" not in identifier
         dataset.validate(self)
         ocfl_metadata = ocfl.VersionMetadata(
             identifier=identifier,
