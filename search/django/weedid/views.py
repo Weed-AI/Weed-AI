@@ -63,6 +63,11 @@ def json_validation_response(exc):
     )
 
 
+def check_ownership(upload_id, user_id):
+    dataset = Dataset.objects.get(upload_id=upload_id)
+    return dataset and dataset.user.id == user_id
+
+
 @require_http_methods(["GET", "POST"])
 def elasticsearch_query(request):
     try:
@@ -252,6 +257,8 @@ class MaskUploader(CustomUploader):
 def upload_image(request):
     user = request.user
     upload_id = request.POST["upload_id"]
+    if not check_ownership(upload_id, user.id):
+        return HttpResponseForbidden("No permission to upload")
     upload_image = request.FILES["upload_image"]
     if upload_image.size > MAX_IMAGE_SIZE:
         return HttpResponseBadRequest("This image has exceeded the size limit!")
@@ -286,6 +293,8 @@ def update_categories(request):
     user = request.user
     data = json.loads(request.body)
     upload_id, categories = data["upload_id"], data["categories"]
+    if not check_ownership(upload_id, user.id):
+        return HttpResponseForbidden("No permission to update")
     weedcoco_path = os.path.join(
         UPLOAD_DIR, str(user.id), str(upload_id), "weedcoco.json"
     )
@@ -310,6 +319,8 @@ def upload_agcontexts(request):
     user = request.user
     data = json.loads(request.body)
     upload_id, ag_contexts = data["upload_id"], data["ag_contexts"]
+    if not check_ownership(upload_id, user.id):
+        return HttpResponseForbidden("No permission to update")
     try:
         validate_json(ag_contexts, schema="agcontext")
     except JsonValidationError as e:
@@ -335,6 +346,8 @@ def upload_metadata(request):
     user = request.user
     data = json.loads(request.body)
     upload_id, metadata = data["upload_id"], data["metadata"]
+    if not check_ownership(upload_id, user.id):
+        return HttpResponseForbidden("No permission to update")
     try:
         validate_json(metadata, schema="metadata")
     except JsonValidationError as e:
@@ -357,6 +370,8 @@ def upload_metadata(request):
 def submit_deposit(request):
     user = request.user
     upload_id = request.POST["upload_id"]
+    if not check_ownership(upload_id, user.id):
+        return HttpResponseForbidden("No permission to submit")
     weedcoco_path = os.path.join(
         UPLOAD_DIR, str(user.id), str(upload_id), "weedcoco.json"
     )
