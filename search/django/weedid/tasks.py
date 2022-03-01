@@ -4,7 +4,10 @@ import traceback
 import datetime
 import subprocess
 from celery import shared_task
-from weedcoco.repo.deposit import deposit, compress_to_download
+from weedcoco.repo.deposit import (
+    deposit,
+    Repository,
+)
 from weedcoco.index.indexing import ElasticSearchIndexer
 from weedcoco.index.thumbnailing import thumbnailing
 from weedid.models import Dataset, WeedidUser
@@ -124,7 +127,7 @@ def update_index_and_thumbnails(
     """
     upload_entity = Dataset.objects.get(upload_id=upload_id)
     try:
-        if process_thumbnails:
+        if process_thumbnails:  # FIXMEOCFL
             # The thumbnails need to be present before indexing
             thumbnailing(
                 Path(thumbnails_dir), Path(repository_dir) / upload_id, weedcoco_path
@@ -163,17 +166,18 @@ def reindex_dataset(
 ):
     """Reindex a dataset already in the repository, and recreate its download"""
     download_dir = Path(download_dir)
-    dataset_dir = Path(repository_dir) / upload_id
-    weedcoco_path = dataset_dir / "weedcoco.json"
+    repository = Repository(repository_dir)
+    dataset = repository.dataset(upload_id)
+    weedcoco_path = dataset.path("weedcoco.json")
     with open(weedcoco_path) as f:
         weedcoco = json.load(f)
-
     upload_entity = Dataset.objects.get(upload_id=upload_id)
     for k, v in make_upload_entity_fields(weedcoco).items():
         setattr(upload_entity, k, v)
     upload_entity.save()
 
-    compress_to_download(dataset_dir, upload_id, download_dir)
+    # FIXMEOCFL - need to handle rebuilding zips differently with ocfl
+    # dataset.compress_to_download(dataset_dir, upload_id, download_dir).
     update_index_and_thumbnails.delay(
         str(weedcoco_path),
         upload_id,

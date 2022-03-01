@@ -69,6 +69,16 @@ class RepositoryDataset:
             for path in paths:
                 yield path
 
+    def path(self, path, version="head"):
+        """Return the actual filesystem path for a logical path in a version."""
+        inventory = self.inventory()
+        if version == "head":
+            version = inventory["head"]
+        for digest, paths in inventory["versions"][version]["state"].items():
+            if path in paths:
+                return inventory["manifest"][digest]
+        raise RepositoryError(f"Path {path} not found in version {version}")
+
     def extract(self, dest_dir, version="head"):
         """
         Write out a version of this object to dest_dir
@@ -228,6 +238,13 @@ class Repository:
         self.ocfl.check_root_structure()
         for path in self.ocfl.object_paths():
             yield RepositoryDataset(self, path.split("/")[-1])
+
+    def dataset(self, identifier):
+        dataset = RepositoryDataset(self, identifier)
+        if dataset.open():
+            return dataset
+        else:
+            return None
 
     def setup_deposit(self, temp_dir, deposit_id):
         dataset_dir = temp_dir / deposit_id
