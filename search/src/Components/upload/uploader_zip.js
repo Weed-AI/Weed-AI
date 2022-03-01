@@ -46,8 +46,7 @@ const getZipUploadResponse = ({upload_id, images, filename}) => {
             const poll = () => {
                 axios({
                     method: 'get',
-                    url: baseURL + "api/check_image_zip/",
-                    params: {task_id: taskId},
+                    url: baseURL + "api/check_image_zip/" + taskId,
                     headers: {'X-CSRFToken': Cookies.get('csrftoken') }
                 }).then(res => {
                     if (res.status !== 200) {

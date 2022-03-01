@@ -294,8 +294,7 @@ def unpack_image_zip(request):
     return HttpResponse(json.dumps({"task_id": celery_task.id}))
 
 
-def check_image_zip(request):
-    task_id = request.GET["task_id"]
+def check_image_zip(request, task_id):
     result = store_tmp_image_from_zip.AsyncResult(task_id)
     if not result.ready():
         return HttpResponse("wait", status_code=202)
