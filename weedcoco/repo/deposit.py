@@ -31,7 +31,10 @@ class RepositoryError(Exception):
 
 class RepositoryDataset:
     """
-    Class representing a dataset in the repository
+    Class representing a dataset in the ocfl repository
+    ---
+    repo (Repository): the ocfl repository
+    identifier (str): this dataset's unique identifier in the repository
     """
 
     def __init__(self, repo, identifier):
@@ -214,11 +217,14 @@ class RepositoryDataset:
 
 class Repository:
     """
-    Class representing the repository.
+    Class representing the ocfl repository
+    ---
+    root (pathlib.Path): the root directory of the repository
+    disposition (str): the algorithm used by the ocfl library to map ids to paths
     """
 
-    def __init__(self, root=None, disposition="pairtree"):
-        self.root = pathlib.Path(root)
+    def __init__(self, root, disposition="pairtree"):
+        self.root = root
         self.disposition = disposition
         if self.root.is_dir():
             self.connect()
