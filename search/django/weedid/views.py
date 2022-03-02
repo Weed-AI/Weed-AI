@@ -16,6 +16,7 @@ from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.hashers import check_password
+from django.core.exceptions import PermissionDenied
 from django.http import (
     HttpResponse,
     HttpResponseBadRequest,
@@ -31,6 +32,7 @@ from weedcoco.importers.voc import voc_to_coco
 from weedcoco.utils import fix_compatibility_quirks
 from weedcoco.validation import JsonValidationError, validate, validate_json
 
+from weedid.decorators import decorator_post_logged_in
 from weedid.models import Dataset, WeedidUser
 from weedid.notification import review_notification
 from weedid.tasks import submit_upload_task, update_index_and_thumbnails
@@ -63,9 +65,10 @@ def json_validation_response(exc):
     )
 
 
-def check_ownership(upload_id, user_id):
+def check_ownership(upload_id, user_id, message="Permission Denied"):
     dataset = Dataset.objects.get(upload_id=upload_id)
-    return dataset and dataset.user.id == user_id
+    if not dataset or dataset.user.id == user_id:
+        raise PermissionDenied(message)
 
 
 @require_http_methods(["GET", "POST"])
@@ -120,9 +123,8 @@ def upload(request):
 
 
 class CustomUploader:
-    @require_http_methods(["POST"])
-    @login_required
     @classmethod
+    @decorator_post_logged_in
     def upload(cls, request):
         user = request.user
         try:
@@ -142,9 +144,8 @@ class CustomUploader:
         else:
             return HttpResponse(f"Uploaded {payload.name} to {store_dir}")
 
-    @login_required
-    @require_http_methods(["POST"])
     @classmethod
+    @decorator_post_logged_in
     def remove(cls, request):
         user = request.user
         try:
@@ -163,9 +164,8 @@ class CustomUploader:
         except Exception:
             return HttpResponseBadRequest(f"Error when removing {remove_name}")
 
-    @login_required
-    @require_http_methods(["POST"])
     @classmethod
+    @decorator_post_logged_in
     def move(cls, request):
         user = request.user
         try:
@@ -182,9 +182,8 @@ class CustomUploader:
         except Exception as e:
             return HttpResponseBadRequest(str(e))
 
-    @login_required
-    @require_http_methods(["POST"])
     @classmethod
+    @decorator_post_logged_in
     def submit(cls, request):
         user = request.user
         try:
@@ -257,8 +256,7 @@ class MaskUploader(CustomUploader):
 def upload_image(request):
     user = request.user
     upload_id = request.POST["upload_id"]
-    if not check_ownership(upload_id, user.id):
-        return HttpResponseForbidden("No permission to upload")
+    check_ownership(upload_id, user.id, "No permission to upload")
     upload_image = request.FILES["upload_image"]
     if upload_image.size > MAX_IMAGE_SIZE:
         return HttpResponseBadRequest("This image has exceeded the size limit!")
@@ -293,8 +291,7 @@ def update_categories(request):
     user = request.user
     data = json.loads(request.body)
     upload_id, categories = data["upload_id"], data["categories"]
-    if not check_ownership(upload_id, user.id):
-        return HttpResponseForbidden("No permission to update")
+    check_ownership(upload_id, user.id, "No permission to update")
     weedcoco_path = os.path.join(
         UPLOAD_DIR, str(user.id), str(upload_id), "weedcoco.json"
     )
@@ -319,8 +316,7 @@ def upload_agcontexts(request):
     user = request.user
     data = json.loads(request.body)
     upload_id, ag_contexts = data["upload_id"], data["ag_contexts"]
-    if not check_ownership(upload_id, user.id):
-        return HttpResponseForbidden("No permission to update")
+    check_ownership(upload_id, user.id, "No permission to update")
     try:
         validate_json(ag_contexts, schema="agcontext")
     except JsonValidationError as e:
@@ -346,8 +342,7 @@ def upload_metadata(request):
     user = request.user
     data = json.loads(request.body)
     upload_id, metadata = data["upload_id"], data["metadata"]
-    if not check_ownership(upload_id, user.id):
-        return HttpResponseForbidden("No permission to update")
+    check_ownership(upload_id, user.id, "No permission to update")
     try:
         validate_json(metadata, schema="metadata")
     except JsonValidationError as e:
@@ -370,8 +365,7 @@ def upload_metadata(request):
 def submit_deposit(request):
     user = request.user
     upload_id = request.POST["upload_id"]
-    if not check_ownership(upload_id, user.id):
-        return HttpResponseForbidden("No permission to submit")
+    check_ownership(upload_id, user.id, "No permission to submit")
     weedcoco_path = os.path.join(
         UPLOAD_DIR, str(user.id), str(upload_id), "weedcoco.json"
     )
