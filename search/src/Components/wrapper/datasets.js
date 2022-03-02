@@ -38,13 +38,15 @@ class DatasetComponent extends Component {
         })
         
         axios.get(baseURL + 'api/awaiting_list/')
-        .then(res => res.data)
-        .then(json => {
-            this.setState({awaiting_list: json, is_staff: true})
-            const awaiting_id_list = json.map(row => row.upload_id)
-            this.setState({awaiting_id_list: awaiting_id_list})
-            if (awaiting_id_list.includes(this.props.upload_id)) {
-                this.setState({upload_id: this.props.upload_id})
+        .then(res => {
+            const json = res.data
+            if (res.status === 200 && Array.isArray(json)){
+                this.setState({awaiting_list: json, is_staff: true})
+                const awaiting_id_list = json.map(row => row.upload_id)
+                this.setState({awaiting_id_list: awaiting_id_list})
+                if (awaiting_id_list.includes(this.props.upload_id)) {
+                    this.setState({upload_id: this.props.upload_id})
+                }
             }
         })
         .catch(err => console.log(err))

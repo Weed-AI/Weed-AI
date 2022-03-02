@@ -1,9 +1,8 @@
 import json
-import logging
 import os
-import shutil
 import traceback
 from pathlib import Path
+
 import requests
 from core.settings import (
     MAX_IMAGE_SIZE,
@@ -13,8 +12,11 @@ from core.settings import (
     TUS_DESTINATION_DIR,
     UPLOAD_DIR,
 )
+from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth import login, logout
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.hashers import check_password
+from django.core.exceptions import PermissionDenied
 from django.http import (
     HttpResponse,
     HttpResponseBadRequest,
@@ -24,11 +26,13 @@ from django.http import (
 )
 from django.shortcuts import render
 from django.views.decorators.csrf import ensure_csrf_cookie
+from django.views.decorators.http import require_http_methods
 from weedcoco.importers.mask import generate_paths_from_mask_only, masks_to_coco
 from weedcoco.importers.voc import voc_to_coco
 from weedcoco.utils import fix_compatibility_quirks
 from weedcoco.validation import JsonValidationError, validate, validate_json
 
+from weedid.decorators import check_post_and_authenticated
 from weedid.models import Dataset, WeedidUser
 from weedid.notification import review_notification
 from weedid.tasks import submit_upload_task, update_index_and_thumbnails
@@ -50,9 +54,6 @@ from weedid.utils import (
 )
 
 
-logger = logging.getLogger(__name__)
-
-
 @ensure_csrf_cookie
 def set_csrf(request):
     return HttpResponse("Success")
@@ -64,6 +65,13 @@ def json_validation_response(exc):
     )
 
 
+def check_ownership(upload_id, user_id, message="Permission Denied"):
+    dataset = Dataset.objects.get(upload_id=upload_id)
+    if dataset.user.id != user_id:
+        raise PermissionDenied(message)
+
+
+@require_http_methods(["GET", "POST"])
 def elasticsearch_query(request):
     try:
         elasticsearch_url = "/".join(request.path.split("/")[2:])
@@ -71,8 +79,6 @@ def elasticsearch_query(request):
         return HttpResponseBadRequest("Invalid query format")
     if not elasticsearch_url.startswith("weedid/_msearch"):
         return HttpResponseBadRequest("Only _msearch queries are currently forwarded")
-    if request.method not in ["POST", "GET"]:
-        return HttpResponseNotAllowed(request.method)
     elasticsearch_response = requests.post(
         url=f"http://elasticsearch:9200/{elasticsearch_url}",
         data=request.body,
@@ -101,12 +107,10 @@ def upload_helper(weedcoco_json, user_id, schema="coco", upload_id=None):
     return upload_id, images, categories
 
 
+@require_http_methods(["POST"])
+@login_required
 def upload(request):
-    if not request.method == "POST":
-        return HttpResponseNotAllowed(request.method)
     user = request.user
-    if not (user and user.is_authenticated):
-        return HttpResponseForbidden("You dont have access to proceed")
     try:
         images = []
         file_weedcoco = request.FILES["weedcoco"]
@@ -179,12 +183,9 @@ def editing_init(request, dataset_id):
 
 class CustomUploader:
     @classmethod
+    @check_post_and_authenticated
     def upload(cls, request):
-        if not request.method == "POST":
-            return HttpResponseNotAllowed(request.method)
         user = request.user
-        if not (user and user.is_authenticated):
-            return HttpResponseForbidden("You dont have access to proceed")
         try:
             store_id = request.POST[cls.id_name]
             if "/" in store_id:
@@ -203,12 +204,9 @@ class CustomUploader:
             return HttpResponse(f"Uploaded {payload.name} to {store_dir}")
 
     @classmethod
+    @check_post_and_authenticated
     def remove(cls, request):
-        if not request.method == "POST":
-            return HttpResponseNotAllowed(request.method)
         user = request.user
-        if not (user and user.is_authenticated):
-            return HttpResponseForbidden("You dont have access to proceed")
         try:
             store_id = request.POST[cls.id_name]
             if "/" in store_id:
@@ -226,12 +224,9 @@ class CustomUploader:
             return HttpResponseBadRequest(f"Error when removing {remove_name}")
 
     @classmethod
+    @check_post_and_authenticated
     def move(cls, request):
-        if not request.method == "POST":
-            return HttpResponseNotAllowed(request.method)
         user = request.user
-        if not (user and user.is_authenticated):
-            return HttpResponseForbidden("You dont have access to proceed")
         try:
             store_id = request.POST[cls.id_name]
             if "/" in store_id:
@@ -247,12 +242,9 @@ class CustomUploader:
             return HttpResponseBadRequest(str(e))
 
     @classmethod
+    @check_post_and_authenticated
     def submit(cls, request):
-        if not request.method == "POST":
-            return HttpResponseNotAllowed(request.method)
         user = request.user
-        if not (user and user.is_authenticated):
-            return HttpResponseForbidden("You dont have access to proceed")
         try:
             store_id = request.POST[cls.id_name]
             if "/" in store_id:
@@ -318,13 +310,12 @@ class MaskUploader(CustomUploader):
         )
 
 
+@login_required
+@require_http_methods(["POST"])
 def upload_image(request):
-    if not request.method == "POST":
-        return HttpResponseNotAllowed(request.method)
     user = request.user
-    if not (user and user.is_authenticated):
-        return HttpResponseForbidden("You dont have access to proceed")
     upload_id = request.POST["upload_id"]
+    check_ownership(upload_id, user.id, "No permission to upload")
     upload_image = request.FILES["upload_image"]
     if upload_image.size > MAX_IMAGE_SIZE:
         return HttpResponseBadRequest("This image has exceeded the size limit!")
@@ -333,13 +324,11 @@ def upload_image(request):
     return HttpResponse(f"Uploaded {upload_image.name} to {upload_dir}")
 
 
+@login_required
+@require_http_methods(["POST"])
 def unpack_image_zip(request):
     """Unpack a zipfile which has been uploaded via tus"""
-    if not request.method == "POST":
-        return HttpResponseNotAllowed(request.method)
     user = request.user
-    if not (user and user.is_authenticated):
-        return HttpResponseForbidden("You dont have access to proceed")
     upload_id = request.POST["upload_id"]
     upload_image_zip = request.POST["upload_image_zip"]
     # Get list of missing images from frontend to calculate images that are still missing after the current zip being uploaded
@@ -355,14 +344,13 @@ def unpack_image_zip(request):
     )
 
 
+@login_required
+@require_http_methods(["POST"])
 def update_categories(request):
-    if not request.method == "POST":
-        return HttpResponseNotAllowed(request.method)
     user = request.user
-    if not (user and user.is_authenticated):
-        return HttpResponseForbidden("You dont have access to proceed")
     data = json.loads(request.body)
     upload_id, categories = data["upload_id"], data["categories"]
+    check_ownership(upload_id, user.id, "No permission to update")
     weedcoco_path = os.path.join(
         UPLOAD_DIR, str(user.id), str(upload_id), "weedcoco.json"
     )
@@ -381,14 +369,13 @@ def update_categories(request):
         )
 
 
+@login_required
+@require_http_methods(["POST"])
 def upload_agcontexts(request):
-    if not request.method == "POST":
-        return HttpResponseNotAllowed(request.method)
     user = request.user
-    if not (user and user.is_authenticated):
-        return HttpResponseForbidden("You dont have access to proceed")
     data = json.loads(request.body)
     upload_id, ag_contexts = data["upload_id"], data["ag_contexts"]
+    check_ownership(upload_id, user.id, "No permission to update")
     try:
         validate_json(ag_contexts, schema="agcontext")
     except JsonValidationError as e:
@@ -408,42 +395,36 @@ def upload_agcontexts(request):
         )
 
 
+@login_required
+@require_http_methods(["POST"])
 def upload_metadata(request):
-    if request.method == "POST":
-        user = request.user
-        if user and user.is_authenticated:
-            data = json.loads(request.body)
-            upload_id, metadata = data["upload_id"], data["metadata"]
-            try:
-                validate_json(metadata, schema="metadata")
-            except JsonValidationError as e:
-                traceback.print_exc()
-                return json_validation_response(e)
-            weedcoco_path = os.path.join(
-                UPLOAD_DIR, str(user.id), str(upload_id), "weedcoco.json"
-            )
-            try:
-                add_metadata(weedcoco_path, metadata)
-                Dataset.objects.filter(upload_id=upload_id).update(metadata=metadata)
-            except Exception:
-                return HttpResponseNotAllowed("Failed to add Metadata")
-            else:
-                return HttpResponse(
-                    f"Updated Metadata for user {user.id}'s upload{upload_id}"
-                )
-        else:
-            return HttpResponseForbidden("You dont have access to proceed")
-    else:
-        return HttpResponseNotAllowed(request.method)
-
-
-def submit_deposit(request):
-    if not request.method == "POST":
-        return HttpResponseNotAllowed(request.method)
     user = request.user
-    if not (user and user.is_authenticated):
-        return HttpResponseForbidden("You dont have access to proceed")
+    data = json.loads(request.body)
+    upload_id, metadata = data["upload_id"], data["metadata"]
+    check_ownership(upload_id, user.id, "No permission to update")
+    try:
+        validate_json(metadata, schema="metadata")
+    except JsonValidationError as e:
+        traceback.print_exc()
+        return json_validation_response(e)
+    weedcoco_path = os.path.join(
+        UPLOAD_DIR, str(user.id), str(upload_id), "weedcoco.json"
+    )
+    try:
+        add_metadata(weedcoco_path, metadata)
+        Dataset.objects.filter(upload_id=upload_id).update(metadata=metadata)
+    except Exception:
+        return HttpResponseNotAllowed("Failed to add Metadata")
+    else:
+        return HttpResponse(f"Updated Metadata for user {user.id}'s upload{upload_id}")
+
+
+@login_required
+@require_http_methods(["POST"])
+def submit_deposit(request):
+    user = request.user
     upload_id = request.POST["upload_id"]
+    check_ownership(upload_id, user.id, "No permission to submit")
     weedcoco_path = os.path.join(
         UPLOAD_DIR, str(user.id), str(upload_id), "weedcoco.json"
     )
@@ -457,10 +438,8 @@ def submit_deposit(request):
     return HttpResponse(f"Work on user {user.id}'s upload{upload_id}")
 
 
+@login_required
 def upload_status(request):
-    user = request.user
-    if not (user and user.is_authenticated):
-        return HttpResponse("You havent been logged in")
     user_id = request.user.id
     upload_entity = WeedidUser.objects.get(id=user_id).latest_upload
     return HttpResponse(
@@ -473,9 +452,8 @@ def upload_status(request):
     )
 
 
+@require_http_methods(["GET"])
 def upload_info(request, dataset_id):
-    if request.method != "GET":
-        return HttpResponseNotAllowed(request.method)
     upload_entity = Dataset.objects.get(upload_id=dataset_id)
     return HttpResponse(
         json.dumps(
@@ -492,24 +470,19 @@ def upload_list(request):
     return HttpResponse(json.dumps(upload_list))
 
 
+@login_required
+@staff_member_required
 def awaiting_list(request):
-    user = request.user
-    if not (user and user.is_authenticated and user.is_staff):
-        return HttpResponseForbidden("You dont have access to proceed")
-    try:
-        awaiting_list = [
-            retrieve_listing_info(dataset, awaiting_review=True)
-            for dataset in Dataset.objects.filter(status="AR")
-        ]
-        return HttpResponse(json.dumps(awaiting_list))
-    except Exception:
-        return HttpResponseNotAllowed("Awaiting list is not able to retrieve")
+    awaiting_list = [
+        retrieve_listing_info(dataset, awaiting_review=True)
+        for dataset in Dataset.objects.filter(status="AR")
+    ]
+    return HttpResponse(json.dumps(awaiting_list))
 
 
+@login_required
 def editing_list(request):
     user = request.user
-    if not (user and user.is_authenticated):
-        return HttpResponseForbidden("You dont have access to proceed")
     try:
         editing_list = [
             retrieve_listing_info(dataset, awaiting_review=False)
@@ -522,10 +495,9 @@ def editing_list(request):
         return HttpResponseNotAllowed("There is no dataset to edit for this user")
 
 
+@login_required
+@staff_member_required
 def dataset_approve(request, dataset_id):
-    user = request.user
-    if not (user and dataset_id and user.is_authenticated and user.is_staff):
-        return HttpResponseForbidden("You dont have access to proceed")
     upload_entity = Dataset.objects.get(upload_id=dataset_id, status="AR")
     if upload_entity:
         weedcoco_path = os.path.join(REPOSITORY_DIR, str(dataset_id), "weedcoco.json")
@@ -538,10 +510,9 @@ def dataset_approve(request, dataset_id):
         return HttpResponseNotAllowed("Dataset to be reviewed doesn't exist")
 
 
+@login_required
+@staff_member_required
 def dataset_reject(request, dataset_id):
-    user = request.user
-    if not (user and dataset_id and user.is_authenticated and user.is_staff):
-        return HttpResponseForbidden("You dont have access to proceed")
     upload_entity = Dataset.objects.get(upload_id=dataset_id, status="AR")
     if upload_entity:
         try:
@@ -556,9 +527,8 @@ def dataset_reject(request, dataset_id):
         return HttpResponseNotAllowed("Dataset to be rejected doesn't exist")
 
 
+@require_http_methods(["POST"])
 def user_register(request):
-    if not request.method == "POST":
-        return HttpResponseNotAllowed(request.method)
     username = request.POST["username"]
     email = request.POST["email"]
     password = request.POST["password"]
@@ -576,9 +546,8 @@ def user_register(request):
         return HttpResponseServerError("Server error")
 
 
+@require_http_methods(["POST"])
 def user_login(request):
-    if not request.method == "POST":
-        return HttpResponseNotAllowed(request.method)
     username = request.POST["username"]
     password = request.POST["password"]
     if not WeedidUser.objects.filter(username=username).count():
@@ -608,9 +577,8 @@ def user_login_status(request):
         return HttpResponseForbidden("You havent been logged in")
 
 
+@require_http_methods(["POST"])
 def login_google(request):
-    if not request.method == "POST":
-        return HttpResponseNotAllowed(request.method)
     body = json.loads(request.body)
     email, googleId = body["email"], body["googleId"]
     users = WeedidUser.objects.all().filter(email=email)
