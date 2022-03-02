@@ -67,7 +67,7 @@ def json_validation_response(exc):
 
 def check_ownership(upload_id, user_id, message="Permission Denied"):
     dataset = Dataset.objects.get(upload_id=upload_id)
-    if not dataset or dataset.user.id != user_id:
+    if dataset.user.id != user_id:
         raise PermissionDenied(message)
 
 
