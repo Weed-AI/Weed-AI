@@ -1,9 +1,9 @@
-import React, {Component} from 'react';
-import DatasetList from '../dataset/dataset_list';
-import DatasetSummaryPage from '../dataset/dataset_summary';
-import axios from 'axios';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Switch from '@material-ui/core/Switch';
+import axios from 'axios';
+import React, { Component } from 'react';
+import DatasetList from '../dataset/dataset_list';
+import DatasetSummaryPage from '../dataset/dataset_summary';
 
 const baseURL = new URL(window.location.origin); 
 
@@ -111,10 +111,11 @@ class DatasetComponent extends Component {
             else {
                 datasetSection = <DatasetList title={""} handleUploadid={this.handleUploadid} upload_list={this.state.editing_list} inEdit={true}/>;
             }
-       } else {
+        } 
+        else {
             datasetSection = <DatasetSummaryPage upload_id={this.state.upload_id} handleUploadid={this.handleUploadid}/>;
-       }
-       return [editingToggle, datasetSection]
+        }
+        return [editingToggle, datasetSection]
     }
 }
 
