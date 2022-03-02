@@ -32,7 +32,7 @@ from weedcoco.importers.voc import voc_to_coco
 from weedcoco.utils import fix_compatibility_quirks
 from weedcoco.validation import JsonValidationError, validate, validate_json
 
-from weedid.decorators import decorator_post_logged_in
+from weedid.decorators import check_post_and_authenticated
 from weedid.models import Dataset, WeedidUser
 from weedid.notification import review_notification
 from weedid.tasks import submit_upload_task, update_index_and_thumbnails
@@ -124,7 +124,7 @@ def upload(request):
 
 class CustomUploader:
     @classmethod
-    @decorator_post_logged_in
+    @check_post_and_authenticated
     def upload(cls, request):
         user = request.user
         try:
@@ -145,7 +145,7 @@ class CustomUploader:
             return HttpResponse(f"Uploaded {payload.name} to {store_dir}")
 
     @classmethod
-    @decorator_post_logged_in
+    @check_post_and_authenticated
     def remove(cls, request):
         user = request.user
         try:
@@ -165,7 +165,7 @@ class CustomUploader:
             return HttpResponseBadRequest(f"Error when removing {remove_name}")
 
     @classmethod
-    @decorator_post_logged_in
+    @check_post_and_authenticated
     def move(cls, request):
         user = request.user
         try:
@@ -183,7 +183,7 @@ class CustomUploader:
             return HttpResponseBadRequest(str(e))
 
     @classmethod
-    @decorator_post_logged_in
+    @check_post_and_authenticated
     def submit(cls, request):
         user = request.user
         try:

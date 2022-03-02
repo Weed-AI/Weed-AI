@@ -1,7 +1,7 @@
 from django.http import HttpResponseForbidden, HttpResponseNotAllowed
 
 
-def decorator_post_logged_in(view_func):
+def check_post_and_authenticated(view_func):
     def _wrapped_view(cls, request, *args, **kwargs):
         if not request.method == "POST":
             return HttpResponseNotAllowed(request.method)
