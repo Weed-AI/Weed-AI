@@ -77,7 +77,7 @@ export default function UploadDialog(props) {
           upload_mode !== 'edit'
           ?
           <Button className={classes.uploadButton} variant="contained" onClick={handleClickOpen}>
-            `Begin ${upload_mode}`
+            Begin {upload_mode}
           </Button>
           :
           <Button onClick={handleClickOpen}>
