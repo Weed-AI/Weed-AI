@@ -4,6 +4,7 @@ import MuiDialogContent from '@material-ui/core/DialogContent';
 import MuiDialogTitle from '@material-ui/core/DialogTitle';
 import IconButton from '@material-ui/core/IconButton';
 import { withStyles } from '@material-ui/core/styles';
+import Tooltip from '@material-ui/core/Tooltip';
 import Typography from '@material-ui/core/Typography';
 import CloseIcon from '@material-ui/icons/Close';
 import EditIcon from '@material-ui/icons/Edit';
@@ -80,9 +81,11 @@ export default function UploadDialog(props) {
             Begin {upload_mode}
           </Button>
           :
-          <Button onClick={handleClickOpen}>
-            <EditIcon fontSize='small'/>
-          </Button>
+          <Tooltip title="Edit Dataset" onClick={handleClickOpen}>
+            <IconButton>
+              <EditIcon fontSize='small'/>
+            </IconButton>
+          </Tooltip>
       }
       <Dialog maxWidth='md' onClose={handleClose} aria-labelledby="upload-dialog-title" open={open} disableBackdropClick={true}>
         <DialogTitle id="upload-dialog-title" onClose={handleClose}>
