@@ -39,7 +39,7 @@ from weedid.notification import review_notification
 from weedid.tasks import (
     submit_upload_task,
     update_index_and_thumbnails,
-    store_tmp_image_from_zip
+    store_tmp_image_from_zip,
 )
 from weedid.utils import (
     add_agcontexts,
