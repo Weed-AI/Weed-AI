@@ -463,8 +463,9 @@ def upload_info(request, dataset_id):
 
 
 def upload_list(request):
+    user_id = request.user.id if request.user else 0
     upload_list = [
-        retrieve_listing_info(dataset, awaiting_review=False)
+        retrieve_listing_info(dataset, awaiting_review=False, user_id=user_id)
         for dataset in Dataset.objects.filter(status="C")
     ]
     return HttpResponse(json.dumps(upload_list))
@@ -478,21 +479,6 @@ def awaiting_list(request):
         for dataset in Dataset.objects.filter(status="AR")
     ]
     return HttpResponse(json.dumps(awaiting_list))
-
-
-@login_required
-def editing_list(request):
-    user = request.user
-    try:
-        editing_list = [
-            retrieve_listing_info(dataset, awaiting_review=False)
-            for dataset in Dataset.objects.filter(
-                status="C", user=WeedidUser.objects.get(id=user.id)
-            )
-        ]
-        return HttpResponse(json.dumps(editing_list))
-    except Exception:
-        return HttpResponseNotAllowed("There is no dataset to edit for this user")
 
 
 @login_required

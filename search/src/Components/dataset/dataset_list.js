@@ -51,7 +51,6 @@ const useStyles = makeStyles((theme) => ({
 
 export default function DatasetList(props) {
   const inReview = props.inReview;  // should we list 
-  const inEdit = props.inEdit;
   const baseURL = new URL(window.location.origin);
   const classes = useStyles();
   const [loading, setLoading] = useState(false);
@@ -90,8 +89,8 @@ export default function DatasetList(props) {
               <TableCell className={classes.tableHeader}>Dataset Title</TableCell>
               {inReview ? <TableCell className={classes.tableHeader}>Contact</TableCell> : ""}
               <TableCell className={classes.tableHeader}>Upload Date</TableCell>
-              {!inEdit ? <TableCell className={classes.tableHeader}>Explore</TableCell> : ""}
-              {inEdit ? <TableCell className={classes.tableHeader}>Edit</TableCell> : ""}
+              <TableCell className={classes.tableHeader}>Explore</TableCell>
+              <TableCell className={classes.tableHeader}>Edit</TableCell>
               {inReview ? <TableCell className={classes.tableHeader}>Command</TableCell> : ""}
             </TableRow>
           </TableHead>
@@ -105,12 +104,12 @@ export default function DatasetList(props) {
                 </TableCell>
                 {inReview ? <TableCell><a href="mailto:{row.contributor_email}">{row.contributor_email}</a></TableCell> : ""}
                 <TableCell>{row.upload_date}</TableCell>
-                {!inEdit ? <TableCell><IconButton href={"/explore?dataset_name_filter=%5B%22" + row.name + "%22%5D"}><PhotoIcon /></IconButton></TableCell> : ""}
-                {inEdit
-                  ?<TableCell>
-                    <UploadDialog upload_mode={'edit'} upload_id={row.upload_id}/>
-                  </TableCell>
-                  : ""} 
+                <TableCell><IconButton href={"/explore?dataset_name_filter=%5B%22" + row.name + "%22%5D"}><PhotoIcon /></IconButton></TableCell>
+                <TableCell>
+                  {row.editable
+                  ?<UploadDialog upload_mode={'edit'} upload_id={row.upload_id}/>
+                  : ""}
+                </TableCell>
                 {inReview
                   ?<TableCell className={classes.commandCol}>
                     <button className={`${classes.command} ${classes.approval}`} onClick={() => handleApprove(row.upload_id)}>Approve</button>

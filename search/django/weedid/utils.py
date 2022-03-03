@@ -168,7 +168,7 @@ def remove_entity_local_record(user_id, upload_id):
             os.remove(dir_path)
 
 
-def retrieve_listing_info(query_entity, awaiting_review):
+def retrieve_listing_info(query_entity, awaiting_review, user_id=0):
     """Retrieving info from specific upload entity"""
     return {
         "name": query_entity.metadata["name"]
@@ -178,6 +178,7 @@ def retrieve_listing_info(query_entity, awaiting_review):
         "upload_date": str(query_entity.date),
         "contributor": query_entity.user.username,
         "contributor_email": query_entity.user.email if awaiting_review else "",
+        "editable": query_entity.user.id == user_id,
     }
 
 

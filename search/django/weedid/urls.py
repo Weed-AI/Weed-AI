@@ -1,6 +1,6 @@
-from django.urls import path, re_path, include
-from weedid import views, tus
+from django.urls import include, path, re_path
 
+from weedid import tus, views
 
 api_urlpatterns = [
     path("upload/", views.upload, name="upload"),
@@ -24,7 +24,6 @@ api_urlpatterns = [
     path("upload_info/<str:dataset_id>", views.upload_info, name="upload_info"),
     path("upload_list/", views.upload_list, name="upload_list"),
     path("awaiting_list/", views.awaiting_list, name="awaiting_list"),
-    path("editing_list/", views.editing_list, name="editing_list"),
     path(
         "dataset_approve/<str:dataset_id>",
         views.dataset_approve,
