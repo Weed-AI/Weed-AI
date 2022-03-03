@@ -90,7 +90,6 @@ export default function DatasetList(props) {
               {inReview ? <TableCell className={classes.tableHeader}>Contact</TableCell> : ""}
               <TableCell className={classes.tableHeader}>Upload Date</TableCell>
               <TableCell className={classes.tableHeader}>Explore</TableCell>
-              <TableCell className={classes.tableHeader}>Edit</TableCell>
               {inReview ? <TableCell className={classes.tableHeader}>Command</TableCell> : ""}
             </TableRow>
           </TableHead>
@@ -101,15 +100,13 @@ export default function DatasetList(props) {
                 <Link href={baseURL + 'datasets/' + row.upload_id} color='blue'>
                   {row.name}
                 </Link>
+                {row.editable
+                ?<UploadDialog upload_mode={'edit'} upload_id={row.upload_id}/>
+                : ""}
                 </TableCell>
                 {inReview ? <TableCell><a href="mailto:{row.contributor_email}">{row.contributor_email}</a></TableCell> : ""}
                 <TableCell>{row.upload_date}</TableCell>
                 <TableCell><IconButton href={"/explore?dataset_name_filter=%5B%22" + row.name + "%22%5D"}><PhotoIcon /></IconButton></TableCell>
-                <TableCell>
-                  {row.editable
-                  ?<UploadDialog upload_mode={'edit'} upload_id={row.upload_id}/>
-                  : ""}
-                </TableCell>
                 {inReview
                   ?<TableCell className={classes.commandCol}>
                     <button className={`${classes.command} ${classes.approval}`} onClick={() => handleApprove(row.upload_id)}>Approve</button>

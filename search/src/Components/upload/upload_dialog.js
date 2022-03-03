@@ -6,6 +6,7 @@ import IconButton from '@material-ui/core/IconButton';
 import { withStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import CloseIcon from '@material-ui/icons/Close';
+import EditIcon from '@material-ui/icons/Edit';
 import axios from 'axios';
 import React from 'react';
 import UploadSteper from './upload_stepper';
@@ -26,7 +27,7 @@ const styles = (theme) => ({
     fontWeight: 600,
     backgroundColor: '#4490db',
     color: 'white'
-  }
+  },
 });
 
 const DialogTitle = withStyles(styles)((props) => {
@@ -72,9 +73,17 @@ export default function UploadDialog(props) {
 
   return (
     <React.Fragment>
-      <Button className={classes.uploadButton} variant="contained" onClick={handleClickOpen}>
-        {`Begin ${upload_mode}`}
-      </Button>
+      {
+          upload_mode !== 'edit'
+          ?
+          <Button className={classes.uploadButton} variant="contained" onClick={handleClickOpen}>
+            `Begin ${upload_mode}`
+          </Button>
+          :
+          <Button onClick={handleClickOpen}>
+            <EditIcon fontSize='small'/>
+          </Button>
+      }
       <Dialog maxWidth='md' onClose={handleClose} aria-labelledby="upload-dialog-title" open={open} disableBackdropClick={true}>
         <DialogTitle id="upload-dialog-title" onClose={handleClose}>
         </DialogTitle>
