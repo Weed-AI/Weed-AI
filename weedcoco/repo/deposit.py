@@ -40,61 +40,97 @@ class RepositoryDataset:
     def __init__(self, repo, identifier):
         self.repo = repo
         self.identifier = identifier
-        self.ocfl = None
+        self._ocfl = None
+        self._inventory = None
+        self._object_path = None
 
-    def open(self):
-        obj_path = self.repo.ocfl.object_path(identifier=self.identifier)
-        self.path = self.repo.root / pathlib.Path(obj_path)
-        self.ocfl = ocfl.Object(identifier=self.identifier)
-        if self.path.is_dir():
-            self.ocfl.open_fs(str(self.path))
-            return self.path
+    @property
+    def ocfl(self):
+        if self._ocfl is not None:
+            return self._ocfl
+        rel_path = self.repo.ocfl.object_path(identifier=self.identifier)
+        self._object_path = self.repo.root / pathlib.Path(rel_path)
+        if self._object_path.is_dir():
+            self._ocfl = ocfl.Object(identifier=self.identifier)
+            self._ocfl.open_fs(str(self._object_path))
+            return self._ocfl
         else:
             return None
 
-    def sources(self, weedcoco_path, image_dir):
-        """Set the weedcoco_path and images_dir for the build"""
-        self.weedcoco_path = weedcoco_path
-        self.image_dir = image_dir
+    @property
+    def object_path(self):
+        """
+        Returns a pathlib.Path to the dataset's OCFL object, or None if
+        an object with this identifiery isn't found in the repo
+        """
+        if self._object_path is not None:
+            return self._object_path
+        if self.ocfl is not None:
+            return self._object_path
+        return None
 
+    @property
+    def exists_in_repo(self):
+        if self.ocfl is not None:
+            return True
+        return False
+
+    @property
     def inventory(self):
-        """Return the object's inventory"""
-        if not self.open():
-            raise RepositoryError(f"Object {self.identifier} not found in repository")
-        return self.ocfl.parse_inventory()
+        """The object's parsed inventory."""
+        if self._inventory is not None:
+            return self._inventory
+        if self.ocfl is not None:
+            self._inventory = self.ocfl.parse_inventory()
+            return self._inventory
+        return None
 
-    def paths(self, version="head"):
-        """Iterate over the paths of all the content in a version"""
-        inventory = self.inventory()
+    @property
+    def head_version(self):
+        if self.inventory is not None:
+            return self._inventory["head"]
+        return None
+
+    def get_logical_paths(self, version="head"):
+        """Iterate over all content in a version as logical paths"""
+        if self.inventory is None:
+            raise RepositoryError(f"Object {self.identifier} not in repository")
         if version == "head":
-            version = inventory["head"]
-        for paths in inventory["versions"][version]["state"].values():
+            version = self.inventory["head"]
+        for paths in self.inventory["versions"][version]["state"].values():
             for path in paths:
                 yield path
 
-    def path(self, path, version="head"):
-        """Return the actual filesystem path for a logical path in a version."""
-        inventory = self.inventory()
+    def resolve_path(self, logical_path, version="head"):
+        if self.inventory is None:
+            raise RepositoryError(f"Object {self.identifier} not in repository")
         if version == "head":
-            version = inventory["head"]
-        for digest, paths in inventory["versions"][version]["state"].items():
-            if path in paths:
-                return inventory["manifest"][digest]
-        raise RepositoryError(f"Path {path} not found in version {version}")
+            version = self.inventory["head"]
+        for digest, paths in self.inventory["versions"][version]["state"].items():
+            if logical_path in paths:
+                return self.inventory["manifest"][digest]
+        raise RepositoryError(
+            f"Logical path {logical_path} not found in version {version}"
+        )
 
     def extract(self, dest_dir, version="head"):
-        """
-        Write out a version of this object to dest_dir
-        """
-        if not self.open():
+        """Write out a version of this object to dest_dir"""
+        if not self.exists_in_repo:
             raise RepositoryError(f"Object {self.identifier} not found in repository")
-        self.ocfl.extract(objdir=str(self.path), version=version, dstdir=dest_dir)
+        self.ocfl.extract(
+            objdir=str(self.object_path), version=version, dstdir=dest_dir
+        )
 
-    def validate(self, repository):
+    def validate(self):
         """Run checks which need to pass before deposit"""
         self.create_image_hash()
         self.validate_duplicate_images()
-        self.validate_existing_images(repository)
+        self.validate_existing_images()
+
+    def set_sources(self, weedcoco_path, image_dir):
+        """Set the weedcoco_path and images_dir for the build"""
+        self.weedcoco_path = weedcoco_path
+        self.image_dir = image_dir
 
     def build(self, dataset_dir):
         """Build a dataset to be deposited"""
@@ -102,30 +138,27 @@ class RepositoryDataset:
         self.migrate_images(dataset_dir)
 
     def rollback(self, dataset_dir, last_version):
-        """Undo any changes in the event of error. This uses the ocfl object's obj_fs
-        for file operations, so that it works on s3 objects as well as traditional fileystems"""
+        """Undo any changes in the event of error.
+        TODO: should use the ocfl's filesystem object so that it works on other
+        forms of storage like s3"""
         if last_version:
-            inventory = self.inventory()
-            if inventory["head"] != last_version:
-                vi = int(last_version[1:])
-                for version in self.path.glob("v*"):
-                    if int(version.name[1:]) > vi:
+            if self.inventory["head"] != last_version:
+                version_number = int(last_version[1:])
+                for version in self.object_path.glob("v*"):
+                    if int(version.name[1:]) > version_number:
                         rmtree(str(self.path / version))
-                    # self.ocfl.obj_fs.removedir(str(self.path / version), True, True)
                 copy(
-                    str(self.path / last_version / "inventory.json"),
-                    str(self.path / "inventory.json"),
+                    str(self.object_path / last_version / "inventory.json"),
+                    str(self.object_path / "inventory.json"),
                 )
                 copy(
-                    str(self.path / last_version / "inventory.json.sha512"),
-                    str(self.path / "inventory.json.sha512"),
+                    str(self.object_path / last_version / "inventory.json.sha512"),
+                    str(self.object_path / "inventory.json.sha512"),
                 )
         else:
-            # no last_version means a create failed, so remove the whole objext
-            if self.path.is_dir():
-                rmtree(str(self.path))
-                # self.ocfl.open_fs(str(self.path))
-                # self.ocfl.obj_fs.removedir(str(self.path), True, True)
+            # no last_version means a create failed, so remove the whole object
+            if self.object_path.is_dir():
+                rmtree(str(self.object_path))
 
     def write_weedcoco(self, dataset_dir):
         with open(self.weedcoco_path) as f:
@@ -136,7 +169,7 @@ class RepositoryDataset:
                 image_reference["file_name"] = "images/" + self.image_hash[file_name]
         validate(weedcoco, self.image_dir)
         new_weedcoco = dataset_dir / "weedcoco.json"
-        with (new_weedcoco).open("w") as out:
+        with new_weedcoco.open("w") as out:
             json.dump(weedcoco, out, indent=4)
 
     def migrate_images(self, dataset_dir):
@@ -171,9 +204,9 @@ class RepositoryDataset:
                 + image_pairs
             )
 
-    def validate_existing_images(self, repository):
+    def validate_existing_images(self):
         addition_hash = get_hashset_from_image_name(self.image_hash)
-        all_existing_hash = self.get_all_existing_hash(repository)
+        all_existing_hash = self.get_all_existing_hash(self.repo)
         if len(all_existing_hash.union(addition_hash)) != len(all_existing_hash) + len(
             addition_hash
         ):
@@ -184,7 +217,7 @@ class RepositoryDataset:
             os.path.splitext(path.split("/")[-1])[0]
             for dataset in repository.datasets()
             if dataset.identifier != self.identifier
-            for path in dataset.paths()
+            for path in dataset.get_logical_paths()
             if path.split("/")[0] == "images"
         }
 
@@ -226,8 +259,7 @@ class Repository:
     def __init__(self, root, disposition="pairtree"):
         self.root = root
         self.disposition = disposition
-        if self.root.is_dir():
-            self.connect()
+        self._ocfl = None
 
     def initialize(self):
         if not self.root.is_dir():
@@ -236,8 +268,12 @@ class Repository:
             ocfl_store = ocfl.Store(root=str(self.root))
             ocfl_store.initialize()
 
-    def connect(self):
-        self.ocfl = ocfl.Store(root=str(self.root), disposition=self.disposition)
+    @property
+    def ocfl(self):
+        if self._ocfl is not None:
+            return self._ocfl
+        self._ocfl = ocfl.Store(root=str(self.root), disposition=self.disposition)
+        return self._ocfl
 
     def datasets(self):
         self.ocfl.open_root_fs()
@@ -246,11 +282,7 @@ class Repository:
             yield RepositoryDataset(self, path.split("/")[-1])
 
     def dataset(self, identifier):
-        dataset = RepositoryDataset(self, identifier)
-        if dataset.open():
-            return dataset
-        else:
-            return None
+        return RepositoryDataset(self, identifier)
 
     def setup_deposit(self, temp_dir, deposit_id):
         dataset_dir = temp_dir / deposit_id
@@ -267,32 +299,28 @@ class Repository:
 
         Returns the id of the object.
         """
-        if not identifier:
+        if identifier is None:
             identifier = str(uuid4())
             dataset.identifier = identifier
         else:
             assert "/" not in identifier
-        dataset.validate(self)
+        dataset.validate()
         ocfl_metadata = ocfl.VersionMetadata(
             identifier=identifier,
             message=metadata["message"],
             address=metadata["address"],
             name=metadata["name"],
         )
-        obj_dir = dataset.open()
-        last_version = None
-        if obj_dir:
-            inventory = dataset.inventory()
-            last_version = inventory["head"]
+        last_version = dataset.head_version
         with tempfile.TemporaryDirectory() as temp_dir:
             temp_dir = pathlib.Path(temp_dir)
             dataset_dir = self.setup_deposit(temp_dir, identifier)
             dataset.build(dataset_dir)
             zip_file = dataset.compress_to_download(temp_dir)
             try:
-                if obj_dir:
+                if dataset.exists_in_repo:
                     dataset.ocfl.update(
-                        objdir=str(obj_dir),
+                        objdir=str(dataset.object_path),
                         srcdir=str(dataset_dir),
                         metadata=ocfl_metadata,
                     )
@@ -324,9 +352,8 @@ def deposit(
 ):
     repository = Repository(repository_dir)
     repository.initialize()
-    repository.connect()
-    dataset = RepositoryDataset(repository, upload_id)
-    dataset.sources(weedcoco_path, image_dir)
+    dataset = repository.dataset(upload_id)
+    dataset.set_sources(weedcoco_path, image_dir)
     repository.deposit(upload_id, dataset, metadata, download_dir)
     return repository, dataset
 
@@ -344,18 +371,19 @@ def main(args=None):
     ap.add_argument("--address", default="", type=str)
     ap.add_argument("--message", default="", type=str)
     args = ap.parse_args(args)
-    repository = Repository(args.repository_dir)
-    repository.initialize()
-    repository.connect()
-    dataset = RepositoryDataset(repository, args.identifier)
-    dataset.sources(args.weedcoco_path, args.image_dir)
     metadata = {
         "name": args.name,
         "address": args.address,
         "message": args.message,
     }
-    repository.deposit(args.identifier, dataset, metadata, args.download_dir)
-    return repository, dataset
+    return deposit(
+        args.weedcoco_path,
+        args.image_dir,
+        args.repository_dir,
+        args.download_dir,
+        metadata,
+        args.identifier,
+    )
 
 
 if __name__ == "__main__":
