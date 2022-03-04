@@ -146,7 +146,7 @@ class RepositoryDataset:
                 version_number = int(last_version[1:])
                 for version in self.object_path.glob("v*"):
                     if int(version.name[1:]) > version_number:
-                        rmtree(str(self.path / version))
+                        rmtree(str(self.object_path / version))
                 copy(
                     str(self.object_path / last_version / "inventory.json"),
                     str(self.object_path / "inventory.json"),
