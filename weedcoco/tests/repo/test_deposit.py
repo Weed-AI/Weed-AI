@@ -7,6 +7,7 @@ import re
 import subprocess
 import shutil
 from weedcoco.repo.deposit import main, RepositoryDataset, mkdir_safely
+from weedcoco.index.thumbnailing import thumbnailing
 from weedcoco.validation import ValidationError
 
 TEST_DATA_DIR = pathlib.Path(__file__).parent / "deposit_data"
@@ -169,3 +170,19 @@ def test_multiple_datasets(executor, rewrite_deposit_truth):
     dataset2.extract(str(test_extract_dir / pathlib.Path("dataset_2")))
     assert_files_equal(test_extract_dir, TEST_DATA_SAMPLE_DIR / "multiple")
     assert_weedcoco_equal(test_extract_dir, TEST_DATA_SAMPLE_DIR / "multiple")
+
+
+def test_thumbnails(executor):
+    test_extract_dir, repo, dataset1 = executor.run(
+        "dataset_1", TEST_BASIC_DIR_1 / "weedcoco.json", TEST_BASIC_DIR_1 / "images"
+    )
+    # make thumbnails in the extract dir
+    thumbnailing(test_extract_dir, repo.root, "dataset_1")
+    images = [
+        path.split("/")[1]
+        for path in dataset1.get_logical_paths()
+        if path.split("/")[0] == "images"
+    ]
+    for image in images:
+        thumbnail = test_extract_dir / pathlib.Path(image)
+        assert thumbnail.is_file()

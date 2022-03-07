@@ -108,7 +108,9 @@ class RepositoryDataset:
             version = self.inventory["head"]
         for digest, paths in self.inventory["versions"][version]["state"].items():
             if logical_path in paths:
-                return self.inventory["manifest"][digest]
+                return self.object_path / pathlib.Path(
+                    self.inventory["manifest"][digest][0]
+                )
         raise RepositoryError(
             f"Logical path {logical_path} not found in version {version}"
         )

@@ -8,6 +8,7 @@ from weedcoco.utils import (
     check_if_approved_image_extension,
     denormalise_weedcoco,
 )
+from weedcoco.repo.deposit import Repository
 
 
 def _ensure_dir(path):
@@ -29,6 +30,8 @@ def thumbnail_one(coco_image, image_path, thumbnails_dir, thumbnail_size):
     image.thumbnail(thumbnail_size)
     thumb_width, thumb_height = image.size
     _ensure_dir(thumb_path)
+    # image.save is failing because it wants an extension (even though
+    # the image.format seems to be set)
     image.save(thumb_path)
 
     for annotation in coco_image["annotations"]:
@@ -53,9 +56,11 @@ def thumbnail_one(coco_image, image_path, thumbnails_dir, thumbnail_size):
     image.save(bbox_path)
 
 
-def thumbnailing(
-    thumbnails_dir, repository_dir, weedcoco_path, THUMBNAIL_SIZE=(300, 300)
-):
+def thumbnailing(thumbnails_dir, repository_dir, upload_id, THUMBNAIL_SIZE=(300, 300)):
+    repository = Repository(repository_dir)
+    dataset = repository.dataset(upload_id)
+    weedcoco_path = dataset.resolve_path("weedcoco.json")
+
     with open(weedcoco_path) as f:
         coco = json.load(f)
     denormalise_weedcoco(coco)
@@ -63,26 +68,26 @@ def thumbnailing(
         os.path.basename(image["file_name"]): image for image in coco["images"]
     }
 
-    for dirpath, dirnames, filenames in os.walk(repository_dir):
-        for filename in filenames:
-            if not check_if_approved_image_extension(filename):
-                # XXX: should this raise an error?
-                continue
-            thumbnail_one(
-                coco_by_filename[filename],
-                f"{dirpath}/{filename}",
-                thumbnails_dir,
-                thumbnail_size=THUMBNAIL_SIZE,
-            )
+    for path in dataset.get_logical_paths():
+        if path.split("/")[0] == "images":
+            filename = path.split("/")[1]
+            if check_if_approved_image_extension(filename):
+                content_path = dataset.resolve_path(path)
+                thumbnail_one(
+                    coco_by_filename[filename],
+                    str(content_path),
+                    thumbnails_dir,
+                    thumbnail_size=THUMBNAIL_SIZE,
+                )
 
 
 def main(args=None):
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--thumbnails-dir", type=pathlib.Path, required=True)
     ap.add_argument("--repository-dir", type=pathlib.Path, required=True)
-    ap.add_argument("--weedcoco-path", type=pathlib.Path, required=True)
+    ap.add_argument("--identifier", type=str, required=True)
     args = ap.parse_args(args)
-    thumbnailing(args.thumbnails_dir, args.repository_dir, args.weedcoco_path)
+    thumbnailing(args.thumbnails_dir, args.repository_dir, args.identifier)
 
 
 if __name__ == "__main__":
