@@ -1,15 +1,15 @@
-import React, {Component} from 'react';
-import UploadDialog from '../upload/upload_dialog';
-import AuthPrompt from '../auth/auth_prompt';
-import { withStyles } from '@material-ui/core/styles';
-import axios from 'axios';
-import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
 import Paper from '@material-ui/core/Paper';
-import content from './upload.md'
+import { withStyles } from '@material-ui/core/styles';
+import Typography from '@material-ui/core/Typography';
+import axios from 'axios';
+import React, { Component } from 'react';
 import { Helmet } from "react-helmet";
-import { useArticleStyles } from '../../styles/common'
 import Markdown from "../../Common/Markdown";
+import { useArticleStyles } from '../../styles/common';
+import AuthPrompt from '../auth/auth_prompt';
+import UploadDialog from '../upload/upload_dialog';
+import content from './upload.md';
 
 const PaddedPaper = withStyles((theme) => ({
     root: {
@@ -45,6 +45,7 @@ class UploadComponent extends Component {
             upload_status_details: "",
         }
         this.retrieveUploadStatus = this.retrieveUploadStatus.bind(this);
+        this.checkUploadStatusInterval = this.checkUploadStatusInterval.bind(this);
         this.handleLogin = this.handleLogin.bind(this);
         this.handleLogout = this.handleLogout.bind(this);
     }
@@ -78,6 +79,10 @@ class UploadComponent extends Component {
         })
     }
 
+    checkUploadStatusInterval(interval=5000){
+        setInterval(this.retrieveUploadStatus, interval)
+    }
+
     retrieveLoginStatus(){
         return new Promise((resolve, reject) => {
             axios.get(baseURL + "api/login_status/")
@@ -103,7 +108,6 @@ class UploadComponent extends Component {
         const isLoggedIn = await this.retrieveLoginStatus()
         if(isLoggedIn){
             this.retrieveUploadStatus()
-            setInterval(this.retrieveUploadStatus, 50000)
         }
     }
 
@@ -125,7 +129,7 @@ class UploadComponent extends Component {
                     <Typography variant="body1" style={{color: "#f0983a"}}>{this.state.upload_status_details}</Typography>
                 </PaddedPaper>
                 <div>
-                    <UploadDialog handleUploadStatus={this.retrieveUploadStatus}/>
+                    <UploadDialog handleUploadStatus={this.retrieveUploadStatus} checkUploadStatusInterval={this.checkUploadStatusInterval}/>
                     <Button variant="outlined" color="primary" onClick={this.handleLogout}>
                         Log out
                     </Button>

@@ -1,24 +1,24 @@
-import React from 'react';
-import { withStyles } from '@material-ui/core/styles';
-import Stepper from '@material-ui/core/Stepper';
+import Button from '@material-ui/core/Button';
 import Step from '@material-ui/core/Step';
 import StepLabel from '@material-ui/core/StepLabel';
-import Button from '@material-ui/core/Button';
+import Stepper from '@material-ui/core/Stepper';
+import { withStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
-import UploaderSingle from './uploader_single';
-import UploaderVoc from './uploader_voc';
-import UploaderMasks from './uploader_masks';
-import CategoryMapper from './uploader_category_mapper';
-import ErrorMessage from '../error/display';
-import AgContextForm from '../forms/AgContextForm';
-import UploadJsonButton from '../forms/UploadJsonButton';
-import MetadataForm from '../forms/MetadataForm';
 import axios from 'axios';
 import Cookies from 'js-cookie';
 import cloneDeep from 'lodash/cloneDeep';
-import {jsonSchemaTitle} from '../error/utils';
-import ImageOrZipUploader from './uploader_zip_images';
+import React from 'react';
+import ErrorMessage from '../error/display';
+import { jsonSchemaTitle } from '../error/utils';
+import AgContextForm from '../forms/AgContextForm';
+import MetadataForm from '../forms/MetadataForm';
+import UploadJsonButton from '../forms/UploadJsonButton';
 import CardSelector from '../generic/card_selector';
+import CategoryMapper from './uploader_category_mapper';
+import UploaderMasks from './uploader_masks';
+import UploaderSingle from './uploader_single';
+import UploaderVoc from './uploader_voc';
+import ImageOrZipUploader from './uploader_zip_images';
 
 
 const baseURL = new URL(window.location.origin);
@@ -195,6 +195,7 @@ class UploadStepper extends React.Component {
         if (this.state.activeStep === this.state.steps.length - 1){
             this.handleSubmit();
             this.props.handleClose();
+            this.props.checkUploadStatusInterval(3000);
             this.handleReset();
         }
         else {

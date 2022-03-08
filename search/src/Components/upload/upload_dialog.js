@@ -1,13 +1,13 @@
-import React from 'react';
-import { withStyles } from '@material-ui/core/styles';
 import Button from '@material-ui/core/Button';
 import Dialog from '@material-ui/core/Dialog';
-import MuiDialogTitle from '@material-ui/core/DialogTitle';
 import MuiDialogContent from '@material-ui/core/DialogContent';
+import MuiDialogTitle from '@material-ui/core/DialogTitle';
 import IconButton from '@material-ui/core/IconButton';
-import CloseIcon from '@material-ui/icons/Close';
+import { withStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
-import UploadSteper from './upload_stepper'
+import CloseIcon from '@material-ui/icons/Close';
+import React from 'react';
+import UploadSteper from './upload_stepper';
 
 const styles = (theme) => ({
   root: {
@@ -71,7 +71,7 @@ export default function UploadDialog(props) {
         <DialogTitle id="upload-dialog-title" onClose={handleClose}>
         </DialogTitle>
         <DialogContent>
-            <UploadSteper handleClose={handleClose} />
+            <UploadSteper handleClose={handleClose} checkUploadStatusInterval={props.checkUploadStatusInterval}/>
         </DialogContent>
       </Dialog>
     </React.Fragment>
