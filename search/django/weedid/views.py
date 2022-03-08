@@ -12,7 +12,6 @@ from core.settings import (
     TUS_DESTINATION_DIR,
     UPLOAD_DIR,
 )
-
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required
@@ -37,9 +36,9 @@ from weedid.decorators import check_post_and_authenticated
 from weedid.models import Dataset, WeedidUser
 from weedid.notification import review_notification
 from weedid.tasks import (
+    store_tmp_image_from_zip,
     submit_upload_task,
     update_index_and_thumbnails,
-    store_tmp_image_from_zip,
 )
 from weedid.utils import (
     add_agcontexts,

@@ -1,29 +1,31 @@
 from __future__ import absolute_import, unicode_literals
-import json
-import traceback
+
 import datetime
+import json
+import os
 import subprocess
 import tempfile
-from shutil import copy
+import traceback
+from pathlib import Path
+from shutil import copy, move, rmtree
 from zipfile import ZipFile
+
 from celery import shared_task
-from weedcoco.repo.deposit import deposit, compress_to_download
+from core.settings import (
+    DOWNLOAD_DIR,
+    DVC_REMOTE_PATH,
+    GIT_REMOTE_PATH,
+    REPOSITORY_DIR,
+    THUMBNAILS_DIR,
+    UPLOAD_DIR,
+)
 from weedcoco.index.indexing import ElasticSearchIndexer
 from weedcoco.index.thumbnailing import thumbnailing
+from weedcoco.repo.deposit import compress_to_download, deposit
+
 from weedid.models import Dataset
+from weedid.notification import review_notification, upload_notification
 from weedid.utils import make_upload_entity_fields, mkdir_safely
-from weedid.notification import upload_notification, review_notification
-from core.settings import (
-    THUMBNAILS_DIR,
-    REPOSITORY_DIR,
-    DOWNLOAD_DIR,
-    UPLOAD_DIR,
-    GIT_REMOTE_PATH,
-    DVC_REMOTE_PATH,
-)
-from pathlib import Path
-import os
-from shutil import move, rmtree
 
 
 @shared_task
@@ -235,5 +237,10 @@ def store_tmp_image_from_zip(upload_id, upload_image_zip, image_dir, full_images
             for filename in filenames:
                 if filename in full_images and filename not in existing_images:
                     copy(os.path.join(dir, filename), os.path.join(image_dir, filename))
-    missing_images = list(set(os.listdir(image_dir)))
-    return {"upload_id": upload_id, "missing_images": missing_images}
+    uploaded_images_set = set(os.listdir(image_dir))
+    missing_image_amount = len(set(full_images) - uploaded_images_set)
+    return {
+        "upload_id": upload_id,
+        "uploaded_images": list(uploaded_images_set),
+        "missing_image_amount": missing_image_amount,
+    }

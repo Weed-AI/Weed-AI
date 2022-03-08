@@ -1,7 +1,7 @@
-import React from 'react';
-import MenuItem from '@material-ui/core/MenuItem';
 import FormControl from '@material-ui/core/FormControl';
+import MenuItem from '@material-ui/core/MenuItem';
 import Select from '@material-ui/core/Select';
+import React from 'react';
 import UploaderImages from './uploader_images';
 import UploaderUppyZip from './uploader_zip';
 
@@ -15,7 +15,7 @@ const ImageOrZipUploader = (props) => {
     const syncImageErrorMessage = updatedFilesName => {
         const missingImagesAmount = images.length - updatedFilesName.length;
         const missingImages = [...images].filter(image => !updatedFilesName.includes(image));
-        if (missingImagesAmount == 0 && new Set(missingImages).size === 0) {
+        if (missingImagesAmount === 0 && new Set(missingImages).size === 0) {
             handleValidation(true);
             handleErrorMessage("");
         } else {

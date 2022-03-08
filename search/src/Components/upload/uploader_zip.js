@@ -1,14 +1,14 @@
-import React from 'react';
-import 'react-dropzone-uploader/dist/styles.css';
-import Cookies from 'js-cookie';
-import axios from 'axios';
 import Uppy from '@uppy/core';
 import '@uppy/core/dist/style.css';
 import '@uppy/dashboard/dist/style.css';
+import { Dashboard } from '@uppy/react';
 import Tus from '@uppy/tus';
-import { Dashboard, useUppy } from '@uppy/react';
-
+import axios from 'axios';
+import Cookies from 'js-cookie';
+import React from 'react';
+import 'react-dropzone-uploader/dist/styles.css';
 import { jsonSchemaTitle } from '../error/utils';
+
 
 const baseURL = new URL(window.location.origin);
 
@@ -86,7 +86,6 @@ class UploaderUppyZip extends React.Component {
     componentDidMount() {
 
         this.uppy.on("complete", (result) => {
-            const baseURL = new URL(window.location.origin);
             const files = result.successful;
             if( files.length !== 1 ) {
                 console.log("Got wrong number of successful uploaded files");
@@ -103,12 +102,12 @@ class UploaderUppyZip extends React.Component {
             }
             getZipUploadResponse({ upload_id: this.props.upload_id, images: this.props.images, filename}).then(res => {
                 if( res.data.upload_id === this.props.upload_id ) {
-                    if( res.data.missing_images.length === 0 ) {
+                    if( res.data.missing_image_amount === 0 ) {
                         this.props.handleValidation(true);
                         this.props.handleErrorMessage("");
                     } else {
                         this.props.handleValidation(false);
-                        this.props.syncImageErrorMessage(res.data.missing_images)
+                        this.props.syncImageErrorMessage(res.data.uploaded_images)
                     }
                 } else {
                     this.props.handleValidation(false);
