@@ -1,13 +1,13 @@
-import json
-import pathlib
-import os
-import warnings
 import hashlib
+import json
+import os
+import pathlib
 import re
+import warnings
 
+import imagehash
 import PIL.Image
 import yaml
-import imagehash
 
 from .species_utils import get_eppo_singleton
 
@@ -153,7 +153,7 @@ def format_category_name(role, taxon=None, subcategory=None):
     if taxon:
         out += f": {taxon}"
     if subcategory:
-        out += f": ({subcategory})"
+        out += f" ({subcategory})"
     return out
 
 
