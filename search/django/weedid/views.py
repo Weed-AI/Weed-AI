@@ -42,7 +42,6 @@ from weedid.utils import (
     create_upload_entity,
     move_to_upload,
     parse_category_for_mapper,
-    parse_category_name,
     remove_entity_local_record,
     retrieve_listing_info,
     set_categories,
