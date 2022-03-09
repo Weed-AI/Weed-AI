@@ -63,9 +63,11 @@ We make use of [data from EPPO](https://data.eppo.int/) to validate and cross-re
 
 ## General 
 
-If you found Weed-AI useful in your research, please cite the database as: 
+If you found Weed-AI useful in your research or project, please cite the database as:
 
-CITATION TBA by mid 2021
+Weed-AI: A repository of Weed Images in Crops. Precision Weed Control Group and Sydney Informatics Hub, the University of Sydney. https://weed-ai.sydney.edu.au/, accessed YYYY-MM-DD.
+
+An academic citation is TBA.
 
 ## Specific Datasets 
 
