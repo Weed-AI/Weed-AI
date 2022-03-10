@@ -99,10 +99,10 @@ def upload(request):
         file_weedcoco = request.FILES["weedcoco"]
         weedcoco_json = json.load(file_weedcoco)
         fix_compatibility_quirks(weedcoco_json)
-        # validate(
-        #     weedcoco_json,
-        #     schema=request.POST["schema"] if request.POST["schema"] else "coco",
-        # )
+        validate(
+            weedcoco_json,
+            schema=request.POST["schema"] if request.POST["schema"] else "coco",
+        )
         for image_reference in weedcoco_json["images"]:
             images.append(image_reference["file_name"].split("/")[-1])
         categories = [
