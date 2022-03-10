@@ -286,7 +286,7 @@ def unpack_image_zip(request):
 def check_image_zip(request, task_id):
     result = store_tmp_image_from_zip.AsyncResult(task_id)
     if not result.ready():
-        return HttpResponse("wait", status_code=202)
+        return HttpResponse("wait", status=202)
     return HttpResponse(json.dumps(result.get(propagate=True)))
 
 

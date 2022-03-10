@@ -55,7 +55,7 @@ const getZipUploadResponse = ({upload_id, images, filename}) => {
                     } else {
                         resolve(res)
                     }
-                })
+                }).catch(reject)
             }
             setTimeout(poll, pollPeriod);
         }).catch(reject)
@@ -117,7 +117,7 @@ class UploaderUppyZip extends React.Component {
                 this.props.handleValidation(false)
                 const data = err.response.data
                 if (typeof data === "object") this.props.handleErrorMessage(jsonSchemaTitle(data), data);
-                else this.props.handleErrorMessage(data || "Server error unpacking zipfile")
+                else this.props.handleErrorMessage(data.length <= 100 ? data : null || "Server error unpacking zipfile")
             });
         })
     }
