@@ -29,7 +29,7 @@ const ImageOrZipUploader = (props) => {
                     uploadImageFormat == "image" ?
                     <UploaderImages upload_id={upload_id} images={images} handleValidation={handleValidation} handleErrorMessage={handleErrorMessage} syncImageErrorMessage={syncImageErrorMessage}/>
                     :
-                    <UploaderUppyZip upload_id={upload_id} images={images} handleValidation={handleValidation} handleErrorMessage={handleErrorMessage} syncImageErrorMessage={syncImageErrorMessage}/>
+                    <UploaderUppyZip upload_id={upload_id} images={images} handleNextProcessing={props.handleNextProcessing} handleValidation={handleValidation} handleErrorMessage={handleErrorMessage} syncImageErrorMessage={syncImageErrorMessage}/>
     const select = stepName === "images" ?
                     <FormControl>
                         <Select

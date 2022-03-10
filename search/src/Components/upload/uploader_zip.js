@@ -29,7 +29,7 @@ function getTusUploadFile(file) {
 }
 
 
-const getZipUploadResponse = ({upload_id, images, filename}) => {
+const getZipUploadResponse = ({upload_id, images, filename, handleNextProcessing}) => {
     return new Promise((resolve, reject) => {
         const pollPeriod = 200;
         const body = new FormData()
@@ -43,6 +43,7 @@ const getZipUploadResponse = ({upload_id, images, filename}) => {
             headers: {'X-CSRFToken': Cookies.get('csrftoken') }
         }).then(res => {
             const taskId = res.data.task_id;
+            handleNextProcessing(true)
             const poll = () => {
                 axios({
                     method: 'get',
@@ -54,6 +55,7 @@ const getZipUploadResponse = ({upload_id, images, filename}) => {
                         setTimeout(poll, pollPeriod)
                     } else {
                         resolve(res)
+                        handleNextProcessing(false)
                     }
                 }).catch(reject)
             }
@@ -100,7 +102,7 @@ class UploaderUppyZip extends React.Component {
                 this.props.handleErrorMessage("Upload zipfile failed");
                 return;
             }
-            getZipUploadResponse({ upload_id: this.props.upload_id, images: this.props.images, filename}).then(res => {
+            getZipUploadResponse({ upload_id: this.props.upload_id, images: this.props.images, filename: filename, handleNextProcessing: this.props.handleNextProcessing}).then(res => {
                 if( res.data.upload_id === this.props.upload_id ) {
                     if( res.data.missing_image_amount === 0 ) {
                         this.props.handleValidation(true);

@@ -1,25 +1,25 @@
-import React from 'react';
-import { withStyles } from '@material-ui/core/styles';
-import Stepper from '@material-ui/core/Stepper';
+import Button from '@material-ui/core/Button';
+import CircularProgress from '@material-ui/core/CircularProgress';
 import Step from '@material-ui/core/Step';
 import StepLabel from '@material-ui/core/StepLabel';
-import Button from '@material-ui/core/Button';
+import Stepper from '@material-ui/core/Stepper';
+import { withStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
-import CircularProgress from '@material-ui/core/CircularProgress';
-import UploaderSingle from './uploader_single';
-import UploaderVoc from './uploader_voc';
-import UploaderMasks from './uploader_masks';
-import CategoryMapper from './uploader_category_mapper';
-import ErrorMessage from '../error/display';
-import AgContextForm from '../forms/AgContextForm';
-import UploadJsonButton from '../forms/UploadJsonButton';
-import MetadataForm from '../forms/MetadataForm';
 import axios from 'axios';
 import Cookies from 'js-cookie';
 import cloneDeep from 'lodash/cloneDeep';
-import {jsonSchemaTitle} from '../error/utils';
-import ImageOrZipUploader from './uploader_zip_images';
+import React from 'react';
+import ErrorMessage from '../error/display';
+import { jsonSchemaTitle } from '../error/utils';
+import AgContextForm from '../forms/AgContextForm';
+import MetadataForm from '../forms/MetadataForm';
+import UploadJsonButton from '../forms/UploadJsonButton';
 import CardSelector from '../generic/card_selector';
+import CategoryMapper from './uploader_category_mapper';
+import UploaderMasks from './uploader_masks';
+import UploaderSingle from './uploader_single';
+import UploaderVoc from './uploader_voc';
+import ImageOrZipUploader from './uploader_zip_images';
 
 
 const baseURL = new URL(window.location.origin);
@@ -127,6 +127,7 @@ class UploadStepper extends React.Component {
         this.handleMetadataFormData = this.handleMetadataFormData.bind(this);
         this.handleErrorMessage = this.handleErrorMessage.bind(this);
         this.progressToNext = this.progressToNext.bind(this);
+        this.handleNextProcessing = this.handleNextProcessing.bind(this);
         this.handleBack = this.handleBack.bind(this);
         this.handleSkip = this.handleSkip.bind(this);
         this.handleReset = this.handleReset.bind(this);
@@ -217,6 +218,10 @@ class UploadStepper extends React.Component {
             this.handleErrorMessage("")
         }
     };
+
+    handleNextProcessing(nextProcessing) {
+        this.setState({nextProcessing: nextProcessing})
+    }
 
     handleBack(){
         this.setState(prevState => {return {activeStep: prevState.activeStep - 1}});
@@ -415,7 +420,7 @@ class UploadStepper extends React.Component {
                     </React.Fragment>
                 )
             case "images":
-                return <ImageOrZipUploader stepName={step} upload_id={this.state.upload_id} images={this.state.images} handleValidation={this.handleValidation} handleErrorMessage={this.handleErrorMessage} />
+                return <ImageOrZipUploader stepName={step} upload_id={this.state.upload_id} images={this.state.images} handleNextProcessing={this.handleNextProcessing} handleValidation={this.handleValidation} handleErrorMessage={this.handleErrorMessage} />
             default:
                 return ''
         }
