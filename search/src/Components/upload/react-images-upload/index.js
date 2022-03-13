@@ -234,7 +234,7 @@ class ReactImageUploadComponent extends React.Component {
       );
     })
     :
-    <p>No preview for images more than {preview_maximum}</p>
+    <p>No preview available over {preview_maximum} images</p>
   }
 
   /*
