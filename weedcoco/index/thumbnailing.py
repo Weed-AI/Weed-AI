@@ -32,7 +32,9 @@ def thumbnail_one(coco_image, image_path, thumbnails_dir, thumbnail_size):
     _ensure_dir(thumb_path)
     # image.save is failing because it wants an extension (even though
     # the image.format seems to be set)
-    image.save(thumb_path)
+    image.save(str(thumb_path))
+
+    # This does seem to be leaving a file behind so the error is coming from somewhere else.
 
     for annotation in coco_image["annotations"]:
         if "bbox" not in annotation:
@@ -53,7 +55,7 @@ def thumbnail_one(coco_image, image_path, thumbnails_dir, thumbnail_size):
         draw.rectangle([bx, by, bx + bw, by + bh], outline=color, width=2)
 
     _ensure_dir(bbox_path)
-    image.save(bbox_path)
+    image.save(str(bbox_path))
 
 
 def thumbnailing(thumbnails_dir, repository_dir, upload_id, THUMBNAIL_SIZE=(300, 300)):
