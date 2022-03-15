@@ -176,6 +176,8 @@ def test_thumbnails(executor):
     test_extract_dir, repo, dataset1 = executor.run(
         "dataset_1", TEST_BASIC_DIR_1 / "weedcoco.json", TEST_BASIC_DIR_1 / "images"
     )
+    # temp dirs are LocalPaths, cast to Path so we can use is_file
+    test_extract_dir = pathlib.Path(test_extract_dir)
     # make thumbnails in the extract dir
     thumbnailing(test_extract_dir, repo.root, "dataset_1")
     images = [
@@ -184,5 +186,7 @@ def test_thumbnails(executor):
         if path.split("/")[0] == "images"
     ]
     for image in images:
-        thumbnail = test_extract_dir / pathlib.Path(image)
+        thumbnail = test_extract_dir / image[:2] / image
+        bbox = test_extract_dir / ("bbox-" + image[:2]) / image
         assert thumbnail.is_file()
+        assert bbox.is_file()
