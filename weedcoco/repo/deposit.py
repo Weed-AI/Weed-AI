@@ -4,7 +4,7 @@ import json
 import os
 import tempfile
 import ocfl
-from shutil import copy, move, rmtree
+from shutil import copy, rmtree
 from zipfile import ZipFile
 from PIL import Image
 from collections import defaultdict
@@ -235,19 +235,20 @@ class RepositoryDataset:
             for filename in files:
                 yield (os.path.join(root, filename), filename)
 
-    def compress_to_download(self, temp_dir):
-        mkdir_safely(temp_dir)
-        download_path = (temp_dir / self.identifier).with_suffix(".zip")
+    def make_zipfile(self, download_dir, version="head"):
+        zip_file = (download_dir / self.identifier).with_suffix(".zip")
         with tempfile.TemporaryDirectory() as tmpdir:
-            zip_path = pathlib.Path(tmpdir) / "bundle.zip"
-            with ZipFile(zip_path, "w") as zip:
-                zip.write(self.weedcoco_path, "weedcoco.json")
-                for image, image_name in self.retrieve_image_paths():
-                    zip.write(image, "images/" + image_name)
+            tmp_zip = pathlib.Path(tmpdir) / "bundle.zip"
+            with ZipFile(tmp_zip, "w") as zip:
+                for lpath in self.get_logical_paths(version):
+                    zip.write(self.resolve_path(lpath), lpath)
             # XXX: this should be move() not copy(), but move resulted in files
             #      that we could not delete or move in the Docker volume.
-            copy(zip_path, download_path)
-        return download_path
+            # copy(tmp_zip_path, download_path)
+            if tmp_zip.is_file():
+                if zip_file.is_file():
+                    zip_file.unlink()
+                copy(str(tmp_zip), str(zip_file))
 
 
 class Repository:
@@ -263,6 +264,8 @@ class Repository:
         self.disposition = disposition
         self._ocfl = None
 
+    # this requires the ocfl root to not exist (because the OCFL libary won't
+    # create a new root in an existing directory)
     def initialize(self):
         if not self.root.is_dir():
             # use a separate ocfl.Store because it will create an invalid
@@ -318,7 +321,6 @@ class Repository:
             temp_dir = pathlib.Path(temp_dir)
             dataset_dir = self.setup_deposit(temp_dir, identifier)
             dataset.build(dataset_dir)
-            zip_file = dataset.compress_to_download(temp_dir)
             try:
                 if dataset.exists_in_repo:
                     dataset.ocfl.update(
@@ -335,14 +337,10 @@ class Repository:
                         metadata=ocfl_metadata,
                     )
                     self.ocfl.add(object_path=str(new_object_dir))
-                if zip_file.is_file():
-                    old_zip = download_dir / zip_file.name
-                    if old_zip.is_file():
-                        old_zip.unlink()
-                    move(str(zip_file), str(download_dir))
+                dataset.make_zipfile(download_dir)  # should this raise an exception?
             except Exception:
                 dataset.rollback(dataset_dir, last_version)
-                zip_file = download_dir / zip_file.name
+                zip_file = (download_dir / self.identifier).with_suffix(".zip")
                 if zip_file.is_file():
                     zip_file.unlink()  # missing_ok is not in 3.7
                 raise

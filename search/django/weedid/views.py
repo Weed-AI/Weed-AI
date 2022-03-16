@@ -7,7 +7,6 @@ import requests
 from core.settings import (
     MAX_IMAGE_SIZE,
     MAX_VOC_SIZE,
-    REPOSITORY_DIR,
     SITE_BASE_URL,
     TUS_DESTINATION_DIR,
     UPLOAD_DIR,
@@ -421,8 +420,7 @@ def awaiting_list(request):
 def dataset_approve(request, dataset_id):
     upload_entity = Dataset.objects.get(upload_id=dataset_id, status="AR")
     if upload_entity:
-        weedcoco_path = os.path.join(REPOSITORY_DIR, str(dataset_id), "weedcoco.json")
-        update_index_and_thumbnails.delay(weedcoco_path, dataset_id)
+        update_index_and_thumbnails.delay(dataset_id)
         upload_entity.status = "P"
         upload_entity.status_details = "It's now being indexed"
         upload_entity.save()

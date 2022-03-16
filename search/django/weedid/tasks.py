@@ -7,6 +7,7 @@ from celery import shared_task
 from weedcoco.repo.deposit import (
     deposit,
     Repository,
+    RepositoryError,
 )
 from weedcoco.index.indexing import ElasticSearchIndexer
 from weedcoco.index.thumbnailing import thumbnailing
@@ -107,7 +108,6 @@ def submit_upload_task(weedcoco_path, image_dir, upload_id, new_upload=True):
 
 @shared_task
 def update_index_and_thumbnails(
-    weedcoco_path,
     upload_id,
     process_thumbnails=True,
     thumbnails_dir=THUMBNAILS_DIR,
@@ -118,7 +118,6 @@ def update_index_and_thumbnails(
 
     Parameters
     ----------
-    weedcoco_path : str
     upload_id : str
     process_thumbnails: bool, default=True
     thumbnails_dir: str, default=THUMBNAILS_DIR
@@ -127,7 +126,12 @@ def update_index_and_thumbnails(
         If it's not a new upload, upload status and status details don't need to be updated.
     """
     upload_entity = Dataset.objects.get(upload_id=upload_id)
+    repository = Repository(Path(repository_dir))
+    dataset = repository.dataset(upload_id)
     try:
+        if not dataset.exists_in_repo:
+            raise RepositoryError(f"Dataset {upload_id} not found in repository")
+        weedcoco_path = dataset.resolve_path("weedcoco.json")
         if process_thumbnails:
             # The thumbnails need to be present before indexing
             thumbnailing(Path(thumbnails_dir), Path(repository_dir), upload_id)
@@ -167,7 +171,7 @@ def reindex_dataset(
     download_dir = Path(download_dir)
     repository = Repository(repository_dir)
     dataset = repository.dataset(upload_id)
-    weedcoco_path = dataset.path("weedcoco.json")
+    weedcoco_path = dataset.resolve_path("weedcoco.json")
     with open(weedcoco_path) as f:
         weedcoco = json.load(f)
     upload_entity = Dataset.objects.get(upload_id=upload_id)
@@ -175,10 +179,8 @@ def reindex_dataset(
         setattr(upload_entity, k, v)
     upload_entity.save()
 
-    # FIXMEOCFL - need to handle rebuilding zips differently with ocfl
-    # dataset.compress_to_download(dataset_dir, upload_id, download_dir).
+    dataset.make_zipfile(download_dir)
     update_index_and_thumbnails.delay(
-        str(weedcoco_path),
         upload_id,
         process_thumbnails=process_thumbnails,
         thumbnails_dir=str(thumbnails_dir),
