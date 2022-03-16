@@ -8,7 +8,7 @@ SITE_BASE_URL = "https://weed-ai.sydney.edu.au"
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 UPLOAD_DIR = os.path.join(BASE_DIR, "upload")
 THUMBNAILS_DIR = os.path.join(BASE_DIR, "thumbnails")
-REPOSITORY_DIR = os.path.join(BASE_DIR, "repository")
+REPOSITORY_DIR = os.path.join(BASE_DIR, "repository", "ocfl")
 DOWNLOAD_DIR = os.path.join(BASE_DIR, "download")
 
 TUS_UPLOAD_DIR = os.path.join(BASE_DIR, "tus_upload")

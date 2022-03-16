@@ -58,11 +58,11 @@ def submit_upload_task(weedcoco_path, image_dir, upload_id, new_upload=True):
             json.dump(weedcoco, f)
 
     upload_entity.save()
-    user = WeedidUser.objects.get(user_id=upload_entity.user_id)
+    user = WeedidUser.objects.get(id=upload_entity.user_id)
     metadata = {
         "name": user.username,
         "address": user.email,
-        "comment": "WeedAI upload",
+        "message": "WeedAI upload",
     }
     try:
         deposit(
