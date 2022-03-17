@@ -1,25 +1,25 @@
-import React from 'react';
-import { withStyles } from '@material-ui/core/styles';
-import Stepper from '@material-ui/core/Stepper';
+import Button from '@material-ui/core/Button';
 import Step from '@material-ui/core/Step';
 import StepLabel from '@material-ui/core/StepLabel';
-import Button from '@material-ui/core/Button';
+import Stepper from '@material-ui/core/Stepper';
+import { withStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import CircularProgress from '@material-ui/core/CircularProgress';
-import UploaderSingle from './uploader_single';
-import UploaderVoc from './uploader_voc';
-import UploaderMasks from './uploader_masks';
-import CategoryMapper from './uploader_category_mapper';
-import ErrorMessage from '../error/display';
-import AgContextForm from '../forms/AgContextForm';
-import UploadJsonButton from '../forms/UploadJsonButton';
-import MetadataForm from '../forms/MetadataForm';
 import axios from 'axios';
 import Cookies from 'js-cookie';
 import cloneDeep from 'lodash/cloneDeep';
-import {jsonSchemaTitle} from '../error/utils';
-import ImageOrZipUploader from './uploader_zip_images';
+import React from 'react';
+import ErrorMessage from '../error/display';
+import { jsonSchemaTitle } from '../error/utils';
+import AgContextForm from '../forms/AgContextForm';
+import MetadataForm from '../forms/MetadataForm';
+import UploadJsonButton from '../forms/UploadJsonButton';
 import CardSelector from '../generic/card_selector';
+import CategoryMapper from './uploader_category_mapper';
+import UploaderMasks from './uploader_masks';
+import UploaderSingle from './uploader_single';
+import UploaderVoc from './uploader_voc';
+import ImageOrZipUploader from './uploader_zip_images';
 
 
 const baseURL = new URL(window.location.origin);
@@ -98,23 +98,19 @@ class UploadStepper extends React.Component {
 
     constructor(props) {
         super(props);
-        const upload_type = props.upload_type || "weedcoco";
+        const upload_type = props.upload_type || this.props.upload_mode == "edit" ? "coco": "weedcoco";
         this.state = {
             activeStep: 0,
-            nextProcessing: false,
-            skip_mapping: {'weedcoco': -1, 'coco': -1},
+            skip_mapping: this.props.upload_mode == "edit" ? Object.keys(stepsByType).reduce((a, v) => ({ ...a, [v]: [1]}), {}) : Object.keys(stepsByType).reduce((a, v) => ({ ...a, [v]: []}), {}),
             skipped: new Set(),
-            upload_id: 0,
+            cvat_task_id: 0,
             voc_id: Math.random().toString(36).slice(-8),
             mask_id: Math.random().toString(36).slice(-8),
             image_ext: '',
-            images: [],
-            categories: [],
-            ag_context: {},
-            metadata: {},
             error_message: "",
             error_message_details: "",
-            ... this.getUploadTypeState(upload_type),
+            ...this.getUploadTypeState(upload_type),
+            ...this.getPresetData(),
         }
         this.isStepOptional = this.isStepOptional.bind(this);
         this.isStepSkipped = this.isStepSkipped.bind(this);
@@ -157,8 +153,28 @@ class UploadStepper extends React.Component {
         }
     }
 
+    getPresetData() {
+        if (!this.props.preset) {
+            return {
+                upload_id: 0,
+                categories: [],
+                ag_context: {},
+                metadata: {},
+                images: [],
+            }
+        } else {
+            return {
+                upload_id: !this.props.preset.upload_id ? 0 : this.props.preset.upload_id,
+                categories: !this.props.preset.categories ? [] : this.props.preset.categories,
+                ag_context: !this.props.preset.agcontext ? {} : this.props.preset.agcontext[0],
+                metadata: !this.props.preset.metadata ? {} : this.props.preset.metadata,
+                images: !this.props.preset.images ? [] : this.props.preset.images,
+            }
+        }
+    }
+
     isStepOptional(step, upload_type) {
-        return this.state.skip_mapping[upload_type] === step;
+        return this.state.skip_mapping[upload_type].includes(step);
     };
 
     isStepSkipped(step) {
@@ -352,6 +368,7 @@ class UploadStepper extends React.Component {
         const baseURL = new URL(window.location.origin);
         const body = new FormData()
         body.append('upload_id', this.state.upload_id)
+        body.append('upload_mode', this.props.upload_mode)
         axios({
             method: 'post',
             url: baseURL + "api/submit_deposit/",
@@ -387,7 +404,7 @@ class UploadStepper extends React.Component {
             case "coco-upload":
             case "weedcoco-upload":
                 const schema = step == "coco-upload" ? "coco" : "weedcoco"
-                return <UploaderSingle upload_id={this.state.upload_id} images={this.state.images} handleUploadId={this.handleUploadId} handleImages={this.handleImages} handleCategories={this.handleCategories} handleValidation={this.handleValidation} handleErrorMessage={this.handleErrorMessage} schema={schema}/>
+                return <UploaderSingle upload_id={this.state.upload_id} images={this.state.images} handleUploadId={this.handleUploadId} handleImages={this.handleImages} handleCategories={this.handleCategories} handleValidation={this.handleValidation} handleErrorMessage={this.handleErrorMessage} schema={schema} upload_mode={this.props.upload_mode}/>
             case "voc-upload":
                 return <UploaderVoc handleUploadId={this.handleUploadId} handleImages={this.handleImages} handleCategories={this.handleCategories} handleValidation={this.handleValidation} handleErrorMessage={this.handleErrorMessage} voc_id={this.state.voc_id}/>
             case "masks-upload":

@@ -1,27 +1,28 @@
-import os
-from shutil import rmtree, move
 import json
+import os
 import re
-from uuid import uuid4
 import smtplib
-from email.message import EmailMessage
 import tempfile
+from email.message import EmailMessage
+from shutil import copy, move, rmtree
+from uuid import uuid4
 from zipfile import ZipFile
-from shutil import copy
-from weedcoco.repo.deposit import mkdir_safely
-from weedcoco.utils import set_info, set_licenses
-from weedcoco.stats import WeedCOCOStats
-from django.core.files.storage import FileSystemStorage
-from weedid.models import Dataset, WeedidUser
+
 from core.settings import (
-    UPLOAD_DIR,
-    REPOSITORY_DIR,
     DOWNLOAD_DIR,
+    FROM_EMAIL,
+    REPOSITORY_DIR,
+    SEND_EMAIL,
     SMTP_HOST,
     SMTP_PORT,
-    FROM_EMAIL,
-    SEND_EMAIL,
+    UPLOAD_DIR,
 )
+from django.core.files.storage import FileSystemStorage
+from weedcoco.repo.deposit import mkdir_safely
+from weedcoco.stats import WeedCOCOStats
+from weedcoco.utils import set_info, set_licenses
+
+from weedid.models import Dataset, WeedidUser
 
 
 class OverwriteStorage(FileSystemStorage):
@@ -52,6 +53,8 @@ def store_tmp_image_from_zip(upload_image_zip, image_dir, full_images):
 
 def store_tmp_weedcoco(weedcoco, upload_dir):
     weedcoco_path = os.path.join(upload_dir, "weedcoco.json")
+    if os.path.isfile(weedcoco_path):
+        os.remove(weedcoco_path)
     with open(weedcoco_path, "w") as weedcoco_file:
         weedcoco_file.write(json.dumps(weedcoco))
 
@@ -165,7 +168,7 @@ def remove_entity_local_record(user_id, upload_id):
             os.remove(dir_path)
 
 
-def retrieve_listing_info(query_entity, awaiting_review):
+def retrieve_listing_info(query_entity, awaiting_review, user_id=0):
     """Retrieving info from specific upload entity"""
     return {
         "name": query_entity.metadata["name"]
@@ -175,6 +178,7 @@ def retrieve_listing_info(query_entity, awaiting_review):
         "upload_date": str(query_entity.date),
         "contributor": query_entity.user.username,
         "contributor_email": query_entity.user.email if awaiting_review else "",
+        "editable": query_entity.user.id == user_id,
     }
 
 

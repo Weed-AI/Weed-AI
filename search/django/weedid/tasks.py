@@ -1,9 +1,22 @@
 from __future__ import absolute_import, unicode_literals
-import json
-import traceback
+
 import datetime
+import json
+import os
 import subprocess
+import traceback
+from pathlib import Path
+from shutil import move, rmtree
+
 from celery import shared_task
+from core.settings import (
+    DOWNLOAD_DIR,
+    DVC_REMOTE_PATH,
+    GIT_REMOTE_PATH,
+    REPOSITORY_DIR,
+    THUMBNAILS_DIR,
+    UPLOAD_DIR,
+)
 from weedcoco.repo.deposit import (
     deposit,
     Repository,
@@ -14,17 +27,6 @@ from weedcoco.index.thumbnailing import thumbnailing
 from weedid.models import Dataset, WeedidUser
 from weedid.utils import make_upload_entity_fields
 from weedid.notification import upload_notification, review_notification
-from core.settings import (
-    THUMBNAILS_DIR,
-    REPOSITORY_DIR,
-    DOWNLOAD_DIR,
-    UPLOAD_DIR,
-    GIT_REMOTE_PATH,
-    DVC_REMOTE_PATH,
-)
-from pathlib import Path
-import os
-from shutil import move, rmtree
 
 
 @shared_task
