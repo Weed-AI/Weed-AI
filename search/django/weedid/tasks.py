@@ -28,6 +28,10 @@ from weedid.models import Dataset, WeedidUser
 from weedid.utils import make_upload_entity_fields
 from weedid.notification import upload_notification, review_notification
 
+import logging
+
+logger = logging.getLogger(__name__)
+
 
 @shared_task
 def submit_upload_task(weedcoco_path, image_dir, upload_id, new_upload=True):
@@ -170,17 +174,20 @@ def reindex_dataset(
     download_dir=DOWNLOAD_DIR,
 ):
     """Reindex a dataset already in the repository, and recreate its download"""
+    logger.info(f"Reindexing ${upload_id}")
     download_dir = Path(download_dir)
     repository = Repository(repository_dir)
     dataset = repository.dataset(upload_id)
     weedcoco_path = dataset.resolve_path("weedcoco.json")
     with open(weedcoco_path) as f:
         weedcoco = json.load(f)
+    logger.info(f"Loaded weedcoco.json from = {weedcoco_path}")
+    logger.info(f"Weedcoco metadata = {weedcoco['metadata']}")
     upload_entity = Dataset.objects.get(upload_id=upload_id)
     for k, v in make_upload_entity_fields(weedcoco).items():
         setattr(upload_entity, k, v)
     upload_entity.save()
-
+    logger.info(f"upload_entity = {upload_entity}")
     dataset.make_zipfile(download_dir)
     update_index_and_thumbnails.delay(
         upload_id,
