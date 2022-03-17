@@ -10,6 +10,7 @@ from uuid import uuid4
 from zipfile import ZipFile
 
 import ocfl
+import redis
 from PIL import Image
 from weedcoco.utils import check_if_approved_image_extension, get_image_hash
 from weedcoco.validation import ValidationError, validate
@@ -260,6 +261,11 @@ class RepositoryDataset:
             if check_if_approved_image_extension(image_name)
         }
 
+    def store_image_hash_mapping(self, redis_url):
+        redis_client = redis.Redis.from_url(url=redis_url)
+        for image_name, image_hash in self.image_hash.items():
+            redis_client.set(image_hash, "/".join([self.identifier, image_name]))
+
     def retrieve_image_paths(self):
         for root, directories, files in os.walk(self.image_dir):
             for filename in files:
@@ -370,7 +376,7 @@ class Repository:
                 dataset.make_zipfile(download_dir)  # should this raise an exception?
             except Exception:
                 dataset.rollback(dataset_dir, last_version)
-                zip_file = (download_dir / self.identifier).with_suffix(".zip")
+                zip_file = (download_dir / identifier).with_suffix(".zip")
                 if zip_file.is_file():
                     zip_file.unlink()  # missing_ok is not in 3.7
                 raise
@@ -378,13 +384,21 @@ class Repository:
 
 
 def deposit(
-    weedcoco_path, image_dir, repository_dir, download_dir, metadata, upload_id=None
+    weedcoco_path,
+    image_dir,
+    repository_dir,
+    download_dir,
+    metadata,
+    upload_id=None,
+    redis_url=None,
 ):
     repository = Repository(repository_dir)
     repository.initialize()
     dataset = repository.dataset(upload_id)
     dataset.set_sources(weedcoco_path, image_dir)
     repository.deposit(upload_id, dataset, metadata, download_dir)
+    if redis_url:
+        dataset.store_image_hash_mapping(redis_url)
     return repository, dataset
 
 
