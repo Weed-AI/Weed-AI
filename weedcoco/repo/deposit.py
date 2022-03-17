@@ -384,7 +384,6 @@ def deposit(
     repository.initialize()
     dataset = repository.dataset(upload_id)
     dataset.set_sources(weedcoco_path, image_dir)
-    print(dataset.image_hash)
     repository.deposit(upload_id, dataset, metadata, download_dir)
     return repository, dataset
 
