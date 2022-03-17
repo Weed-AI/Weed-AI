@@ -255,7 +255,7 @@ class RepositoryDataset:
 
     def create_image_hash(self, annotations_hash):
         self.image_hash = {
-            image_name: f"{get_image_hash(self.image_dir / image_name, 8, 10)}-{annotations_hash[image_name]}{os.path.splitext(image_name)[-1]}"
+            image_name: f"{get_image_hash(self.image_dir / image_name, 16)}-{annotations_hash[image_name]}{os.path.splitext(image_name)[-1]}"
             for image_name in os.listdir(self.image_dir)
             if check_if_approved_image_extension(image_name)
         }
