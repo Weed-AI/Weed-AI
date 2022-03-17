@@ -1,5 +1,4 @@
-from setuptools import setup, find_packages
-
+from setuptools import find_packages, setup
 
 with open("README.md") as readme_file:
     readme = readme_file.read()
@@ -21,6 +20,7 @@ requirements = [
     "elasticsearch==7.13.*",
     "joblib",
     "ocfl-py",
+    "redis",
 ]
 
 setup(
