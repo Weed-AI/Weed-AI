@@ -1,16 +1,20 @@
 import argparse
-import pathlib
+import hashlib
 import json
 import os
+import pathlib
 import tempfile
-import ocfl
-from shutil import copy, rmtree
-from zipfile import ZipFile
-from PIL import Image
 from collections import defaultdict
+from shutil import copy, rmtree
 from uuid import uuid4
-from weedcoco.utils import get_image_hash, check_if_approved_image_extension
+from zipfile import ZipFile
+
+import ocfl
+from PIL import Image
+from weedcoco.utils import check_if_approved_image_extension, get_image_hash
 from weedcoco.validation import ValidationError, validate
+
+COCO_ANNOTATION_FIELD = ("segmentation", "bbox", "area", "iscrowd", "attributes")
 
 
 def mkdir_safely(local_dir):
@@ -123,9 +127,8 @@ class RepositoryDataset:
             objdir=str(self.object_path), version=version, dstdir=dest_dir
         )
 
-    def validate(self):
+    def validate_image(self):
         """Run checks which need to pass before deposit"""
-        self.create_image_hash()
         self.validate_duplicate_images()
         self.validate_existing_images()
 
@@ -133,6 +136,7 @@ class RepositoryDataset:
         """Set the weedcoco_path and images_dir for the build"""
         self.weedcoco_path = weedcoco_path
         self.image_dir = image_dir
+        self.create_image_hash_and_mapping()
 
     def build(self, dataset_dir):
         """Build a dataset to be deposited"""
@@ -223,9 +227,35 @@ class RepositoryDataset:
             if path.split("/")[0] == "images"
         }
 
-    def create_image_hash(self):
+    def create_image_hash_and_mapping(self):
+        annotations_hash = self.create_annotation_hash()
+        self.create_image_hash(annotations_hash)
+
+    def create_annotation_hash(self):
+        annotations_hash = defaultdict(str)
+        with open(self.weedcoco_path) as f:
+            weedcoco = json.load(f)
+        image_id_mapping = {
+            image["id"]: image["file_name"].split("/")[-1]
+            for image in weedcoco["images"]
+        }
+        image_annotation_mapping = {
+            image_id_mapping[annotation["image_id"]]: {
+                key: value
+                for key, value in annotation.items()
+                if key in COCO_ANNOTATION_FIELD
+            }
+            for annotation in weedcoco["annotations"]
+        }
+        for image_name, image_annotation in image_annotation_mapping.items():
+            annotations_hash[image_name] = hashlib.md5(
+                json.dumps(image_annotation, sort_keys=True).encode("utf-8")
+            ).hexdigest()
+        return annotations_hash
+
+    def create_image_hash(self, annotations_hash):
         self.image_hash = {
-            image_name: f"{get_image_hash(self.image_dir / image_name, 16)}{os.path.splitext(image_name)[-1]}"
+            image_name: f"{get_image_hash(self.image_dir / image_name, 8, 10)}-{annotations_hash[image_name]}{os.path.splitext(image_name)[-1]}"
             for image_name in os.listdir(self.image_dir)
             if check_if_approved_image_extension(image_name)
         }
@@ -309,7 +339,7 @@ class Repository:
             dataset.identifier = identifier
         else:
             assert "/" not in identifier
-        dataset.validate()
+        dataset.validate_image()
         ocfl_metadata = ocfl.VersionMetadata(
             identifier=identifier,
             message=metadata["message"],
@@ -354,6 +384,7 @@ def deposit(
     repository.initialize()
     dataset = repository.dataset(upload_id)
     dataset.set_sources(weedcoco_path, image_dir)
+    print(dataset.image_hash)
     repository.deposit(upload_id, dataset, metadata, download_dir)
     return repository, dataset
 
