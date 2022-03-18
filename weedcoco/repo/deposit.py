@@ -12,6 +12,10 @@ from uuid import uuid4
 from weedcoco.utils import get_image_hash, check_if_approved_image_extension
 from weedcoco.validation import ValidationError, validate
 
+import logging
+
+logger = logging.getLogger(__name__)
+
 
 def mkdir_safely(local_dir):
     try:
@@ -61,7 +65,7 @@ class RepositoryDataset:
     def object_path(self):
         """
         Returns a pathlib.Path to the dataset's OCFL object, or None if
-        an object with this identifiery isn't found in the repo
+        an object with this identifier isn't found in the repo
         """
         if self._object_path is not None:
             return self._object_path
@@ -180,6 +184,9 @@ class RepositoryDataset:
         for image_name_origin in os.listdir(self.image_dir):
             if check_if_approved_image_extension(image_name_origin):
                 if image_name_origin in self.image_hash:  # FIXME
+                    logger.info(
+                        f"Renaming original image {image_name_origin} -> {self.image_hash[image_name_origin]}"
+                    )
                     image_path = new_image_dir / self.image_hash[image_name_origin]
                     if not os.path.isfile(image_path):
                         image_origin = Image.open(self.image_dir / image_name_origin)

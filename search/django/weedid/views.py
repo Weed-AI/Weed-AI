@@ -32,7 +32,7 @@ from weedcoco.importers.mask import generate_paths_from_mask_only, masks_to_coco
 from weedcoco.importers.voc import voc_to_coco
 from weedcoco.utils import fix_compatibility_quirks
 from weedcoco.validation import JsonValidationError, validate, validate_json
-
+from weedcoco.repo.deposit import Repository
 from weedid.decorators import check_post_and_authenticated
 from weedid.models import Dataset, WeedidUser
 from weedid.notification import review_notification
@@ -150,15 +150,19 @@ def editing_init(request, dataset_id):
     user = request.user
     if not (user and user.is_authenticated):
         return HttpResponseForbidden("You dont have access to proceed")
-    dataset = Dataset.objects.get(upload_id=dataset_id, status="C")
-    if dataset.user.id != user.id:
+    upload_entity = Dataset.objects.get(upload_id=dataset_id, status="C")
+    if upload_entity.user.id != user.id:
         return HttpResponseForbidden("You dont have access to edit")
-    dataset_path = os.path.join(REPOSITORY_DIR, dataset_id)
+    repository = Repository(REPOSITORY_DIR)
+    dataset = repository.dataset(dataset_id)
+    if not dataset.exists_in_repo:
+        return HttpResponseServerError("dataset not found")
     upload_path = os.path.join(UPLOAD_DIR, str(user.id), dataset_id)
-    if os.path.isdir(dataset_path):
-        if os.path.isdir(upload_path):
-            shutil.rmtree(upload_path)
-        shutil.copytree(dataset_path, upload_path)
+    # FIXME - extracting the ocfl into upload_path may be slow for
+    # large datasets. Might be better to just extract the weedcoco.json
+    if os.path.isdir(upload_path):
+        shutil.rmtree(upload_path)
+        dataset.extract(upload_path)
     with open(os.path.join(upload_path, "weedcoco.json")) as f:
         images = []
         weedcoco_json = json.load(f)
@@ -173,8 +177,8 @@ def editing_init(request, dataset_id):
         json.dumps(
             {
                 "upload_id": dataset_id,
-                "agcontext": dataset.agcontext,
-                "metadata": dataset.metadata,
+                "agcontext": upload_entity.agcontext,
+                "metadata": upload_entity.metadata,
                 "categories": categories,
                 "images": images,
             }
