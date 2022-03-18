@@ -1,10 +1,24 @@
 from __future__ import absolute_import, unicode_literals
-import json
-import traceback
+
 import datetime
+import json
+import os
 import subprocess
+import traceback
+from pathlib import Path
+from shutil import move, rmtree
+
 from celery import shared_task
+from core.settings import (
+    DOWNLOAD_DIR,
+    DVC_REMOTE_PATH,
+    GIT_REMOTE_PATH,
+    REPOSITORY_DIR,
+    THUMBNAILS_DIR,
+    UPLOAD_DIR,
+)
 from weedcoco.repo.deposit import (
+    mkdir_safely,
     deposit,
     Repository,
     RepositoryError,
@@ -14,17 +28,6 @@ from weedcoco.index.thumbnailing import thumbnailing
 from weedid.models import Dataset, WeedidUser
 from weedid.utils import make_upload_entity_fields
 from weedid.notification import upload_notification, review_notification
-from core.settings import (
-    THUMBNAILS_DIR,
-    REPOSITORY_DIR,
-    DOWNLOAD_DIR,
-    UPLOAD_DIR,
-    GIT_REMOTE_PATH,
-    DVC_REMOTE_PATH,
-)
-from pathlib import Path
-import os
-from shutil import move, rmtree
 
 
 @shared_task
@@ -85,10 +88,11 @@ def submit_upload_task(weedcoco_path, image_dir, upload_id, new_upload=True):
                 ),
                 DOWNLOAD_DIR,
             )
-            move(
-                str(Path(UPLOAD_DIR) / str(upload_entity.user_id) / upload_id),
-                str(Path(REPOSITORY_DIR) / upload_id),
-            )
+            # rolling back the OCFL repo is done in deposit now
+            # move(
+            #     str(Path(UPLOAD_DIR) / str(upload_entity.user_id) / upload_id),
+            #     str(Path(REPOSITORY_DIR) / upload_id),
+            # )
             raise
         traceback.print_exc()
         upload_entity.status = "F"
@@ -178,7 +182,6 @@ def reindex_dataset(
     for k, v in make_upload_entity_fields(weedcoco).items():
         setattr(upload_entity, k, v)
     upload_entity.save()
-
     dataset.make_zipfile(download_dir)
     update_index_and_thumbnails.delay(
         upload_id,
@@ -198,12 +201,14 @@ def redeposit_dataset(
 ):
     upload_entity = Dataset.objects.get(upload_id=upload_id)
     download_dir = Path(download_dir)
-    dataset_dir = Path(repository_dir) / upload_id
+    repository = Repository(repository_dir)
+    dataset = repository.dataset(upload_id)
     upload_user_dir = Path(upload_dir) / str(upload_entity.user_id)
     upload_id_dir = upload_user_dir / upload_id
     if os.path.exists(upload_id_dir):
         rmtree(upload_id_dir)
-    move(str(dataset_dir), str(upload_user_dir))
+    mkdir_safely(upload_id_dir)
+    dataset.extract(upload_id_dir)
     move(str(download_dir / f"{upload_id}.zip"), str(upload_id_dir))
     images_dir = upload_id_dir / "images"
     weedcoco_path = upload_id_dir / "weedcoco.json"

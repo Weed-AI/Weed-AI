@@ -1,5 +1,6 @@
 import json
 import os
+import shutil
 import traceback
 from pathlib import Path
 
@@ -9,6 +10,7 @@ from core.settings import (
     MAX_VOC_SIZE,
     SITE_BASE_URL,
     TUS_DESTINATION_DIR,
+    REPOSITORY_DIR,
     UPLOAD_DIR,
 )
 from django.contrib.admin.views.decorators import staff_member_required
@@ -86,6 +88,26 @@ def elasticsearch_query(request):
     return HttpResponse(elasticsearch_response)
 
 
+def upload_helper(weedcoco_json, user_id, schema="coco", upload_id=None):
+    images = []
+    validate(
+        weedcoco_json,
+        schema=schema,
+    )
+    for image_reference in weedcoco_json["images"]:
+        images.append(image_reference["file_name"].split("/")[-1])
+    categories = [
+        parse_category_name(category) for category in weedcoco_json["categories"]
+    ]
+    if not upload_id:
+        upload_dir, upload_id = setup_upload_dir(os.path.join(UPLOAD_DIR, str(user_id)))
+        create_upload_entity(upload_id, user_id)
+    else:
+        upload_dir = os.path.join(UPLOAD_DIR, str(user_id), upload_id)
+    store_tmp_weedcoco(weedcoco_json, upload_dir)
+    return upload_id, images, categories
+
+
 @require_http_methods(["POST"])
 @login_required
 def upload(request):
@@ -95,18 +117,17 @@ def upload(request):
         file_weedcoco = request.FILES["weedcoco"]
         weedcoco_json = json.load(file_weedcoco)
         fix_compatibility_quirks(weedcoco_json)
-        validate(
-            weedcoco_json,
-            schema=request.POST["schema"] if request.POST["schema"] else "coco",
-        )
-        for image_reference in weedcoco_json["images"]:
-            images.append(image_reference["file_name"].split("/")[-1])
-        categories = [
-            parse_category_name(category) for category in weedcoco_json["categories"]
-        ]
-        upload_dir, upload_id = setup_upload_dir(os.path.join(UPLOAD_DIR, str(user.id)))
-        store_tmp_weedcoco(weedcoco_json, upload_dir)
-        create_upload_entity(upload_id, user.id)
+        if request.POST["upload_mode"] == "edit":
+            upload_id, images, categories = upload_helper(
+                weedcoco_json,
+                user.id,
+                request.POST["schema"],
+                request.POST["upload_id"],
+            )
+        else:
+            upload_id, images, categories = upload_helper(
+                weedcoco_json, user.id, request.POST["schema"]
+            )
     except JsonValidationError as e:
         traceback.print_exc()
         return json_validation_response(e)
@@ -116,9 +137,49 @@ def upload(request):
     else:
         return HttpResponse(
             json.dumps(
-                {"upload_id": upload_id, "images": images, "categories": categories}
+                {
+                    "upload_id": upload_id,
+                    "images": images,
+                    "categories": categories,
+                }
             )
         )
+
+
+def editing_init(request, dataset_id):
+    user = request.user
+    if not (user and user.is_authenticated):
+        return HttpResponseForbidden("You dont have access to proceed")
+    dataset = Dataset.objects.get(upload_id=dataset_id, status="C")
+    if dataset.user.id != user.id:
+        return HttpResponseForbidden("You dont have access to edit")
+    dataset_path = os.path.join(REPOSITORY_DIR, dataset_id)
+    upload_path = os.path.join(UPLOAD_DIR, str(user.id), dataset_id)
+    if os.path.isdir(dataset_path):
+        if os.path.isdir(upload_path):
+            shutil.rmtree(upload_path)
+        shutil.copytree(dataset_path, upload_path)
+    with open(os.path.join(upload_path, "weedcoco.json")) as f:
+        images = []
+        weedcoco_json = json.load(f)
+        categories = [
+            parse_category_name(category) for category in weedcoco_json["categories"]
+        ]
+        for image_reference in weedcoco_json["images"]:
+            image_file_name = image_reference["file_name"].split("/")[-1]
+            if not os.path.isfile(os.path.join(upload_path, "images", image_file_name)):
+                images.append(image_file_name)
+    return HttpResponse(
+        json.dumps(
+            {
+                "upload_id": dataset_id,
+                "agcontext": dataset.agcontext,
+                "metadata": dataset.metadata,
+                "categories": categories,
+                "images": images,
+            }
+        )
+    )
 
 
 class CustomUploader:
@@ -369,7 +430,12 @@ def submit_deposit(request):
         UPLOAD_DIR, str(user.id), str(upload_id), "weedcoco.json"
     )
     images_dir = os.path.join(UPLOAD_DIR, str(user.id), str(upload_id), "images")
-    submit_upload_task.delay(weedcoco_path, images_dir, upload_id)
+    submit_upload_task.delay(
+        weedcoco_path,
+        images_dir,
+        upload_id,
+        new_upload=request.POST["upload_mode"] != "edit",
+    )
     return HttpResponse(f"Work on user {user.id}'s upload{upload_id}")
 
 
@@ -398,8 +464,9 @@ def upload_info(request, dataset_id):
 
 
 def upload_list(request):
+    user_id = request.user.id if request.user else 0
     upload_list = [
-        retrieve_listing_info(dataset, awaiting_review=False)
+        retrieve_listing_info(dataset, awaiting_review=False, user_id=user_id)
         for dataset in Dataset.objects.filter(status="C")
     ]
     return HttpResponse(json.dumps(upload_list))
