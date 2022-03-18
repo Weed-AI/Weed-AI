@@ -18,7 +18,7 @@ from core.settings import (
     UPLOAD_DIR,
 )
 from django.core.files.storage import FileSystemStorage
-from weedcoco.repo.deposit import mkdir_safely
+from weedcoco.repo.deposit import Repository, mkdir_safely
 from weedcoco.stats import WeedCOCOStats
 from weedcoco.utils import set_info, set_licenses
 
@@ -159,7 +159,9 @@ def create_upload_entity(upload_id, upload_userid):
 
 def remove_entity_local_record(user_id, upload_id):
     upload_dir_record = os.path.join(UPLOAD_DIR, user_id, upload_id)
-    repository_dir_record = os.path.join(REPOSITORY_DIR, upload_id)
+    repository = Repository(REPOSITORY_DIR)
+    dataset = repository.dataset(upload_id)
+    repository_dir_record = dataset.object_path
     download_dir_record = os.path.join(DOWNLOAD_DIR, f"{upload_id}.zip")
     for dir_path in [upload_dir_record, repository_dir_record, download_dir_record]:
         if os.path.isdir(dir_path):
