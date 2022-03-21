@@ -158,11 +158,10 @@ def editing_init(request, dataset_id):
     if not dataset.exists_in_repo:
         return HttpResponseServerError("dataset not found")
     upload_path = os.path.join(UPLOAD_DIR, str(user.id), dataset_id)
-    # FIXME - extracting the ocfl into upload_path may be slow for
-    # large datasets. Might be better to just extract the weedcoco.json
     if os.path.isdir(upload_path):
         shutil.rmtree(upload_path)
-        dataset.extract(upload_path)
+    dataset.extract(upload_path)
+
     with open(os.path.join(upload_path, "weedcoco.json")) as f:
         images = []
         weedcoco_json = json.load(f)
