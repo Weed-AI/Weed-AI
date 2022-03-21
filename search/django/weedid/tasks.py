@@ -13,21 +13,18 @@ from core.settings import (
     DOWNLOAD_DIR,
     DVC_REMOTE_PATH,
     GIT_REMOTE_PATH,
+    IMAGE_HASH_MAPPING_URL,
     REPOSITORY_DIR,
     THUMBNAILS_DIR,
     UPLOAD_DIR,
 )
-from weedcoco.repo.deposit import (
-    mkdir_safely,
-    deposit,
-    Repository,
-    RepositoryError,
-)
 from weedcoco.index.indexing import ElasticSearchIndexer
 from weedcoco.index.thumbnailing import thumbnailing
+from weedcoco.repo.deposit import Repository, RepositoryError, deposit, mkdir_safely
+
 from weedid.models import Dataset, WeedidUser
+from weedid.notification import review_notification, upload_notification
 from weedid.utils import make_upload_entity_fields
-from weedid.notification import upload_notification, review_notification
 
 
 @shared_task
@@ -76,6 +73,7 @@ def submit_upload_task(weedcoco_path, image_dir, upload_id, new_upload=True):
             Path(DOWNLOAD_DIR),
             metadata,
             upload_id,
+            IMAGE_HASH_MAPPING_URL,
         )
     except Exception as e:
         if not new_upload:

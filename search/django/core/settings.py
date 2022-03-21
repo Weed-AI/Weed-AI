@@ -1,6 +1,8 @@
 import os
-from celery.schedules import crontab
+
 from corsheaders.defaults import default_headers
+
+from celery.schedules import crontab
 
 SITE_BASE_URL = "https://weed-ai.sydney.edu.au"
 
@@ -203,3 +205,5 @@ CELERY_BEAT_SCHEDULE = {
         "schedule": crontab(minute="0", hour="*/3"),
     },
 }
+
+IMAGE_HASH_MAPPING_URL = os.environ.get("IMAGE_HASH_MAPPING_URL")
