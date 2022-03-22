@@ -4,13 +4,15 @@ import re
 import smtplib
 import tempfile
 from email.message import EmailMessage
-from shutil import copy, move, rmtree
+from shutil import copy, copyfile, move, rmtree
 from uuid import uuid4
 from zipfile import ZipFile
 
+import redis
 from core.settings import (
     DOWNLOAD_DIR,
     FROM_EMAIL,
+    IMAGE_HASH_MAPPING_URL,
     REPOSITORY_DIR,
     SEND_EMAIL,
     SMTP_HOST,
@@ -21,6 +23,7 @@ from django.core.files.storage import FileSystemStorage
 from weedcoco.repo.deposit import Repository, mkdir_safely
 from weedcoco.stats import WeedCOCOStats
 from weedcoco.utils import set_info, set_licenses
+from weedcoco.validation import validate
 
 from weedid.models import Dataset, WeedidUser
 
@@ -214,3 +217,49 @@ def parse_category_name(category):
             "role": "",
             "scientific_name": "",
         }
+
+
+def retrieve_missing_images_list(weedcoco_json, images_path, upload_id):
+    current_images = []
+    for image_reference in weedcoco_json["images"]:
+        current_images.append(image_reference["file_name"].split("/")[-1])
+    existing_hash_images = (
+        set(os.listdir(images_path)) if os.path.isdir(images_path) else set()
+    )
+    if set(current_images) - existing_hash_images:
+        copy_images_with_mapping(upload_id, images_path, existing_hash_images)
+        existing_images = set(os.listdir(images_path))
+    else:
+        existing_images = existing_hash_images
+    return [image for image in current_images if image not in existing_images]
+
+
+def copy_images_with_mapping(upload_id, images_path, hash_images_list):
+    redis_client = redis.Redis.from_url(url=IMAGE_HASH_MAPPING_URL)
+    for hash_image in hash_images_list:
+        original_image_name = redis_client.get("/".join([upload_id, hash_image]))
+        if original_image_name:
+            copyfile(
+                os.path.join(images_path, hash_image),
+                os.path.join(images_path, original_image_name.decode("ascii")),
+            )
+
+
+def upload_helper(weedcoco_json, user_id, schema="coco", upload_id=None):
+    images = []
+    validate(
+        weedcoco_json,
+        schema=schema,
+    )
+    for image_reference in weedcoco_json["images"]:
+        images.append(image_reference["file_name"].split("/")[-1])
+    categories = [
+        parse_category_name(category) for category in weedcoco_json["categories"]
+    ]
+    if not upload_id:
+        upload_dir, upload_id = setup_upload_dir(os.path.join(UPLOAD_DIR, str(user_id)))
+        create_upload_entity(upload_id, user_id)
+    else:
+        upload_dir = os.path.join(UPLOAD_DIR, str(user_id), upload_id)
+    store_tmp_weedcoco(weedcoco_json, upload_dir)
+    return upload_id, images, categories

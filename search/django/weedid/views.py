@@ -5,54 +5,38 @@ import traceback
 from pathlib import Path
 
 import requests
-from core.settings import (
-    MAX_IMAGE_SIZE,
-    MAX_VOC_SIZE,
-    SITE_BASE_URL,
-    TUS_DESTINATION_DIR,
-    REPOSITORY_DIR,
-    UPLOAD_DIR,
-)
+from core.settings import (MAX_IMAGE_SIZE, MAX_VOC_SIZE, REPOSITORY_DIR,
+                           SITE_BASE_URL, TUS_DESTINATION_DIR, UPLOAD_DIR)
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.hashers import check_password
 from django.core.exceptions import PermissionDenied
-from django.http import (
-    HttpResponse,
-    HttpResponseBadRequest,
-    HttpResponseForbidden,
-    HttpResponseNotAllowed,
-    HttpResponseServerError,
-)
+from django.http import (HttpResponse, HttpResponseBadRequest,
+                         HttpResponseForbidden, HttpResponseNotAllowed,
+                         HttpResponseServerError)
 from django.shortcuts import render
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_http_methods
-from weedcoco.importers.mask import generate_paths_from_mask_only, masks_to_coco
+from weedcoco.importers.mask import (generate_paths_from_mask_only,
+                                     masks_to_coco)
 from weedcoco.importers.voc import voc_to_coco
+from weedcoco.repo.deposit import Repository
 from weedcoco.utils import fix_compatibility_quirks
 from weedcoco.validation import JsonValidationError, validate, validate_json
-from weedcoco.repo.deposit import Repository
+
 from weedid.decorators import check_post_and_authenticated
 from weedid.models import Dataset, WeedidUser
 from weedid.notification import review_notification
 from weedid.tasks import submit_upload_task, update_index_and_thumbnails
-from weedid.utils import (
-    add_agcontexts,
-    add_metadata,
-    create_upload_entity,
-    move_to_upload,
-    parse_category_name,
-    remove_entity_local_record,
-    retrieve_listing_info,
-    set_categories,
-    setup_upload_dir,
-    store_tmp_image,
-    store_tmp_image_from_zip,
-    store_tmp_voc,
-    store_tmp_weedcoco,
-    validate_email_format,
-)
+from weedid.utils import (add_agcontexts, add_metadata, create_upload_entity,
+                          move_to_upload, parse_category_name,
+                          remove_entity_local_record, retrieve_listing_info,
+                          retrieve_missing_images_list, set_categories,
+                          setup_upload_dir, store_tmp_image,
+                          store_tmp_image_from_zip, store_tmp_voc,
+                          store_tmp_weedcoco, upload_helper,
+                          validate_email_format)
 
 
 @ensure_csrf_cookie
@@ -86,26 +70,6 @@ def elasticsearch_query(request):
         headers=request.headers,
     )
     return HttpResponse(elasticsearch_response)
-
-
-def upload_helper(weedcoco_json, user_id, schema="coco", upload_id=None):
-    images = []
-    validate(
-        weedcoco_json,
-        schema=schema,
-    )
-    for image_reference in weedcoco_json["images"]:
-        images.append(image_reference["file_name"].split("/")[-1])
-    categories = [
-        parse_category_name(category) for category in weedcoco_json["categories"]
-    ]
-    if not upload_id:
-        upload_dir, upload_id = setup_upload_dir(os.path.join(UPLOAD_DIR, str(user_id)))
-        create_upload_entity(upload_id, user_id)
-    else:
-        upload_dir = os.path.join(UPLOAD_DIR, str(user_id), upload_id)
-    store_tmp_weedcoco(weedcoco_json, upload_dir)
-    return upload_id, images, categories
 
 
 @require_http_methods(["POST"])
@@ -163,15 +127,13 @@ def editing_init(request, dataset_id):
     dataset.extract(upload_path)
 
     with open(os.path.join(upload_path, "weedcoco.json")) as f:
-        images = []
         weedcoco_json = json.load(f)
         categories = [
             parse_category_name(category) for category in weedcoco_json["categories"]
         ]
-        for image_reference in weedcoco_json["images"]:
-            image_file_name = image_reference["file_name"].split("/")[-1]
-            if not os.path.isfile(os.path.join(upload_path, "images", image_file_name)):
-                images.append(image_file_name)
+        images= retrieve_missing_images_list(
+            weedcoco_json, os.path.join(upload_path, "images"), dataset_id
+        )
     return HttpResponse(
         json.dumps(
             {
@@ -259,13 +221,14 @@ class CustomUploader:
             )
             validate(coco_json, schema="coco")
             fix_compatibility_quirks(coco_json)
-            for image_reference in coco_json["images"]:
-                images.append(image_reference["file_name"].split("/")[-1])
             categories = [
                 parse_category_name(category) for category in coco_json["categories"]
             ]
             upload_dir, upload_id = setup_upload_dir(
                 os.path.join(UPLOAD_DIR, str(user.id))
+            )
+            images = retrieve_missing_images_list(
+                coco_json, os.path.join(upload_dir, "images"), upload_id
             )
             store_tmp_weedcoco(coco_json, upload_dir)
             create_upload_entity(upload_id, user.id)
