@@ -269,10 +269,10 @@ class RepositoryDataset:
     def store_image_hash_mapping(self, redis_url):
         redis_client = redis.Redis.from_url(url=redis_url)
         for image_name, image_hash in self.image_hash.items():
-            redis_client.set(image_hash, "/".join([self.identifier, image_name]))
+            redis_client.set("/".join([self.identifier, image_hash]), image_name)
 
     def retrieve_image_paths(self):
-        for root, directories, files in os.walk(self.image_dir):
+        for root, _, files in os.walk(self.image_dir):
             for filename in files:
                 yield (os.path.join(root, filename), filename)
 
