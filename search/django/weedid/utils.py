@@ -75,7 +75,7 @@ def setup_upload_dir(upload_userid_dir):
     if not os.path.isdir(upload_userid_dir):
         mkdir_safely(upload_userid_dir)
     upload_id = str(uuid4())
-    upload_dir = upload_userid_dir + f"/{upload_id}"
+    upload_dir = os.path.join(upload_userid_dir, upload_id)
     mkdir_safely(upload_dir)
     return upload_dir, upload_id
 
@@ -223,9 +223,9 @@ def retrieve_missing_images_list(weedcoco_json, images_path, upload_id):
     current_images = []
     for image_reference in weedcoco_json["images"]:
         current_images.append(image_reference["file_name"].split("/")[-1])
-    existing_hash_images = (
-        set(os.listdir(images_path)) if os.path.isdir(images_path) else set()
-    )
+    if not os.path.isdir(images_path):
+        mkdir_safely(images_path)
+    existing_hash_images = set(os.listdir(images_path))
     if set(current_images) - existing_hash_images:
         copy_images_with_mapping(upload_id, images_path, existing_hash_images)
         existing_images = set(os.listdir(images_path))

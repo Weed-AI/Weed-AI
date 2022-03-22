@@ -234,7 +234,6 @@ class CustomUploader:
             store_id = request.POST[cls.id_name]
             if "/" in store_id:
                 return HttpResponseBadRequest("Bad id")
-            images = []
             coco_json = cls.convert_to_coco(
                 Path(os.path.join(UPLOAD_DIR, str(user.id), store_id)), request
             )
