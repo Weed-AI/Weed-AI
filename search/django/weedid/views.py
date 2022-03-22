@@ -5,21 +5,30 @@ import traceback
 from pathlib import Path
 
 import requests
-from core.settings import (MAX_IMAGE_SIZE, MAX_VOC_SIZE, REPOSITORY_DIR,
-                           SITE_BASE_URL, TUS_DESTINATION_DIR, UPLOAD_DIR)
+from core.settings import (
+    MAX_IMAGE_SIZE,
+    MAX_VOC_SIZE,
+    REPOSITORY_DIR,
+    SITE_BASE_URL,
+    TUS_DESTINATION_DIR,
+    UPLOAD_DIR,
+)
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.hashers import check_password
 from django.core.exceptions import PermissionDenied
-from django.http import (HttpResponse, HttpResponseBadRequest,
-                         HttpResponseForbidden, HttpResponseNotAllowed,
-                         HttpResponseServerError)
+from django.http import (
+    HttpResponse,
+    HttpResponseBadRequest,
+    HttpResponseForbidden,
+    HttpResponseNotAllowed,
+    HttpResponseServerError,
+)
 from django.shortcuts import render
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_http_methods
-from weedcoco.importers.mask import (generate_paths_from_mask_only,
-                                     masks_to_coco)
+from weedcoco.importers.mask import generate_paths_from_mask_only, masks_to_coco
 from weedcoco.importers.voc import voc_to_coco
 from weedcoco.repo.deposit import Repository
 from weedcoco.utils import fix_compatibility_quirks
@@ -29,14 +38,24 @@ from weedid.decorators import check_post_and_authenticated
 from weedid.models import Dataset, WeedidUser
 from weedid.notification import review_notification
 from weedid.tasks import submit_upload_task, update_index_and_thumbnails
-from weedid.utils import (add_agcontexts, add_metadata, create_upload_entity,
-                          move_to_upload, parse_category_name,
-                          remove_entity_local_record, retrieve_listing_info,
-                          retrieve_missing_images_list, set_categories,
-                          setup_upload_dir, store_tmp_image,
-                          store_tmp_image_from_zip, store_tmp_voc,
-                          store_tmp_weedcoco, upload_helper,
-                          validate_email_format)
+from weedid.utils import (
+    add_agcontexts,
+    add_metadata,
+    create_upload_entity,
+    move_to_upload,
+    parse_category_name,
+    remove_entity_local_record,
+    retrieve_listing_info,
+    retrieve_missing_images_list,
+    set_categories,
+    setup_upload_dir,
+    store_tmp_image,
+    store_tmp_image_from_zip,
+    store_tmp_voc,
+    store_tmp_weedcoco,
+    upload_helper,
+    validate_email_format,
+)
 
 
 @ensure_csrf_cookie
@@ -131,7 +150,7 @@ def editing_init(request, dataset_id):
         categories = [
             parse_category_name(category) for category in weedcoco_json["categories"]
         ]
-        images= retrieve_missing_images_list(
+        images = retrieve_missing_images_list(
             weedcoco_json, os.path.join(upload_path, "images"), dataset_id
         )
     return HttpResponse(
