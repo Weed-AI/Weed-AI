@@ -6,7 +6,7 @@ import os
 import pathlib
 import tempfile
 from collections import defaultdict
-from shutil import copy, rmtree
+from shutil import copy, rmtree, move
 from uuid import uuid4
 from zipfile import ZipFile
 
@@ -362,6 +362,8 @@ class Repository:
             temp_dir = pathlib.Path(temp_dir)
             dataset_dir = self.setup_deposit(temp_dir, identifier)
             dataset.build(dataset_dir)
+            zip_file = (download_dir / identifier).with_suffix(".zip")
+            last_zip = (download_dir / f"identifier.{last_version}").with_suffix(".zip")
             try:
                 if dataset.exists_in_repo:
                     dataset.ocfl.update(
@@ -369,6 +371,7 @@ class Repository:
                         srcdir=str(dataset_dir),
                         metadata=ocfl_metadata,
                     )
+                    copy(zip_file, last_zip)
                 else:
                     new_object_dir = temp_dir / pathlib.Path(identifier + "_ocfl")
                     new_object = ocfl.Object(identifier=identifier)
@@ -378,12 +381,13 @@ class Repository:
                         metadata=ocfl_metadata,
                     )
                     self.ocfl.add(object_path=str(new_object_dir))
-                dataset.make_zipfile(download_dir)  # should this raise an exception?
+                dataset.make_zipfile(download_dir)
             except Exception:
                 dataset.rollback(dataset_dir, last_version)
-                zip_file = (download_dir / identifier).with_suffix(".zip")
                 if zip_file.is_file():
                     zip_file.unlink()  # missing_ok is not in 3.7
+                if last_version != "v1":
+                    move(last_zip, zip_file)
                 raise
         return dataset
 
