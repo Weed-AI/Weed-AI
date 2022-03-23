@@ -225,6 +225,7 @@ def retrieve_missing_images_list(weedcoco_json, images_path, upload_id):
         current_images.append(image_reference["file_name"].split("/")[-1])
     if not os.path.isdir(images_path):
         mkdir_safely(images_path)
+        return current_images[:]
     existing_hash_images = set(os.listdir(images_path))
     if set(current_images) - existing_hash_images:
         copy_images_with_mapping(upload_id, images_path, existing_hash_images)
@@ -251,8 +252,6 @@ def upload_helper(weedcoco_json, user_id, schema="coco", upload_id=None):
         weedcoco_json,
         schema=schema,
     )
-    for image_reference in weedcoco_json["images"]:
-        images.append(image_reference["file_name"].split("/")[-1])
     categories = [
         parse_category_name(category) for category in weedcoco_json["categories"]
     ]
@@ -261,5 +260,8 @@ def upload_helper(weedcoco_json, user_id, schema="coco", upload_id=None):
         create_upload_entity(upload_id, user_id)
     else:
         upload_dir = os.path.join(UPLOAD_DIR, str(user_id), upload_id)
+    images = retrieve_missing_images_list(
+        weedcoco_json, os.path.join(upload_dir, "images"), upload_id
+    )
     store_tmp_weedcoco(weedcoco_json, upload_dir)
     return upload_id, images, categories
