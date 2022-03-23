@@ -418,7 +418,7 @@ def submit_deposit(request):
         weedcoco_path,
         images_dir,
         upload_id,
-        new_upload=request.POST["upload_mode"] != "edit",
+        mode=request.POST["upload_mode"],
     )
     return HttpResponse(f"Work on user {user.id}'s upload{upload_id}")
 

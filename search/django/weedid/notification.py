@@ -1,7 +1,9 @@
+from textwrap import dedent
+
 from core.settings import SITE_BASE_URL
+
 from weedid.models import Dataset, WeedidUser
 from weedid.utils import send_email
-from textwrap import dedent
 
 
 def upload_notification(upload_id):
@@ -32,6 +34,28 @@ def review_notification(message, upload_id):
     Your dataset upload {upload_entity.metadata['name']} has been {message} after review.
 
     {'Congratulations! You can now view the entire dataset online from ' + SITE_BASE_URL + '/datasets/' + upload_id if message == 'approved' else 'Unfortunately at this stage your dataset has not been approved. Please contact weed-ai.app@sydney.edu.au for further information.'}.
+
+    Regards,
+    Weed-AI Team
+    """
+    send_email(
+        f"Your upload ({upload_entity.metadata['name']}) has been {message}",
+        dedent(email_body),
+        [uploader.email],
+    )
+
+
+def edit_notification(message, upload_id):
+    upload_entity = Dataset.objects.get(upload_id=upload_id)
+    uploader = upload_entity.user
+    email_body = f"""\
+    Dear {uploader.username},
+
+    Many thanks for contributing to a growing community and repository of weed image datasets.
+
+    Your edit on dataset {upload_entity.metadata['name']} has been {message}.
+
+    {'Congratulations! You can now view the latest version of it online from ' + SITE_BASE_URL + '/datasets/' + upload_id if message == 'successful' else 'Your dataset will remain as the previous version and please contact weed-ai.app@sydney.edu.au for further information if you still want to edit it.'}.
 
     Regards,
     Weed-AI Team
