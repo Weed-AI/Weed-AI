@@ -343,7 +343,7 @@ class Repository:
         metadata - a dict-like with name, address and message
         dataset - a RepositoryDataset
 
-        Returns the id of the object.
+        Returns the updated dataset
         """
         if identifier is None:
             identifier = str(uuid4())

@@ -66,7 +66,7 @@ def submit_upload_task(weedcoco_path, image_dir, upload_id, new_upload=True):
         "message": "WeedAI upload",
     }
     try:
-        deposit(
+        dataset = deposit(
             Path(weedcoco_path),
             Path(image_dir),
             Path(REPOSITORY_DIR),
@@ -99,12 +99,15 @@ def submit_upload_task(weedcoco_path, image_dir, upload_id, new_upload=True):
         # TODO: raise alert
     else:
         if not new_upload:
+            upload_entity.head_version = int(dataset.head[1:])
+            upload_entity.save()
             if upload_entity.status == "C":
                 reindex_dataset.delay(upload_id)
             return
         upload_notification(upload_id)
         upload_entity.status = "AR"
         upload_entity.status_details = "It is currently under review."
+        upload_entity.head_version = 1
         upload_entity.save()
 
 
