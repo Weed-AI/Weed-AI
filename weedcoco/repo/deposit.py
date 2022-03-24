@@ -98,6 +98,14 @@ class RepositoryDataset:
             return self._inventory["head"]
         return None
 
+    def update(self, src_dir, metadata):
+        self.ocfl.update(
+            objdir=str(self.object_path),
+            srcdir=str(src_dir),
+            metadata=metadata,
+        )
+        self._inventory = self.ocfl.parse_inventory()
+
     def get_logical_paths(self, version="head"):
         """Iterate over all content in a version as logical paths"""
         if self.inventory is None:
@@ -362,16 +370,15 @@ class Repository:
             temp_dir = pathlib.Path(temp_dir)
             dataset_dir = self.setup_deposit(temp_dir, identifier)
             dataset.build(dataset_dir)
-            zip_file = (download_dir / identifier).with_suffix(".zip")
-            last_zip = (download_dir / f"identifier.{last_version}").with_suffix(".zip")
+            head_zipfile = (download_dir / identifier).with_suffix(".zip")
+            last_zipfile = (download_dir / identifier).with_suffix(
+                f".{last_version}.zip"
+            )
             try:
                 if dataset.exists_in_repo:
-                    dataset.ocfl.update(
-                        objdir=str(dataset.object_path),
-                        srcdir=str(dataset_dir),
-                        metadata=ocfl_metadata,
-                    )
-                    copy(zip_file, last_zip)
+                    dataset.update(dataset_dir, ocfl_metadata)
+                    logger.warning(f"copying {head_zipfile} to {last_zipfile}")
+                    copy(head_zipfile, last_zipfile)
                 else:
                     new_object_dir = temp_dir / pathlib.Path(identifier + "_ocfl")
                     new_object = ocfl.Object(identifier=identifier)
@@ -384,10 +391,10 @@ class Repository:
                 dataset.make_zipfile(download_dir)
             except Exception:
                 dataset.rollback(dataset_dir, last_version)
-                if zip_file.is_file():
-                    zip_file.unlink()  # missing_ok is not in 3.7
+                if head_zipfile.is_file():
+                    head_zipfile.unlink()  # missing_ok is not in 3.7
                 if last_version != "v1":
-                    move(last_zip, zip_file)
+                    move(last_zipfile, head_zipfile)
                 raise
         return dataset
 
