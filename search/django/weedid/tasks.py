@@ -85,15 +85,6 @@ def submit_upload_task(weedcoco_path, image_dir, upload_id, mode="upload"):
             upload_entity.status_details = str(e)
             upload_entity.save()
         elif mode == "edit":
-            move(
-                str(
-                    Path(UPLOAD_DIR)
-                    / str(upload_entity.user_id)
-                    / upload_id
-                    / f"{upload_id}.zip"
-                ),
-                DOWNLOAD_DIR,
-            )
             edit_notification("unsuccessful during depositing", upload_id)
         elif mode == "admin":
             move(
@@ -166,7 +157,6 @@ def update_index_and_thumbnails(
             upload_entity.status_details = str(e)
         elif mode == "edit":
             edit_notification("unsuccessful during indexing", upload_id)
-            pass
         elif mode == "admin":
             raise
     else:
