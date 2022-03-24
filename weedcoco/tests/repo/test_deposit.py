@@ -13,6 +13,7 @@ from weedcoco.validation import ValidationError
 TEST_DATA_DIR = pathlib.Path(__file__).parent / "deposit_data"
 TEST_DATA_SAMPLE_DIR = pathlib.Path(__file__).parent / "deposit_data_sample"
 TEST_BASIC_DIR_1 = TEST_DATA_DIR / "basic_1"
+TEST_BASIC_DIR_1V2 = TEST_DATA_DIR / "basic_1.v2"
 TEST_BASIC_DIR_2 = TEST_DATA_DIR / "basic_2"
 TEST_COMPLETE_DIR = TEST_DATA_DIR / "complete"
 TEST_DUPLICATE_DIR = TEST_DATA_DIR / "duplicate"
@@ -184,14 +185,14 @@ def test_versioned_datasets(executor, rewrite_deposit_truth):
         "dataset_1", TEST_BASIC_DIR_1 / "weedcoco.json", TEST_BASIC_DIR_1 / "images"
     )
     test_extract_dir, _, repo, _ = executor.run(
-        "dataset_1", TEST_BASIC_DIR_2 / "weedcoco.json", TEST_BASIC_DIR_2 / "images"
+        "dataset_1", TEST_BASIC_DIR_1V2 / "weedcoco.json", TEST_BASIC_DIR_1V2 / "images"
     )
     dataset = repo.dataset("dataset_1")
     assert dataset.head_version == "v2"
     if rewrite_deposit_truth:
         rewrite_outputs(repo, TEST_DATA_SAMPLE_DIR / "versions", True)
-    dataset.extract(str(test_extract_dir / pathlib.Path("dataset.v1")), "v1")
-    dataset.extract(str(test_extract_dir / pathlib.Path("dataset.v2")), "v2")
+    dataset.extract(str(test_extract_dir / "dataset_1.v1"), "v1")
+    dataset.extract(str(test_extract_dir / "dataset_1.v2"), "v2")
     assert_files_equal(test_extract_dir, TEST_DATA_SAMPLE_DIR / "versions")
     assert_weedcoco_equal(test_extract_dir, TEST_DATA_SAMPLE_DIR / "versions")
 
