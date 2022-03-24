@@ -1,9 +1,12 @@
+import logging
 from textwrap import dedent
 
-from core.settings import SITE_BASE_URL
+from core.settings import DEBUG, SITE_BASE_URL
 
 from weedid.models import Dataset, WeedidUser
 from weedid.utils import send_email
+
+logger = logging.getLogger(__name__)
 
 
 def upload_notification(upload_id):
@@ -16,11 +19,14 @@ def upload_notification(upload_id):
     staff_recipients = [
         staff.email for staff in WeedidUser.objects.filter(is_staff=True)
     ]
-    send_email(
-        f"New upload ({upload_entity.metadata['name']})",
-        dedent(email_body),
-        staff_recipients,
-    )
+    if DEBUG:
+        logger.info(email_body)
+    else:
+        send_email(
+            f"New upload ({upload_entity.metadata['name']})",
+            dedent(email_body),
+            staff_recipients,
+        )
 
 
 def review_notification(message, upload_id):
@@ -38,11 +44,14 @@ def review_notification(message, upload_id):
     Regards,
     Weed-AI Team
     """
-    send_email(
-        f"Your upload ({upload_entity.metadata['name']}) has been {message}",
-        dedent(email_body),
-        [uploader.email],
-    )
+    if DEBUG:
+        logger.info(email_body)
+    else:
+        send_email(
+            f"Your upload ({upload_entity.metadata['name']}) has been {message}",
+            dedent(email_body),
+            [uploader.email],
+        )
 
 
 def edit_notification(message, upload_id):
@@ -60,8 +69,11 @@ def edit_notification(message, upload_id):
     Regards,
     Weed-AI Team
     """
-    send_email(
-        f"Your upload ({upload_entity.metadata['name']}) has been {message}",
-        dedent(email_body),
-        [uploader.email],
-    )
+    if DEBUG:
+        logger.info(email_body)
+    else:
+        send_email(
+            f"Your upload ({upload_entity.metadata['name']}) has been {message}",
+            dedent(email_body),
+            [uploader.email],
+        )
