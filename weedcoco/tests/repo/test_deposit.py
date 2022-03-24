@@ -6,6 +6,7 @@ import filecmp
 import re
 import subprocess
 import shutil
+import zipfile
 from weedcoco.repo.deposit import main, mkdir_safely
 from weedcoco.index.thumbnailing import thumbnailing
 from weedcoco.validation import ValidationError
@@ -96,6 +97,11 @@ def assert_weedcoco_equal(dir1, dir2):
             )
 
 
+def unpack_zip(zip_path, destination):
+    z = zipfile.ZipFile(zip_path)
+    z.extractall(str(destination))
+
+
 def rewrite_outputs(repo, expected_dir, versions=False):
     """Copies the content in repo to the fixtures directory. Used to regenerate
     content in deposit_data_sample.
@@ -181,7 +187,7 @@ def test_multiple_datasets(executor, rewrite_deposit_truth):
 
 
 def test_versioned_datasets(executor, rewrite_deposit_truth):
-    test_extract_dir, _, repo, _ = executor.run(
+    test_extract_dir, test_download_dir, repo, _ = executor.run(
         "dataset_1", TEST_BASIC_DIR_1 / "weedcoco.json", TEST_BASIC_DIR_1 / "images"
     )
     test_extract_dir, _, repo, _ = executor.run(
@@ -195,6 +201,19 @@ def test_versioned_datasets(executor, rewrite_deposit_truth):
     dataset.extract(str(test_extract_dir / "dataset_1.v2"), "v2")
     assert_files_equal(test_extract_dir, TEST_DATA_SAMPLE_DIR / "versions")
     assert_weedcoco_equal(test_extract_dir, TEST_DATA_SAMPLE_DIR / "versions")
+    mkdir_safely(str(test_extract_dir / "zipfiles"))
+    unpack_zip(
+        test_download_dir / "dataset_1.v1.zip",
+        test_extract_dir / "zipfiles" / "dataset_1.v1",
+    )
+    unpack_zip(
+        test_download_dir / "dataset_1.zip",
+        test_extract_dir / "zipfiles" / "dataset_1.v2",
+    )
+    assert_files_equal(test_extract_dir / "zipfiles", TEST_DATA_SAMPLE_DIR / "versions")
+    assert_weedcoco_equal(
+        test_extract_dir / "zipfiles", TEST_DATA_SAMPLE_DIR / "versions"
+    )
 
 
 def test_thumbnails(executor):
