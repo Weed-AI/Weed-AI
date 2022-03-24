@@ -1,0 +1,416 @@
+{
+    "images": [
+        {
+            "id": 2,
+            "file_name": "images/64e7fbba392047dc2c33-7b9b96b9c0e10c87004f221b41ff7bd0.png",
+            "license": 0,
+            "agcontext_id": 0,
+            "width": 1296,
+            "height": 966
+        }
+    ],
+    "annotations": [
+        {
+            "id": 318,
+            "image_id": 2,
+            "category_id": 1,
+            "segmentation": [
+                [
+                    591,
+                    320,
+                    516,
+                    369,
+                    421,
+                    404,
+                    380,
+                    436,
+                    441,
+                    566,
+                    511,
+                    674,
+                    569,
+                    685,
+                    672,
+                    538,
+                    696,
+                    444,
+                    647,
+                    378,
+                    613,
+                    326
+                ]
+            ],
+            "iscrowd": 0
+        },
+        {
+            "id": 319,
+            "image_id": 2,
+            "category_id": 1,
+            "segmentation": [
+                [
+                    680,
+                    248,
+                    610,
+                    221,
+                    599,
+                    274,
+                    608,
+                    319,
+                    654,
+                    352,
+                    724,
+                    331,
+                    750,
+                    295,
+                    712,
+                    267
+                ]
+            ],
+            "iscrowd": 0
+        },
+        {
+            "id": 320,
+            "image_id": 2,
+            "category_id": 1,
+            "segmentation": [
+                [
+                    1209,
+                    246,
+                    1137,
+                    263,
+                    1114,
+                    323,
+                    1131,
+                    394,
+                    1164,
+                    412,
+                    1209,
+                    376,
+                    1235,
+                    321,
+                    1249,
+                    278,
+                    1232,
+                    253
+                ]
+            ],
+            "iscrowd": 0
+        },
+        {
+            "id": 321,
+            "image_id": 2,
+            "category_id": 1,
+            "segmentation": [
+                [
+                    1028,
+                    440,
+                    905,
+                    498,
+                    869,
+                    572,
+                    851,
+                    593,
+                    900,
+                    705,
+                    947,
+                    757,
+                    1043,
+                    794,
+                    1224,
+                    840,
+                    1245,
+                    792,
+                    1205,
+                    754,
+                    1125,
+                    646,
+                    1107,
+                    525,
+                    1089,
+                    474,
+                    1069,
+                    445
+                ]
+            ],
+            "iscrowd": 0
+        },
+        {
+            "id": 322,
+            "image_id": 2,
+            "category_id": 0,
+            "segmentation": [
+                [
+                    821,
+                    477,
+                    789,
+                    528,
+                    826,
+                    576,
+                    878,
+                    549,
+                    871,
+                    501,
+                    845,
+                    465
+                ]
+            ],
+            "iscrowd": 0
+        },
+        {
+            "id": 323,
+            "image_id": 2,
+            "category_id": 1,
+            "segmentation": [
+                [
+                    676,
+                    223,
+                    608,
+                    202,
+                    547,
+                    251,
+                    477,
+                    229,
+                    457,
+                    216,
+                    594,
+                    0,
+                    721,
+                    2,
+                    746,
+                    89
+                ]
+            ],
+            "iscrowd": 0
+        },
+        {
+            "id": 324,
+            "image_id": 2,
+            "category_id": 0,
+            "segmentation": [
+                [
+                    816,
+                    170,
+                    888,
+                    145,
+                    859,
+                    108,
+                    928,
+                    1,
+                    738,
+                    1,
+                    737,
+                    41,
+                    765,
+                    110
+                ]
+            ],
+            "iscrowd": 0
+        },
+        {
+            "id": 325,
+            "image_id": 2,
+            "category_id": 1,
+            "segmentation": [
+                [
+                    887,
+                    148,
+                    812,
+                    174,
+                    797,
+                    219,
+                    953,
+                    269,
+                    996,
+                    193,
+                    1004,
+                    57,
+                    954,
+                    37,
+                    891,
+                    58,
+                    859,
+                    107
+                ]
+            ],
+            "iscrowd": 0
+        },
+        {
+            "id": 326,
+            "image_id": 2,
+            "category_id": 1,
+            "segmentation": [
+                [
+                    115,
+                    182,
+                    33,
+                    191,
+                    2,
+                    289,
+                    2,
+                    321,
+                    92,
+                    307,
+                    127,
+                    255,
+                    121,
+                    211
+                ]
+            ],
+            "iscrowd": 0
+        },
+        {
+            "id": 327,
+            "image_id": 2,
+            "category_id": 1,
+            "segmentation": [
+                [
+                    892,
+                    749,
+                    930,
+                    742,
+                    907,
+                    707,
+                    823,
+                    631,
+                    789,
+                    647,
+                    800,
+                    749,
+                    812,
+                    787
+                ]
+            ],
+            "iscrowd": 0
+        },
+        {
+            "id": 328,
+            "image_id": 2,
+            "category_id": 1,
+            "segmentation": [
+                [
+                    1255,
+                    671,
+                    1227,
+                    716,
+                    1265,
+                    762,
+                    1295,
+                    750,
+                    1294,
+                    684
+                ]
+            ],
+            "iscrowd": 0
+        },
+        {
+            "id": 329,
+            "image_id": 2,
+            "category_id": 1,
+            "segmentation": [
+                [
+                    723,
+                    740,
+                    690,
+                    744,
+                    687,
+                    798,
+                    690,
+                    854,
+                    693,
+                    889,
+                    733,
+                    900,
+                    767,
+                    909,
+                    851,
+                    902,
+                    867,
+                    889,
+                    849,
+                    877,
+                    805,
+                    877,
+                    782,
+                    877,
+                    767,
+                    855,
+                    766,
+                    803,
+                    747,
+                    763
+                ]
+            ],
+            "iscrowd": 0
+        }
+    ],
+    "categories": [
+        {
+            "name": "crop: daucus carota",
+            "common_name": "carrot",
+            "species": "daucus carota",
+            "eppo_taxon_code": "DAUCS",
+            "eppo_nontaxon_code": "3UMRC",
+            "role": "crop",
+            "id": 0
+        },
+        {
+            "name": "weed: UNSPECIFIED",
+            "species": "UNSPECIFIED",
+            "role": "weed",
+            "id": 1
+        }
+    ],
+    "info": {
+        "year": 2015,
+        "description": "Cwfid annotations converted into WeedCOCO",
+        "secondary_contributor": "Converted to WeedCOCO by Henry Lydecker",
+        "contributor": "Sebastian Haug",
+        "metadata": {
+            "name": "Cwfid annotations converted into WeedCOCO",
+            "description": "Weeds annotated in carrot crop.",
+            "creator": [
+                {
+                    "name": "Sebastian Haug",
+                    "@type": "Person"
+                }
+            ],
+            "datePublished": "2015-XX-XX",
+            "license": "https://github.com/cwfid/dataset"
+        }
+    },
+    "license": [
+        {
+            "id": 0,
+            "url": "https://github.com/cwfid/dataset"
+        }
+    ],
+    "agcontexts": [
+        {
+            "id": 0,
+            "agcontext_name": "cwfid",
+            "crop_type": "daucus carota",
+            "bbch_growth_range": {
+                "min": 10,
+                "max": 20
+            },
+            "soil_colour": "grey",
+            "surface_cover": "none",
+            "surface_coverage": "0-25",
+            "weather_description": "sunny",
+            "location_lat": 53,
+            "location_long": 11,
+            "upload_time": "2020-10-27 09:58:36",
+            "camera_make": "JAI AD-130GE",
+            "camera_lens": "Fujinon TF15-DA-8",
+            "camera_lens_focallength": 15,
+            "camera_height": 450,
+            "camera_angle": 90,
+            "camera_fov": 22.6,
+            "photography_description": "Mounted on boom",
+            "ground_speed": 0,
+            "lighting": "natural",
+            "cropped_to_plant": false,
+            "url": "https://github.com/cwfid/dataset"
+        }
+    ]
+}

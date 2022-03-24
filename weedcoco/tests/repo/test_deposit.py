@@ -6,7 +6,7 @@ import filecmp
 import re
 import subprocess
 import shutil
-from weedcoco.repo.deposit import main, RepositoryDataset, mkdir_safely
+from weedcoco.repo.deposit import main, mkdir_safely
 from weedcoco.index.thumbnailing import thumbnailing
 from weedcoco.validation import ValidationError
 
@@ -102,24 +102,21 @@ def rewrite_outputs(repo, expected_dir, versions=False):
     repo - the ocfl repository
     expected_dir - the directory within deposit_data_sample
     versions - if true, extracts each version of the datasets into directories
-    with names like expected_dir/obj_id.v1, expected_dir/obj_id.v2 etc
+    with names like expected_dir/identifier.v1, expected_dir/identifier.v2 etc
 
     Default behaviour is to just extract the head version
     """
     shutil.rmtree(expected_dir)
     mkdir_safely(expected_dir)
-    repo.connect()
-    for path in repo.object_paths():
-        obj_id = path.replace("/", "")
-        dataset = RepositoryDataset(repo, obj_id)
+    for dataset in repo.datasets():
+        identifier = dataset.identifier
         if versions:
             head = int(dataset.head_version[1:])
             for version_number in range(1, head + 1):
-                dataset.extract(
-                    str(expected_dir / pathlib.Path(obj_id)) + f".v{version_number}"
-                )
+                d = str(expected_dir / pathlib.Path(identifier)) + f".v{version_number}"
+                dataset.extract(d, f"v{version_number}")
         else:
-            dataset.extract(str(expected_dir / pathlib.Path(obj_id)))
+            dataset.extract(str(expected_dir / pathlib.Path(identifier)))
 
 
 def test_basic(executor, rewrite_deposit_truth):
