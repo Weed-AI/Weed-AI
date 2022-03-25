@@ -6,7 +6,7 @@ import os
 import pathlib
 import tempfile
 from collections import defaultdict
-from shutil import copy, rmtree
+from shutil import copy, rmtree, move
 from uuid import uuid4
 from zipfile import ZipFile
 
@@ -97,6 +97,14 @@ class RepositoryDataset:
         if self.inventory is not None:
             return self._inventory["head"]
         return None
+
+    def update(self, src_dir, metadata):
+        self.ocfl.update(
+            objdir=str(self.object_path),
+            srcdir=str(src_dir),
+            metadata=metadata,
+        )
+        self._inventory = self.ocfl.parse_inventory()
 
     def get_logical_paths(self, version="head"):
         """Iterate over all content in a version as logical paths"""
@@ -343,7 +351,7 @@ class Repository:
         metadata - a dict-like with name, address and message
         dataset - a RepositoryDataset
 
-        Returns the id of the object.
+        Returns the updated dataset
         """
         if identifier is None:
             identifier = str(uuid4())
@@ -362,13 +370,15 @@ class Repository:
             temp_dir = pathlib.Path(temp_dir)
             dataset_dir = self.setup_deposit(temp_dir, identifier)
             dataset.build(dataset_dir)
+            head_zipfile = (download_dir / identifier).with_suffix(".zip")
+            last_zipfile = (download_dir / identifier).with_suffix(
+                f".{last_version}.zip"
+            )
             try:
                 if dataset.exists_in_repo:
-                    dataset.ocfl.update(
-                        objdir=str(dataset.object_path),
-                        srcdir=str(dataset_dir),
-                        metadata=ocfl_metadata,
-                    )
+                    dataset.update(dataset_dir, ocfl_metadata)
+                    logger.warning(f"copying {head_zipfile} to {last_zipfile}")
+                    copy(head_zipfile, last_zipfile)
                 else:
                     new_object_dir = temp_dir / pathlib.Path(identifier + "_ocfl")
                     new_object = ocfl.Object(identifier=identifier)
@@ -378,12 +388,13 @@ class Repository:
                         metadata=ocfl_metadata,
                     )
                     self.ocfl.add(object_path=str(new_object_dir))
-                dataset.make_zipfile(download_dir)  # should this raise an exception?
+                dataset.make_zipfile(download_dir)
             except Exception:
                 dataset.rollback(dataset_dir, last_version)
-                zip_file = (download_dir / identifier).with_suffix(".zip")
-                if zip_file.is_file():
-                    zip_file.unlink()  # missing_ok is not in 3.7
+                if head_zipfile.is_file():
+                    head_zipfile.unlink()  # missing_ok is not in 3.7
+                if last_version != "v1":
+                    move(last_zipfile, head_zipfile)
                 raise
         return dataset
 
