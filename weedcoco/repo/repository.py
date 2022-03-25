@@ -75,8 +75,9 @@ def migrate_dir(repository, src, dry_run, metadata):
 
 def main(args=None):
     ap = argparse.ArgumentParser(description=__doc__)
-    ap.add_argument("--repository-dir", default="repository", type=pathlib.Path)
-    ap.add_argument("--identifier", default="", type=str)
+    ap.add_argument("--repository-dir", required=True, type=pathlib.Path)
+    ap.add_argument("--initialise", default=False, action="store_true")
+    ap.add_argument("--identifier", type=str)
     ap.add_argument("--name", default="", type=str)
     ap.add_argument("--address", default="", type=str)
     ap.add_argument("--message", default="", type=str)
@@ -95,6 +96,13 @@ def main(args=None):
     if args.version and not is_valid_version(args.version):
         raise RepositoryError("'{args.version} is not a valid ocfl version")
     repository = Repository(args.repository_dir)
+    if args.initialise:
+        if args.repository_dir.is_dir():
+            raise RepositoryError(
+                f"Cannot initalise - {args.repository_dir} already exists"
+            )
+        print(f"Initialising ocfl repository in {args.repository_dir}")
+        return repository.initialize()
     if args.validate:
         return validate_ocfl(repository, args.identifier)
     if args.list:
