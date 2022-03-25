@@ -1,10 +1,10 @@
 import Button from '@material-ui/core/Button';
+import CircularProgress from '@material-ui/core/CircularProgress';
 import Step from '@material-ui/core/Step';
 import StepLabel from '@material-ui/core/StepLabel';
 import Stepper from '@material-ui/core/Stepper';
 import { withStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
-import CircularProgress from '@material-ui/core/CircularProgress';
 import axios from 'axios';
 import Cookies from 'js-cookie';
 import cloneDeep from 'lodash/cloneDeep';
@@ -16,6 +16,8 @@ import MetadataForm from '../forms/MetadataForm';
 import UploadJsonButton from '../forms/UploadJsonButton';
 import CardSelector from '../generic/card_selector';
 import CategoryMapper from './uploader_category_mapper';
+import CopyCvatUploader from './uploader_copy_cvat';
+import CvatRetriever from './uploader_cvat';
 import UploaderMasks from './uploader_masks';
 import UploaderSingle from './uploader_single';
 import UploaderVoc from './uploader_voc';
@@ -61,6 +63,11 @@ const typeData = [
     "name": "Mask PNGs",
     "description": <Typography>Colour coded mask images for segmentation.</Typography>
   },
+  {
+    "id": "cvat",
+    "name": "Annotation Project",
+    "description": <Typography>Import from Weed-AI's CVAT annotation server</Typography>
+  },
 ]
 const stepsByType = {
     "coco": [
@@ -91,6 +98,14 @@ const stepsByType = {
         {title: "Add Agcontext", type: "agcontext"},
         {title: "Add Metadata", type: "metadata"},
         {title: "Upload Images", type: "images"}
+    ],
+    "cvat": [
+        {title: "Select Format", type: "select-type"},
+        {title: "Select CVAT Task", type: "cvat"},
+        {title: "Categories", type: "categories"},
+        {title: "Add Agcontext", type: "agcontext"},
+        {title: "Add Metadata", type: "metadata"},
+        {title: "Copy CVAT Images", type: "copy_cvat"}
     ]
 }
 
@@ -115,6 +130,7 @@ class UploadStepper extends React.Component {
         this.isStepOptional = this.isStepOptional.bind(this);
         this.isStepSkipped = this.isStepSkipped.bind(this);
         this.handleUploadId = this.handleUploadId.bind(this);
+        this.handleCvatTaskId = this.handleCvatTaskId.bind(this);
         this.handleImageExtension = this.handleImageExtension.bind(this);
         this.handleImages = this.handleImages.bind(this);
         this.handleCategories = this.handleCategories.bind(this);
@@ -183,6 +199,10 @@ class UploadStepper extends React.Component {
 
     handleUploadId(upload_id) {
         this.setState({upload_id: upload_id});
+    }
+
+    handleCvatTaskId(cvat_task_id) {
+        this.setState({cvat_task_id: cvat_task_id});
     }
 
     handleImageExtension(image_ext) {
@@ -432,7 +452,11 @@ class UploadStepper extends React.Component {
                     </React.Fragment>
                 )
             case "images":
-                return <ImageOrZipUploader stepName={step} upload_id={this.state.upload_id} images={this.state.images} handleValidation={this.handleValidation} handleErrorMessage={this.handleErrorMessage} />
+                return <ImageOrZipUploader stepName={step} upload_id={this.state.upload_id} cvat_task_id={this.state.cvat_task_id} images={this.state.images} handleValidation={this.handleValidation} handleErrorMessage={this.handleErrorMessage} />
+            case "cvat":
+                return <CvatRetriever handleUploadId={this.handleUploadId} handleCvatTaskId={this.handleCvatTaskId} handleImages={this.handleImages} handleCategories={this.handleCategories} handleValidation={this.handleValidation} handleErrorMessage={this.handleErrorMessage} />
+            case "copy_cvat":
+                return <CopyCvatUploader upload_id={this.state.upload_id} cvat_task_id={this.state.cvat_task_id} images={this.state.images} handleValidation={this.handleValidation} handleErrorMessage={this.handleErrorMessage} />
             default:
                 return ''
         }
