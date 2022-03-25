@@ -2,6 +2,7 @@ from __future__ import absolute_import, unicode_literals
 
 import datetime
 import json
+import logging
 import os
 import subprocess
 import traceback
@@ -29,6 +30,8 @@ from weedid.notification import (
     upload_notification,
 )
 from weedid.utils import make_upload_entity_fields
+
+logger = logging.getLogger(__name__)
 
 
 @shared_task
@@ -110,7 +113,7 @@ def submit_upload_task(weedcoco_path, image_dir, upload_id, mode="upload"):
             upload_entity.save()
         elif mode in ("edit", "admin"):
             if upload_entity.status == "C":
-                reindex_dataset.delay(upload_id)
+                reindex_dataset.delay(upload_id, mode=mode)
                 return
 
 
@@ -183,6 +186,7 @@ def reindex_dataset(
     thumbnails_dir=THUMBNAILS_DIR,
     repository_dir=REPOSITORY_DIR,
     download_dir=DOWNLOAD_DIR,
+    upload_mode="admin",
 ):
     """Reindex a dataset already in the repository, and recreate its download"""
     download_dir = Path(download_dir)
@@ -201,7 +205,7 @@ def reindex_dataset(
         process_thumbnails=process_thumbnails,
         thumbnails_dir=str(thumbnails_dir),
         repository_dir=str(repository_dir),
-        mode="admin",
+        mode=upload_mode,
     )
 
 
