@@ -1,10 +1,10 @@
-import React from 'react';
+import Button from '@material-ui/core/Button';
 import { withStyles } from '@material-ui/core/styles';
 import TextField from '@material-ui/core/TextField';
-import Button from '@material-ui/core/Button';
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import axios from 'axios';
-import {jsonSchemaTitle} from '../error/utils';
+import React from 'react';
+import { jsonSchemaTitle } from '../error/utils';
 
 
 const useStyles = (theme) => ({
@@ -67,9 +67,15 @@ class CvatRetriever extends React.Component {
             }
         } catch (error) {
             console.log(error)
-            const err = JSON.parse(error.responseText)
-            this.props.handleErrorMessage(jsonSchemaTitle(err), err)
-            this.props.handleValidation(false)
+            try {
+                const err = JSON.parse(error.responseText)
+                this.props.handleErrorMessage(jsonSchemaTitle(err), err)
+            } catch (err) {
+                this.props.handleErrorMessage("Validation error", error)
+            }
+            finally {
+                this.props.handleValidation(false)
+            }
         }
         
     }
