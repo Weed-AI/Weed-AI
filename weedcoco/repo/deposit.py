@@ -106,6 +106,9 @@ class RepositoryDataset:
         )
         self._inventory = self.ocfl.parse_inventory()
 
+    def validate(self):
+        self.ocfl.validate(str(self.object_path))
+
     def get_logical_paths(self, version="head"):
         """Iterate over all content in a version as logical paths"""
         if self.inventory is None:
@@ -328,6 +331,9 @@ class Repository:
             return self._ocfl
         self._ocfl = ocfl.Store(root=str(self.root), disposition=self.disposition)
         return self._ocfl
+
+    def validate(self):
+        self.ocfl.validate()
 
     def datasets(self):
         self.ocfl.open_root_fs()

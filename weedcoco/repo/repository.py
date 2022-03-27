@@ -18,7 +18,13 @@ def is_valid_version(version):
 
 
 def validate_ocfl(repository, identifier):
-    pass
+    if identifier:
+        dataset = repository.dataset(identifier)
+        if not dataset.exists_in_repo:
+            raise RepositoryError(f"Dataset {identifier} not found in repo")
+        dataset.validate()
+    else:
+        repository.validate()
 
 
 def list_contents(repository, identifier, version):
@@ -27,7 +33,7 @@ def list_contents(repository, identifier, version):
         if dataset.exists_in_repo:
             head = int(dataset.head_version[1:])
             if int(version[1:]) > head:
-                raise RepositoryError(f"Lastest version of {identifier} is v{head}")
+                raise RepositoryError(f"{identifier} has head v{head}")
             for path in dataset.get_logical_paths(version):
                 print(path)
         else:
