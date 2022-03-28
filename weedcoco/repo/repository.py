@@ -51,16 +51,19 @@ def migrate(repository, identifier, src, dry_run, metadata):
         name=metadata["name"],
     )
     dataset = repository.dataset(identifier)
+    dry_warn = ""
+    if dry_run:
+        dry_warn = "[dry run] "
     if dataset.exists_in_repo:
+        new_version = int(dataset.head_version[1:]) + 1
+        print(f"{dry_warn}Updating {identifier} to v{new_version}")
         if dry_run:
-            new_version = int(dataset.head_version[1:]) + 1
-            print(f"Dataset {identifier} will be updated to v{new_version}")
             return None
         dataset.update(src, ocfl_metadata)
         return dataset.head_version
     else:
+        print(f"{dry_warn}Creating OCFL object {identifier} at v1")
         if dry_run:
-            print(f"Dataset {identifier} will be created at v1")
             return None
         with tempfile.TemporaryDirectory() as temp_dir:
             new_object_dir = pathlib.Path(temp_dir) / identifier
@@ -75,8 +78,13 @@ def migrate(repository, identifier, src, dry_run, metadata):
 
 
 def migrate_dir(repository, src, dry_run, metadata):
+    if dry_run:
+        print(f"Dry run, scanning all subdirectories in {src}")
+    else:
+        print(f"Migrating all subdirectories in {src}")
     for subdir in [x for x in src.iterdir() if x.is_dir()]:
-        migrate(repository, str(subdir), subdir, dry_run, metadata)
+        identifier = str(subdir.name)
+        migrate(repository, identifier, subdir, dry_run, metadata)
 
 
 def main(args=None):
