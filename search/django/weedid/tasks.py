@@ -99,7 +99,7 @@ def submit_upload_task(weedcoco_path, image_dir, upload_id, new_upload=True):
         # TODO: raise alert
     else:
         if not new_upload:
-            upload_entity.head_version = int(dataset.head[1:])
+            upload_entity.head_version = int(dataset.head_version[1:])
             upload_entity.save()
             if upload_entity.status == "C":
                 reindex_dataset.delay(upload_id)
@@ -182,6 +182,7 @@ def reindex_dataset(
     upload_entity = Dataset.objects.get(upload_id=upload_id)
     for k, v in make_upload_entity_fields(weedcoco).items():
         setattr(upload_entity, k, v)
+    upload_entity.head_version = int(dataset.head_version[1:])
     upload_entity.save()
     dataset.make_zipfile(download_dir)
     update_index_and_thumbnails.delay(
