@@ -133,6 +133,7 @@ class UploadStepper extends React.Component {
         this.handleCvatTaskId = this.handleCvatTaskId.bind(this);
         this.handleImageExtension = this.handleImageExtension.bind(this);
         this.handleImages = this.handleImages.bind(this);
+        this.handleMissingImages = this.handleMissingImages.bind(this);
         this.handleCategories = this.handleCategories.bind(this);
         this.handleUpdateCategories = this.handleUpdateCategories.bind(this);
         this.handleAgContextsFormData = this.handleAgContextsFormData.bind(this);
@@ -213,6 +214,18 @@ class UploadStepper extends React.Component {
         this.setState({images: images});
     }
 
+    handleMissingImages() {
+        let missingImages = new Set(this.state.images);
+        console.log("Missing images" + missingImages.size.toString)
+        if (missingImages.size === 0) {
+            this.handleValidation(true);
+            this.handleErrorMessage("");
+        } else {
+            this.handleValidation(false);
+            this.handleErrorMessage(`${missingImages.size} ${missingImages.size > 1 ? "images" : "image"} missing`, {error_type: "image", missingImages: Array.from(missingImages)});
+        }
+    }
+
     handleCategories(categories) {
         this.setState({categories: cloneDeep(categories)});
     }
@@ -251,6 +264,9 @@ class UploadStepper extends React.Component {
                 }
             })
             this.handleErrorMessage("")
+            if (stepsByType[this.state.upload_type][this.state.activeStep + 1].type === "images") {
+                this.handleMissingImages();
+            }
         }
     };
 
@@ -452,7 +468,7 @@ class UploadStepper extends React.Component {
                     </React.Fragment>
                 )
             case "images":
-                return <ImageOrZipUploader stepName={step} upload_id={this.state.upload_id} cvat_task_id={this.state.cvat_task_id} images={this.state.images} handleValidation={this.handleValidation} handleErrorMessage={this.handleErrorMessage} />
+                return <ImageOrZipUploader stepName={step} upload_id={this.state.upload_id} cvat_task_id={this.state.cvat_task_id} images={this.state.images} handleValidation={this.handleValidation} handleImages={this.handleImages} handleMissingImages={this.handleMissingImages}/>
             case "cvat":
                 return <CvatRetriever handleUploadId={this.handleUploadId} handleCvatTaskId={this.handleCvatTaskId} handleImages={this.handleImages} handleCategories={this.handleCategories} handleValidation={this.handleValidation} handleErrorMessage={this.handleErrorMessage} />
             case "copy_cvat":
