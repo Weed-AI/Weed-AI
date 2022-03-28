@@ -31,8 +31,6 @@ from weedid.notification import (
 )
 from weedid.utils import make_upload_entity_fields
 
-logger = logging.getLogger(__name__)
-
 
 @shared_task
 def submit_upload_task(weedcoco_path, image_dir, upload_id, mode="upload"):
@@ -82,8 +80,8 @@ def submit_upload_task(weedcoco_path, image_dir, upload_id, mode="upload"):
             IMAGE_HASH_MAPPING_URL,
         )
     except Exception as e:
+        traceback.print_exc()
         if mode == "upload":
-            traceback.print_exc()
             upload_entity.status = "F"
             upload_entity.status_details = str(e)
             upload_entity.save()
@@ -154,8 +152,8 @@ def update_index_and_thumbnails(
         )
         es_index.post_index_entries()
     except Exception as e:
+        traceback.print_exc()
         if mode == "upload":
-            traceback.print_exc()
             upload_entity.status = "F"
             upload_entity.status_details = str(e)
         elif mode == "edit":
