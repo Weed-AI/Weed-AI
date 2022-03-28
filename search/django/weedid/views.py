@@ -116,9 +116,6 @@ def upload(request):
             upload_id, images, categories = upload_helper(
                 weedcoco_json, user.id, request.POST["schema"]
             )
-        upload_id, images, categories = upload_helper(
-            weedcoco_json, user.id, request.POST["schema"]
-        )
     except JsonValidationError as e:
         traceback.print_exc()
         return json_validation_response(e)
