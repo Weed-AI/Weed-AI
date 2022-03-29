@@ -8,10 +8,17 @@ from shutil import copy, move, rmtree
 from uuid import uuid4
 from zipfile import ZipFile
 
-from core.settings import (DOWNLOAD_DIR, FROM_EMAIL, REPOSITORY_DIR,
-                           SEND_EMAIL, SMTP_HOST, SMTP_PORT, UPLOAD_DIR)
+from core.settings import (
+    DOWNLOAD_DIR,
+    FROM_EMAIL,
+    REPOSITORY_DIR,
+    SEND_EMAIL,
+    SMTP_HOST,
+    SMTP_PORT,
+    UPLOAD_DIR,
+)
 from django.core.files.storage import FileSystemStorage
-from weedcoco.repo.deposit import Repository, RepositoryError, mkdir_safely
+from weedcoco.repo.deposit import Repository, mkdir_safely
 from weedcoco.stats import WeedCOCOStats
 from weedcoco.utils import set_info, set_licenses
 from weedcoco.validation import validate
