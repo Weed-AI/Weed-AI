@@ -20,7 +20,7 @@ from core.settings import (
     UPLOAD_DIR,
 )
 from django.core.files.storage import FileSystemStorage
-from weedcoco.repo.deposit import Repository, mkdir_safely, RepositoryError
+from weedcoco.repo.deposit import Repository, RepositoryError, mkdir_safely
 from weedcoco.stats import WeedCOCOStats
 from weedcoco.utils import set_info, set_licenses
 from weedcoco.validation import validate
@@ -248,17 +248,19 @@ def extract_original_images(upload_id, dest_dir, version="head"):
     with open(weedcoco_path, "r") as jsonFile:
         weedcoco_json = json.load(jsonFile)
     images_path = os.path.join(dest_dir, "images")
-    for hash_image in os.listdir(images_path):
+
+    images_set = set(os.listdir(images_path))
+    for hash_image in images_set:
         original_image = redis_client.get("/".join([upload_id, hash_image]))
-        if original_image:
-            weedcoco_json["images"][original_image] = weedcoco_json["images"][
-                hash_image
-            ]
-            del weedcoco_json["images"][hash_image]
-            move(
-                os.path.join(images_path, hash_image),
-                os.path.join(images_path, original_image.decode("ascii")),
-            )
+        move(
+            os.path.join(images_path, hash_image),
+            os.path.join(images_path, original_image.decode("ascii")),
+        )
+    for image in weedcoco_json["images"]:
+        hash_name = image["file_name"].split("/")[-1]
+        original_image = redis_client.get("/".join([upload_id, hash_name]))
+        if hash_name in images_set and original_image:
+            image["file_name"] = original_image.decode("ascii")
     with open(weedcoco_path, "w") as jsonFile:
         jsonFile.write(json.dumps(weedcoco_json))
 
