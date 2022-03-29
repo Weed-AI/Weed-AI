@@ -252,10 +252,11 @@ def extract_original_images(upload_id, dest_dir, version="head"):
     images_set = set(os.listdir(images_path))
     for hash_image in images_set:
         original_image = redis_client.get("/".join([upload_id, hash_image]))
-        move(
-            os.path.join(images_path, hash_image),
-            os.path.join(images_path, original_image.decode("ascii")),
-        )
+        if original_image:
+            move(
+                os.path.join(images_path, hash_image),
+                os.path.join(images_path, original_image.decode("ascii")),
+            )
     for image in weedcoco_json["images"]:
         hash_name = image["file_name"].split("/")[-1]
         original_image = redis_client.get("/".join([upload_id, hash_name]))
