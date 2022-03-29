@@ -32,6 +32,12 @@ def get_hashset_from_image_name(image_hash):
     return {os.path.splitext(image_name)[0] for image_name in image_hash.values()}
 
 
+def retrieve_image_paths(image_dir):
+    for root, _, files in os.walk(image_dir):
+        for filename in files:
+            yield (os.path.join(root, filename), filename)
+
+
 class RepositoryError(Exception):
     pass
 
@@ -279,11 +285,6 @@ class RepositoryDataset:
         for image_name, image_hash in self.image_hash.items():
             redis_client.set("/".join([self.identifier, image_hash]), image_name)
 
-    def retrieve_image_paths(self):
-        for root, _, files in os.walk(self.image_dir):
-            for filename in files:
-                yield (os.path.join(root, filename), filename)
-
     def extract_original_images(self, dest_dir, redis_mapping_url="", version="head"):
         """
         Checks out a version of a dataset from the ocfl repository and then
@@ -328,9 +329,11 @@ class RepositoryDataset:
         zip_file = (download_dir / self.identifier).with_suffix(".zip")
         with tempfile.TemporaryDirectory() as tmpdir:
             tmp_zip = pathlib.Path(tmpdir) / "bundle.zip"
+            tmp_dest = pathlib.Path(tmpdir) / self.identifier
             with ZipFile(tmp_zip, "w") as zip:
-                for lpath in self.get_logical_paths(version):
-                    zip.write(self.resolve_path(lpath), lpath)
+                zip.write(tmp_dest / "weedcoco.json", "weedcoco.json")
+                for image, image_name in retrieve_image_paths(tmp_dest / "images"):
+                    zip.write(image, "images/" + image_name)
             # XXX: this should be move() not copy(), but move resulted in files
             #      that we could not delete or move in the Docker volume.
             # copy(tmp_zip_path, download_path)
