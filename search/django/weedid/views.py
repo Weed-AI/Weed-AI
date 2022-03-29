@@ -33,7 +33,7 @@ from django.views.decorators.http import require_http_methods
 from weedcoco.importers.mask import generate_paths_from_mask_only, masks_to_coco
 from weedcoco.importers.voc import voc_to_coco
 from weedcoco.repo.deposit import mkdir_safely
-from weedcoco.utils import fix_compatibility_quirks, extract_original_images
+from weedcoco.utils import fix_compatibility_quirks
 from weedcoco.validation import JsonValidationError, validate, validate_json
 
 from weedid.decorators import check_post_and_authenticated
@@ -44,6 +44,7 @@ from weedid.utils import (
     add_agcontexts,
     add_metadata,
     create_upload_entity,
+    extract_original_images,
     move_to_upload,
     parse_category_name,
     remove_entity_local_record,
