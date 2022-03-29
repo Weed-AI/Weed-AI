@@ -8,17 +8,8 @@ from shutil import copy, move, rmtree
 from uuid import uuid4
 from zipfile import ZipFile
 
-import redis
-from core.settings import (
-    DOWNLOAD_DIR,
-    FROM_EMAIL,
-    IMAGE_HASH_MAPPING_URL,
-    REPOSITORY_DIR,
-    SEND_EMAIL,
-    SMTP_HOST,
-    SMTP_PORT,
-    UPLOAD_DIR,
-)
+from core.settings import (DOWNLOAD_DIR, FROM_EMAIL, REPOSITORY_DIR,
+                           SEND_EMAIL, SMTP_HOST, SMTP_PORT, UPLOAD_DIR)
 from django.core.files.storage import FileSystemStorage
 from weedcoco.repo.deposit import Repository, RepositoryError, mkdir_safely
 from weedcoco.stats import WeedCOCOStats
@@ -228,42 +219,6 @@ def retrieve_missing_images_list(weedcoco_json, images_path, upload_id):
         return current_images[:]
     existing_images = set(os.listdir(images_path))
     return [image for image in current_images if image not in existing_images]
-
-
-def extract_original_images(upload_id, dest_dir, version="head"):
-    """
-    Checks out a version of a dataset from the ocfl repository and then
-    tries to remap the image filenames to their originals, also updating the
-    weedcoco. If the images have no redis mappings, leaves them unchanged.
-    """
-    redis_client = redis.Redis.from_url(url=IMAGE_HASH_MAPPING_URL)
-    repository = Repository(REPOSITORY_DIR)
-    dataset = repository.dataset(upload_id)
-    if not dataset.exists_in_repo:
-        raise RepositoryError("dataset not found")
-    if os.path.isdir(dest_dir):
-        rmtree(dest_dir)
-    dataset.extract(dest_dir, version)
-    weedcoco_path = os.path.join(dest_dir, "weedcoco.json")
-    with open(weedcoco_path, "r") as jsonFile:
-        weedcoco_json = json.load(jsonFile)
-    images_path = os.path.join(dest_dir, "images")
-
-    images_set = set(os.listdir(images_path))
-    for hash_image in images_set:
-        original_image = redis_client.get("/".join([upload_id, hash_image]))
-        if original_image:
-            move(
-                os.path.join(images_path, hash_image),
-                os.path.join(images_path, original_image.decode("ascii")),
-            )
-    for image in weedcoco_json["images"]:
-        hash_name = image["file_name"].split("/")[-1]
-        original_image = redis_client.get("/".join([upload_id, hash_name]))
-        if hash_name in images_set and original_image:
-            image["file_name"] = original_image.decode("ascii")
-    with open(weedcoco_path, "w") as jsonFile:
-        jsonFile.write(json.dumps(weedcoco_json))
 
 
 def upload_helper(weedcoco_json, user_id, schema="coco", upload_id=None):

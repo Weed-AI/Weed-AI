@@ -9,8 +9,10 @@ from zipfile import ZipFile
 import requests
 from core.settings import (
     CVAT_DATA_DIR,
+    IMAGE_HASH_MAPPING_URL,
     MAX_IMAGE_SIZE,
     MAX_VOC_SIZE,
+    REPOSITORY_DIR,
     SITE_BASE_URL,
     TUS_DESTINATION_DIR,
     UPLOAD_DIR,
@@ -32,7 +34,7 @@ from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_http_methods
 from weedcoco.importers.mask import generate_paths_from_mask_only, masks_to_coco
 from weedcoco.importers.voc import voc_to_coco
-from weedcoco.repo.deposit import mkdir_safely
+from weedcoco.repo.deposit import RepositoryDataset, mkdir_safely
 from weedcoco.utils import fix_compatibility_quirks
 from weedcoco.validation import JsonValidationError, validate, validate_json
 
@@ -44,7 +46,6 @@ from weedid.utils import (
     add_agcontexts,
     add_metadata,
     create_upload_entity,
-    extract_original_images,
     move_to_upload,
     parse_category_name,
     remove_entity_local_record,
@@ -169,7 +170,8 @@ def editing_init(request, dataset_id):
     if upload_entity.user.id != user.id:
         return HttpResponseForbidden("You dont have access to edit")
     upload_path = os.path.join(UPLOAD_DIR, str(user.id), dataset_id)
-    extract_original_images(dataset_id, upload_path)
+    repo = RepositoryDataset(os.path.join(REPOSITORY_DIR, "ocfl"), dataset_id)
+    repo.extract_original_images(upload_path, redis_mapping_url=IMAGE_HASH_MAPPING_URL)
 
     with open(os.path.join(upload_path, "weedcoco.json")) as f:
         weedcoco_json = json.load(f)
