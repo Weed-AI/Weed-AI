@@ -216,12 +216,12 @@ class UploadStepper extends React.Component {
 
     handleMissingImages() {
         let missingImages = new Set(this.state.images);
-        console.log("Missing images" + missingImages.size.toString)
+        console.log("Missing images: " + missingImages.size.toString())
         if (missingImages.size === 0) {
-            this.handleValidation(true);
+            this.handleValidation(true, "images");
             this.handleErrorMessage("");
         } else {
-            this.handleValidation(false);
+            this.handleValidation(false, "images");
             this.handleErrorMessage(`${missingImages.size} ${missingImages.size > 1 ? "images" : "image"} missing`, {error_type: "image", missingImages: Array.from(missingImages)});
         }
     }
@@ -287,6 +287,9 @@ class UploadStepper extends React.Component {
             newSkipped.add(this.state.activeStep);
             return {skipped: newSkipped};
         })
+        if (stepsByType[this.state.upload_type][this.state.activeStep + 1].type === "images") {
+            this.handleMissingImages();
+        }
     };
 
     handleReset(){
@@ -413,8 +416,8 @@ class UploadStepper extends React.Component {
         })
     }
 
-    handleValidation(status){
-        const currentStep = stepsByType[this.state.upload_type][this.state.activeStep].type
+    handleValidation(status, currentStep=""){
+        currentStep = currentStep ? currentStep: stepsByType[this.state.upload_type][this.state.activeStep].type
         this.setState(prevState => {
             const newState = {stepValid: {...prevState.stepValid}}
             newState.stepValid[currentStep] = status
