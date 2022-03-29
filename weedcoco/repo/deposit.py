@@ -330,6 +330,7 @@ class RepositoryDataset:
         with tempfile.TemporaryDirectory() as tmpdir:
             tmp_zip = pathlib.Path(tmpdir) / "bundle.zip"
             tmp_dest = pathlib.Path(tmpdir) / self.identifier
+            self.extract_original_images(tmp_dest)
             with ZipFile(tmp_zip, "w") as zip:
                 zip.write(tmp_dest / "weedcoco.json", "weedcoco.json")
                 for image, image_name in retrieve_image_paths(tmp_dest / "images"):
