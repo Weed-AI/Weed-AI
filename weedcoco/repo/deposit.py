@@ -6,7 +6,7 @@ import os
 import pathlib
 import tempfile
 from collections import defaultdict
-from shutil import copy, rmtree, move
+from shutil import copy, move, rmtree
 from uuid import uuid4
 from zipfile import ZipFile
 
@@ -283,6 +283,45 @@ class RepositoryDataset:
         for root, _, files in os.walk(self.image_dir):
             for filename in files:
                 yield (os.path.join(root, filename), filename)
+
+    def extract_original_images(self, dest_dir, redis_mapping_url="", version="head"):
+        """
+        Checks out a version of a dataset from the ocfl repository and then
+        tries to remap the image filenames to their originals, also updating the
+        weedcoco. If the images have no redis mappings, leaves them unchanged.
+        """
+        upload_id = self.identifier
+        redis_client = (
+            redis.Redis.from_url(url=redis_mapping_url) if redis_mapping_url else None
+        )
+        repository = self.repo
+        dataset = repository.dataset(upload_id)
+        if not dataset.exists_in_repo:
+            raise RepositoryError("dataset not found")
+        if os.path.isdir(dest_dir):
+            rmtree(dest_dir)
+        dataset.extract(dest_dir, version)
+        weedcoco_path = os.path.join(dest_dir, "weedcoco.json")
+        with open(weedcoco_path, "r") as jsonFile:
+            weedcoco_json = json.load(jsonFile)
+        images_path = os.path.join(dest_dir, "images")
+
+        images_set = set(os.listdir(images_path))
+        if redis_client:
+            for hash_image in images_set:
+                original_image = redis_client.get("/".join([upload_id, hash_image]))
+                if original_image:
+                    move(
+                        os.path.join(images_path, hash_image),
+                        os.path.join(images_path, original_image.decode("ascii")),
+                    )
+            for image in weedcoco_json["images"]:
+                hash_name = image["file_name"].split("/")[-1]
+                original_image = redis_client.get("/".join([upload_id, hash_name]))
+                if hash_name in images_set and original_image:
+                    image["file_name"] = original_image.decode("ascii")
+        with open(weedcoco_path, "w") as jsonFile:
+            jsonFile.write(json.dumps(weedcoco_json))
 
     def make_zipfile(self, download_dir, version="head"):
         zip_file = (download_dir / self.identifier).with_suffix(".zip")
