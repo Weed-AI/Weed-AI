@@ -290,17 +290,14 @@ class RepositoryDataset:
         tries to remap the image filenames to their originals, also updating the
         weedcoco. If the images have no redis mappings, leaves them unchanged.
         """
-        upload_id = self.identifier
         redis_client = (
             redis.Redis.from_url(url=redis_mapping_url) if redis_mapping_url else None
         )
-        repository = self.repo
-        dataset = repository.dataset(upload_id)
-        if not dataset.exists_in_repo:
+        if not self.exists_in_repo:
             raise RepositoryError("dataset not found")
         if os.path.isdir(dest_dir):
             rmtree(dest_dir)
-        dataset.extract(dest_dir, version)
+        self.extract(dest_dir, version)
         weedcoco_path = os.path.join(dest_dir, "weedcoco.json")
         with open(weedcoco_path, "r") as jsonFile:
             weedcoco_json = json.load(jsonFile)
@@ -309,7 +306,9 @@ class RepositoryDataset:
         images_set = set(os.listdir(images_path))
         if redis_client:
             for hash_image in images_set:
-                original_image = redis_client.get("/".join([upload_id, hash_image]))
+                original_image = redis_client.get(
+                    "/".join([self.identifier, hash_image])
+                )
                 if original_image:
                     move(
                         os.path.join(images_path, hash_image),
@@ -317,7 +316,9 @@ class RepositoryDataset:
                     )
             for image in weedcoco_json["images"]:
                 hash_name = image["file_name"].split("/")[-1]
-                original_image = redis_client.get("/".join([upload_id, hash_name]))
+                original_image = redis_client.get(
+                    "/".join([self.identifier, hash_name])
+                )
                 if hash_name in images_set and original_image:
                     image["file_name"] = original_image.decode("ascii")
         with open(weedcoco_path, "w") as jsonFile:
