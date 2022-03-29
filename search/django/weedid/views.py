@@ -11,7 +11,6 @@ from core.settings import (
     CVAT_DATA_DIR,
     MAX_IMAGE_SIZE,
     MAX_VOC_SIZE,
-    REPOSITORY_DIR,
     SITE_BASE_URL,
     TUS_DESTINATION_DIR,
     UPLOAD_DIR,
@@ -33,8 +32,8 @@ from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_http_methods
 from weedcoco.importers.mask import generate_paths_from_mask_only, masks_to_coco
 from weedcoco.importers.voc import voc_to_coco
-from weedcoco.repo.deposit import Repository, mkdir_safely
-from weedcoco.utils import fix_compatibility_quirks
+from weedcoco.repo.deposit import mkdir_safely
+from weedcoco.utils import fix_compatibility_quirks, extract_original_images
 from weedcoco.validation import JsonValidationError, validate, validate_json
 
 from weedid.decorators import check_post_and_authenticated
@@ -168,14 +167,8 @@ def editing_init(request, dataset_id):
     upload_entity = Dataset.objects.get(upload_id=dataset_id, status="C")
     if upload_entity.user.id != user.id:
         return HttpResponseForbidden("You dont have access to edit")
-    repository = Repository(REPOSITORY_DIR)
-    dataset = repository.dataset(dataset_id)
-    if not dataset.exists_in_repo:
-        return HttpResponseServerError("dataset not found")
     upload_path = os.path.join(UPLOAD_DIR, str(user.id), dataset_id)
-    if os.path.isdir(upload_path):
-        shutil.rmtree(upload_path)
-    dataset.extract(upload_path)
+    extract_original_images(dataset_id, upload_path)
 
     with open(os.path.join(upload_path, "weedcoco.json")) as f:
         weedcoco_json = json.load(f)

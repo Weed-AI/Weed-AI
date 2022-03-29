@@ -4,7 +4,7 @@ import re
 import smtplib
 import tempfile
 from email.message import EmailMessage
-from shutil import copy, copyfile, move, rmtree
+from shutil import copy, move, rmtree
 from uuid import uuid4
 from zipfile import ZipFile
 
@@ -20,7 +20,7 @@ from core.settings import (
     UPLOAD_DIR,
 )
 from django.core.files.storage import FileSystemStorage
-from weedcoco.repo.deposit import Repository, mkdir_safely
+from weedcoco.repo.deposit import Repository, mkdir_safely, RepositoryError
 from weedcoco.stats import WeedCOCOStats
 from weedcoco.utils import set_info, set_licenses
 from weedcoco.validation import validate
@@ -226,24 +226,41 @@ def retrieve_missing_images_list(weedcoco_json, images_path, upload_id):
     if not os.path.isdir(images_path):
         mkdir_safely(images_path)
         return current_images[:]
-    existing_hash_images = set(os.listdir(images_path))
-    if set(current_images) - existing_hash_images:
-        copy_images_with_mapping(upload_id, images_path, existing_hash_images)
-        existing_images = set(os.listdir(images_path))
-    else:
-        existing_images = existing_hash_images
+    existing_images = set(os.listdir(images_path))
     return [image for image in current_images if image not in existing_images]
 
 
-def copy_images_with_mapping(upload_id, images_path, hash_images_list):
+def extract_original_images(upload_id, dest_dir, version="head"):
+    """
+    Checks out a version of a dataset from the ocfl repository and then
+    tries to remap the image filenames to their originals, also updating the
+    weedcoco. If the images have no redis mappings, leaves them unchanged.
+    """
     redis_client = redis.Redis.from_url(url=IMAGE_HASH_MAPPING_URL)
-    for hash_image in hash_images_list:
-        original_image_name = redis_client.get("/".join([upload_id, hash_image]))
-        if original_image_name:
-            copyfile(
+    repository = Repository(REPOSITORY_DIR)
+    dataset = repository.dataset(upload_id)
+    if not dataset.exists_in_repo:
+        raise RepositoryError("dataset not found")
+    if os.path.isdir(dest_dir):
+        rmtree(dest_dir)
+    dataset.extract(dest_dir, version)
+    weedcoco_path = os.path.join(dest_dir, "weedcoco.json")
+    with open(weedcoco_path, "r") as jsonFile:
+        weedcoco_json = json.load(jsonFile)
+    images_path = os.path.join(dest_dir, "images")
+    for hash_image in os.listdir(images_path):
+        original_image = redis_client.get("/".join([upload_id, hash_image]))
+        if original_image:
+            weedcoco_json["images"][original_image] = weedcoco_json["images"][
+                hash_image
+            ]
+            del weedcoco_json["images"][hash_image]
+            move(
                 os.path.join(images_path, hash_image),
-                os.path.join(images_path, original_image_name.decode("ascii")),
+                os.path.join(images_path, original_image.decode("ascii")),
             )
+    with open(weedcoco_path, "w") as jsonFile:
+        jsonFile.write(json.dumps(weedcoco_json))
 
 
 def upload_helper(weedcoco_json, user_id, schema="coco", upload_id=None):
