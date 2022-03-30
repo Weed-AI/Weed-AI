@@ -325,12 +325,12 @@ class RepositoryDataset:
             with open(weedcoco_path, "w") as jsonFile:
                 jsonFile.write(json.dumps(weedcoco_json))
 
-    def make_zipfile(self, download_dir, version="head"):
+    def make_zipfile(self, download_dir, redis_url=None, version="head"):
         zip_file = (download_dir / self.identifier).with_suffix(".zip")
         with tempfile.TemporaryDirectory() as tmpdir:
             tmp_zip = pathlib.Path(tmpdir) / "bundle.zip"
             tmp_dest = pathlib.Path(tmpdir) / self.identifier
-            self.extract_original_images(tmp_dest)
+            self.extract_original_images(tmp_dest, redis_url)
             with ZipFile(tmp_zip, "w") as zip:
                 zip.write(tmp_dest / "weedcoco.json", "weedcoco.json")
                 for image, image_name in retrieve_image_paths(tmp_dest / "images"):
@@ -387,7 +387,7 @@ class Repository:
         os.mkdir(dataset_dir)
         return dataset_dir
 
-    def deposit(self, identifier, dataset, metadata, download_dir):
+    def deposit(self, identifier, dataset, metadata, download_dir, redis_url=None):
         """Validate and deposit a RepositoryDataset in the Repository.  Creates a new
         dataset for identifier if it does not already exist.
         --------
@@ -432,7 +432,7 @@ class Repository:
                         metadata=ocfl_metadata,
                     )
                     self.ocfl.add(object_path=str(new_object_dir))
-                dataset.make_zipfile(download_dir)
+                dataset.make_zipfile(download_dir, redis_url)
             except Exception:
                 dataset.rollback(dataset_dir, last_version)
                 if head_zipfile.is_file():
@@ -456,7 +456,7 @@ def deposit(
     repository.initialize()
     dataset = repository.dataset(upload_id)
     dataset.set_sources(weedcoco_path, image_dir)
-    repository.deposit(upload_id, dataset, metadata, download_dir)
+    repository.deposit(upload_id, dataset, metadata, download_dir, redis_url)
     if redis_url:
         dataset.store_image_hash_mapping(redis_url)
     return repository, dataset
