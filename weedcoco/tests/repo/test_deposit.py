@@ -211,6 +211,7 @@ def test_versioned_datasets(executor, rewrite_deposit_truth):
         test_download_dir / "dataset_1.zip",
         test_extract_dir / "zipfiles" / "dataset_1.v2",
     )
+    assert_files_equal(test_extract_dir / "zipfiles", TEST_DATA_SAMPLE_DIR / "versions")
     assert_weedcoco_equal(
         test_extract_dir / "zipfiles", TEST_DATA_SAMPLE_DIR / "versions"
     )

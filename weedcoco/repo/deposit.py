@@ -322,8 +322,8 @@ class RepositoryDataset:
                 )
                 if hash_name in images_set and original_image:
                     image["file_name"] = original_image.decode("ascii")
-        with open(weedcoco_path, "w") as jsonFile:
-            jsonFile.write(json.dumps(weedcoco_json))
+            with open(weedcoco_path, "w") as jsonFile:
+                jsonFile.write(json.dumps(weedcoco_json))
 
     def make_zipfile(self, download_dir, version="head"):
         zip_file = (download_dir / self.identifier).with_suffix(".zip")
