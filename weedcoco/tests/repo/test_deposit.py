@@ -1,14 +1,15 @@
-import pathlib
-import json
-import pytest
-import os
 import filecmp
+import json
+import os
+import pathlib
 import re
-import subprocess
 import shutil
+import subprocess
 import zipfile
-from weedcoco.repo.deposit import main, mkdir_safely
+
+import pytest
 from weedcoco.index.thumbnailing import thumbnailing
+from weedcoco.repo.deposit import main, mkdir_safely
 from weedcoco.validation import ValidationError
 
 TEST_DATA_DIR = pathlib.Path(__file__).parent / "deposit_data"
@@ -210,7 +211,6 @@ def test_versioned_datasets(executor, rewrite_deposit_truth):
         test_download_dir / "dataset_1.zip",
         test_extract_dir / "zipfiles" / "dataset_1.v2",
     )
-    assert_files_equal(test_extract_dir / "zipfiles", TEST_DATA_SAMPLE_DIR / "versions")
     assert_weedcoco_equal(
         test_extract_dir / "zipfiles", TEST_DATA_SAMPLE_DIR / "versions"
     )
