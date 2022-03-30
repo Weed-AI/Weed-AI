@@ -456,9 +456,9 @@ def deposit(
     repository.initialize()
     dataset = repository.dataset(upload_id)
     dataset.set_sources(weedcoco_path, image_dir)
-    repository.deposit(upload_id, dataset, metadata, download_dir, redis_url)
     if redis_url:
         dataset.store_image_hash_mapping(redis_url)
+    repository.deposit(upload_id, dataset, metadata, download_dir, redis_url)
     return repository, dataset
 
 
