@@ -34,7 +34,7 @@ from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_http_methods
 from weedcoco.importers.mask import generate_paths_from_mask_only, masks_to_coco
 from weedcoco.importers.voc import voc_to_coco
-from weedcoco.repo.deposit import RepositoryDataset, mkdir_safely
+from weedcoco.repo.deposit import Repository, mkdir_safely
 from weedcoco.utils import fix_compatibility_quirks
 from weedcoco.validation import JsonValidationError, validate, validate_json
 
@@ -170,8 +170,11 @@ def editing_init(request, dataset_id):
     if upload_entity.user.id != user.id:
         return HttpResponseForbidden("You dont have access to edit")
     upload_path = os.path.join(UPLOAD_DIR, str(user.id), dataset_id)
-    repo = RepositoryDataset(os.path.join(REPOSITORY_DIR, "ocfl"), dataset_id)
-    repo.extract_original_images(upload_path, redis_mapping_url=IMAGE_HASH_MAPPING_URL)
+    repository = Repository(REPOSITORY_DIR)
+    dataset = repository.dataset(dataset_id)
+    dataset.extract_original_images(
+        upload_path, redis_mapping_url=IMAGE_HASH_MAPPING_URL
+    )
 
     with open(os.path.join(upload_path, "weedcoco.json")) as f:
         weedcoco_json = json.load(f)
