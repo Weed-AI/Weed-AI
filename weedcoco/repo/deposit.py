@@ -236,7 +236,9 @@ class RepositoryDataset:
     def validate_existing_images(self):
         addition_hash = get_hashset_from_image_name(self.image_hash)
         all_existing_hash = self.get_all_existing_hash(self.repo)
-        reverse_mapping = {value.split('.')[0]: key for key, value in self.image_hash.items()}
+        reverse_mapping = {
+            value.split(".")[0]: key for key, value in self.image_hash.items()
+        }
         if len(all_existing_hash.union(addition_hash)) != len(all_existing_hash) + len(
             addition_hash
         ):
