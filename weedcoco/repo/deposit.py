@@ -239,7 +239,10 @@ class RepositoryDataset:
         if len(all_existing_hash.union(addition_hash)) != len(all_existing_hash) + len(
             addition_hash
         ):
-            raise ValidationError("There are identical images in the repository.")
+            raise ValidationError(
+                "There are identical images in the repository. Existing image hash names are: "
+                + "; ".join(addition_hash & all_existing_hash)
+            )
 
     def get_all_existing_hash(self, repository):
         return {
