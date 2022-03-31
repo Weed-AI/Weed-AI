@@ -183,7 +183,7 @@ def reindex_dataset(
     thumbnails_dir=THUMBNAILS_DIR,
     repository_dir=REPOSITORY_DIR,
     download_dir=DOWNLOAD_DIR,
-    upload_mode="admin",
+    mode="admin",
 ):
     """Reindex a dataset already in the repository, and recreate its download"""
     download_dir = Path(download_dir)
@@ -203,7 +203,7 @@ def reindex_dataset(
         process_thumbnails=process_thumbnails,
         thumbnails_dir=str(thumbnails_dir),
         repository_dir=str(repository_dir),
-        mode=upload_mode,
+        mode=mode,
     )
 
 
