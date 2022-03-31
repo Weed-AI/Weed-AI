@@ -303,20 +303,25 @@ class RepositoryDataset:
             rmtree(dest_dir)
         self.extract(dest_dir, version)
         if redis_client:
+            logger.warning(f"remapping images for {version} of {self.identifier}")
             weedcoco_path = os.path.join(dest_dir, "weedcoco.json")
             with open(weedcoco_path, "r") as jsonFile:
                 weedcoco_json = json.load(jsonFile)
             images_path = os.path.join(dest_dir, "images")
             images_set = set(os.listdir(images_path))
             for hash_image in images_set:
+                redis_key = "/".join([self.identifier, hash_image])
                 original_image = redis_client.get(
                     "/".join([self.identifier, hash_image])
                 )
+                logger.warning(f"<REDIS> {redis_key} maps to {original_image}")
                 if original_image:
                     move(
                         os.path.join(images_path, hash_image),
                         os.path.join(images_path, original_image.decode("ascii")),
                     )
+                else:
+                    logger.warning(f"No match found for {redis_key}")
             for image in weedcoco_json["images"]:
                 hash_name = image["file_name"].split("/")[-1]
                 original_image = redis_client.get(
