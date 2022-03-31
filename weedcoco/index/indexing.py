@@ -130,10 +130,11 @@ class ElasticSearchIndexer:
             )  # for deterministic random order
             _flatten(image["agcontext"], image, "agcontext")
             # todo: add license
-            if "annotations" in image:
-                for annotation in image["annotations"]:
-                    for k in annotation:
-                        image.setdefault(f"annotation__{k}", []).append(annotation[k])
+            if "annotations" not in image:
+                image["annotations"] = list()
+            for annotation in image["annotations"]:
+                for k in annotation:
+                    image.setdefault(f"annotation__{k}", []).append(annotation[k])
 
             image["task_type"] = sorted(get_task_types(image["annotations"]))
             image[
