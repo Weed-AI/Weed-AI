@@ -153,7 +153,8 @@ def test_duplicate_images(executor):
 
 def test_existing_images(executor):
     with pytest.raises(
-        ValidationError, match="There are identical images in the repository."
+        ValidationError,
+        match="There are identical images in the repository. Existing image hash names are: 001_image.png <-> 5f1218b0e469003cc0a1-986e5d71ce7562a90ff91581a9f2617d",
     ):
         executor.run(
             "dataset1", TEST_BASIC_DIR_1 / "weedcoco.json", TEST_BASIC_DIR_1 / "images"
