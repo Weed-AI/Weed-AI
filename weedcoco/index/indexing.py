@@ -1,16 +1,17 @@
 import argparse
+import json
 import os
 import pathlib
-import json
 import sys
 from uuid import uuid4
+
 import elasticsearch  # using `from elastisearch` breaks elasticmock
 from elasticsearch import helpers
 from weedcoco.utils import (
     denormalise_weedcoco,
-    lookup_growth_stage_name,
-    get_task_types,
     get_supercategory_names,
+    get_task_types,
+    lookup_growth_stage_name,
 )
 
 
@@ -129,9 +130,10 @@ class ElasticSearchIndexer:
             )  # for deterministic random order
             _flatten(image["agcontext"], image, "agcontext")
             # todo: add license
-            for annotation in image["annotations"]:
-                for k in annotation:
-                    image.setdefault(f"annotation__{k}", []).append(annotation[k])
+            if "annotations" in image:
+                for annotation in image["annotations"]:
+                    for k in annotation:
+                        image.setdefault(f"annotation__{k}", []).append(annotation[k])
 
             image["task_type"] = sorted(get_task_types(image["annotations"]))
             image[
