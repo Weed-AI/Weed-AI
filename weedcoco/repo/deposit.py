@@ -303,7 +303,6 @@ class RepositoryDataset:
             rmtree(dest_dir)
         self.extract(dest_dir, version)
         if redis_client:
-            logger.warning(f"remapping images for {version} of {self.identifier}")
             weedcoco_path = os.path.join(dest_dir, "weedcoco.json")
             with open(weedcoco_path, "r") as jsonFile:
                 weedcoco_json = json.load(jsonFile)
@@ -314,7 +313,6 @@ class RepositoryDataset:
                 original_image = redis_client.get(
                     "/".join([self.identifier, hash_image])
                 )
-                logger.warning(f"<REDIS> {redis_key} maps to {original_image}")
                 if original_image:
                     move(
                         os.path.join(images_path, hash_image),
@@ -431,7 +429,6 @@ class Repository:
             try:
                 if dataset.exists_in_repo:
                     dataset.update(dataset_dir, ocfl_metadata)
-                    logger.warning(f"copying {head_zipfile} to {last_zipfile}")
                     copy(head_zipfile, last_zipfile)
                 else:
                     new_object_dir = temp_dir / pathlib.Path(identifier + "_ocfl")

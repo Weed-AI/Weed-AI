@@ -182,11 +182,9 @@ def reindex_dataset(
     process_thumbnails=True,
     thumbnails_dir=THUMBNAILS_DIR,
     repository_dir=REPOSITORY_DIR,
-    download_dir=DOWNLOAD_DIR,
     mode="admin",
 ):
-    """Reindex a dataset already in the repository, and recreate its download"""
-    download_dir = Path(download_dir)
+    """Reindex a dataset already in the repository"""
     repository = Repository(repository_dir)
     dataset = repository.dataset(upload_id)
     weedcoco_path = dataset.resolve_path("weedcoco.json")
@@ -197,7 +195,6 @@ def reindex_dataset(
         setattr(upload_entity, k, v)
     upload_entity.head_version = int(dataset.head_version[1:])
     upload_entity.save()
-    dataset.make_zipfile(download_dir)
     update_index_and_thumbnails.delay(
         upload_id,
         process_thumbnails=process_thumbnails,
