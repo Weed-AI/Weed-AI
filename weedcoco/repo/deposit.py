@@ -299,13 +299,12 @@ class RepositoryDataset:
         if os.path.isdir(dest_dir):
             rmtree(dest_dir)
         self.extract(dest_dir, version)
-        weedcoco_path = os.path.join(dest_dir, "weedcoco.json")
-        with open(weedcoco_path, "r") as jsonFile:
-            weedcoco_json = json.load(jsonFile)
-        images_path = os.path.join(dest_dir, "images")
-
-        images_set = set(os.listdir(images_path))
         if redis_client:
+            weedcoco_path = os.path.join(dest_dir, "weedcoco.json")
+            with open(weedcoco_path, "r") as jsonFile:
+                weedcoco_json = json.load(jsonFile)
+            images_path = os.path.join(dest_dir, "images")
+            images_set = set(os.listdir(images_path))
             for hash_image in images_set:
                 original_image = redis_client.get(
                     "/".join([self.identifier, hash_image])
@@ -323,7 +322,7 @@ class RepositoryDataset:
                 if hash_name in images_set and original_image:
                     image["file_name"] = original_image.decode("ascii")
             with open(weedcoco_path, "w") as jsonFile:
-                jsonFile.write(json.dumps(weedcoco_json))
+                jsonFile.write(json.dumps(weedcoco_json, indent=4))
 
     def make_zipfile(self, download_dir, redis_url=None, version="head"):
         zip_file = (download_dir / self.identifier).with_suffix(".zip")
