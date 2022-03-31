@@ -19,6 +19,7 @@ api_urlpatterns = [
     path("update_categories/", views.update_categories, name="update_categories"),
     path("upload_agcontexts/", views.upload_agcontexts, name="upload_agcontexts"),
     path("upload_metadata/", views.upload_metadata, name="upload_metadata"),
+    path("copy_cvat/", views.copy_cvat, name="copy_cvat"),
     path("submit_deposit/", views.submit_deposit, name="submit_deposit"),
     path("upload_status/", views.upload_status, name="upload_status"),
     path("upload_info/<str:dataset_id>", views.upload_info, name="upload_info"),
@@ -31,6 +32,11 @@ api_urlpatterns = [
     ),
     path(
         "dataset_reject/<str:dataset_id>", views.dataset_reject, name="dataset_reject"
+    ),
+    path(
+        "retrieve_cvat_task/<str:task_id>",
+        views.retrieve_cvat_task,
+        name="retrieve_cvat_task",
     ),
     path("register/", views.user_register, name="user_register"),
     path("login/", views.user_login, name="user_login"),

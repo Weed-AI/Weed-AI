@@ -1,11 +1,15 @@
 import json
+import logging
 import os
 import shutil
 import traceback
 from pathlib import Path
+from zipfile import ZipFile
 
 import requests
 from core.settings import (
+    CVAT_DATA_DIR,
+    IMAGE_HASH_MAPPING_URL,
     MAX_IMAGE_SIZE,
     MAX_VOC_SIZE,
     REPOSITORY_DIR,
@@ -30,7 +34,7 @@ from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_http_methods
 from weedcoco.importers.mask import generate_paths_from_mask_only, masks_to_coco
 from weedcoco.importers.voc import voc_to_coco
-from weedcoco.repo.deposit import Repository
+from weedcoco.repo.deposit import RepositoryDataset, mkdir_safely
 from weedcoco.utils import fix_compatibility_quirks
 from weedcoco.validation import JsonValidationError, validate, validate_json
 
@@ -56,6 +60,8 @@ from weedid.utils import (
     upload_helper,
     validate_email_format,
 )
+
+logger = logging.getLogger(__name__)
 
 
 @ensure_csrf_cookie
@@ -120,6 +126,33 @@ def upload(request):
     else:
         return HttpResponse(
             json.dumps(
+                {"upload_id": upload_id, "images": images, "categories": categories}
+            )
+        )
+
+
+def retrieve_cvat_task(request, task_id):
+    user = request.user
+    if not (user and user.is_authenticated):
+        return HttpResponseForbidden("You dont have access to proceed")
+    try:
+        with ZipFile(
+            os.path.join(
+                CVAT_DATA_DIR, "tasks", task_id, "export_cache/annotations_coco-10.ZIP"
+            )
+        ) as cvat_zip:
+            with cvat_zip.open("annotations/instances_default.json") as cvat_task_coco:
+                coco_json = json.load(cvat_task_coco)
+                upload_id, images, categories = upload_helper(coco_json, user.id)
+    except JsonValidationError as e:
+        traceback.print_exc()
+        return json_validation_response(e)
+    except Exception as e:
+        traceback.print_exc()
+        return HttpResponseBadRequest(str(e))
+    else:
+        return HttpResponse(
+            json.dumps(
                 {
                     "upload_id": upload_id,
                     "images": images,
@@ -136,14 +169,9 @@ def editing_init(request, dataset_id):
     upload_entity = Dataset.objects.get(upload_id=dataset_id, status="C")
     if upload_entity.user.id != user.id:
         return HttpResponseForbidden("You dont have access to edit")
-    repository = Repository(REPOSITORY_DIR)
-    dataset = repository.dataset(dataset_id)
-    if not dataset.exists_in_repo:
-        return HttpResponseServerError("dataset not found")
     upload_path = os.path.join(UPLOAD_DIR, str(user.id), dataset_id)
-    if os.path.isdir(upload_path):
-        shutil.rmtree(upload_path)
-    dataset.extract(upload_path)
+    repo = RepositoryDataset(os.path.join(REPOSITORY_DIR, "ocfl"), dataset_id)
+    repo.extract_original_images(upload_path, redis_mapping_url=IMAGE_HASH_MAPPING_URL)
 
     with open(os.path.join(upload_path, "weedcoco.json")) as f:
         weedcoco_json = json.load(f)
@@ -406,6 +434,44 @@ def upload_metadata(request):
 
 @login_required
 @require_http_methods(["POST"])
+def copy_cvat(request):
+    """Copy the images for a CVAT task from the CVAT volume to the upload dir"""
+    user = request.user
+    upload_id = request.POST["upload_id"]
+    cvat_task_id = request.POST["task_id"]
+    upload_dir = os.path.join(UPLOAD_DIR, str(user.id), str(upload_id))
+    if not os.path.isdir(upload_dir):
+        return HttpResponseServerError(f"upload directory {upload_id} not found")
+    image_dir = os.path.join(upload_dir, "images")
+    if not os.path.isdir(image_dir):
+        mkdir_safely(image_dir)
+    weedcoco_path = os.path.join(upload_dir, "weedcoco.json")
+    try:
+        with open(weedcoco_path, "r") as weedcoco_file:
+            weedcoco = json.load(weedcoco_file)
+            missing = []
+            for img in weedcoco["images"]:
+                fn = img["file_name"]
+                cvat_image = os.path.join(
+                    CVAT_DATA_DIR, "data", str(cvat_task_id), "raw", fn
+                )
+                weedai_image = os.path.join(image_dir, fn)
+                logger.warn(f"copy {cvat_image} -> {weedai_image}")
+                try:
+                    shutil.copy(cvat_image, weedai_image)
+                except Exception as e:
+                    logger.error(f"error copying {cvat_image} to {weedai_image}: {e}")
+                    missing.append(img["image_id"])
+            return HttpResponse(
+                json.dumps({"upload_id": upload_id, "missing_images": missing})
+            )
+    except Exception as e:
+        logger.error(f"error copying files: {e}")
+        return HttpResponseServerError(f"error copying files: {e}")
+
+
+@login_required
+@require_http_methods(["POST"])
 def submit_deposit(request):
     user = request.user
     upload_id = request.POST["upload_id"]
@@ -418,7 +484,7 @@ def submit_deposit(request):
         weedcoco_path,
         images_dir,
         upload_id,
-        new_upload=request.POST["upload_mode"] != "edit",
+        mode=request.POST["upload_mode"],
     )
     return HttpResponse(f"Work on user {user.id}'s upload{upload_id}")
 

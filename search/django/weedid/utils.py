@@ -4,15 +4,13 @@ import re
 import smtplib
 import tempfile
 from email.message import EmailMessage
-from shutil import copy, copyfile, move, rmtree
+from shutil import copy, move, rmtree
 from uuid import uuid4
 from zipfile import ZipFile
 
-import redis
 from core.settings import (
     DOWNLOAD_DIR,
     FROM_EMAIL,
-    IMAGE_HASH_MAPPING_URL,
     REPOSITORY_DIR,
     SEND_EMAIL,
     SMTP_HOST,
@@ -226,24 +224,8 @@ def retrieve_missing_images_list(weedcoco_json, images_path, upload_id):
     if not os.path.isdir(images_path):
         mkdir_safely(images_path)
         return current_images[:]
-    existing_hash_images = set(os.listdir(images_path))
-    if set(current_images) - existing_hash_images:
-        copy_images_with_mapping(upload_id, images_path, existing_hash_images)
-        existing_images = set(os.listdir(images_path))
-    else:
-        existing_images = existing_hash_images
+    existing_images = set(os.listdir(images_path))
     return [image for image in current_images if image not in existing_images]
-
-
-def copy_images_with_mapping(upload_id, images_path, hash_images_list):
-    redis_client = redis.Redis.from_url(url=IMAGE_HASH_MAPPING_URL)
-    for hash_image in hash_images_list:
-        original_image_name = redis_client.get("/".join([upload_id, hash_image]))
-        if original_image_name:
-            copyfile(
-                os.path.join(images_path, hash_image),
-                os.path.join(images_path, original_image_name.decode("ascii")),
-            )
 
 
 def upload_helper(weedcoco_json, user_id, schema="coco", upload_id=None):

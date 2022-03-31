@@ -12,6 +12,7 @@ UPLOAD_DIR = os.path.join(BASE_DIR, "upload")
 THUMBNAILS_DIR = os.path.join(BASE_DIR, "thumbnails")
 REPOSITORY_DIR = os.path.join(BASE_DIR, "repository", "ocfl")
 DOWNLOAD_DIR = os.path.join(BASE_DIR, "download")
+CVAT_DATA_DIR = os.path.join(BASE_DIR, "cvat_data")
 
 TUS_UPLOAD_DIR = os.path.join(BASE_DIR, "tus_upload")
 TUS_DESTINATION_DIR = os.path.join(BASE_DIR, "tus_dir", "data")
@@ -53,6 +54,7 @@ DEBUG = os.environ.get("ENV", "PROD") == "DEV"
 ALLOWED_HOSTS = ["*"]
 CORS_ORIGIN_ALLOW_ALL = True
 AUTH_USER_MODEL = "weedid.WeedidUser"
+SESSION_COOKIE_NAME = "weedai_sessionid"
 
 # TUS headers
 

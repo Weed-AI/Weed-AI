@@ -1,14 +1,15 @@
-import pathlib
-import json
-import pytest
-import os
 import filecmp
+import json
+import os
+import pathlib
 import re
-import subprocess
 import shutil
+import subprocess
 import zipfile
-from weedcoco.repo.deposit import main, mkdir_safely
+
+import pytest
 from weedcoco.index.thumbnailing import thumbnailing
+from weedcoco.repo.deposit import main, mkdir_safely
 from weedcoco.validation import ValidationError
 
 TEST_DATA_DIR = pathlib.Path(__file__).parent / "deposit_data"
