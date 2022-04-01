@@ -19,6 +19,9 @@ TEST_BASIC_DIR_1V2 = TEST_DATA_DIR / "basic_1.v2"
 TEST_BASIC_DIR_2 = TEST_DATA_DIR / "basic_2"
 TEST_COMPLETE_DIR = TEST_DATA_DIR / "complete"
 TEST_DUPLICATE_DIR = TEST_DATA_DIR / "duplicate"
+TEST_UPDATES_DIR = TEST_DATA_DIR / "updates"
+TEST_UPDATES_DIR_1 = TEST_UPDATES_DIR / "v1"
+TEST_UPDATES_DIR_2 = TEST_UPDATES_DIR / "v2"
 
 TEST_NAME = "weed.ai"
 TEST_ADDRESS = "weed@weed.ai.org"
@@ -96,6 +99,13 @@ def assert_weedcoco_equal(dir1, dir2):
             assert json.load(open(dir1 / dir / "weedcoco.json")) == json.load(
                 open(dir2 / dir / "weedcoco.json")
             )
+
+
+def assert_mapped_files_equal(hash_map_file, dir1, dir2):
+    with open(hash_map_file, "r") as fh:
+        hash_map = json.load(fh)
+    for orig, hashed in hash_map.items():
+        assert filecmp.cmp(dir1 / orig, dir2 / hashed, shallow=False)
 
 
 def unpack_zip(zip_path, destination):
@@ -214,6 +224,22 @@ def test_versioned_datasets(executor, rewrite_deposit_truth):
     assert_files_equal(test_extract_dir / "zipfiles", TEST_DATA_SAMPLE_DIR / "versions")
     assert_weedcoco_equal(
         test_extract_dir / "zipfiles", TEST_DATA_SAMPLE_DIR / "versions"
+    )
+
+
+def test_update_renaming(executor, rewrite_deposit_truth):
+    test_extract_dir, test_download_dir, repo, _ = executor.run(
+        "dataset", TEST_UPDATES_DIR_1 / "weedcoco.json", TEST_UPDATES_DIR_1 / "images"
+    )
+    dataset = repo.dataset("dataset")
+    assert dataset.head_version == "v1"
+    if rewrite_deposit_truth:
+        rewrite_outputs(repo, TEST_DATA_SAMPLE_DIR / "updates", True)
+    dataset.extract(str(test_extract_dir / "dataset"), "v1")
+    assert_mapped_files_equal(
+        TEST_UPDATES_DIR / "hash_map.json",
+        TEST_UPDATES_DIR_1 / "images",
+        test_extract_dir / "dataset" / "images",
     )
 
 

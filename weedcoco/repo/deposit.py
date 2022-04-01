@@ -13,7 +13,7 @@ from zipfile import ZipFile
 import ocfl
 import redis
 
-# from PIL import Image
+from PIL import Image
 from weedcoco.utils import check_if_approved_image_extension, get_image_hash
 from weedcoco.validation import ValidationError, validate
 
@@ -210,13 +210,13 @@ class RepositoryDataset:
                     )
                     image_path = new_image_dir / self.image_hash[image_name_origin]
                     if not os.path.isfile(image_path):
-                        copy(self.image_dir / image_name_origin, image_path)
-                        # image_origin = Image.open(self.image_dir / image_name_origin)
-                        # image_without_exif = Image.new(
-                        #     image_origin.mode, image_origin.size
-                        # )
-                        # image_without_exif.putdata(image_origin.getdata())
-                        # image_without_exif.save(image_path)
+                        #                        copy(self.image_dir / image_name_origin, image_path)
+                        image_origin = Image.open(self.image_dir / image_name_origin)
+                        image_without_exif = Image.new(
+                            image_origin.mode, image_origin.size
+                        )
+                        image_without_exif.putdata(image_origin.getdata())
+                        image_without_exif.save(image_path)
 
     def validate_duplicate_images(self):
         if len(get_hashset_from_image_name(self.image_hash)) != len(self.image_hash):
@@ -479,6 +479,7 @@ def main(args=None):
     ap.add_argument("--image-dir", default="cwfid_images", type=pathlib.Path)
     ap.add_argument("--repository-dir", default="repository", type=pathlib.Path)
     ap.add_argument("--download-dir", default="download", type=pathlib.Path)
+    ap.add_argument("--redis-url", default=None, type=str)
     ap.add_argument("--identifier", default="", type=str)
     ap.add_argument("--name", default="", type=str)
     ap.add_argument("--address", default="", type=str)
@@ -496,6 +497,7 @@ def main(args=None):
         args.download_dir,
         metadata,
         args.identifier,
+        args.redis_url,
     )
 
 

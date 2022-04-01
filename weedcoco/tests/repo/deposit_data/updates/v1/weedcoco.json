@@ -1,0 +1,289 @@
+{
+    "info": {
+        "year": 2021,
+        "description": "20201014 - Cobbity Wheat BFLY smol version",
+        "metadata": {
+            "name": "Original dataset",
+            "@type": "Dataset",
+            "funder": [
+                {
+                    "name": "Grains Research and Development Corporation",
+                    "@type": "Organization",
+                    "sameAs": "https://ror.org/02xwr1996"
+                }
+            ],
+            "creator": [
+                {
+                    "name": "Guy Coleman",
+                    "@type": "Person",
+                    "sameAs": "https://orcid.org/0000-0002-8808-2965",
+                    "givenName": "Guy",
+                    "familyName": "Coleman"
+                }
+            ],
+            "license": "https://creativecommons.org/licenses/by/4.0/legalcode",
+            "description": "original dataset",
+            "datePublished": "2021-02-19"
+        }
+    },
+    "licenses": [
+        {
+            "url": "https://creativecommons.org/licenses/by/4.0/legalcode",
+            "id": 0
+        }
+    ],
+    "agcontexts": [
+        {
+            "id": 0,
+            "lighting": "artificial",
+            "n_images": 101,
+            "crop_type": "wheat",
+            "camera_fov": "variable",
+            "camera_lens": "Tamron Compact 5MP C-Mount 12mm Lens",
+            "camera_make": "FLIR BF 23S6C-C",
+            "soil_colour": "grey",
+            "camera_angle": 90,
+            "ground_speed": 0,
+            "location_lat": -34.020932,
+            "camera_height": 1500,
+            "location_long": 150.664883,
+            "surface_cover": "cereal",
+            "cropped_to_plant": false,
+            "surface_coverage": "0-25",
+            "bbch_growth_range": {
+                "max": 51,
+                "min": 43
+            },
+            "category_statistics": {
+                "weed: lolium rigidum": {
+                    "image_count": 55,
+                    "annotation_count": 94,
+                    "bounding_box_count": 94,
+                    "segmentation_count": 0
+                },
+                "weed: rapistrum rugosum": {
+                    "image_count": 71,
+                    "annotation_count": 174,
+                    "bounding_box_count": 174,
+                    "segmentation_count": 0
+                }
+            },
+            "weather_description": "night time",
+            "camera_lens_focallength": 12,
+            "photography_description": "Images of turnipweed and annual ryegrass in wheat in sandy, grey soils at night time with artificial illumination"
+        }
+    ],
+    "images": [
+        {
+            "agcontext_id": 0,
+            "license": 0,
+            "file_name": "images/image-1.jpg",
+            "height": 1200,
+            "width": 1920,
+            "id": 0
+        },
+        {
+            "agcontext_id": 0,
+            "license": 0,
+            "file_name": "images/image-2.jpg",
+            "height": 1200,
+            "width": 1920,
+            "id": 1
+        },
+        {
+            "agcontext_id": 0,
+            "license": 0,
+            "file_name": "images/image-3.jpg",
+            "height": 1200,
+            "width": 1920,
+            "id": 2
+        },
+        {
+            "agcontext_id": 0,
+            "license": 0,
+            "file_name": "images/image-4.jpg",
+            "height": 1200,
+            "width": 1920,
+            "id": 3
+        },
+        {
+            "agcontext_id": 0,
+            "license": 0,
+            "file_name": "images/image-5.jpg",
+            "height": 1200,
+            "width": 1920,
+            "id": 4
+        }
+    ],
+    "annotations": [
+        {
+            "image_id": 0,
+            "category_id": 0,
+            "id": 0,
+            "bbox": [
+                311,
+                33,
+                226,
+                247
+            ]
+        },
+        {
+            "image_id": 0,
+            "category_id": 0,
+            "id": 1,
+            "bbox": [
+                667,
+                9,
+                208,
+                200
+            ]
+        },
+        {
+            "image_id": 1,
+            "category_id": 0,
+            "id": 2,
+            "bbox": [
+                377,
+                377,
+                109,
+                124
+            ]
+        },
+        {
+            "image_id": 1,
+            "category_id": 0,
+            "id": 3,
+            "bbox": [
+                742,
+                392,
+                106,
+                113
+            ]
+        },
+        {
+            "image_id": 1,
+            "category_id": 0,
+            "id": 4,
+            "bbox": [
+                22,
+                331,
+                89,
+                111
+            ]
+        },
+        {
+            "image_id": 2,
+            "category_id": 0,
+            "id": 5,
+            "bbox": [
+                341,
+                876,
+                248,
+                239
+            ]
+        },
+        {
+            "image_id": 2,
+            "category_id": 0,
+            "id": 6,
+            "bbox": [
+                711,
+                75,
+                194,
+                153
+            ]
+        },
+        {
+            "image_id": 2,
+            "category_id": 0,
+            "id": 7,
+            "bbox": [
+                705,
+                775,
+                245,
+                336
+            ]
+        },
+        {
+            "image_id": 2,
+            "category_id": 0,
+            "id": 8,
+            "bbox": [
+                1099,
+                77,
+                261,
+                278
+            ]
+        },
+        {
+            "image_id": 3,
+            "category_id": 0,
+            "id": 9,
+            "bbox": [
+                637,
+                705,
+                77,
+                136
+            ]
+        },
+        {
+            "image_id": 3,
+            "category_id": 0,
+            "id": 10,
+            "bbox": [
+                1080,
+                818,
+                99,
+                109
+            ]
+        },
+        {
+            "image_id": 4,
+            "category_id": 0,
+            "id": 11,
+            "bbox": [
+                1080,
+                818,
+                99,
+                109
+            ]
+        }
+    ],
+    "categories": [
+        {
+            "id": 0,
+            "name": "weed: lolium rigidum"
+        },
+        {
+            "id": 1,
+            "name": "weed: rapistrum rugosum"
+        },
+        {
+            "id": 2,
+            "name": "weed: sonchus oleraceus"
+        }
+    ],
+    "metadata": {
+        "name": "Original dataset",
+        "@type": "Dataset",
+        "funder": [
+            {
+                "name": "Grains Research and Development Corporation",
+                "@type": "Organization",
+                "sameAs": "https://ror.org/02xwr1996"
+            }
+        ],
+        "creator": [
+            {
+                "name": "Guy Coleman",
+                "@type": "Person",
+                "sameAs": "https://orcid.org/0000-0002-8808-2965",
+                "givenName": "Guy",
+                "familyName": "Coleman"
+            }
+        ],
+        "license": "https://creativecommons.org/licenses/by/4.0/legalcode",
+        "description": "Original dataset",
+        "datePublished": "2021-02-19"
+    }
+}
