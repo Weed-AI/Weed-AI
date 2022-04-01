@@ -187,12 +187,12 @@ class ElasticSearchIndexer:
         {{
           "query": {{
             "bool": {{
-              "match": {{
-                "upload_id": "{self.upload_id}"
+              "must": {{
+                  "term": {{"upload_id": "{self.upload_id}"}}
+              }},
+              "must_not": {{
+                  "term": {{"version_tag": "{self.version_tag}"}}
               }}
-            }},
-            "must_not": {{
-                "version_tag": "{self.version_tag}"
             }}
           }}
         }}
