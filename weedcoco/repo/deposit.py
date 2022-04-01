@@ -205,25 +205,10 @@ class RepositoryDataset:
         for image_name_origin in os.listdir(self.image_dir):
             if check_if_approved_image_extension(image_name_origin):
                 if image_name_origin in self.image_hash:  # FIXME
-                    logger.info(
-                        f"Renaming original image {image_name_origin} -> {self.image_hash[image_name_origin]}"
-                    )
                     image_path = new_image_dir / self.image_hash[image_name_origin]
                     if not os.path.isfile(image_path):
                         image_orig = self.image_dir / image_name_origin
-                        s_before = image_orig.stat().st_size
                         copy(image_orig, image_path)
-                        # image_origin = Image.open(image_orig)
-                        # image_without_exif = Image.new(
-                        #     image_origin.mode, image_origin.size
-                        # )
-                        # image_without_exif.putdata(image_origin.getdata())
-                        # image_without_exif.save(image_path)
-                        s_after = image_path.stat().st_size
-                        logger.warning(
-                            f">>>migrated image  {image_orig} -> {image_path}"
-                        )
-                        logger.warning(f">>>sizes before {s_before} -> after {s_after}")
 
     def validate_duplicate_images(self):
         if len(get_hashset_from_image_name(self.image_hash)) != len(self.image_hash):
