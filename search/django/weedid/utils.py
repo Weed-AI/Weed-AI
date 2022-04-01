@@ -237,7 +237,7 @@ def upload_helper(weedcoco_json, user_id, schema="coco", upload_id=None):
     categories = [
         parse_category_name(category) for category in weedcoco_json["categories"]
     ]
-    if not upload_id:
+    if not upload_id or len(upload_id) != len(str(uuid4())):
         upload_dir, upload_id = setup_upload_dir(os.path.join(UPLOAD_DIR, str(user_id)))
         create_upload_entity(upload_id, user_id)
     else:
