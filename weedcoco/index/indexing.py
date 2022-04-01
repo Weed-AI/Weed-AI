@@ -186,7 +186,14 @@ class ElasticSearchIndexer:
         body = f"""
         {{
           "query": {{
-              "query_string": {{"query": "(upload_id: {self.upload_id}) AND NOT (version_tag: {self.version_tag})"}}
+            "bool": {{
+              "must": {{
+                  "term": {{"upload_id": "{self.upload_id}"}}
+              }},
+              "must_not": {{
+                  "term": {{"version_tag": "{self.version_tag}"}}
+              }}
+            }}
           }}
         }}
         """
