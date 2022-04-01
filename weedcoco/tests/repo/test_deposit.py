@@ -227,7 +227,7 @@ def test_versioned_datasets(executor, rewrite_deposit_truth):
     )
 
 
-def test_update_renaming(executor, rewrite_deposit_truth):
+def test_round_trip_identical(executor, rewrite_deposit_truth):
     test_extract_dir, test_download_dir, repo, _ = executor.run(
         "dataset", TEST_UPDATES_DIR_1 / "weedcoco.json", TEST_UPDATES_DIR_1 / "images"
     )
@@ -237,7 +237,7 @@ def test_update_renaming(executor, rewrite_deposit_truth):
         rewrite_outputs(repo, TEST_DATA_SAMPLE_DIR / "updates", True)
     dataset.extract(str(test_extract_dir / "dataset"), "v1")
     assert_mapped_files_equal(
-        TEST_UPDATES_DIR / "hash_map.json",
+        TEST_UPDATES_DIR / "hash_map_v1.json",
         TEST_UPDATES_DIR_1 / "images",
         test_extract_dir / "dataset" / "images",
     )
