@@ -34,7 +34,7 @@ api_urlpatterns = [
         "dataset_reject/<str:dataset_id>", views.dataset_reject, name="dataset_reject"
     ),
     path(
-        "retrieve_cvat_task/<str:task_id>",
+        "retrieve_cvat_task/<str:upload_id>/<str:task_id>",
         views.retrieve_cvat_task,
         name="retrieve_cvat_task",
     ),

@@ -131,7 +131,7 @@ def upload(request):
         )
 
 
-def retrieve_cvat_task(request, task_id):
+def retrieve_cvat_task(request, upload_id, task_id):
     user = request.user
     if not (user and user.is_authenticated):
         return HttpResponseForbidden("You dont have access to proceed")
@@ -143,7 +143,9 @@ def retrieve_cvat_task(request, task_id):
         ) as cvat_zip:
             with cvat_zip.open("annotations/instances_default.json") as cvat_task_coco:
                 coco_json = json.load(cvat_task_coco)
-                upload_id, images, categories = upload_helper(coco_json, user.id)
+                upload_id, images, categories = upload_helper(
+                    coco_json, user.id, upload_id=upload_id
+                )
     except JsonValidationError as e:
         traceback.print_exc()
         return json_validation_response(e)
