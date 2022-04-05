@@ -169,10 +169,10 @@ class ElasticSearchIndexer:
         for index_batch in self.generate_batches():
             if hasattr(self.es_client, "bulk"):
                 helpers.bulk(self.es_client, index_batch)
+                self.remove_other_versions()
             else:
                 # a file for dry run
                 self.es_client.write(json.dumps(index_batch, indent=2))
-        self.remove_other_versions()
 
     def remove_other_versions(self):
         # in case other filenames had been submitted with this upload_id
