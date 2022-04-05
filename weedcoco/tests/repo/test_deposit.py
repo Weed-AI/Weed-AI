@@ -137,15 +137,6 @@ def rewrite_outputs(repo, expected_dir, versions=False):
             dataset.extract(str(expected_dir / pathlib.Path(identifier)))
 
 
-def rewrite_ocfl(repo, identifier, expected_dir):
-    """Used for debugging ocfl - copy the whole test object into the samples
-    directory"""
-    if expected_dir.is_dir():
-        shutil.rmtree(expected_dir)
-    dataset = repo.dataset(identifier)
-    shutil.copytree(dataset.object_path, expected_dir)
-
-
 def rewrite_hash_maps(versions):
     """Uses before- and after- weedcoco.json to write a fixture to replace
     the redis image mapping"""
@@ -276,7 +267,7 @@ def test_round_trip_identical(executor):
     )
 
 
-def test_ocfl_deduplication(executor, rewrite_deposit_truth, dump_ocfl):
+def test_ocfl_deduplication(executor, rewrite_deposit_truth):
     """Check in v1, then extract it and add one more image and a different
     weedcoco.json, check that in as v2, and make sure that the resulting ocfl
     is deduplicated"""
@@ -311,8 +302,6 @@ def test_ocfl_deduplication(executor, rewrite_deposit_truth, dump_ocfl):
     if rewrite_deposit_truth:
         rewrite_outputs(repo, TEST_DATA_SAMPLE_DIR / "updates", True)
         rewrite_hash_maps(["v1", "v2"])
-    if dump_ocfl:
-        rewrite_ocfl(repo, "dataset", TEST_DATA_SAMPLE_DIR / "updates" / "ocfl")
     dataset.extract(str(test_extract_dir / "dataset.v2"))
     assert_mapped_files_equal(
         TEST_DATA_SAMPLE_DIR / "hash_maps" / "hash_map_v2.json",
