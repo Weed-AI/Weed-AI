@@ -45,6 +45,7 @@ class ElasticSearchIndexer:
         self.thumbnail_dir = pathlib.Path(thumbnail_dir)
         self.es_index_name = es_index_name
         self.batch_size = batch_size
+        self.dry_run = dry_run
         hosts = [{"host": es_host, "port": es_port}]
         if dry_run:
             self.es_client = sys.stdout
@@ -169,10 +170,11 @@ class ElasticSearchIndexer:
         for index_batch in self.generate_batches():
             if hasattr(self.es_client, "bulk"):
                 helpers.bulk(self.es_client, index_batch)
-                self.remove_other_versions()
             else:
                 # a file for dry run
                 self.es_client.write(json.dumps(index_batch, indent=2))
+        if not self.dry_run:
+            self.remove_other_versions()
 
     def remove_other_versions(self):
         # in case other filenames had been submitted with this upload_id
