@@ -45,6 +45,7 @@ class ElasticSearchIndexer:
         self.thumbnail_dir = pathlib.Path(thumbnail_dir)
         self.es_index_name = es_index_name
         self.batch_size = batch_size
+        self.dry_run = dry_run
         hosts = [{"host": es_host, "port": es_port}]
         if dry_run:
             self.es_client = sys.stdout
@@ -172,6 +173,8 @@ class ElasticSearchIndexer:
             else:
                 # a file for dry run
                 self.es_client.write(json.dumps(index_batch, indent=2))
+        if not self.dry_run:
+            self.remove_other_versions()
 
     def remove_other_versions(self):
         # in case other filenames had been submitted with this upload_id
@@ -186,17 +189,13 @@ class ElasticSearchIndexer:
         {{
           "query": {{
             "bool": {{
-              "match": {{
-                "upload_id": "{self.upload_id}"
-              }}
-            }},
-            "must_not": {{
-                "version_tag": "{self.version_tag}"
+              "must": {{"match": {{"upload_id": "{self.upload_id}"}}}},
+              "must_not": {{"match": {{"version_tag": "{self.version_tag}"}}}}
             }}
           }}
         }}
         """
-        self.es_client.delete_by_query(self.es_index_name, body)
+        self.es_client.delete_by_query(self.es_index_name, body, conflicts="proceed")
 
 
 def main(args=None):

@@ -17,8 +17,7 @@ def _ensure_dir(path):
         os.mkdir(os.path.dirname(str(path)))
 
 
-def thumbnail_one(coco_image, image_path, thumbnails_dir, thumbnail_size):
-    filename = os.path.basename(image_path)
+def thumbnail_one(coco_image, filename, image_path, thumbnails_dir, thumbnail_size):
     thumb_path = thumbnails_dir / filename[:2] / filename
     bbox_path = thumbnails_dir / ("bbox-" + filename[:2]) / filename
 
@@ -79,6 +78,7 @@ def thumbnailing(thumbnails_dir, repository_dir, upload_id, THUMBNAIL_SIZE=(300,
                 content_path = dataset.resolve_path(path)
                 thumbnail_one(
                     coco_by_filename[filename],
+                    filename,
                     str(content_path),
                     thumbnails_dir,
                     thumbnail_size=THUMBNAIL_SIZE,
