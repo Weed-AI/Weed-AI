@@ -105,14 +105,6 @@
             "height": 1200,
             "width": 1920,
             "id": 3
-        },
-        {
-            "agcontext_id": 0,
-            "license": 0,
-            "file_name": "images/image-5.jpg",
-            "height": 1200,
-            "width": 1920,
-            "id": 4
         }
     ],
     "annotations": [
@@ -230,17 +222,6 @@
             "image_id": 3,
             "category_id": 0,
             "id": 10,
-            "bbox": [
-                1080,
-                818,
-                99,
-                109
-            ]
-        },
-        {
-            "image_id": 4,
-            "category_id": 0,
-            "id": 11,
             "bbox": [
                 1080,
                 818,

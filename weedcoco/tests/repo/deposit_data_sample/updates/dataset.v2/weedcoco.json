@@ -109,7 +109,7 @@
         {
             "agcontext_id": 0,
             "license": 0,
-            "file_name": "images/0d1d20fd2083c743b034-717415faeb3890c4119dc27674c2436a.jpg",
+            "file_name": "images/0d1d20fd2083c743b034-9f187bdb8ab1043bc3e4a97add2b273d.jpg",
             "height": 1200,
             "width": 1920,
             "id": 4
@@ -242,8 +242,8 @@
             "category_id": 0,
             "id": 11,
             "bbox": [
-                1080,
-                818,
+                344,
+                534,
                 99,
                 109
             ]

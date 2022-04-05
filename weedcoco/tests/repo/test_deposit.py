@@ -137,6 +137,41 @@ def rewrite_outputs(repo, expected_dir, versions=False):
             dataset.extract(str(expected_dir / pathlib.Path(identifier)))
 
 
+def rewrite_ocfl(repo, identifier, expected_dir):
+    """Used for debugging ocfl - copy the whole test object into the samples
+    directory"""
+    if expected_dir.is_dir():
+        shutil.rmtree(expected_dir)
+    dataset = repo.dataset(identifier)
+    shutil.copytree(dataset.object_path, expected_dir)
+
+
+def rewrite_hash_maps(versions):
+    """Uses before- and after- weedcoco.json to write a fixture to replace
+    the redis image mapping"""
+    for version in versions:
+        weedcoco_orig_file = TEST_UPDATES_DIR / version / "weedcoco.json"
+        with open(weedcoco_orig_file, "r") as fh:
+            weedcoco_orig = json.load(fh)
+        weedcoco_hash_file = (
+            TEST_DATA_SAMPLE_DIR / "updates" / ("dataset." + version) / "weedcoco.json"
+        )
+        with open(weedcoco_hash_file, "r") as fh:
+            weedcoco_hash = json.load(fh)
+        hash_images = weedcoco_hash["images"]
+        hash_map = {}
+        for image in weedcoco_orig["images"]:
+            orig_file = pathlib.Path(image["file_name"]).name
+            new_images = [i for i in hash_images if i["id"] == image["id"]]
+            assert len(new_images) == 1
+            hash_map[orig_file] = pathlib.Path(new_images[0]["file_name"]).name
+        hash_map_file = (
+            TEST_DATA_SAMPLE_DIR / "hash_maps" / ("hash_map_" + version + ".json")
+        )
+        with open(hash_map_file, "w") as fh:
+            fh.write(json.dumps(hash_map, indent=4))
+
+
 def test_basic(executor, rewrite_deposit_truth):
     test_extract_dir, _, repo, dataset = executor.run(
         "dataset_1", TEST_BASIC_DIR_1 / "weedcoco.json", TEST_BASIC_DIR_1 / "images"
@@ -227,19 +262,62 @@ def test_versioned_datasets(executor, rewrite_deposit_truth):
     )
 
 
-def test_round_trip_identical(executor, rewrite_deposit_truth):
+def test_round_trip_identical(executor):
     test_extract_dir, test_download_dir, repo, _ = executor.run(
         "dataset", TEST_UPDATES_DIR_1 / "weedcoco.json", TEST_UPDATES_DIR_1 / "images"
     )
     dataset = repo.dataset("dataset")
     assert dataset.head_version == "v1"
-    if rewrite_deposit_truth:
-        rewrite_outputs(repo, TEST_DATA_SAMPLE_DIR / "updates", True)
     dataset.extract(str(test_extract_dir / "dataset"), "v1")
     assert_mapped_files_equal(
-        TEST_UPDATES_DIR / "hash_map_v1.json",
+        TEST_DATA_SAMPLE_DIR / "hash_maps" / "hash_map_v1.json",
         TEST_UPDATES_DIR_1 / "images",
         test_extract_dir / "dataset" / "images",
+    )
+
+
+def test_ocfl_deduplication(executor, rewrite_deposit_truth, dump_ocfl):
+    """Check in v1, then extract it and add one more image and a different
+    weedcoco.json, check that in as v2, and make sure that the resulting ocfl
+    is deduplicated"""
+    test_extract_dir, test_download_dir, repo, _ = executor.run(
+        "dataset", TEST_UPDATES_DIR_1 / "weedcoco.json", TEST_UPDATES_DIR_1 / "images"
+    )
+    dataset = repo.dataset("dataset")
+    assert dataset.head_version == "v1"
+    dataset.extract(str(test_extract_dir / "dataset"))
+    images_dir = test_extract_dir / "dataset" / "images"
+    # have to remap the images to their unhashed versions
+    with open(TEST_DATA_SAMPLE_DIR / "hash_maps" / "hash_map_v1.json", "r") as fh:
+        hash_map = json.load(fh)
+    for orig, hashed in hash_map.items():
+        if pathlib.Path(images_dir / hashed).is_file():
+            shutil.move(images_dir / hashed, images_dir / orig)
+    shutil.copy(
+        TEST_UPDATES_DIR_2 / "weedcoco.json",
+        test_extract_dir / "dataset" / "weedcoco.json",
+    )
+    shutil.copy(
+        TEST_UPDATES_DIR_2 / "images" / "image-5.jpg",
+        test_extract_dir / "dataset" / "images" / "image-5.jpg",
+    )
+    _, _, _, _ = executor.run(
+        "dataset",
+        test_extract_dir / "dataset" / "weedcoco.json",
+        test_extract_dir / "dataset" / "images",
+    )
+    dataset2 = repo.dataset("dataset")
+    assert dataset2.head_version == "v2"
+    if rewrite_deposit_truth:
+        rewrite_outputs(repo, TEST_DATA_SAMPLE_DIR / "updates", True)
+        rewrite_hash_maps(["v1", "v2"])
+    if dump_ocfl:
+        rewrite_ocfl(repo, "dataset", TEST_DATA_SAMPLE_DIR / "updates" / "ocfl")
+    dataset.extract(str(test_extract_dir / "dataset.v2"))
+    assert_mapped_files_equal(
+        TEST_DATA_SAMPLE_DIR / "hash_maps" / "hash_map_v2.json",
+        TEST_UPDATES_DIR_2 / "images",
+        test_extract_dir / "dataset.v2" / "images",
     )
 
 
