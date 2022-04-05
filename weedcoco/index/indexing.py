@@ -195,7 +195,7 @@ class ElasticSearchIndexer:
           }}
         }}
         """
-        self.es_client.delete_by_query(self.es_index_name, body)
+        self.es_client.delete_by_query(self.es_index_name, body, conflicts="proceed")
 
 
 def main(args=None):
