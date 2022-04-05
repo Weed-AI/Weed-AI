@@ -112,8 +112,6 @@ describe('overall upload workflow', () => {
         cy.wait(5000)
         cy.clickText(/^Apply$/)
         cy.wait(5000)
-        cy.clickText(/^Apply$/)
-        cy.wait(5000)
         cy.clickText(/^Next$/)
         cy.findByText(task.label.split(': ')[0]).type('weed{enter}')
         cy.findByDisplayValue(task.label.split(': ')[1]).click().clear().type('rapistrum rugosum{enter}')
