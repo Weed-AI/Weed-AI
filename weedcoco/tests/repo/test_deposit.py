@@ -22,6 +22,7 @@ TEST_DUPLICATE_DIR = TEST_DATA_DIR / "duplicate"
 TEST_UPDATES_DIR = TEST_DATA_DIR / "updates"
 TEST_UPDATES_DIR_1 = TEST_UPDATES_DIR / "v1"
 TEST_UPDATES_DIR_2 = TEST_UPDATES_DIR / "v2"
+TEST_UPDATES_MERGED = TEST_UPDATES_DIR / "merged"
 
 TEST_NAME = "weed.ai"
 TEST_ADDRESS = "weed@weed.ai.org"
@@ -108,6 +109,16 @@ def assert_mapped_files_equal(hash_map_file, dir1, dir2):
         assert filecmp.cmp(dir1 / orig, dir2 / hashed, shallow=False)
 
 
+def unhash_images(hash_map_file, images_dir):
+    """Used to build dataset versions with original filenames, using a JSON
+    file with the hash mapping"""
+    with open(hash_map_file, "r") as fh:
+        hash_map = json.load(fh)
+    for orig, hashed in hash_map.items():
+        if pathlib.Path(images_dir / hashed).is_file():
+            shutil.move(images_dir / hashed, images_dir / orig)
+
+
 def unpack_zip(zip_path, destination):
     z = zipfile.ZipFile(zip_path)
     z.extractall(str(destination))
@@ -161,6 +172,13 @@ def rewrite_hash_maps(versions):
         )
         with open(hash_map_file, "w") as fh:
             fh.write(json.dumps(hash_map, indent=4))
+
+
+def rewrite_unhashed(dataset, version, hash_map, dest_dir):
+    if dest_dir.is_dir():
+        shutil.rmtree(dest_dir)
+    dataset.extract(dest_dir, version)
+    unhash_images(hash_map, dest_dir / "images")
 
 
 def test_basic(executor, rewrite_deposit_truth):
@@ -278,12 +296,7 @@ def test_ocfl_deduplication(executor, rewrite_deposit_truth):
     assert dataset.head_version == "v1"
     dataset.extract(str(test_extract_dir / "dataset"))
     images_dir = test_extract_dir / "dataset" / "images"
-    # have to remap the images to their unhashed versions
-    with open(TEST_DATA_SAMPLE_DIR / "hash_maps" / "hash_map_v1.json", "r") as fh:
-        hash_map = json.load(fh)
-    for orig, hashed in hash_map.items():
-        if pathlib.Path(images_dir / hashed).is_file():
-            shutil.move(images_dir / hashed, images_dir / orig)
+    unhash_images(TEST_DATA_SAMPLE_DIR / "hash_maps" / "hash_map_v1.json", images_dir)
     shutil.copy(
         TEST_UPDATES_DIR_2 / "weedcoco.json",
         test_extract_dir / "dataset" / "weedcoco.json",
@@ -302,10 +315,12 @@ def test_ocfl_deduplication(executor, rewrite_deposit_truth):
     if rewrite_deposit_truth:
         rewrite_outputs(repo, TEST_DATA_SAMPLE_DIR / "updates", True)
         rewrite_hash_maps(["v1", "v2"])
+        hash_map_v2 = TEST_DATA_SAMPLE_DIR / "hash_maps" / "hash_map_v2.json"
+        rewrite_unhashed(dataset, "v2", hash_map_v2, TEST_DATA_SAMPLE_DIR / "merged")
     dataset.extract(str(test_extract_dir / "dataset.v2"))
     assert_mapped_files_equal(
         TEST_DATA_SAMPLE_DIR / "hash_maps" / "hash_map_v2.json",
-        TEST_UPDATES_DIR_2 / "images",
+        TEST_DATA_SAMPLE_DIR / "merged" / "images",
         test_extract_dir / "dataset.v2" / "images",
     )
 
