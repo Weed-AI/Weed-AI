@@ -236,14 +236,33 @@ class RepositoryDataset:
     def validate_existing_images(self):
         addition_hash = get_hashset_from_image_name(self.image_hash)
         all_existing_hash = self.get_all_existing_hash(self.repo)
-        if len(all_existing_hash.union(addition_hash)) != len(all_existing_hash) + len(
-            addition_hash
-        ):
-            raise ValidationError("There are identical images in the repository.")
+        reverse_mapping = {
+            value.split(".")[0]: key for key, value in self.image_hash.items()
+        }
+        for hash_name in addition_hash:
+            if (
+                hash_name in all_existing_hash
+                and all_existing_hash[hash_name] != self.identifier
+            ):
+                raise ValidationError(
+                    "There are identical images in the repository. Existing image hash names are: "
+                    + "; ".join(
+                        [
+                            " <-> ".join(
+                                [
+                                    f"{self.identifier}/{reverse_mapping[existing_hash]}",
+                                    f"{all_existing_hash[existing_hash]}/{existing_hash}",
+                                ]
+                            )
+                            for existing_hash in addition_hash
+                            & set(all_existing_hash.keys())
+                        ]
+                    )
+                )
 
     def get_all_existing_hash(self, repository):
         return {
-            os.path.splitext(path.split("/")[-1])[0]
+            os.path.splitext(path.split("/")[-1])[0]: dataset.identifier
             for dataset in repository.datasets()
             if dataset.identifier != self.identifier
             for path in dataset.get_logical_paths()

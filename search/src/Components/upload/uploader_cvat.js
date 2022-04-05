@@ -24,7 +24,8 @@ class CvatRetriever extends React.Component {
         this.state = {
             cvat_logged_in: false,
             cvat_tasks: [],
-            selected_task_id: 0
+            selected_task_id: 0,
+            upload_id: props.upload_id
         }
         this.retrieveCvatTasksList = this.retrieveCvatTasksList.bind(this);
         this.retrieveTaskExportFile = this.retrieveTaskExportFile.bind(this);
@@ -58,7 +59,7 @@ class CvatRetriever extends React.Component {
         try {
             const res = await axios.get(baseURL + `cvat-annotation/api/v1/tasks/${this.state.selected_task_id}/annotations?format=COCO%201.0&filename=temp.zip`)
             if (res.statusText === 'Created') {
-                const cvat_res = await axios.get(baseURL + `api/retrieve_cvat_task/${this.state.selected_task_id}`)
+                const cvat_res = await axios.get(baseURL + `api/retrieve_cvat_task/${this.state.upload_id}/${this.state.selected_task_id}`)
                 const payload = cvat_res.data
                 this.props.handleUploadId(payload.upload_id)
                 this.props.handleImages(payload.images)
