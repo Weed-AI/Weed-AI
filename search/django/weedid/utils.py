@@ -132,7 +132,7 @@ def make_upload_entity_fields(weedcoco):
     for agcontext in weedcoco["agcontexts"]:
         agcontext["n_images"] = int(
             stats.agcontext_summary.loc[agcontext["id"]].image_count
-        )
+        ) + count_image_with_no_annotation(weedcoco)
 
         # Should produce something like:
         # {"crop: daucus carota": {"image_count": 1, "annotation_count": 1, "bounding_box_count": 1, "segmentation_count": 1}}
@@ -148,6 +148,13 @@ def make_upload_entity_fields(weedcoco):
         "agcontext": weedcoco["agcontexts"],
         "metadata": weedcoco["info"]["metadata"],
     }
+
+
+def count_image_with_no_annotation(weedcoco):
+    return len(
+        set([image["id"] for image in weedcoco["images"]])
+        - set([annotation["image_id"] for annotation in weedcoco["annotations"]])
+    )
 
 
 def create_upload_entity(upload_id, upload_userid):
