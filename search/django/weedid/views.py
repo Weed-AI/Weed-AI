@@ -513,7 +513,11 @@ def upload_info(request, dataset_id):
     upload_entity = Dataset.objects.get(upload_id=dataset_id)
     return HttpResponse(
         json.dumps(
-            {"metadata": upload_entity.metadata, "agcontexts": upload_entity.agcontext}
+            {
+                "metadata": upload_entity.metadata,
+                "agcontexts": upload_entity.agcontext,
+                "head_version": upload_entity.head_version,
+            }
         )
     )
 
