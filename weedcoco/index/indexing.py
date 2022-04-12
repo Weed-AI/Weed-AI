@@ -39,7 +39,7 @@ class ElasticSearchIndexer:
         es_port=9200,
         indexes=None,
         upload_id="#",
-        version_id=0,
+        version_id=str(uuid4()),
         dry_run=False,
     ):
         self.weedcoco_path = pathlib.Path(weedcoco_path)
@@ -54,7 +54,7 @@ class ElasticSearchIndexer:
             self.es_client = elasticsearch.Elasticsearch(hosts=hosts)
         self.indexes = indexes if indexes is not None else {}
         self.upload_id = upload_id
-        self.version_tag = int(version_id)
+        self.version_tag = version_id
 
     def generate_index_entries(self):
         """
