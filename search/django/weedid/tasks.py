@@ -148,6 +148,7 @@ def update_index_and_thumbnails(
             es_host="elasticsearch",
             es_port=9200,
             upload_id=upload_id,
+            version_id=dataset.head_version,
         )
         es_index.post_index_entries()
     except Exception as e:
