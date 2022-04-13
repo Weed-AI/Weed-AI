@@ -1,19 +1,16 @@
-import React, { Component } from 'react';
-import Paper from '@material-ui/core/Paper';
-import IconButton from '@material-ui/core/IconButton';
-import Typography from '@material-ui/core/Typography';
-import CloseIcon from '@material-ui/icons/Close'
-import Tooltip from '@material-ui/core/Tooltip';
-import {
-    RangeSlider,
-    MultiList,
-    SelectedFilters,
-    MultiDropdownList
-} from '@appbaseio/reactivesearch';
 import { GeoDistanceSlider } from "@appbaseio/reactivemaps";
-import SearchBase from '../search/SearchBase';
-import ResultsList from '../search/ResultsList';
+import {
+    MultiDropdownList, MultiList,
+    SelectedFilters
+} from '@appbaseio/reactivesearch';
+import IconButton from '@material-ui/core/IconButton';
+import Paper from '@material-ui/core/Paper';
+import Typography from '@material-ui/core/Typography';
+import CloseIcon from '@material-ui/icons/Close';
+import React, { Component } from 'react';
 import { Helmet } from "react-helmet";
+import ResultsList from '../search/ResultsList';
+import SearchBase from '../search/SearchBase';
 
 
 const IntroText = () => {
@@ -66,6 +63,8 @@ class ReactiveSearchComponent extends Component {
                         "lighting_filter",
                         "geo_distance_filter",
                         "dataset_name_filter",
+                        "is_head_filter",
+                        "version_filter",
                     ]
                 },
                 ...multilistFacetProps
@@ -119,6 +118,25 @@ class ReactiveSearchComponent extends Component {
                         placeholder="Search growth stage"
                         filterLabel="Growth stage"
                         {...makeProps("grainstextfilter", true)}
+                    />
+                    <MultiList
+                        componentId="is_head_filter"
+                        title="Latest version"
+                        dataField="version.version_tag.keyword"
+                        selectAllLabel="Latest and past versions"
+                        placeholder="Choose latest version"
+                        filterLabel="Latest version"
+                        {...makeProps("is_head_filter", true)}
+                    />
+                    <MultiList
+                        componentId="version_filter"
+                        title="Dataset versions"
+                        dataField="version.version_id.keyword"
+                        sortBy="asc"
+                        selectAllLabel="All versions"
+                        placeholder="Search version"
+                        filterLabel="Dataset version"
+                        {...makeProps("version_filter", true)}
                     />
                     <GeoDistanceSlider
                       title="Location"
