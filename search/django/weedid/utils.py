@@ -4,7 +4,7 @@ import re
 import smtplib
 import tempfile
 from email.message import EmailMessage
-from shutil import copy, move, rmtree
+from shutil import move, rmtree
 from uuid import uuid4
 from zipfile import ZipFile
 
@@ -20,7 +20,7 @@ from core.settings import (
 from django.core.files.storage import FileSystemStorage
 from weedcoco.repo.deposit import Repository, mkdir_safely
 from weedcoco.stats import WeedCOCOStats
-from weedcoco.utils import set_info, set_licenses
+from weedcoco.utils import set_info, set_licenses, copy_without_exif
 from weedcoco.validation import validate
 
 from weedid.models import Dataset, WeedidUser
@@ -35,7 +35,9 @@ class OverwriteStorage(FileSystemStorage):
 
 def store_tmp_image(image, image_dir):
     fs = OverwriteStorage()
-    fs.save(os.path.join(image_dir, image.name), image)
+    image_file = os.path.join(image_dir, image.name)
+    fs.save(image_file, image)
+    copy_without_exif(image_file, image_file)
 
 
 def store_tmp_image_from_zip(upload_image_zip, image_dir, full_images):
@@ -48,7 +50,9 @@ def store_tmp_image_from_zip(upload_image_zip, image_dir, full_images):
             # FIXME: this should reject a zip upload if two filenames are identical
             for filename in filenames:
                 if filename in full_images and filename not in existing_images:
-                    copy(os.path.join(dir, filename), os.path.join(image_dir, filename))
+                    copy_without_exif(
+                        os.path.join(dir, filename), os.path.join(image_dir, filename)
+                    )
     return list(set(os.listdir(image_dir)))
 
 

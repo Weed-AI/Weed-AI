@@ -93,6 +93,13 @@ def check_if_approved_image_format(image_ext):
     return image_ext in ("PNG", "JPG", "JPEG", "TIFF")
 
 
+def copy_without_exif(src, dest):
+    image_origin = PIL.Image.open(src)
+    image_without_exif = PIL.Image.new(image_origin.mode, image_origin.size)
+    image_without_exif.putdata(image_origin.getdata())
+    image_without_exif.save(dest)
+
+
 def _get_growth_stage_names():
     global __GROWTH_STAGE_NAMES
     try:
