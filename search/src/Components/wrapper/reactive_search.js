@@ -126,6 +126,7 @@ class ReactiveSearchComponent extends Component {
                         selectAllLabel="Latest and past versions"
                         placeholder="Choose latest version"
                         filterLabel="Latest version"
+                        value={["latest version"]}
                         {...makeProps("is_head_filter", true)}
                     />
                     <MultiList
