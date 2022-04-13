@@ -143,7 +143,10 @@ class ElasticSearchIndexer:
                 "location"
             ] = f'{image["agcontext"]["location_lat"]}, {image["agcontext"]["location_long"]}'
             image["dataset_name"] = coco["info"]["metadata"]["name"]
-            image["version_tag"] = {"version_id": self.version_id, "head": True}
+            image["version"] = {
+                "version_id": self.version_id,
+                "version_tag": "latest version",
+            }
             yield image
 
     def generate_batches(self):
@@ -189,12 +192,12 @@ class ElasticSearchIndexer:
         body = f"""
         {{
           "script": {{
-            "source": "ctx._source.version_tag.head = false"
+            "source": "ctx._source.version.version_tag = 'past version'"
           }},
           "query": {{
             "bool": {{
               "must": {{"match": {{"upload_id": "{self.upload_id}"}}}},
-              "must_not": {{"match": {{"version_tag.version_id": "{self.version_id}"}}}}
+              "must_not": {{"match": {{"version.version_id": "{self.version_id}"}}}}
             }}
           }}
         }}
