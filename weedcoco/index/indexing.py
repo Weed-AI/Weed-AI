@@ -189,7 +189,8 @@ class ElasticSearchIndexer:
         body = f"""
         {{
           "script": {{
-            "inline": "version_tag.head = '{False}'"
+            "source": "ctx._source.version_tag.head = {False}",
+            "lang": "painless"
           }},
           "query": {{
             "bool": {{
