@@ -5,6 +5,7 @@ import warnings
 import hashlib
 
 import PIL.Image
+import PIL.ImageOps
 import yaml
 import imagehash
 
@@ -94,7 +95,10 @@ def check_if_approved_image_format(image_ext):
 
 
 def copy_without_exif(src, dest):
-    image_origin = PIL.Image.open(src)
+    """Makes a copy of an image with any exif metadata stripped out.
+    Before copying, uses exif_transpose to orient the image correctly
+    if it has an exif orientation value != 1."""
+    image_origin = PIL.ImageOps.exif_transpose(PIL.Image.open(src))
     image_without_exif = PIL.Image.new(image_origin.mode, image_origin.size)
     image_without_exif.putdata(image_origin.getdata())
     image_without_exif.save(dest)
