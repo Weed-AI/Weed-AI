@@ -12,6 +12,7 @@ from core.settings import (
     TUS_DESTINATION_DIR,
     UPLOAD_DIR,
 )
+
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required
@@ -35,7 +36,11 @@ from weedcoco.validation import JsonValidationError, validate, validate_json
 from weedid.decorators import check_post_and_authenticated
 from weedid.models import Dataset, WeedidUser
 from weedid.notification import review_notification
-from weedid.tasks import submit_upload_task, update_index_and_thumbnails
+from weedid.tasks import (
+    submit_upload_task,
+    update_index_and_thumbnails,
+    store_tmp_image_from_zip,
+)
 from weedid.utils import (
     add_agcontexts,
     add_metadata,
@@ -47,7 +52,6 @@ from weedid.utils import (
     set_categories,
     setup_upload_dir,
     store_tmp_image,
-    store_tmp_image_from_zip,
     store_tmp_voc,
     store_tmp_weedcoco,
     validate_email_format,
@@ -276,13 +280,15 @@ def unpack_image_zip(request):
     images = request.POST["images"].split(",")
     zipfile = os.path.join(TUS_DESTINATION_DIR, upload_image_zip)
     upload_dir = os.path.join(UPLOAD_DIR, str(user.id), upload_id, "images")
-    try:
-        missing_images = store_tmp_image_from_zip(zipfile, upload_dir, images)
-    except Exception as e:
-        return HttpResponseBadRequest(str(e))
-    return HttpResponse(
-        json.dumps({"upload_id": upload_id, "missing_images": missing_images})
-    )
+    celery_task = store_tmp_image_from_zip.delay(upload_id, zipfile, upload_dir, images)
+    return HttpResponse(json.dumps({"task_id": celery_task.id}))
+
+
+def check_image_zip(request, task_id):
+    result = store_tmp_image_from_zip.AsyncResult(task_id)
+    if not result.ready():
+        return HttpResponse("wait", status_code=202)
+    return HttpResponse(json.dumps(result.get(propagate=True)))
 
 
 @login_required

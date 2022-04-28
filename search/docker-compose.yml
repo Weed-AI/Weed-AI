@@ -87,6 +87,7 @@ services:
       - repository_dir:/code/repository
       - upload_dir:/code/upload
       - download_dir:/code/download
+      - tus_dir:/code/tus_dir
       - ${GIT_REMOTE_PATH}:/mnt/git_remote
       - ${DVC_REMOTE_PATH}:/mnt/dvc_remote
     depends_on:
