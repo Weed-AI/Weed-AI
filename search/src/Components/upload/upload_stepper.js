@@ -222,7 +222,7 @@ class UploadStepper extends React.Component {
             this.handleErrorMessage("");
         } else {
             this.handleValidation(false, "images");
-            this.handleErrorMessage(`${missingImages.size} ${missingImages.size > 1 ? "images" : "image"} missing`, {error_type: "image", missingImages: Array.from(missingImages)});
+            this.handleErrorMessage(`${missingImages.size} ${missingImages.size > 1 ? "images" : "image"} to be uploaded`, {error_type: "image", missingImages: Array.from(missingImages)});
         }
     }
 
