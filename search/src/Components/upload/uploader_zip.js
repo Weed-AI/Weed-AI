@@ -1,14 +1,14 @@
-import React from 'react';
-import 'react-dropzone-uploader/dist/styles.css';
-import Cookies from 'js-cookie';
-import axios from 'axios';
 import Uppy from '@uppy/core';
 import '@uppy/core/dist/style.css';
 import '@uppy/dashboard/dist/style.css';
+import { Dashboard } from '@uppy/react';
 import Tus from '@uppy/tus';
-import { Dashboard, useUppy } from '@uppy/react';
-
+import axios from 'axios';
+import Cookies from 'js-cookie';
+import React from 'react';
+import 'react-dropzone-uploader/dist/styles.css';
 import { jsonSchemaTitle } from '../error/utils';
+
 
 const baseURL = new URL(window.location.origin);
 
@@ -29,7 +29,7 @@ function getTusUploadFile(file) {
 }
 
 
-const getZipUploadResponse = ({upload_id, images, filename}) => {
+const getZipUploadResponse = ({upload_id, images, filename, handleNextProcessing}) => {
     return new Promise((resolve, reject) => {
         const pollPeriod = 200;
         const body = new FormData()
@@ -43,6 +43,7 @@ const getZipUploadResponse = ({upload_id, images, filename}) => {
             headers: {'X-CSRFToken': Cookies.get('csrftoken') }
         }).then(res => {
             const taskId = res.data.task_id;
+            handleNextProcessing(true)
             const poll = () => {
                 axios({
                     method: 'get',
@@ -54,8 +55,9 @@ const getZipUploadResponse = ({upload_id, images, filename}) => {
                         setTimeout(poll, pollPeriod)
                     } else {
                         resolve(res)
+                        handleNextProcessing(false)
                     }
-                })
+                }).catch(reject)
             }
             setTimeout(poll, pollPeriod);
         }).catch(reject)
@@ -86,7 +88,6 @@ class UploaderUppyZip extends React.Component {
     componentDidMount() {
 
         this.uppy.on("complete", (result) => {
-            const baseURL = new URL(window.location.origin);
             const files = result.successful;
             if( files.length !== 1 ) {
                 console.log("Got wrong number of successful uploaded files");
@@ -101,14 +102,14 @@ class UploaderUppyZip extends React.Component {
                 this.props.handleErrorMessage("Upload zipfile failed");
                 return;
             }
-            getZipUploadResponse({ upload_id: this.props.upload_id, images: this.props.images, filename}).then(res => {
+            getZipUploadResponse({ upload_id: this.props.upload_id, images: this.props.images, filename: filename, handleNextProcessing: this.props.handleNextProcessing}).then(res => {
                 if( res.data.upload_id === this.props.upload_id ) {
-                    if( res.data.missing_images.length === 0 ) {
+                    if( res.data.missing_image_amount === 0 ) {
                         this.props.handleValidation(true);
                         this.props.handleErrorMessage("");
                     } else {
                         this.props.handleValidation(false);
-                        this.props.syncImageErrorMessage(res.data.missing_images)
+                        this.props.syncImageErrorMessage(res.data.uploaded_images)
                     }
                 } else {
                     this.props.handleValidation(false);
@@ -118,7 +119,7 @@ class UploaderUppyZip extends React.Component {
                 this.props.handleValidation(false)
                 const data = err.response.data
                 if (typeof data === "object") this.props.handleErrorMessage(jsonSchemaTitle(data), data);
-                else this.props.handleErrorMessage(data || "Server error unpacking zipfile")
+                else this.props.handleErrorMessage(data.length <= 100 ? data : null || "Server error unpacking zipfile")
             });
         })
     }

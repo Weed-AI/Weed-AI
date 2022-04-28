@@ -51,31 +51,54 @@ class CategoryMapper extends React.Component {
         this.changeSciName = this.changeSciName.bind(this);
     }
 
+    componentDidMount() {
+        const { nCategories, nComplete } = this.getStats(this.state.categories)
+        if (nCategories === nComplete) {
+            this.props.handleValidation(true);
+            this.props.handleErrorMessage("");
+        }
+    }
+
     modifyCategories(index, field, value) {
         const newCategories = cloneDeep(this.state.categories);
         newCategories[index][field] = value;
         this.setState({categories: newCategories});
+
+        const { nCategories, nComplete } = this.getStats(newCategories);
+        if (nCategories && nCategories === nComplete) {
+            this.props.handleCategories(newCategories);
+            this.props.handleErrorMessage("");
+            this.props.handleValidation(true);
+        } else {
+            this.props.handleErrorMessage("Role or scientific name missing")
+            this.props.handleValidation(false);
+        }
     }
 
     changeRole(e, index) {
         this.modifyCategories(index, "role", e.target.value);
-        this.props.handleValidation(false);
         this.props.handleErrorMessage("");
     }
 
     changeSciName(e, index) {
         this.modifyCategories(index, "scientific_name", e.target.value);
-        this.props.handleValidation(false);
         this.props.handleErrorMessage("");
+    }
+
+    getStats(categories) {
+        const nCategories = categories.length;
+        const nComplete = categories.filter(category => category.role && category.scientific_name).length;
+        return {nCategories, nComplete}
     }
 
     render() {
         const { classes } = this.props;
-        const nCategories = this.state.categories.length;
-        const nComplete = this.state.categories.filter(category => category.role && category.scientific_name).length;
+        const { nCategories, nComplete } = this.getStats(this.state.categories);
         return (
             <React.Fragment>
-                <p className={classes.summary}>{nCategories - nComplete} of {nCategories} {nCategories != 1 ? 'categories' : 'category'} need mapping to weedcoco categories</p>
+                <p className={classes.summary}>
+                    {nCategories === nComplete ? 0 : <span className={classes.incomplete}>{nCategories - nComplete}</span>} of {nCategories} {nCategories != 1 ? 'categories' : 'category'} need mapping to weedcoco categories
+                </p>
                 <ol>
                     {
                         this.state.categories.map((category, index) => {
@@ -102,20 +125,6 @@ class CategoryMapper extends React.Component {
                         })
                     }
                 </ol>
-                <Button variant="contained"
-                        color="primary"
-                        className={classes.applyButton}
-                        onClick={() => {
-                            if (nCategories && nCategories === nComplete) {
-                                this.props.handleCategories(this.state.categories)
-                                this.props.handleErrorMessage("")
-                                this.props.handleValidation(true);
-                            }
-                            else {
-                                this.props.handleErrorMessage("Role or scientific name missing")
-                                this.props.handleValidation(true);
-                            }
-                        }}>Apply</Button>
             </React.Fragment>
         )
     }

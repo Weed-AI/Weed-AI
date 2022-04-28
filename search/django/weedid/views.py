@@ -12,7 +12,6 @@ from core.settings import (
     TUS_DESTINATION_DIR,
     UPLOAD_DIR,
 )
-
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required
@@ -37,9 +36,9 @@ from weedid.decorators import check_post_and_authenticated
 from weedid.models import Dataset, WeedidUser
 from weedid.notification import review_notification
 from weedid.tasks import (
+    store_tmp_image_from_zip,
     submit_upload_task,
     update_index_and_thumbnails,
-    store_tmp_image_from_zip,
 )
 from weedid.utils import (
     add_agcontexts,
@@ -100,10 +99,10 @@ def upload(request):
         file_weedcoco = request.FILES["weedcoco"]
         weedcoco_json = json.load(file_weedcoco)
         fix_compatibility_quirks(weedcoco_json)
-        # validate(
-        #     weedcoco_json,
-        #     schema=request.POST["schema"] if request.POST["schema"] else "coco",
-        # )
+        validate(
+            weedcoco_json,
+            schema=request.POST["schema"] if request.POST["schema"] else "coco",
+        )
         for image_reference in weedcoco_json["images"]:
             images.append(image_reference["file_name"].split("/")[-1])
         categories = [
@@ -287,7 +286,7 @@ def unpack_image_zip(request):
 def check_image_zip(request, task_id):
     result = store_tmp_image_from_zip.AsyncResult(task_id)
     if not result.ready():
-        return HttpResponse("wait", status_code=202)
+        return HttpResponse("wait", status=202)
     return HttpResponse(json.dumps(result.get(propagate=True)))
 
 
