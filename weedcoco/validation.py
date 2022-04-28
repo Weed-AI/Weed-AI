@@ -24,7 +24,6 @@ MAIN_SCHEMAS = {
 
 FORMAT_CHECKER = FormatChecker()
 # TODO: change from temp path to config
-EPPO_CACHE_PATH = pathlib.Path(tempfile.gettempdir()) / "eppo-codes.zip"
 
 
 @FORMAT_CHECKER.checks("date")
