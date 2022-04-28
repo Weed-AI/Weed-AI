@@ -39,6 +39,7 @@ class ElasticSearchIndexer:
         es_port=9200,
         indexes=None,
         upload_id="#",
+        version_id=str(uuid4()),
         dry_run=False,
     ):
         self.weedcoco_path = pathlib.Path(weedcoco_path)
@@ -53,7 +54,7 @@ class ElasticSearchIndexer:
             self.es_client = elasticsearch.Elasticsearch(hosts=hosts)
         self.indexes = indexes if indexes is not None else {}
         self.upload_id = upload_id
-        self.version_tag = str(uuid4())
+        self.version_id = version_id
 
     def generate_index_entries(self):
         """
@@ -142,7 +143,10 @@ class ElasticSearchIndexer:
                 "location"
             ] = f'{image["agcontext"]["location_lat"]}, {image["agcontext"]["location_long"]}'
             image["dataset_name"] = coco["info"]["metadata"]["name"]
-            image["version_tag"] = self.version_tag
+            image["version"] = {
+                "version_id": self.version_id,
+                "version_tag": "latest version",
+            }
             yield image
 
     def generate_batches(self):
@@ -174,12 +178,12 @@ class ElasticSearchIndexer:
                 # a file for dry run
                 self.es_client.write(json.dumps(index_batch, indent=2))
         if not self.dry_run:
-            self.remove_other_versions()
+            self.archive_other_versions()
 
-    def remove_other_versions(self):
+    def archive_other_versions(self):
         # in case other filenames had been submitted with this upload_id
         if self.upload_id == "#":
-            raise ValueError("remove_other_versions requires upload_id != '#'")
+            raise ValueError("archive_other_versions requires upload_id != '#'")
         assert '"' not in self.upload_id
         assert "\\" not in self.upload_id
 
@@ -187,15 +191,18 @@ class ElasticSearchIndexer:
             return
         body = f"""
         {{
+          "script": {{
+            "source": "ctx._source.version.version_tag = 'past version'"
+          }},
           "query": {{
             "bool": {{
               "must": {{"match": {{"upload_id": "{self.upload_id}"}}}},
-              "must_not": {{"match": {{"version_tag": "{self.version_tag}"}}}}
+              "must_not": {{"match": {{"version.version_id": "{self.version_id}"}}}}
             }}
           }}
         }}
         """
-        self.es_client.delete_by_query(self.es_index_name, body, conflicts="proceed")
+        self.es_client.update_by_query(self.es_index_name, body, conflicts="proceed")
 
 
 def main(args=None):
