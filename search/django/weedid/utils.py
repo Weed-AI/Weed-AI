@@ -2,11 +2,9 @@ import json
 import os
 import re
 import smtplib
-import tempfile
 from email.message import EmailMessage
-from shutil import copy, move, rmtree
+from shutil import move, rmtree
 from uuid import uuid4
-from zipfile import ZipFile
 
 from core.settings import (
     DOWNLOAD_DIR,
@@ -36,20 +34,6 @@ class OverwriteStorage(FileSystemStorage):
 def store_tmp_image(image, image_dir):
     fs = OverwriteStorage()
     fs.save(os.path.join(image_dir, image.name), image)
-
-
-def store_tmp_image_from_zip(upload_image_zip, image_dir, full_images):
-    if not os.path.isdir(image_dir):
-        mkdir_safely(image_dir)
-    existing_images = os.listdir(image_dir)
-    with tempfile.TemporaryDirectory() as tempdir:
-        ZipFile(upload_image_zip).extractall(tempdir)
-        for dir, _, filenames in os.walk(tempdir):
-            # FIXME: this should reject a zip upload if two filenames are identical
-            for filename in filenames:
-                if filename in full_images and filename not in existing_images:
-                    copy(os.path.join(dir, filename), os.path.join(image_dir, filename))
-    return list(set(os.listdir(image_dir)))
 
 
 def store_tmp_weedcoco(weedcoco, upload_dir):

@@ -4,9 +4,11 @@ import datetime
 import json
 import os
 import subprocess
+import tempfile
 import traceback
 from pathlib import Path
-from shutil import move, rmtree
+from shutil import copy, move, rmtree
+from zipfile import ZipFile
 
 from celery import shared_task
 from core.settings import (
@@ -247,3 +249,19 @@ def backup_repository_changes(repository_dir=REPOSITORY_DIR, commit_message=None
         ],
         cwd=REPOSITORY_DIR,
     )
+
+
+@shared_task
+def store_tmp_image_from_zip(upload_id, upload_image_zip, image_dir, full_images):
+    if not os.path.isdir(image_dir):
+        mkdir_safely(image_dir)
+    existing_images = os.listdir(image_dir)
+    with tempfile.TemporaryDirectory() as tempdir:
+        ZipFile(upload_image_zip).extractall(tempdir)
+        for dir, _, filenames in os.walk(tempdir):
+            # FIXME: this should reject a zip upload if two filenames are identical
+            for filename in filenames:
+                if filename in full_images and filename not in existing_images:
+                    copy(os.path.join(dir, filename), os.path.join(image_dir, filename))
+    missing_images = list(set(os.listdir(image_dir)))
+    return {"upload_id": upload_id, "missing_images": missing_images}
