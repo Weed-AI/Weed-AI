@@ -2,15 +2,21 @@ import React, {Component} from 'react';
 import UploadDialog from '../upload/upload_dialog';
 import AuthPrompt from '../auth/auth_prompt';
 import { withStyles } from '@material-ui/core/styles';
-import MenuItem from '@material-ui/core/MenuItem';
-import FormControl from '@material-ui/core/FormControl';
-import Select from '@material-ui/core/Select';
 import axios from 'axios';
+import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
+import Paper from '@material-ui/core/Paper';
 import content from './upload.md'
 import { Helmet } from "react-helmet";
 import { useArticleStyles } from '../../styles/common'
 import Markdown from "../../Common/Markdown";
+
+const PaddedPaper = withStyles((theme) => ({
+    root: {
+        padding: 8,
+        marginBottom: 8,
+    }
+}))(Paper);
 
 const useStyles = (theme) => ({
 	...useArticleStyles(theme),
@@ -37,17 +43,11 @@ class UploadComponent extends Component {
             isLoggedIn: false,
             upload_status: "None",
             upload_status_details: "",
-            upload_type: "",
         }
-        this.handleChange = this.handleChange.bind(this);
         this.retrieveUploadStatus = this.retrieveUploadStatus.bind(this);
         this.handleLogin = this.handleLogin.bind(this);
         this.handleLogout = this.handleLogout.bind(this);
     }
-
-    handleChange(event){
-        this.setState({upload_type: event.target.value})
-    };
 
     handleLogin(){
         this.setState({isLoggedIn: true})
@@ -120,30 +120,15 @@ class UploadComponent extends Component {
                 { this.state.isLoggedIn
                 ?
                 <React.Fragment>
+                <PaddedPaper elevation={2}>
+                    <Typography gutterBottom variant="h6">Current upload status: {this.state.upload_status}</Typography>
+                    <Typography variant="body1" style={{color: "#f0983a"}}>{this.state.upload_status_details}</Typography>
+                </PaddedPaper>
                 <div>
-                    <h2>Current upload status: {this.state.upload_status}</h2>
-                    <p style={{color: "#f0983a"}}>{this.state.upload_status_details}</p>
+                    <UploadDialog handleUploadStatus={this.retrieveUploadStatus}/>
                     <Button variant="outlined" color="primary" onClick={this.handleLogout}>
                         Log out
                     </Button>
-                </div>
-                <div style={{ display: 'flex', alignItems: 'center' }}>
-                    <FormControl className={classes.formControl}>
-                        <Select
-                        value={this.state.upload_type}
-                        displayEmpty
-                        onChange={this.handleChange}
-                        >
-                            <MenuItem value="" disabled>
-                                Select annotation format
-                            </MenuItem>
-                            <MenuItem value="weedcoco">WeedCOCO</MenuItem>
-                            <MenuItem value="coco">COCO</MenuItem>
-                            <MenuItem value="voc">VOC</MenuItem>
-                            <MenuItem value="masks">Segmentation masks</MenuItem>
-                        </Select>
-                    </FormControl>
-                    <UploadDialog handleUploadStatus={this.retrieveUploadStatus} upload_type={this.state.upload_type}/>
                 </div>
                 </React.Fragment>
                 :

@@ -14,7 +14,7 @@ services:
       - elastic
     restart: always
     logging:
-      driver: none
+      driver: json-file
     volumes:
       # Static file service
       - thumbnails_dir:/media/thumbnails
@@ -54,7 +54,7 @@ services:
       - download_dir:/code/download
       - mystatic_dir:/code/mystatic
       - tus_dir:/code/tus_dir
-    command: bash -c "python manage.py makemigrations && python manage.py migrate && python manage.py collectstatic <<<yes && gunicorn core.wsgi -b 0.0.0.0:8000"
+    command: bash -c "python manage.py makemigrations && python manage.py migrate && python manage.py collectstatic <<<yes && gunicorn core.wsgi --access-logfile - -b 0.0.0.0:8000"
     entrypoint: /entrypoint.sh
     ports:
       - "8000:8000"
@@ -87,6 +87,7 @@ services:
       - repository_dir:/code/repository
       - upload_dir:/code/upload
       - download_dir:/code/download
+      - tus_dir:/code/tus_dir
       - ${GIT_REMOTE_PATH}:/mnt/git_remote
       - ${DVC_REMOTE_PATH}:/mnt/dvc_remote
     depends_on:
@@ -210,7 +211,7 @@ services:
     user: root
     image: fluent/fluentd:v1.11-debian
     volumes:
-      - /var/lib/docker/containers:/fluentd/log/containers
+      - /data/docker/containers:/fluentd/log/containers
       - ./fluent.conf:/fluentd/etc/fluent.conf
       - ${FLUENTD_LOGS_PATH:-/data/logs}:/output/
     logging:

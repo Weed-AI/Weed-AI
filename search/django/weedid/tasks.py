@@ -3,12 +3,15 @@ import json
 import traceback
 import datetime
 import subprocess
+import tempfile
+from shutil import copy
+from zipfile import ZipFile
 from celery import shared_task
 from weedcoco.repo.deposit import deposit, compress_to_download
 from weedcoco.index.indexing import ElasticSearchIndexer
 from weedcoco.index.thumbnailing import thumbnailing
 from weedid.models import Dataset
-from weedid.utils import make_upload_entity_fields
+from weedid.utils import make_upload_entity_fields, mkdir_safely
 from weedid.notification import upload_notification, review_notification
 from core.settings import (
     THUMBNAILS_DIR,
@@ -39,6 +42,7 @@ def submit_upload_task(weedcoco_path, image_dir, upload_id, new_upload=True):
     if new_upload:
         upload_entity.status = "P"
         upload_entity.status_details = ""
+        upload_entity.save()
         # Update fields in database
         # XXX: maybe this should be delayed
         with open(weedcoco_path) as f:
@@ -217,3 +221,19 @@ def backup_repository_changes(repository_dir=REPOSITORY_DIR, commit_message=None
         ],
         cwd=REPOSITORY_DIR,
     )
+
+
+@shared_task
+def store_tmp_image_from_zip(upload_id, upload_image_zip, image_dir, full_images):
+    if not os.path.isdir(image_dir):
+        mkdir_safely(image_dir)
+    existing_images = os.listdir(image_dir)
+    with tempfile.TemporaryDirectory() as tempdir:
+        ZipFile(upload_image_zip).extractall(tempdir)
+        for dir, _, filenames in os.walk(tempdir):
+            # FIXME: this should reject a zip upload if two filenames are identical
+            for filename in filenames:
+                if filename in full_images and filename not in existing_images:
+                    copy(os.path.join(dir, filename), os.path.join(image_dir, filename))
+    missing_images = list(set(os.listdir(image_dir)))
+    return {"upload_id": upload_id, "missing_images": missing_images}

@@ -64,14 +64,14 @@ export default function UploadDialog(props) {
 
   return (
     <React.Fragment>
-      <Button disabled={!props.upload_type} className={classes.uploadButton} variant="contained" onClick={handleClickOpen}>
+      <Button className={classes.uploadButton} variant="contained" onClick={handleClickOpen}>
         Begin upload
       </Button>
       <Dialog maxWidth='md' onClose={handleClose} aria-labelledby="upload-dialog-title" open={open} disableBackdropClick={true}>
         <DialogTitle id="upload-dialog-title" onClose={handleClose}>
         </DialogTitle>
         <DialogContent>
-            <UploadSteper handleClose={handleClose} upload_type={props.upload_type}/>
+            <UploadSteper handleClose={handleClose} />
         </DialogContent>
       </Dialog>
     </React.Fragment>
