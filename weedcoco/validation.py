@@ -25,6 +25,7 @@ MAIN_SCHEMAS = {
 FORMAT_CHECKER = FormatChecker()
 # TODO: change from temp path to config
 EPPO_CACHE_PATH = pathlib.Path(tempfile.gettempdir()) / "eppo-codes.zip"
+eppo = get_eppo_singleton(EPPO_CACHE_PATH)
 
 
 @FORMAT_CHECKER.checks("date")
@@ -45,7 +46,6 @@ def check_date_missing_parts_format(value):
 def check_plant_taxon_format(value):
     if not value.islower():
         return False
-    eppo = get_eppo_singleton(EPPO_CACHE_PATH)
     try:
         return eppo.lookup_preferred_name(value, species_only=False)
     except KeyError:
