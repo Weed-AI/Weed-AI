@@ -6,7 +6,7 @@ import pathlib
 import ocfl
 import uuid
 
-from deposit import Repository, RepositoryError
+from .deposit import Repository, RepositoryError
 
 logger = logging.getLogger(__name__)
 
