@@ -1,9 +1,9 @@
-import React from 'react';
 import {
-    ReactiveList,
+  ReactiveList
 } from '@appbaseio/reactivesearch';
-import ResultCard from './ResultCard';
+import React from 'react';
 import { Helmet } from "react-helmet";
+import ResultCard from './ResultCard';
 
 
 const OgThumbnail = ({ url }) => {

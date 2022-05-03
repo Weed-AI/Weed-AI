@@ -24,6 +24,9 @@ import IconButton from '@material-ui/core/IconButton';
 import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
 import { makeStyles } from "@material-ui/core/styles";
+import FormControl from '@material-ui/core/FormControl';
+import MenuItem from '@material-ui/core/MenuItem';
+import Select from '@material-ui/core/Select';
 import Cookies from 'js-cookie'
 import Markdown from "../../Common/Markdown";
 import {
@@ -275,10 +278,27 @@ const AgContextDetails = (props) => {
     );
 }
 
+const VersionsMenu = ( props ) => {
+  const { rootURL, upload_id, versions } = props;
+  return <FormControl>
+    <Select value="" displayEmpty onChange={e => downloadZip(rootURL, upload_id, e.target.value)}>
+      <MenuItem value="" disabled>Older versions</MenuItem>
+      { versions.map((v) => <MenuItem value={v}>Download v{v}</MenuItem>) }
+    </Select>
+  </FormControl>
+}
+
+
 const listToWords = l => l.map((x, i) => [i == 0 ? "" : i == l.length - 1 ? (i > 1 ? "," : "") + " and " : ", ", x]);
 
+const downloadZip = (rootURL, upload_id, version) => {
+  const v_ext = version ? `.v${version}` : "";
+  const uri = `${rootURL}/code/download/${upload_id}${v_ext}.zip`; 
+  window.open(uri);
+}
+
 export const DatasetSummary = (props) => {
-    const {metadata, agcontexts, classes, rootURL, upload_id} = props;
+    const {metadata, agcontexts, head_version, classes, rootURL, upload_id} = props;
     const linkedEntity = (ent) => {
       if (ent.sameAs)
         return (<a href={ent.sameAs}>{ent.name}</a>);
@@ -303,6 +323,8 @@ export const DatasetSummary = (props) => {
     const datasetUrl = "https://weed-ai.sydney.edu.au/datasets/" + upload_id;
     displayMeta["identifier"] = [...displayMeta.identifier || [], datasetUrl];
     const authorList = listToWords(displayMeta.creator.map((creator) => creator.name));
+    const head = parseInt(head_version);
+    const old_versions = isNaN(head) ? [] : [...Array(head - 1).keys()].map((i) => i + 1).reverse();
     return (
       <React.Fragment>
         <Helmet>
@@ -352,8 +374,9 @@ export const DatasetSummary = (props) => {
           </Grid>
           <Grid item xs={2}>
             <div className={classes.summary}>
-                <Button component="a" variant="contained" className={classes.download} startIcon={<DownloadIcon />} onClick={() => window.open(`${rootURL}/code/download/${upload_id}.zip`)}>Download in WeedCOCO format</Button>
-        <Button variant="outlined" startIcon={<PhotoIcon/>} href={"/explore?dataset_name_filter=%5B%22" + metadata.name + "%22%5D"}>Explore the Images</Button>
+            <Button component="a" variant="contained" className={classes.download} startIcon={<DownloadIcon />} onClick={() => downloadZip(rootURL, upload_id)}>Download in WeedCOCO format</Button>
+            { old_versions.length > 0 && <VersionsMenu rootURL={rootURL} upload_id={upload_id} versions={old_versions}></VersionsMenu> }
+            <Button variant="outlined" startIcon={<PhotoIcon/>} href={"/explore?dataset_name_filter=%5B%22" + metadata.name + "%22%5D"}>Explore the Images</Button>
             </div>
           </Grid>
         </Grid>
@@ -418,7 +441,7 @@ class DatasetSummaryPage extends Component {
     const esURL = new URL(window.location.origin)
     return (
       <div className={classes.root}>
-        <DatasetSummary metadata={this.state.metadata} agcontexts={this.state.agcontexts} classes={classes} rootURL={esURL} upload_id={this.props.upload_id} />
+        <DatasetSummary metadata={this.state.metadata} agcontexts={this.state.agcontexts} head_version={this.state.head_version} classes={classes} rootURL={esURL} upload_id={this.props.upload_id} />
       </div>
     );
   }

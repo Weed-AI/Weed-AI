@@ -1,36 +1,53 @@
-import pathlib
-import json
-import pytest
-import os
 import filecmp
+import json
+import os
+import pathlib
 import re
-import subprocess
 import shutil
-from weedcoco.repo.deposit import main
+import subprocess
+import zipfile
+
+import pytest
+from weedcoco.index.thumbnailing import thumbnailing
+from weedcoco.repo.deposit import main, mkdir_safely
 from weedcoco.validation import ValidationError
 
 TEST_DATA_DIR = pathlib.Path(__file__).parent / "deposit_data"
 TEST_DATA_SAMPLE_DIR = pathlib.Path(__file__).parent / "deposit_data_sample"
 TEST_BASIC_DIR_1 = TEST_DATA_DIR / "basic_1"
+TEST_BASIC_DIR_1V2 = TEST_DATA_DIR / "basic_1.v2"
 TEST_BASIC_DIR_2 = TEST_DATA_DIR / "basic_2"
 TEST_COMPLETE_DIR = TEST_DATA_DIR / "complete"
 TEST_DUPLICATE_DIR = TEST_DATA_DIR / "duplicate"
+
+TEST_NAME = "weed.ai"
+TEST_ADDRESS = "weed@weed.ai.org"
+TEST_MESSAGE = "Test commit"
 
 
 @pytest.fixture
 def executor(tmpdir):
     test_repo_dir = tmpdir / "test_repo"
     test_download_dir = tmpdir / "test_download"
+    test_extract_dir = tmpdir / "test_extract"
+    mkdir_safely(test_extract_dir)
+    mkdir_safely(test_download_dir)
 
     class Executor:
         def run(
             self,
+            identifier,
             weedcoco_path,
             image_dir,
             repository_dir=test_repo_dir,
             download_dir=test_download_dir,
+            name=TEST_NAME,
+            address=TEST_ADDRESS,
+            message=TEST_MESSAGE,
         ):
             args = [
+                "--identifier",
+                identifier,
                 "--weedcoco-path",
                 weedcoco_path,
                 "--image-dir",
@@ -39,16 +56,21 @@ def executor(tmpdir):
                 repository_dir,
                 "--download-dir",
                 download_dir,
+                "--name",
+                name,
+                "--address",
+                address,
+                "--message",
+                message,
             ]
             args = [str(arg) for arg in args]
-            main(args)
-            return test_repo_dir
+            repo, dataset = main(args)
+            return test_extract_dir, test_download_dir, repo, dataset
 
     return Executor()
 
 
 def assert_files_equal(dir1, dir2):
-
     dirs_cmp = filecmp.dircmp(dir1, dir2, ignore=[".DS_Store"])
     assert len(dirs_cmp.left_only) == 0
     assert len(dirs_cmp.right_only) == 0
@@ -76,19 +98,45 @@ def assert_weedcoco_equal(dir1, dir2):
             )
 
 
-def rewrite_outputs(actual_dir, expected_dir):
+def unpack_zip(zip_path, destination):
+    z = zipfile.ZipFile(zip_path)
+    z.extractall(str(destination))
+
+
+def rewrite_outputs(repo, expected_dir, versions=False):
+    """Copies the content in repo to the fixtures directory. Used to regenerate
+    content in deposit_data_sample.
+
+    repo - the ocfl repository
+    expected_dir - the directory within deposit_data_sample
+    versions - if true, extracts each version of the datasets into directories
+    with names like expected_dir/identifier.v1, expected_dir/identifier.v2 etc
+
+    Default behaviour is to just extract the head version
+    """
     shutil.rmtree(expected_dir)
-    shutil.copytree(actual_dir, expected_dir, symlinks=True)
+    mkdir_safely(expected_dir)
+    for dataset in repo.datasets():
+        identifier = dataset.identifier
+        if versions:
+            head = int(dataset.head_version[1:])
+            for version_number in range(1, head + 1):
+                d = str(expected_dir / pathlib.Path(identifier)) + f".v{version_number}"
+                dataset.extract(d, f"v{version_number}")
+        else:
+            dataset.extract(str(expected_dir / pathlib.Path(identifier)))
 
 
 def test_basic(executor, rewrite_deposit_truth):
-    test_repo_dir = executor.run(
-        TEST_BASIC_DIR_1 / "weedcoco.json", TEST_BASIC_DIR_1 / "images"
+    test_extract_dir, _, repo, dataset = executor.run(
+        "dataset_1", TEST_BASIC_DIR_1 / "weedcoco.json", TEST_BASIC_DIR_1 / "images"
     )
+
     if rewrite_deposit_truth:
-        rewrite_outputs(test_repo_dir, TEST_DATA_SAMPLE_DIR / "basic")
-    assert_files_equal(test_repo_dir, TEST_DATA_SAMPLE_DIR / "basic")
-    assert_weedcoco_equal(test_repo_dir, TEST_DATA_SAMPLE_DIR / "basic")
+        rewrite_outputs(repo, TEST_DATA_SAMPLE_DIR / "basic")
+    dataset.extract(str(test_extract_dir / pathlib.Path("dataset_1")))
+    assert_files_equal(test_extract_dir, TEST_DATA_SAMPLE_DIR / "basic")
+    assert_weedcoco_equal(test_extract_dir, TEST_DATA_SAMPLE_DIR / "basic")
 
 
 def test_duplicate_images(executor):
@@ -97,24 +145,94 @@ def test_duplicate_images(executor):
         match="There are identical images in the image directory. Identical image sets are: 001_image.png <-> 002_image.png",
     ):
         executor.run(
-            TEST_DUPLICATE_DIR / "weedcoco.json", TEST_DUPLICATE_DIR / "images"
+            "dataset1",
+            TEST_DUPLICATE_DIR / "weedcoco.json",
+            TEST_DUPLICATE_DIR / "images",
         )
 
 
 def test_existing_images(executor):
     with pytest.raises(
-        ValidationError, match="There are identical images in the repository."
+        ValidationError,
+        match="There are identical images in the repository. Existing image hash names are: dataset2/001_image.png <-> dataset1/5f1218b0e469003cc0a1-986e5d71ce7562a90ff91581a9f2617d",
     ):
-        executor.run(TEST_BASIC_DIR_1 / "weedcoco.json", TEST_BASIC_DIR_1 / "images")
-        executor.run(TEST_BASIC_DIR_1 / "weedcoco.json", TEST_BASIC_DIR_1 / "images")
+        executor.run(
+            "dataset1", TEST_BASIC_DIR_1 / "weedcoco.json", TEST_BASIC_DIR_1 / "images"
+        )
+        executor.run(
+            "dataset2", TEST_BASIC_DIR_1 / "weedcoco.json", TEST_BASIC_DIR_1 / "images"
+        )
+
+
+def test_existing_no_self_match(executor):
+    executor.run(
+        "dataset1", TEST_BASIC_DIR_1 / "weedcoco.json", TEST_BASIC_DIR_1 / "images"
+    )
+    executor.run(
+        "dataset1", TEST_BASIC_DIR_1 / "weedcoco.json", TEST_BASIC_DIR_1 / "images"
+    )
 
 
 def test_multiple_datasets(executor, rewrite_deposit_truth):
-    executor.run(TEST_BASIC_DIR_1 / "weedcoco.json", TEST_BASIC_DIR_1 / "images")
-    test_repo_dir = executor.run(
-        TEST_BASIC_DIR_2 / "weedcoco.json", TEST_BASIC_DIR_2 / "images"
+    test_extract_dir, _, repo, dataset1 = executor.run(
+        "dataset_1", TEST_BASIC_DIR_1 / "weedcoco.json", TEST_BASIC_DIR_1 / "images"
+    )
+    _, _, _, dataset2 = executor.run(
+        "dataset_2", TEST_BASIC_DIR_2 / "weedcoco.json", TEST_BASIC_DIR_2 / "images"
     )
     if rewrite_deposit_truth:
-        rewrite_outputs(test_repo_dir, TEST_DATA_SAMPLE_DIR / "multiple")
-    assert_files_equal(test_repo_dir, TEST_DATA_SAMPLE_DIR / "multiple")
-    assert_weedcoco_equal(test_repo_dir, TEST_DATA_SAMPLE_DIR / "multiple")
+        rewrite_outputs(repo, TEST_DATA_SAMPLE_DIR / "multiple")
+    dataset1.extract(str(test_extract_dir / pathlib.Path("dataset_1")))
+    dataset2.extract(str(test_extract_dir / pathlib.Path("dataset_2")))
+    assert_files_equal(test_extract_dir, TEST_DATA_SAMPLE_DIR / "multiple")
+    assert_weedcoco_equal(test_extract_dir, TEST_DATA_SAMPLE_DIR / "multiple")
+
+
+def test_versioned_datasets(executor, rewrite_deposit_truth):
+    test_extract_dir, test_download_dir, repo, _ = executor.run(
+        "dataset_1", TEST_BASIC_DIR_1 / "weedcoco.json", TEST_BASIC_DIR_1 / "images"
+    )
+    test_extract_dir, _, repo, _ = executor.run(
+        "dataset_1", TEST_BASIC_DIR_1V2 / "weedcoco.json", TEST_BASIC_DIR_1V2 / "images"
+    )
+    dataset = repo.dataset("dataset_1")
+    assert dataset.head_version == "v2"
+    if rewrite_deposit_truth:
+        rewrite_outputs(repo, TEST_DATA_SAMPLE_DIR / "versions", True)
+    dataset.extract(str(test_extract_dir / "dataset_1.v1"), "v1")
+    dataset.extract(str(test_extract_dir / "dataset_1.v2"), "v2")
+    assert_files_equal(test_extract_dir, TEST_DATA_SAMPLE_DIR / "versions")
+    assert_weedcoco_equal(test_extract_dir, TEST_DATA_SAMPLE_DIR / "versions")
+    mkdir_safely(str(test_extract_dir / "zipfiles"))
+    unpack_zip(
+        test_download_dir / "dataset_1.v1.zip",
+        test_extract_dir / "zipfiles" / "dataset_1.v1",
+    )
+    unpack_zip(
+        test_download_dir / "dataset_1.zip",
+        test_extract_dir / "zipfiles" / "dataset_1.v2",
+    )
+    assert_files_equal(test_extract_dir / "zipfiles", TEST_DATA_SAMPLE_DIR / "versions")
+    assert_weedcoco_equal(
+        test_extract_dir / "zipfiles", TEST_DATA_SAMPLE_DIR / "versions"
+    )
+
+
+def test_thumbnails(executor):
+    test_extract_dir, _, repo, dataset1 = executor.run(
+        "dataset_1", TEST_BASIC_DIR_1 / "weedcoco.json", TEST_BASIC_DIR_1 / "images"
+    )
+    # temp dirs are LocalPaths, cast to Path so we can use is_file
+    test_extract_dir = pathlib.Path(test_extract_dir)
+    # make thumbnails in the extract dir
+    thumbnailing(test_extract_dir, repo.root, "dataset_1")
+    images = [
+        path.split("/")[1]
+        for path in dataset1.get_logical_paths()
+        if path.split("/")[0] == "images"
+    ]
+    for image in images:
+        thumbnail = test_extract_dir / image[:2] / image
+        bbox = test_extract_dir / ("bbox-" + image[:2]) / image
+        assert thumbnail.is_file()
+        assert bbox.is_file()
