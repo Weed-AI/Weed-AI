@@ -76,6 +76,16 @@ def migrate_dir(repository, src, metadata):
             print(f"Skipping non-uuid path {identifier}")
 
 
+def ensure_ocfl(repository_str):
+    """Initialises an OCFL repo in repository_str if it doesn't already
+    exist, and returns the Repository object"""
+    repository_dir = pathlib.Path(repository_str)
+    repository = Repository(repository_dir)
+    if not repository_dir.is_dir():
+        repository.initialize()
+    return repository
+
+
 def main(args=None):
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--repository-dir", required=True, type=pathlib.Path)
