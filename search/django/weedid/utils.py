@@ -18,7 +18,7 @@ from core.settings import (
 from django.core.files.storage import FileSystemStorage
 from weedcoco.repo.deposit import Repository, mkdir_safely
 from weedcoco.stats import WeedCOCOStats
-from weedcoco.utils import set_info, set_licenses, copy_without_exif
+from weedcoco.utils import copy_without_exif, set_info, set_licenses
 from weedcoco.validation import validate
 
 from weedid.models import Dataset, WeedidUser
