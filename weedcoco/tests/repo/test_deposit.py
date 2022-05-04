@@ -189,7 +189,6 @@ def test_basic(executor, rewrite_deposit_truth):
     test_extract_dir, _, repo, dataset = executor.run(
         "dataset_1", TEST_BASIC_DIR_1 / "weedcoco.json", TEST_BASIC_DIR_1 / "images"
     )
-
     if rewrite_deposit_truth:
         rewrite_outputs(repo, TEST_DATA_SAMPLE_DIR / "basic")
     dataset.extract(str(test_extract_dir / pathlib.Path("dataset_1")))
@@ -238,8 +237,6 @@ def test_multiple_datasets(executor, rewrite_deposit_truth):
     _, _, _, dataset2 = executor.run(
         "dataset_2", TEST_BASIC_DIR_2 / "weedcoco.json", TEST_BASIC_DIR_2 / "images"
     )
-    dataset = repo.dataset("dataset_1")
-    assert dataset.head_version == "v2"
     if rewrite_deposit_truth:
         rewrite_outputs(repo, TEST_DATA_SAMPLE_DIR / "multiple")
     dataset1.extract(str(test_extract_dir / pathlib.Path("dataset_1")))
