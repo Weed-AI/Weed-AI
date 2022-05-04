@@ -6,13 +6,12 @@ import os
 import pathlib
 import tempfile
 from collections import defaultdict
-from shutil import copy, rmtree, move
+from shutil import copy, move, rmtree
 from uuid import uuid4
 from zipfile import ZipFile
 
 import ocfl
 import redis
-from PIL import Image
 from weedcoco.utils import check_if_approved_image_extension, get_image_hash
 from weedcoco.validation import ValidationError, validate
 
@@ -30,6 +29,12 @@ def mkdir_safely(local_dir):
 
 def get_hashset_from_image_name(image_hash):
     return {os.path.splitext(image_name)[0] for image_name in image_hash.values()}
+
+
+def retrieve_image_paths(image_dir):
+    for root, _, files in os.walk(image_dir):
+        for filename in files:
+            yield (os.path.join(root, filename), filename)
 
 
 class RepositoryError(Exception):
@@ -198,17 +203,10 @@ class RepositoryDataset:
         for image_name_origin in os.listdir(self.image_dir):
             if check_if_approved_image_extension(image_name_origin):
                 if image_name_origin in self.image_hash:  # FIXME
-                    logger.info(
-                        f"Renaming original image {image_name_origin} -> {self.image_hash[image_name_origin]}"
-                    )
                     image_path = new_image_dir / self.image_hash[image_name_origin]
                     if not os.path.isfile(image_path):
-                        image_origin = Image.open(self.image_dir / image_name_origin)
-                        image_without_exif = Image.new(
-                            image_origin.mode, image_origin.size
-                        )
-                        image_without_exif.putdata(image_origin.getdata())
-                        image_without_exif.save(image_path)
+                        image_orig = self.image_dir / image_name_origin
+                        copy(image_orig, image_path)
 
     def validate_duplicate_images(self):
         if len(get_hashset_from_image_name(self.image_hash)) != len(self.image_hash):
@@ -230,14 +228,33 @@ class RepositoryDataset:
     def validate_existing_images(self):
         addition_hash = get_hashset_from_image_name(self.image_hash)
         all_existing_hash = self.get_all_existing_hash(self.repo)
-        if len(all_existing_hash.union(addition_hash)) != len(all_existing_hash) + len(
-            addition_hash
-        ):
-            raise ValidationError("There are identical images in the repository.")
+        reverse_mapping = {
+            value.split(".")[0]: key for key, value in self.image_hash.items()
+        }
+        for hash_name in addition_hash:
+            if (
+                hash_name in all_existing_hash
+                and all_existing_hash[hash_name] != self.identifier
+            ):
+                raise ValidationError(
+                    "There are identical images in the repository. Existing image hash names are: "
+                    + "; ".join(
+                        [
+                            " <-> ".join(
+                                [
+                                    f"{self.identifier}/{reverse_mapping[existing_hash]}",
+                                    f"{all_existing_hash[existing_hash]}/{existing_hash}",
+                                ]
+                            )
+                            for existing_hash in addition_hash
+                            & set(all_existing_hash.keys())
+                        ]
+                    )
+                )
 
     def get_all_existing_hash(self, repository):
         return {
-            os.path.splitext(path.split("/")[-1])[0]
+            os.path.splitext(path.split("/")[-1])[0]: dataset.identifier
             for dataset in repository.datasets()
             if dataset.identifier != self.identifier
             for path in dataset.get_logical_paths()
@@ -282,18 +299,58 @@ class RepositoryDataset:
         for image_name, image_hash in self.image_hash.items():
             redis_client.set("/".join([self.identifier, image_hash]), image_name)
 
-    def retrieve_image_paths(self):
-        for root, _, files in os.walk(self.image_dir):
-            for filename in files:
-                yield (os.path.join(root, filename), filename)
+    def extract_original_images(self, dest_dir, redis_mapping_url="", version="head"):
+        """
+        Checks out a version of a dataset from the ocfl repository and then
+        tries to remap the image filenames to their originals, also updating the
+        weedcoco. If the images have no redis mappings, leaves them unchanged.
+        """
+        redis_client = (
+            redis.Redis.from_url(url=redis_mapping_url) if redis_mapping_url else None
+        )
+        if not self.exists_in_repo:
+            raise RepositoryError("dataset not found")
+        if os.path.isdir(dest_dir):
+            rmtree(dest_dir)
+        self.extract(dest_dir, version)
+        if redis_client:
+            weedcoco_path = os.path.join(dest_dir, "weedcoco.json")
+            with open(weedcoco_path, "r") as jsonFile:
+                weedcoco_json = json.load(jsonFile)
+            images_path = os.path.join(dest_dir, "images")
+            images_set = set(os.listdir(images_path))
+            for hash_image in images_set:
+                redis_key = "/".join([self.identifier, hash_image])
+                original_image = redis_client.get(
+                    "/".join([self.identifier, hash_image])
+                )
+                if original_image:
+                    move(
+                        os.path.join(images_path, hash_image),
+                        os.path.join(images_path, original_image.decode("ascii")),
+                    )
+                else:
+                    logger.warning(f"No match found for {redis_key}")
+            for image in weedcoco_json["images"]:
+                hash_name = image["file_name"].split("/")[-1]
+                original_image = redis_client.get(
+                    "/".join([self.identifier, hash_name])
+                )
+                if hash_name in images_set and original_image:
+                    image["file_name"] = original_image.decode("ascii")
+            with open(weedcoco_path, "w") as jsonFile:
+                jsonFile.write(json.dumps(weedcoco_json, indent=4))
 
-    def make_zipfile(self, download_dir, version="head"):
+    def make_zipfile(self, download_dir, redis_url=None, version="head"):
         zip_file = (download_dir / self.identifier).with_suffix(".zip")
         with tempfile.TemporaryDirectory() as tmpdir:
             tmp_zip = pathlib.Path(tmpdir) / "bundle.zip"
+            tmp_dest = pathlib.Path(tmpdir) / self.identifier
+            self.extract_original_images(tmp_dest, redis_url)
             with ZipFile(tmp_zip, "w") as zip:
-                for lpath in self.get_logical_paths(version):
-                    zip.write(self.resolve_path(lpath), lpath)
+                zip.write(tmp_dest / "weedcoco.json", "weedcoco.json")
+                for image, image_name in retrieve_image_paths(tmp_dest / "images"):
+                    zip.write(image, "images/" + image_name)
             # XXX: this should be move() not copy(), but move resulted in files
             #      that we could not delete or move in the Docker volume.
             # copy(tmp_zip_path, download_path)
@@ -349,7 +406,7 @@ class Repository:
         os.mkdir(dataset_dir)
         return dataset_dir
 
-    def deposit(self, identifier, dataset, metadata, download_dir):
+    def deposit(self, identifier, dataset, metadata, download_dir, redis_url=None):
         """Validate and deposit a RepositoryDataset in the Repository.  Creates a new
         dataset for identifier if it does not already exist.
         --------
@@ -383,7 +440,6 @@ class Repository:
             try:
                 if dataset.exists_in_repo:
                     dataset.update(dataset_dir, ocfl_metadata)
-                    logger.warning(f"copying {head_zipfile} to {last_zipfile}")
                     copy(head_zipfile, last_zipfile)
                 else:
                     new_object_dir = temp_dir / pathlib.Path(identifier + "_ocfl")
@@ -394,7 +450,7 @@ class Repository:
                         metadata=ocfl_metadata,
                     )
                     self.ocfl.add(object_path=str(new_object_dir))
-                dataset.make_zipfile(download_dir)
+                dataset.make_zipfile(download_dir, redis_url)
             except Exception:
                 dataset.rollback(dataset_dir, last_version)
                 if head_zipfile.is_file():
@@ -418,9 +474,9 @@ def deposit(
     repository.initialize()
     dataset = repository.dataset(upload_id)
     dataset.set_sources(weedcoco_path, image_dir)
-    repository.deposit(upload_id, dataset, metadata, download_dir)
     if redis_url:
         dataset.store_image_hash_mapping(redis_url)
+    repository.deposit(upload_id, dataset, metadata, download_dir, redis_url)
     return repository, dataset
 
 

@@ -1,14 +1,15 @@
-import pathlib
-import json
-import pytest
-import os
 import filecmp
+import json
+import os
+import pathlib
 import re
-import subprocess
 import shutil
+import subprocess
 import zipfile
-from weedcoco.repo.deposit import main, mkdir_safely
+
+import pytest
 from weedcoco.index.thumbnailing import thumbnailing
+from weedcoco.repo.deposit import main, mkdir_safely
 from weedcoco.validation import ValidationError
 
 TEST_DATA_DIR = pathlib.Path(__file__).parent / "deposit_data"
@@ -18,6 +19,14 @@ TEST_BASIC_DIR_1V2 = TEST_DATA_DIR / "basic_1.v2"
 TEST_BASIC_DIR_2 = TEST_DATA_DIR / "basic_2"
 TEST_COMPLETE_DIR = TEST_DATA_DIR / "complete"
 TEST_DUPLICATE_DIR = TEST_DATA_DIR / "duplicate"
+TEST_UPDATES_DIR = TEST_DATA_DIR / "updates"
+TEST_UPDATES_DIR_1 = TEST_UPDATES_DIR / "v1"
+TEST_UPDATES_DIR_2 = TEST_UPDATES_DIR / "v2"
+TEST_UPDATES_MERGED = TEST_UPDATES_DIR / "merged"
+
+TEST_NAME = "weed.ai"
+TEST_ADDRESS = "weed@weed.ai.org"
+TEST_MESSAGE = "Test commit"
 
 TEST_NAME = "weed.ai"
 TEST_ADDRESS = "weed@weed.ai.org"
@@ -97,6 +106,23 @@ def assert_weedcoco_equal(dir1, dir2):
             )
 
 
+def assert_mapped_files_equal(hash_map_file, dir1, dir2):
+    with open(hash_map_file, "r") as fh:
+        hash_map = json.load(fh)
+    for orig, hashed in hash_map.items():
+        assert filecmp.cmp(dir1 / orig, dir2 / hashed, shallow=False)
+
+
+def unhash_images(hash_map_file, images_dir):
+    """Used to build dataset versions with original filenames, using a JSON
+    file with the hash mapping"""
+    with open(hash_map_file, "r") as fh:
+        hash_map = json.load(fh)
+    for orig, hashed in hash_map.items():
+        if pathlib.Path(images_dir / hashed).is_file():
+            shutil.move(images_dir / hashed, images_dir / orig)
+
+
 def unpack_zip(zip_path, destination):
     z = zipfile.ZipFile(zip_path)
     z.extractall(str(destination))
@@ -126,11 +152,43 @@ def rewrite_outputs(repo, expected_dir, versions=False):
             dataset.extract(str(expected_dir / pathlib.Path(identifier)))
 
 
+def rewrite_hash_maps(versions):
+    """Uses before- and after- weedcoco.json to write a fixture to replace
+    the redis image mapping"""
+    for version in versions:
+        weedcoco_orig_file = TEST_UPDATES_DIR / version / "weedcoco.json"
+        with open(weedcoco_orig_file, "r") as fh:
+            weedcoco_orig = json.load(fh)
+        weedcoco_hash_file = (
+            TEST_DATA_SAMPLE_DIR / "updates" / ("dataset." + version) / "weedcoco.json"
+        )
+        with open(weedcoco_hash_file, "r") as fh:
+            weedcoco_hash = json.load(fh)
+        hash_images = weedcoco_hash["images"]
+        hash_map = {}
+        for image in weedcoco_orig["images"]:
+            orig_file = pathlib.Path(image["file_name"]).name
+            new_images = [i for i in hash_images if i["id"] == image["id"]]
+            assert len(new_images) == 1
+            hash_map[orig_file] = pathlib.Path(new_images[0]["file_name"]).name
+        hash_map_file = (
+            TEST_DATA_SAMPLE_DIR / "hash_maps" / ("hash_map_" + version + ".json")
+        )
+        with open(hash_map_file, "w") as fh:
+            fh.write(json.dumps(hash_map, indent=4))
+
+
+def rewrite_unhashed(dataset, version, hash_map, dest_dir):
+    if dest_dir.is_dir():
+        shutil.rmtree(dest_dir)
+    dataset.extract(dest_dir, version)
+    unhash_images(hash_map, dest_dir / "images")
+
+
 def test_basic(executor, rewrite_deposit_truth):
     test_extract_dir, _, repo, dataset = executor.run(
         "dataset_1", TEST_BASIC_DIR_1 / "weedcoco.json", TEST_BASIC_DIR_1 / "images"
     )
-
     if rewrite_deposit_truth:
         rewrite_outputs(repo, TEST_DATA_SAMPLE_DIR / "basic")
     dataset.extract(str(test_extract_dir / pathlib.Path("dataset_1")))
@@ -152,7 +210,8 @@ def test_duplicate_images(executor):
 
 def test_existing_images(executor):
     with pytest.raises(
-        ValidationError, match="There are identical images in the repository."
+        ValidationError,
+        match="There are identical images in the repository. Existing image hash names are: dataset2/001_image.png <-> dataset1/5f1218b0e469003cc0a1-986e5d71ce7562a90ff91581a9f2617d",
     ):
         executor.run(
             "dataset1", TEST_BASIC_DIR_1 / "weedcoco.json", TEST_BASIC_DIR_1 / "images"
@@ -213,6 +272,60 @@ def test_versioned_datasets(executor, rewrite_deposit_truth):
     assert_files_equal(test_extract_dir / "zipfiles", TEST_DATA_SAMPLE_DIR / "versions")
     assert_weedcoco_equal(
         test_extract_dir / "zipfiles", TEST_DATA_SAMPLE_DIR / "versions"
+    )
+
+
+def test_round_trip_identical(executor):
+    test_extract_dir, test_download_dir, repo, _ = executor.run(
+        "dataset", TEST_UPDATES_DIR_1 / "weedcoco.json", TEST_UPDATES_DIR_1 / "images"
+    )
+    dataset = repo.dataset("dataset")
+    assert dataset.head_version == "v1"
+    dataset.extract(str(test_extract_dir / "dataset"), "v1")
+    assert_mapped_files_equal(
+        TEST_DATA_SAMPLE_DIR / "hash_maps" / "hash_map_v1.json",
+        TEST_UPDATES_DIR_1 / "images",
+        test_extract_dir / "dataset" / "images",
+    )
+
+
+def test_ocfl_deduplication(executor, rewrite_deposit_truth):
+    """Check in v1, then extract it and add one more image and a different
+    weedcoco.json, check that in as v2, and make sure that the resulting ocfl
+    is deduplicated"""
+    test_extract_dir, test_download_dir, repo, _ = executor.run(
+        "dataset", TEST_UPDATES_DIR_1 / "weedcoco.json", TEST_UPDATES_DIR_1 / "images"
+    )
+    dataset = repo.dataset("dataset")
+    assert dataset.head_version == "v1"
+    dataset.extract(str(test_extract_dir / "dataset"))
+    images_dir = test_extract_dir / "dataset" / "images"
+    unhash_images(TEST_DATA_SAMPLE_DIR / "hash_maps" / "hash_map_v1.json", images_dir)
+    shutil.copy(
+        TEST_UPDATES_DIR_2 / "weedcoco.json",
+        test_extract_dir / "dataset" / "weedcoco.json",
+    )
+    shutil.copy(
+        TEST_UPDATES_DIR_2 / "images" / "image-5.jpg",
+        test_extract_dir / "dataset" / "images" / "image-5.jpg",
+    )
+    _, _, _, _ = executor.run(
+        "dataset",
+        test_extract_dir / "dataset" / "weedcoco.json",
+        test_extract_dir / "dataset" / "images",
+    )
+    dataset2 = repo.dataset("dataset")
+    assert dataset2.head_version == "v2"
+    if rewrite_deposit_truth:
+        rewrite_outputs(repo, TEST_DATA_SAMPLE_DIR / "updates", True)
+        rewrite_hash_maps(["v1", "v2"])
+        hash_map_v2 = TEST_DATA_SAMPLE_DIR / "hash_maps" / "hash_map_v2.json"
+        rewrite_unhashed(dataset, "v2", hash_map_v2, TEST_DATA_SAMPLE_DIR / "merged")
+    dataset.extract(str(test_extract_dir / "dataset.v2"))
+    assert_mapped_files_equal(
+        TEST_DATA_SAMPLE_DIR / "hash_maps" / "hash_map_v2.json",
+        TEST_DATA_SAMPLE_DIR / "merged" / "images",
+        test_extract_dir / "dataset.v2" / "images",
     )
 
 

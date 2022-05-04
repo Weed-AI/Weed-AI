@@ -1,14 +1,15 @@
 import argparse
-import os
 import json
+import os
 import pathlib
+
 from PIL import Image, ImageDraw
+from weedcoco.repo.deposit import Repository
 from weedcoco.utils import (
-    check_if_approved_image_format,
     check_if_approved_image_extension,
+    check_if_approved_image_format,
     denormalise_weedcoco,
 )
-from weedcoco.repo.deposit import Repository
 
 
 def _ensure_dir(path):
@@ -16,8 +17,7 @@ def _ensure_dir(path):
         os.mkdir(os.path.dirname(str(path)))
 
 
-def thumbnail_one(coco_image, image_path, thumbnails_dir, thumbnail_size):
-    filename = os.path.basename(image_path)
+def thumbnail_one(coco_image, filename, image_path, thumbnails_dir, thumbnail_size):
     thumb_path = thumbnails_dir / filename[:2] / filename
     bbox_path = thumbnails_dir / ("bbox-" + filename[:2]) / filename
 
@@ -36,23 +36,24 @@ def thumbnail_one(coco_image, image_path, thumbnails_dir, thumbnail_size):
 
     # This does seem to be leaving a file behind so the error is coming from somewhere else.
 
-    for annotation in coco_image["annotations"]:
-        if "bbox" not in annotation:
-            continue
-        bx, by, bw, bh = annotation["bbox"]
-        bx = bx / orig_width * thumb_width
-        bw = bw / orig_width * thumb_width
-        by = by / orig_height * thumb_height
-        bh = bh / orig_height * thumb_height
-        if annotation["category"]["name"].startswith("weed"):
-            color = "#dc3545"
-        elif annotation["category"]["name"].startswith("crop"):
-            color = "#28a745"
-        else:
-            color = "#cccccc"
+    if "annotations" in coco_image:
+        for annotation in coco_image["annotations"]:
+            if "bbox" not in annotation:
+                continue
+            bx, by, bw, bh = annotation["bbox"]
+            bx = bx / orig_width * thumb_width
+            bw = bw / orig_width * thumb_width
+            by = by / orig_height * thumb_height
+            bh = bh / orig_height * thumb_height
+            if annotation["category"]["name"].startswith("weed"):
+                color = "#dc3545"
+            elif annotation["category"]["name"].startswith("crop"):
+                color = "#28a745"
+            else:
+                color = "#cccccc"
 
-        draw = ImageDraw.Draw(image)
-        draw.rectangle([bx, by, bx + bw, by + bh], outline=color, width=2)
+            draw = ImageDraw.Draw(image)
+            draw.rectangle([bx, by, bx + bw, by + bh], outline=color, width=2)
 
     _ensure_dir(bbox_path)
     image.save(str(bbox_path))
@@ -77,6 +78,7 @@ def thumbnailing(thumbnails_dir, repository_dir, upload_id, THUMBNAIL_SIZE=(300,
                 content_path = dataset.resolve_path(path)
                 thumbnail_one(
                     coco_by_filename[filename],
+                    filename,
                     str(content_path),
                     thumbnails_dir,
                     thumbnail_size=THUMBNAIL_SIZE,

@@ -16,6 +16,8 @@ jobs:
         python-version: [3.7]
     steps:
       - uses: actions/checkout@v2
+        with:
+          submodules: recursive
 #      - uses: satackey/action-docker-layer-caching@v0.0.11
 #        continue-on-error: true
       - name: Bring system up
@@ -32,8 +34,10 @@ jobs:
             POSTGRES_DB=weedai
             WEEDCOCO_VERSION=$MERGE_SHA
             SEND_EMAIL=False
+            CVAT_BASEPATH='/cvat-annotation'
             GIT_REMOTE_PATH=/tmp/git_remote
             DVC_REMOTE_PATH=/tmp/dvc_remote
+            HTTPS_HOST=localhost
             HERE
             cat .env
             # TODO The following could be a separate GitHub action
@@ -60,6 +64,8 @@ jobs:
         uses: cypress-io/github-action@v2
         with:
           working-directory: search
+        env:
+          ELECTRON_ENABLE_LOGGING: 1
       - uses: actions/upload-artifact@v2
         if: failure()
         with:

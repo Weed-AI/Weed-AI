@@ -1,11 +1,15 @@
 import json
+import logging
 import os
 import shutil
 import traceback
 from pathlib import Path
+from zipfile import ZipFile
 
 import requests
 from core.settings import (
+    CVAT_DATA_DIR,
+    IMAGE_HASH_MAPPING_URL,
     MAX_IMAGE_SIZE,
     MAX_VOC_SIZE,
     REPOSITORY_DIR,
@@ -13,6 +17,7 @@ from core.settings import (
     TUS_DESTINATION_DIR,
     UPLOAD_DIR,
 )
+
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required
@@ -30,14 +35,18 @@ from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_http_methods
 from weedcoco.importers.mask import generate_paths_from_mask_only, masks_to_coco
 from weedcoco.importers.voc import voc_to_coco
-from weedcoco.repo.deposit import Repository
+from weedcoco.repo.deposit import Repository, mkdir_safely
 from weedcoco.utils import fix_compatibility_quirks
 from weedcoco.validation import JsonValidationError, validate, validate_json
 
 from weedid.decorators import check_post_and_authenticated
 from weedid.models import Dataset, WeedidUser
 from weedid.notification import review_notification
-from weedid.tasks import submit_upload_task, update_index_and_thumbnails
+from weedid.tasks import (
+    submit_upload_task,
+    update_index_and_thumbnails,
+    store_tmp_image_from_zip,
+)
 from weedid.utils import (
     add_agcontexts,
     add_metadata,
@@ -50,12 +59,13 @@ from weedid.utils import (
     set_categories,
     setup_upload_dir,
     store_tmp_image,
-    store_tmp_image_from_zip,
     store_tmp_voc,
     store_tmp_weedcoco,
     upload_helper,
     validate_email_format,
 )
+
+logger = logging.getLogger(__name__)
 
 
 @ensure_csrf_cookie
@@ -120,6 +130,35 @@ def upload(request):
     else:
         return HttpResponse(
             json.dumps(
+                {"upload_id": upload_id, "images": images, "categories": categories}
+            )
+        )
+
+
+def retrieve_cvat_task(request, upload_id, task_id):
+    user = request.user
+    if not (user and user.is_authenticated):
+        return HttpResponseForbidden("You dont have access to proceed")
+    try:
+        with ZipFile(
+            os.path.join(
+                CVAT_DATA_DIR, "tasks", task_id, "export_cache/annotations_coco-10.ZIP"
+            )
+        ) as cvat_zip:
+            with cvat_zip.open("annotations/instances_default.json") as cvat_task_coco:
+                coco_json = json.load(cvat_task_coco)
+                upload_id, images, categories = upload_helper(
+                    coco_json, user.id, upload_id=upload_id
+                )
+    except JsonValidationError as e:
+        traceback.print_exc()
+        return json_validation_response(e)
+    except Exception as e:
+        traceback.print_exc()
+        return HttpResponseBadRequest(str(e))
+    else:
+        return HttpResponse(
+            json.dumps(
                 {
                     "upload_id": upload_id,
                     "images": images,
@@ -136,14 +175,12 @@ def editing_init(request, dataset_id):
     upload_entity = Dataset.objects.get(upload_id=dataset_id, status="C")
     if upload_entity.user.id != user.id:
         return HttpResponseForbidden("You dont have access to edit")
+    upload_path = os.path.join(UPLOAD_DIR, str(user.id), dataset_id)
     repository = Repository(REPOSITORY_DIR)
     dataset = repository.dataset(dataset_id)
-    if not dataset.exists_in_repo:
-        return HttpResponseServerError("dataset not found")
-    upload_path = os.path.join(UPLOAD_DIR, str(user.id), dataset_id)
-    if os.path.isdir(upload_path):
-        shutil.rmtree(upload_path)
-    dataset.extract(upload_path)
+    dataset.extract_original_images(
+        upload_path, redis_mapping_url=IMAGE_HASH_MAPPING_URL
+    )
 
     with open(os.path.join(upload_path, "weedcoco.json")) as f:
         weedcoco_json = json.load(f)
@@ -320,13 +357,15 @@ def unpack_image_zip(request):
     images = request.POST["images"].split(",")
     zipfile = os.path.join(TUS_DESTINATION_DIR, upload_image_zip)
     upload_dir = os.path.join(UPLOAD_DIR, str(user.id), upload_id, "images")
-    try:
-        missing_images = store_tmp_image_from_zip(zipfile, upload_dir, images)
-    except Exception as e:
-        return HttpResponseBadRequest(str(e))
-    return HttpResponse(
-        json.dumps({"upload_id": upload_id, "missing_images": missing_images})
-    )
+    celery_task = store_tmp_image_from_zip.delay(upload_id, zipfile, upload_dir, images)
+    return HttpResponse(json.dumps({"task_id": celery_task.id}))
+
+
+def check_image_zip(request, task_id):
+    result = store_tmp_image_from_zip.AsyncResult(task_id)
+    if not result.ready():
+        return HttpResponse("wait", status_code=202)
+    return HttpResponse(json.dumps(result.get(propagate=True)))
 
 
 @login_required
@@ -406,6 +445,44 @@ def upload_metadata(request):
 
 @login_required
 @require_http_methods(["POST"])
+def copy_cvat(request):
+    """Copy the images for a CVAT task from the CVAT volume to the upload dir"""
+    user = request.user
+    upload_id = request.POST["upload_id"]
+    cvat_task_id = request.POST["task_id"]
+    upload_dir = os.path.join(UPLOAD_DIR, str(user.id), str(upload_id))
+    if not os.path.isdir(upload_dir):
+        return HttpResponseServerError(f"upload directory {upload_id} not found")
+    image_dir = os.path.join(upload_dir, "images")
+    if not os.path.isdir(image_dir):
+        mkdir_safely(image_dir)
+    weedcoco_path = os.path.join(upload_dir, "weedcoco.json")
+    try:
+        with open(weedcoco_path, "r") as weedcoco_file:
+            weedcoco = json.load(weedcoco_file)
+            missing = []
+            for img in weedcoco["images"]:
+                fn = img["file_name"]
+                cvat_image = os.path.join(
+                    CVAT_DATA_DIR, "data", str(cvat_task_id), "raw", fn
+                )
+                weedai_image = os.path.join(image_dir, fn)
+                logger.warn(f"copy {cvat_image} -> {weedai_image}")
+                try:
+                    shutil.copy(cvat_image, weedai_image)
+                except Exception as e:
+                    logger.error(f"error copying {cvat_image} to {weedai_image}: {e}")
+                    missing.append(img["image_id"])
+            return HttpResponse(
+                json.dumps({"upload_id": upload_id, "missing_images": missing})
+            )
+    except Exception as e:
+        logger.error(f"error copying files: {e}")
+        return HttpResponseServerError(f"error copying files: {e}")
+
+
+@login_required
+@require_http_methods(["POST"])
 def submit_deposit(request):
     user = request.user
     upload_id = request.POST["upload_id"]
@@ -418,7 +495,7 @@ def submit_deposit(request):
         weedcoco_path,
         images_dir,
         upload_id,
-        new_upload=request.POST["upload_mode"] != "edit",
+        mode=request.POST["upload_mode"],
     )
     return HttpResponse(f"Work on user {user.id}'s upload{upload_id}")
 
@@ -427,11 +504,19 @@ def submit_deposit(request):
 def upload_status(request):
     user_id = request.user.id
     upload_entity = WeedidUser.objects.get(id=user_id).latest_upload
+
+    if upload_entity is not None:
+        status = upload_entity.status
+        details = upload_entity.status_details
+    else:
+        status = "N"
+        details = ""
+
     return HttpResponse(
         json.dumps(
             {
-                "upload_status": upload_entity.status,
-                "upload_status_details": upload_entity.status_details,
+                "upload_status": status,
+                "upload_status_details": details,
             }
         )
     )
@@ -442,7 +527,11 @@ def upload_info(request, dataset_id):
     upload_entity = Dataset.objects.get(upload_id=dataset_id)
     return HttpResponse(
         json.dumps(
-            {"metadata": upload_entity.metadata, "agcontexts": upload_entity.agcontext}
+            {
+                "metadata": upload_entity.metadata,
+                "agcontexts": upload_entity.agcontext,
+                "head_version": upload_entity.head_version,
+            }
         )
     )
 

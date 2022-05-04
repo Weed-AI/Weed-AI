@@ -4,9 +4,11 @@ import datetime
 import json
 import os
 import subprocess
+import tempfile
 import traceback
 from pathlib import Path
-from shutil import move, rmtree
+from shutil import copy, move, rmtree
+from zipfile import ZipFile
 
 from celery import shared_task
 from core.settings import (
@@ -24,12 +26,16 @@ from weedcoco.repo.deposit import Repository, RepositoryError, deposit, mkdir_sa
 from weedcoco.repo.repository import migrate_dir
 
 from weedid.models import Dataset, WeedidUser
-from weedid.notification import review_notification, upload_notification
+from weedid.notification import (
+    edit_notification,
+    review_notification,
+    upload_notification,
+)
 from weedid.utils import make_upload_entity_fields
 
 
 @shared_task
-def submit_upload_task(weedcoco_path, image_dir, upload_id, new_upload=True):
+def submit_upload_task(weedcoco_path, image_dir, upload_id, mode="upload"):
     """Submit deposit task from upload
 
     Parameters
@@ -37,27 +43,26 @@ def submit_upload_task(weedcoco_path, image_dir, upload_id, new_upload=True):
     weedcoco_path : str
     image_dir : str
     upload_id : str
-    new_upload : bool, default=True
-        If it's not a new upload and fails the deposit, updated metadata and agcontexts need to be applied to weedcoco.json and previous deposited dataset and zip file should be copied back when exception raised during deposit.
+    mode : str ("upload"|"edit"|"admin")
     """
     upload_entity = Dataset.objects.get(upload_id=upload_id)
-    if new_upload:
+    with open(weedcoco_path) as f:
+        weedcoco = json.load(f)
+    if mode == "upload":
         upload_entity.status = "P"
         upload_entity.status_details = ""
         upload_entity.save()
         # Update fields in database
         # XXX: maybe this should be delayed
-        with open(weedcoco_path) as f:
-            weedcoco = json.load(f)
         for k, v in make_upload_entity_fields(weedcoco).items():
             setattr(upload_entity, k, v)
-    else:
-        with open(weedcoco_path) as f:
-            weedcoco = json.load(f)
+    elif mode == "admin":
         weedcoco["info"]["metadata"] = upload_entity.metadata
         weedcoco["agcontexts"] = upload_entity.agcontext
         with open(weedcoco_path, "w") as f:
             json.dump(weedcoco, f)
+    elif mode == "edit":
+        pass
 
     upload_entity.save()
     user = WeedidUser.objects.get(id=upload_entity.user_id)
@@ -67,7 +72,7 @@ def submit_upload_task(weedcoco_path, image_dir, upload_id, new_upload=True):
         "message": "WeedAI upload",
     }
     try:
-        dataset = deposit(
+        deposit(
             Path(weedcoco_path),
             Path(image_dir),
             Path(REPOSITORY_DIR),
@@ -77,7 +82,14 @@ def submit_upload_task(weedcoco_path, image_dir, upload_id, new_upload=True):
             IMAGE_HASH_MAPPING_URL,
         )
     except Exception as e:
-        if not new_upload:
+        traceback.print_exc()
+        if mode == "upload":
+            upload_entity.status = "F"
+            upload_entity.status_details = str(e)
+            upload_entity.save()
+        elif mode == "edit":
+            edit_notification("unsuccessful during depositing", upload_id)
+        elif mode == "admin":
             move(
                 str(
                     Path(UPLOAD_DIR)
@@ -93,23 +105,16 @@ def submit_upload_task(weedcoco_path, image_dir, upload_id, new_upload=True):
             #     str(Path(REPOSITORY_DIR) / upload_id),
             # )
             raise
-        traceback.print_exc()
-        upload_entity.status = "F"
-        upload_entity.status_details = str(e)
-        upload_entity.save()
-        # TODO: raise alert
     else:
-        if not new_upload:
-            upload_entity.head_version = int(dataset.head[1:])
+        if mode == "upload":
+            upload_notification(upload_id)
+            upload_entity.status = "AR"
+            upload_entity.status_details = "It is currently under review."
             upload_entity.save()
+        elif mode in ("edit", "admin"):
             if upload_entity.status == "C":
-                reindex_dataset.delay(upload_id)
-            return
-        upload_notification(upload_id)
-        upload_entity.status = "AR"
-        upload_entity.status_details = "It is currently under review."
-        upload_entity.head_version = 1
-        upload_entity.save()
+                reindex_dataset.delay(upload_id, mode=mode)
+                return
 
 
 @shared_task
@@ -118,7 +123,7 @@ def update_index_and_thumbnails(
     process_thumbnails=True,
     thumbnails_dir=THUMBNAILS_DIR,
     repository_dir=REPOSITORY_DIR,
-    new_upload=True,
+    mode="upload",
 ):
     """Submit deposit task from upload
 
@@ -128,8 +133,7 @@ def update_index_and_thumbnails(
     process_thumbnails: bool, default=True
     thumbnails_dir: str, default=THUMBNAILS_DIR
     repository_dir: str, default=REPOSITORY_DIR
-    new_upload : bool, default=True
-        If it's not a new upload, upload status and status details don't need to be updated.
+    mode : str ("upload"|"edit"|"admin")
     """
     upload_entity = Dataset.objects.get(upload_id=upload_id)
     repository = Repository(Path(repository_dir))
@@ -147,20 +151,31 @@ def update_index_and_thumbnails(
             es_host="elasticsearch",
             es_port=9200,
             upload_id=upload_id,
+            version_id=dataset.head_version,
         )
         es_index.post_index_entries()
     except Exception as e:
-        if not new_upload:
-            raise
         traceback.print_exc()
-        upload_entity.status = "F"
-        upload_entity.status_details = str(e)
+        if mode == "upload":
+            upload_entity.status = "F"
+            upload_entity.status_details = str(e)
+        elif mode == "edit":
+            edit_notification("unsuccessful during indexing", upload_id)
+        elif mode == "admin":
+            raise
     else:
-        if not new_upload:
+        if mode == "upload":
+            upload_entity.status = "C"
+            upload_entity.status_details = "It has been successfully indexed."
+            review_notification("approved and indexed", upload_id)
+        elif mode == "edit":
+            with open(weedcoco_path) as f:
+                weedcoco = json.load(f)
+            for k, v in make_upload_entity_fields(weedcoco).items():
+                setattr(upload_entity, k, v)
+            edit_notification("successful", upload_id)
+        elif mode == "admin":
             return
-        upload_entity.status = "C"
-        upload_entity.status_details = "It has been successfully indexed."
-        review_notification("approved and indexed", upload_id)
     finally:
         upload_entity.save()
 
@@ -171,10 +186,9 @@ def reindex_dataset(
     process_thumbnails=True,
     thumbnails_dir=THUMBNAILS_DIR,
     repository_dir=REPOSITORY_DIR,
-    download_dir=DOWNLOAD_DIR,
+    mode="admin",
 ):
-    """Reindex a dataset already in the repository, and recreate its download"""
-    download_dir = Path(download_dir)
+    """Reindex a dataset already in the repository"""
     repository = Repository(repository_dir)
     dataset = repository.dataset(upload_id)
     weedcoco_path = dataset.resolve_path("weedcoco.json")
@@ -183,14 +197,14 @@ def reindex_dataset(
     upload_entity = Dataset.objects.get(upload_id=upload_id)
     for k, v in make_upload_entity_fields(weedcoco).items():
         setattr(upload_entity, k, v)
+    upload_entity.head_version = int(dataset.head_version[1:])
     upload_entity.save()
-    dataset.make_zipfile(download_dir)
     update_index_and_thumbnails.delay(
         upload_id,
         process_thumbnails=process_thumbnails,
         thumbnails_dir=str(thumbnails_dir),
         repository_dir=str(repository_dir),
-        new_upload=False,
+        mode=mode,
     )
 
 
@@ -215,7 +229,7 @@ def redeposit_dataset(
     images_dir = upload_id_dir / "images"
     weedcoco_path = upload_id_dir / "weedcoco.json"
     submit_upload_task.delay(
-        str(weedcoco_path), str(images_dir), upload_id, new_upload=False
+        str(weedcoco_path), str(images_dir), upload_id, mode="admin"
     )
 
 
@@ -246,3 +260,19 @@ def backup_repository_changes(repository_dir=REPOSITORY_DIR, commit_message=None
         ],
         cwd=REPOSITORY_DIR,
     )
+
+
+@shared_task
+def store_tmp_image_from_zip(upload_id, upload_image_zip, image_dir, full_images):
+    if not os.path.isdir(image_dir):
+        mkdir_safely(image_dir)
+    existing_images = os.listdir(image_dir)
+    with tempfile.TemporaryDirectory() as tempdir:
+        ZipFile(upload_image_zip).extractall(tempdir)
+        for dir, _, filenames in os.walk(tempdir):
+            # FIXME: this should reject a zip upload if two filenames are identical
+            for filename in filenames:
+                if filename in full_images and filename not in existing_images:
+                    copy(os.path.join(dir, filename), os.path.join(image_dir, filename))
+    missing_images = list(set(os.listdir(image_dir)))
+    return {"upload_id": upload_id, "missing_images": missing_images}

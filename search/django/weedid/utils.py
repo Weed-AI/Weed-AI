@@ -2,17 +2,13 @@ import json
 import os
 import re
 import smtplib
-import tempfile
 from email.message import EmailMessage
-from shutil import copy, copyfile, move, rmtree
+from shutil import move, rmtree
 from uuid import uuid4
-from zipfile import ZipFile
 
-import redis
 from core.settings import (
     DOWNLOAD_DIR,
     FROM_EMAIL,
-    IMAGE_HASH_MAPPING_URL,
     REPOSITORY_DIR,
     SEND_EMAIL,
     SMTP_HOST,
@@ -22,7 +18,7 @@ from core.settings import (
 from django.core.files.storage import FileSystemStorage
 from weedcoco.repo.deposit import Repository, mkdir_safely
 from weedcoco.stats import WeedCOCOStats
-from weedcoco.utils import set_info, set_licenses
+from weedcoco.utils import set_info, set_licenses, copy_without_exif
 from weedcoco.validation import validate
 
 from weedid.models import Dataset, WeedidUser
@@ -37,21 +33,9 @@ class OverwriteStorage(FileSystemStorage):
 
 def store_tmp_image(image, image_dir):
     fs = OverwriteStorage()
-    fs.save(os.path.join(image_dir, image.name), image)
-
-
-def store_tmp_image_from_zip(upload_image_zip, image_dir, full_images):
-    if not os.path.isdir(image_dir):
-        mkdir_safely(image_dir)
-    existing_images = os.listdir(image_dir)
-    with tempfile.TemporaryDirectory() as tempdir:
-        ZipFile(upload_image_zip).extractall(tempdir)
-        for dir, _, filenames in os.walk(tempdir):
-            # FIXME: this should reject a zip upload if two filenames are identical
-            for filename in filenames:
-                if filename in full_images and filename not in existing_images:
-                    copy(os.path.join(dir, filename), os.path.join(image_dir, filename))
-    return list(set(os.listdir(image_dir)))
+    image_file = os.path.join(image_dir, image.name)
+    fs.save(image_file, image)
+    copy_without_exif(image_file, image_file)
 
 
 def store_tmp_weedcoco(weedcoco, upload_dir):
@@ -74,7 +58,7 @@ def move_to_upload(store_dir, upload_dir, mode=""):
 def setup_upload_dir(upload_userid_dir):
     if not os.path.isdir(upload_userid_dir):
         mkdir_safely(upload_userid_dir)
-    upload_id = str(uuid4())
+    upload_id = str(str(uuid4()))
     upload_dir = os.path.join(upload_userid_dir, upload_id)
     mkdir_safely(upload_dir)
     return upload_dir, upload_id
@@ -134,7 +118,7 @@ def make_upload_entity_fields(weedcoco):
     for agcontext in weedcoco["agcontexts"]:
         agcontext["n_images"] = int(
             stats.agcontext_summary.loc[agcontext["id"]].image_count
-        )
+        ) + count_image_with_no_annotation(weedcoco)
 
         # Should produce something like:
         # {"crop: daucus carota": {"image_count": 1, "annotation_count": 1, "bounding_box_count": 1, "segmentation_count": 1}}
@@ -150,6 +134,13 @@ def make_upload_entity_fields(weedcoco):
         "agcontext": weedcoco["agcontexts"],
         "metadata": weedcoco["info"]["metadata"],
     }
+
+
+def count_image_with_no_annotation(weedcoco):
+    return len(
+        set([image["id"] for image in weedcoco["images"]])
+        - set([annotation["image_id"] for annotation in weedcoco["annotations"]])
+    )
 
 
 def create_upload_entity(upload_id, upload_userid):
@@ -226,24 +217,8 @@ def retrieve_missing_images_list(weedcoco_json, images_path, upload_id):
     if not os.path.isdir(images_path):
         mkdir_safely(images_path)
         return current_images[:]
-    existing_hash_images = set(os.listdir(images_path))
-    if set(current_images) - existing_hash_images:
-        copy_images_with_mapping(upload_id, images_path, existing_hash_images)
-        existing_images = set(os.listdir(images_path))
-    else:
-        existing_images = existing_hash_images
+    existing_images = set(os.listdir(images_path))
     return [image for image in current_images if image not in existing_images]
-
-
-def copy_images_with_mapping(upload_id, images_path, hash_images_list):
-    redis_client = redis.Redis.from_url(url=IMAGE_HASH_MAPPING_URL)
-    for hash_image in hash_images_list:
-        original_image_name = redis_client.get("/".join([upload_id, hash_image]))
-        if original_image_name:
-            copyfile(
-                os.path.join(images_path, hash_image),
-                os.path.join(images_path, original_image_name.decode("ascii")),
-            )
 
 
 def upload_helper(weedcoco_json, user_id, schema="coco", upload_id=None):
@@ -255,7 +230,7 @@ def upload_helper(weedcoco_json, user_id, schema="coco", upload_id=None):
     categories = [
         parse_category_name(category) for category in weedcoco_json["categories"]
     ]
-    if not upload_id:
+    if not upload_id or len(upload_id) != len(str(uuid4())):
         upload_dir, upload_id = setup_upload_dir(os.path.join(UPLOAD_DIR, str(user_id)))
         create_upload_entity(upload_id, user_id)
     else:
