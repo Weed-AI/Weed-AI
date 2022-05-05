@@ -233,6 +233,36 @@ def redeposit_dataset(
 
 
 @shared_task
+def remove_dataset(
+    upload_id,
+    repository_dir=REPOSITORY_DIR,
+    download_dir=DOWNLOAD_DIR,
+    upload_dir=UPLOAD_DIR,
+):
+    upload_entity = Dataset.objects.get(upload_id=upload_id)
+    upload_record_path = Path(upload_dir) / str(upload_entity.user_id) / upload_id
+    download_zipfile_path = str(Path(download_dir) / f"{upload_id}.zip")
+    repository = Repository(repository_dir)
+    dataset = repository.dataset(upload_id)
+
+    # remove upload record
+    if os.path.exists(upload_record_path):
+        rmtree(upload_record_path)
+    # remove download entity
+    if os.path.isfile(download_zipfile_path):
+        os.remove(download_zipfile_path)
+    # remove dataset in repositry
+    dataset.remove()
+    # remove dataset index
+    ElasticSearchIndexer.remove_all_index_with_upload(
+        upload_id, es_host="elasticsearch"
+    )
+    # remove database entity
+    if upload_entity:
+        upload_entity.delete()
+
+
+@shared_task
 def backup_repository_changes(repository_dir=REPOSITORY_DIR, commit_message=None):
     # XXX: Not safe for concurrency
     if commit_message is None:
