@@ -190,6 +190,10 @@ def editing_init(request, dataset_id):
         images = retrieve_missing_images_list(
             weedcoco_json, os.path.join(upload_path, "images"), dataset_id
         )
+    if len(images) == len(weedcoco_json["images"]):
+        # if the incoming weedcoco has no images in common with the current
+        # dataset, we don't proceed - this is to catch the migrated v1 datasets
+        return HttpResponseBadRequest("Incompatible weedcoco.json - can't edit")
     return HttpResponse(
         json.dumps(
             {
