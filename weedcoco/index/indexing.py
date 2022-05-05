@@ -206,7 +206,7 @@ class ElasticSearchIndexer:
 
     @staticmethod
     def remove_all_index_with_upload(
-        upload_id, es_index_name="weedid", es_host="host", es_port=9200
+        upload_id, es_index_name="weedid", es_host="localhost", es_port=9200
     ):
         es_client = elasticsearch.Elasticsearch(
             hosts=[{"host": es_host, "port": es_port}]
