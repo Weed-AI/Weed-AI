@@ -23,7 +23,7 @@ from core.settings import (
 from weedcoco.index.indexing import ElasticSearchIndexer
 from weedcoco.index.thumbnailing import thumbnailing
 from weedcoco.repo.deposit import Repository, RepositoryError, deposit, mkdir_safely
-from weedcoco.repo.repository import migrate, ensure_ocfl
+from weedcoco.repo.repository import migrate_dir, ensure_ocfl
 
 from weedid.models import Dataset, WeedidUser
 from weedid.notification import (
@@ -242,7 +242,7 @@ def migrate_to_ocfl(
     repository_dir=REPOSITORY_DIR,
 ):
     repository = ensure_ocfl(repository_dir)
-    migrate(repository, upload_id, Path(old_repository_dir), metadata)
+    migrate_dir(repository, Path(old_repository_dir), metadata)
     update_index_and_thumbnails.delay(
         upload_id,
         process_thumbnails=True,
