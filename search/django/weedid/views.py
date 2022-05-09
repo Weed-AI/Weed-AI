@@ -117,6 +117,11 @@ def upload(request):
                 request.POST["schema"],
                 request.POST["upload_id"],
             )
+            if len(images) == len(weedcoco_json["images"]):
+                logger.error("All weedcoco files missing in edited dataset")
+                return HttpResponseBadRequest(
+                    "weedcoco.json does not match earlier version"
+                )
         else:
             upload_id, images, categories = upload_helper(
                 weedcoco_json, user.id, request.POST["schema"]
