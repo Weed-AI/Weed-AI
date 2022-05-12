@@ -146,10 +146,15 @@ class CategoryMapper extends React.Component {
         this.props.handleErrorMessage("");
     }
 
+    getStats(categories) {
+        const nCategories = categories.length;
+        const nComplete = categories.filter(isComplete).length;
+        return {nCategories, nComplete}
+    }
+
     render() {
         const { classes } = this.props;
-        const nCategories = this.state.categories.length;
-        const nComplete = this.state.categories.filter(isComplete).length;
+        const { nCategories, nComplete } = this.getStats(this.state.categories);
         return (
             <React.Fragment>
                 <p className={classes.summary}>{nCategories - nComplete} of {nCategories} {nCategories != 1 ? 'categories' : 'category'} need mapping to weedcoco categories</p>
