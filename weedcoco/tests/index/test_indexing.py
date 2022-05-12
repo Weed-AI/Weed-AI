@@ -1,8 +1,8 @@
 import pathlib
-import pytest
 
+import pytest
 from elasticmock import elasticmock as elasticmock
-from weedcoco.index.indexing import main, ElasticSearchIndexer
+from weedcoco.index.indexing import ElasticSearchIndexer, main
 
 BASIC_INPUT_PATH = str(
     pathlib.Path(__file__).parent.parent
@@ -25,6 +25,7 @@ def test_smoke_indexing():
             THUMBNAIL_DIR,
             "--upload-id",
             "12345",
+            "--dry-run",
         ]
     )
 

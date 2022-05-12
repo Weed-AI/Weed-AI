@@ -29,6 +29,39 @@ function getTusUploadFile(file) {
 }
 
 
+const getZipUploadResponse = ({upload_id, images, filename}) => {
+    return new Promise((resolve, reject) => {
+        const pollPeriod = 200;
+        const body = new FormData()
+        body.append("upload_id", upload_id);
+        body.append("images", images);
+        body.append("upload_image_zip", filename);
+        axios({
+            method: 'post',
+            url: baseURL + "api/unpack_image_zip/",
+            data: body,
+            headers: {'X-CSRFToken': Cookies.get('csrftoken') }
+        }).then(res => {
+            const taskId = res.data.task_id;
+            const poll = () => {
+                axios({
+                    method: 'get',
+                    url: baseURL + "api/check_image_zip/" + taskId,
+                    headers: {'X-CSRFToken': Cookies.get('csrftoken') }
+                }).then(res => {
+                    if (res.status !== 200) {
+                        // keep waiting
+                        setTimeout(poll, pollPeriod)
+                    } else {
+                        resolve(res)
+                    }
+                })
+            }
+            setTimeout(poll, pollPeriod);
+        }).catch(reject)
+    })
+}
+
 class UploaderUppyZip extends React.Component {
 
     constructor(props) {
@@ -68,16 +101,7 @@ class UploaderUppyZip extends React.Component {
                 this.props.handleErrorMessage("Upload zipfile failed");
                 return;
             }
-            const body = new FormData()
-            body.append("upload_id", this.props.upload_id);
-            body.append("images", this.props.images);
-            body.append("upload_image_zip", filename);
-            axios({
-                method: 'post',
-                url: baseURL + "api/unpack_image_zip/",
-                data: body,
-                headers: {'X-CSRFToken': Cookies.get('csrftoken') }
-            }).then(res => {
+            getZipUploadResponse({ upload_id: this.props.upload_id, images: this.props.images, filename}).then(res => {
                 if( res.data.upload_id === this.props.upload_id ) {
                     if( res.data.missing_images.length === 0 ) {
                         this.props.handleValidation(true);

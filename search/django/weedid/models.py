@@ -28,6 +28,7 @@ class Dataset(models.Model):
     status = models.CharField(max_length=2, choices=STATUS_CHOICES, default="N")
     status_details = models.TextField(null=True, blank=True)
     annotation_format = models.CharField(max_length=20, default="WeedCOCO")
+    head_version = models.PositiveIntegerField(default=1)
 
 
 class WeedidUser(AbstractUser):
