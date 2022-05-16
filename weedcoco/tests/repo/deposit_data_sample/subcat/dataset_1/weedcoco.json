@@ -2,7 +2,7 @@
     "images": [
         {
             "id": 1,
-            "file_name": "/Weed-ID-Interchange/weedcoco/tests/repo/deposit_data/basic_1/images/001_image.png",
+            "file_name": "images/5f1218b0e469003cc0a1-986e5d71ce7562a90ff91581a9f2617d.png",
             "license": 0,
             "agcontext_id": 0,
             "width": 1296,
@@ -661,7 +661,7 @@
             "id": 2
         },
         {
-            "name": "weed: lolium perenne",
+            "name": "weed: lolium perenne (growing point)",
             "id": 3
         }
     ],
@@ -671,7 +671,12 @@
         "metadata": {
             "name": "Cwfid annotations converted into WeedCOCO",
             "description": "Weeds annotated in carrot crop.",
-            "creator": [{"name": "Sebastian Haug", "@type": "Person"}],
+            "creator": [
+                {
+                    "name": "Sebastian Haug",
+                    "@type": "Person"
+                }
+            ],
             "datePublished": "2015-XX-XX",
             "license": "https://github.com/cwfid/dataset"
         }
@@ -688,7 +693,7 @@
             "agcontext_name": "cwfid",
             "crop_type": "daucus carota",
             "bbch_growth_range": {
-                "min":  10,
+                "min": 10,
                 "max": 20
             },
             "soil_colour": "grey",

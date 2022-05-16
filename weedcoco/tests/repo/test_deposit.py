@@ -17,6 +17,7 @@ TEST_DATA_SAMPLE_DIR = pathlib.Path(__file__).parent / "deposit_data_sample"
 TEST_BASIC_DIR_1 = TEST_DATA_DIR / "basic_1"
 TEST_BASIC_DIR_1V2 = TEST_DATA_DIR / "basic_1.v2"
 TEST_BASIC_DIR_2 = TEST_DATA_DIR / "basic_2"
+TEST_SUBCAT_DIR = TEST_DATA_DIR / "subcat"
 TEST_COMPLETE_DIR = TEST_DATA_DIR / "complete"
 TEST_DUPLICATE_DIR = TEST_DATA_DIR / "duplicate"
 TEST_UPDATES_DIR = TEST_DATA_DIR / "updates"
@@ -194,6 +195,17 @@ def test_basic(executor, rewrite_deposit_truth):
     dataset.extract(str(test_extract_dir / pathlib.Path("dataset_1")))
     assert_files_equal(test_extract_dir, TEST_DATA_SAMPLE_DIR / "basic")
     assert_weedcoco_equal(test_extract_dir, TEST_DATA_SAMPLE_DIR / "basic")
+
+
+def test_subcat(executor, rewrite_deposit_truth):
+    test_extract_dir, _, repo, dataset = executor.run(
+        "dataset_1", TEST_SUBCAT_DIR / "weedcoco.json", TEST_SUBCAT_DIR / "images"
+    )
+    if rewrite_deposit_truth:
+        rewrite_outputs(repo, TEST_DATA_SAMPLE_DIR / "subcat")
+    dataset.extract(str(test_extract_dir / pathlib.Path("dataset_1")))
+    assert_files_equal(test_extract_dir, TEST_DATA_SAMPLE_DIR / "subcat")
+    assert_weedcoco_equal(test_extract_dir, TEST_DATA_SAMPLE_DIR / "subcat")
 
 
 def test_duplicate_images(executor):
