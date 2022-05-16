@@ -8,7 +8,7 @@ BASIC_INPUT_PATH = str(
     pathlib.Path(__file__).parent.parent
     / "repo"
     / "deposit_data"
-    / "basic_1"
+    / "subcat"
     / "weedcoco.json"
 )
 THUMBNAIL_DIR = "arbitrary-thumbnail-dir"
