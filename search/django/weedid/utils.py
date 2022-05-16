@@ -85,6 +85,9 @@ def set_categories(weedcoco_path, categories):
         }
         for category in categories
     ]
+    category_name_set = [category["name"] for category in data["categories"]]
+    if len(set(category_name_set)) < len(category_name_set):
+        raise Exception("Sorry, category with the same name is not allowed")
     with open(weedcoco_path, "w") as jsonFile:
         json.dump(data, jsonFile)
     return data
