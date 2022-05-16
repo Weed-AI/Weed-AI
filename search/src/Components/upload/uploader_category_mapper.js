@@ -2,7 +2,6 @@ import { FormHelperText } from '@material-ui/core';
 import Accordion from '@material-ui/core/Accordion';
 import AccordionDetails from '@material-ui/core/AccordionDetails';
 import AccordionSummary from '@material-ui/core/AccordionSummary';
-import Button from '@material-ui/core/Button';
 import FormControl from '@material-ui/core/FormControl';
 import InputLabel from '@material-ui/core/InputLabel';
 import MenuItem from '@material-ui/core/MenuItem';
@@ -171,20 +170,6 @@ class CategoryMapper extends React.Component {
                         })
                     }
                 </div>
-                <Button variant="contained"
-                        color="primary"
-                        className={classes.applyButton}
-                        onClick={() => {
-                            if (nCategories && nCategories === nComplete) {
-                                this.props.handleCategories(this.state.categories)
-                                this.props.handleErrorMessage("")
-                                this.props.handleValidation(true);
-                            }
-                            else {
-                                this.props.handleErrorMessage("Role or scientific name missing")
-                                this.props.handleValidation(true);
-                            }
-                        }}>Apply</Button>
             </React.Fragment>
         )
     }
