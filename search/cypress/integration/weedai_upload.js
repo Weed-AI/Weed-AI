@@ -83,6 +83,7 @@ describe('overall upload workflow', () => {
                 secondY: 450,
             }
         }
+
         cy.wait(5000)
         cy.visit('http://localhost/cvat-annotation/auth/register', {failOnStatusCode: false})
         cy.get('#firstName', { timeout: 60000 }).should('be.visible')
