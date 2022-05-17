@@ -23,7 +23,7 @@ from core.settings import (
 from weedcoco.index.indexing import ElasticSearchIndexer
 from weedcoco.index.thumbnailing import thumbnailing
 from weedcoco.repo.deposit import Repository, RepositoryError, deposit, mkdir_safely
-from weedcoco.repo.repository import migrate_dir, ensure_ocfl
+from weedcoco.repo.repository import ensure_ocfl, migrate_dir
 
 from weedid.models import Dataset, WeedidUser
 from weedid.notification import (
@@ -261,6 +261,7 @@ def remove_dataset(
     # remove database entity
     if upload_entity:
         upload_entity.delete()
+
 
 def migrate_to_ocfl(
     old_repository_dir,
