@@ -1,8 +1,8 @@
-import React from 'react';
-import 'react-dropzone-uploader/dist/styles.css';
-import Dropzone from 'react-dropzone-uploader';
 import Cookies from 'js-cookie';
-import {jsonSchemaTitle} from '../error/utils';
+import React from 'react';
+import Dropzone from 'react-dropzone-uploader';
+import 'react-dropzone-uploader/dist/styles.css';
+import { jsonSchemaTitle } from '../error/utils';
 
 
 const UploaderSingle  = (props) => {
@@ -10,6 +10,8 @@ const UploaderSingle  = (props) => {
     const getUploadParams = ({ file, meta }) => {
         const body = new FormData()
         body.append('weedcoco', file)
+        body.append('upload_mode', props.upload_mode)
+        body.append('upload_id', props.upload_id)
         body.append('schema', props.schema)
         return { url: baseURL + 'api/upload/',
                  mode: 'same-origin',

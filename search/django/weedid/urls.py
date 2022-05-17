@@ -1,9 +1,10 @@
-from django.urls import path, re_path, include
-from weedid import views, tus
+from django.urls import include, path, re_path
 
+from weedid import tus, views
 
 api_urlpatterns = [
     path("upload/", views.upload, name="upload"),
+    path("editing_init/<str:dataset_id>", views.editing_init, name="editing_init"),
     path("upload_voc/", views.VocUploader.upload, name="upload_voc"),
     path("remove_voc/", views.VocUploader.remove, name="remove_voc"),
     path("submit_voc/", views.VocUploader.submit, name="submit_voc"),
@@ -20,6 +21,7 @@ api_urlpatterns = [
     path("update_categories/", views.update_categories, name="update_categories"),
     path("upload_agcontexts/", views.upload_agcontexts, name="upload_agcontexts"),
     path("upload_metadata/", views.upload_metadata, name="upload_metadata"),
+    path("copy_cvat/", views.copy_cvat, name="copy_cvat"),
     path("submit_deposit/", views.submit_deposit, name="submit_deposit"),
     path("upload_status/", views.upload_status, name="upload_status"),
     path("upload_info/<str:dataset_id>", views.upload_info, name="upload_info"),
@@ -32,6 +34,11 @@ api_urlpatterns = [
     ),
     path(
         "dataset_reject/<str:dataset_id>", views.dataset_reject, name="dataset_reject"
+    ),
+    path(
+        "retrieve_cvat_task/<str:upload_id>/<str:task_id>",
+        views.retrieve_cvat_task,
+        name="retrieve_cvat_task",
     ),
     path("register/", views.user_register, name="user_register"),
     path("login/", views.user_login, name="user_login"),

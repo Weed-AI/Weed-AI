@@ -1,15 +1,14 @@
 """Validation tools for WeedCOCO
 """
-import pathlib
 import argparse
-import sys
-import json
-import tempfile
 import datetime
+import json
+import pathlib
+import sys
 
+import yaml
 from jsonschema import FormatChecker
 from jsonschema.validators import Draft7Validator, RefResolver
-import yaml
 
 from .utils import get_gbif_record
 
@@ -161,11 +160,11 @@ def validate_references(
                                 f"Found in {section_name} id {obj.get('id')}"
                             )
                         referenced_ids.add(id_key)
-
-    for known_id in known_ids:
-        section_name = known_id[0]
-        if section_name in require_reference and known_id not in referenced_ids:
-            raise ValidationError(f"{section_name} ID {known_id[1]} is unreferenced")
+    # Commented to allow datasets with incomplete annotations
+    # for known_id in known_ids:
+    #     section_name = known_id[0]
+    #     if section_name in require_reference and known_id not in referenced_ids:
+    #         raise ValidationError(f"{section_name} ID {known_id[1]} is unreferenced")
     # TODO: consider warning if not require_reference
 
 

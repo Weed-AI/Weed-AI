@@ -1,6 +1,8 @@
 import os
-from celery.schedules import crontab
+
 from corsheaders.defaults import default_headers
+
+from celery.schedules import crontab
 
 SITE_BASE_URL = "https://weed-ai.sydney.edu.au"
 
@@ -8,8 +10,9 @@ SITE_BASE_URL = "https://weed-ai.sydney.edu.au"
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 UPLOAD_DIR = os.path.join(BASE_DIR, "upload")
 THUMBNAILS_DIR = os.path.join(BASE_DIR, "thumbnails")
-REPOSITORY_DIR = os.path.join(BASE_DIR, "repository")
+REPOSITORY_DIR = os.path.join(BASE_DIR, "repository", "ocfl")
 DOWNLOAD_DIR = os.path.join(BASE_DIR, "download")
+CVAT_DATA_DIR = os.path.join(BASE_DIR, "cvat_data")
 
 TUS_UPLOAD_DIR = os.path.join(BASE_DIR, "tus_upload")
 TUS_DESTINATION_DIR = os.path.join(BASE_DIR, "tus_dir", "data")
@@ -51,6 +54,7 @@ DEBUG = os.environ.get("ENV", "PROD") == "DEV"
 ALLOWED_HOSTS = ["*"]
 CORS_ORIGIN_ALLOW_ALL = True
 AUTH_USER_MODEL = "weedid.WeedidUser"
+SESSION_COOKIE_NAME = "weedai_sessionid"
 
 # TUS headers
 
@@ -203,3 +207,5 @@ CELERY_BEAT_SCHEDULE = {
         "schedule": crontab(minute="0", hour="*/3"),
     },
 }
+
+IMAGE_HASH_MAPPING_URL = os.environ.get("IMAGE_HASH_MAPPING_URL", "")

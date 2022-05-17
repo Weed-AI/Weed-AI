@@ -14,7 +14,7 @@ class DatasetComponent extends Component {
             upload_id_list: [],
             upload_list: [],
             awaiting_id_list: [],
-            awaiting_list: []
+            awaiting_list: [],
         }
         this.handleUploadid = this.handleUploadid.bind(this)
     }
@@ -30,6 +30,7 @@ class DatasetComponent extends Component {
                 this.setState({upload_id: this.props.upload_id})
             }
         })
+        
         axios.get(baseURL + 'api/awaiting_list/')
         .then(res => {
             const json = res.data
@@ -52,21 +53,24 @@ class DatasetComponent extends Component {
     }
 
     render() {
+        let datasetSection;
         if (this.state.upload_id === "*") {
             // Dataset listing
             if (!this.state.is_staff || this.state.awaiting_list.length == 0) {
-                return (<DatasetList title={""} handleUploadid={this.handleUploadid} upload_list={this.state.upload_list} />);
+                datasetSection = <DatasetList title={""} handleUploadid={this.handleUploadid} upload_list={this.state.upload_list} />;
             } else {
-                return (
+                datasetSection = (
                     <React.Fragment>
                         <DatasetList title={"Awaiting approval"} handleUploadid={this.handleUploadid} upload_list={this.state.awaiting_list} inReview={true} />
-						<DatasetList title={"Public"} handleUploadid={this.handleUploadid} upload_list={this.state.upload_list} />
+                        <DatasetList title={"Public"} handleUploadid={this.handleUploadid} upload_list={this.state.upload_list} />
                     </React.Fragment>
                 );
             }
-       } else {
-           return (<DatasetSummaryPage upload_id={this.state.upload_id} handleUploadid={this.handleUploadid}/>);
-       }
+        } 
+        else {
+            datasetSection = <DatasetSummaryPage upload_id={this.state.upload_id} handleUploadid={this.handleUploadid}/>;
+        }
+        return datasetSection
     }
 }
 

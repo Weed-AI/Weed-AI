@@ -1,10 +1,15 @@
 import json
+import logging
 import os
+import shutil
 import traceback
 from pathlib import Path
+from zipfile import ZipFile
 
 import requests
 from core.settings import (
+    CVAT_DATA_DIR,
+    IMAGE_HASH_MAPPING_URL,
     MAX_IMAGE_SIZE,
     MAX_VOC_SIZE,
     REPOSITORY_DIR,
@@ -30,6 +35,7 @@ from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_http_methods
 from weedcoco.importers.mask import generate_paths_from_mask_only, masks_to_coco
 from weedcoco.importers.voc import voc_to_coco
+from weedcoco.repo.deposit import Repository, mkdir_safely
 from weedcoco.utils import fix_compatibility_quirks
 from weedcoco.validation import JsonValidationError, validate, validate_json
 
@@ -49,13 +55,17 @@ from weedid.utils import (
     parse_category_name,
     remove_entity_local_record,
     retrieve_listing_info,
+    retrieve_missing_images_list,
     set_categories,
     setup_upload_dir,
     store_tmp_image,
     store_tmp_voc,
     store_tmp_weedcoco,
+    upload_helper,
     validate_email_format,
 )
+
+logger = logging.getLogger(__name__)
 
 
 @ensure_csrf_cookie
@@ -100,18 +110,22 @@ def upload(request):
         file_weedcoco = request.FILES["weedcoco"]
         weedcoco_json = json.load(file_weedcoco)
         fix_compatibility_quirks(weedcoco_json)
-        validate(
-            weedcoco_json,
-            schema=request.POST["schema"] if request.POST["schema"] else "coco",
-        )
-        for image_reference in weedcoco_json["images"]:
-            images.append(image_reference["file_name"].split("/")[-1])
-        categories = [
-            parse_category_name(category) for category in weedcoco_json["categories"]
-        ]
-        upload_dir, upload_id = setup_upload_dir(os.path.join(UPLOAD_DIR, str(user.id)))
-        store_tmp_weedcoco(weedcoco_json, upload_dir)
-        create_upload_entity(upload_id, user.id)
+        if request.POST["upload_mode"] == "edit":
+            upload_id, images, categories = upload_helper(
+                weedcoco_json,
+                user.id,
+                request.POST["schema"],
+                request.POST["upload_id"],
+            )
+            if len(images) == len(weedcoco_json["images"]):
+                logger.error("All weedcoco files missing in edited dataset")
+                return HttpResponseBadRequest(
+                    "weedcoco.json does not match earlier version"
+                )
+        else:
+            upload_id, images, categories = upload_helper(
+                weedcoco_json, user.id, request.POST["schema"]
+            )
     except JsonValidationError as e:
         traceback.print_exc()
         return json_validation_response(e)
@@ -124,6 +138,74 @@ def upload(request):
                 {"upload_id": upload_id, "images": images, "categories": categories}
             )
         )
+
+
+def retrieve_cvat_task(request, upload_id, task_id):
+    user = request.user
+    if not (user and user.is_authenticated):
+        return HttpResponseForbidden("You dont have access to proceed")
+    try:
+        with ZipFile(
+            os.path.join(
+                CVAT_DATA_DIR, "tasks", task_id, "export_cache/annotations_coco-10.ZIP"
+            )
+        ) as cvat_zip:
+            with cvat_zip.open("annotations/instances_default.json") as cvat_task_coco:
+                coco_json = json.load(cvat_task_coco)
+                upload_id, images, categories = upload_helper(
+                    coco_json, user.id, upload_id=upload_id
+                )
+    except JsonValidationError as e:
+        traceback.print_exc()
+        return json_validation_response(e)
+    except Exception as e:
+        traceback.print_exc()
+        return HttpResponseBadRequest(str(e))
+    else:
+        return HttpResponse(
+            json.dumps(
+                {
+                    "upload_id": upload_id,
+                    "images": images,
+                    "categories": categories,
+                }
+            )
+        )
+
+
+def editing_init(request, dataset_id):
+    user = request.user
+    if not (user and user.is_authenticated):
+        return HttpResponseForbidden("You dont have access to proceed")
+    upload_entity = Dataset.objects.get(upload_id=dataset_id, status="C")
+    if upload_entity.user.id != user.id:
+        return HttpResponseForbidden("You dont have access to edit")
+    upload_path = os.path.join(UPLOAD_DIR, str(user.id), dataset_id)
+    repository = Repository(REPOSITORY_DIR)
+    dataset = repository.dataset(dataset_id)
+    dataset.extract_original_images(
+        upload_path, redis_mapping_url=IMAGE_HASH_MAPPING_URL
+    )
+
+    with open(os.path.join(upload_path, "weedcoco.json")) as f:
+        weedcoco_json = json.load(f)
+        categories = [
+            parse_category_name(category) for category in weedcoco_json["categories"]
+        ]
+        images = retrieve_missing_images_list(
+            weedcoco_json, os.path.join(upload_path, "images"), dataset_id
+        )
+    return HttpResponse(
+        json.dumps(
+            {
+                "upload_id": dataset_id,
+                "agcontext": upload_entity.agcontext,
+                "metadata": upload_entity.metadata,
+                "categories": categories,
+                "images": images,
+            }
+        )
+    )
 
 
 class CustomUploader:
@@ -194,19 +276,19 @@ class CustomUploader:
             store_id = request.POST[cls.id_name]
             if "/" in store_id:
                 return HttpResponseBadRequest("Bad id")
-            images = []
             coco_json = cls.convert_to_coco(
                 Path(os.path.join(UPLOAD_DIR, str(user.id), store_id)), request
             )
             validate(coco_json, schema="coco")
             fix_compatibility_quirks(coco_json)
-            for image_reference in coco_json["images"]:
-                images.append(image_reference["file_name"].split("/")[-1])
             categories = [
                 parse_category_name(category) for category in coco_json["categories"]
             ]
             upload_dir, upload_id = setup_upload_dir(
                 os.path.join(UPLOAD_DIR, str(user.id))
+            )
+            images = retrieve_missing_images_list(
+                coco_json, os.path.join(upload_dir, "images"), upload_id
             )
             store_tmp_weedcoco(coco_json, upload_dir)
             create_upload_entity(upload_id, user.id)
@@ -368,6 +450,44 @@ def upload_metadata(request):
 
 @login_required
 @require_http_methods(["POST"])
+def copy_cvat(request):
+    """Copy the images for a CVAT task from the CVAT volume to the upload dir"""
+    user = request.user
+    upload_id = request.POST["upload_id"]
+    cvat_task_id = request.POST["task_id"]
+    upload_dir = os.path.join(UPLOAD_DIR, str(user.id), str(upload_id))
+    if not os.path.isdir(upload_dir):
+        return HttpResponseServerError(f"upload directory {upload_id} not found")
+    image_dir = os.path.join(upload_dir, "images")
+    if not os.path.isdir(image_dir):
+        mkdir_safely(image_dir)
+    weedcoco_path = os.path.join(upload_dir, "weedcoco.json")
+    try:
+        with open(weedcoco_path, "r") as weedcoco_file:
+            weedcoco = json.load(weedcoco_file)
+            missing = []
+            for img in weedcoco["images"]:
+                fn = img["file_name"]
+                cvat_image = os.path.join(
+                    CVAT_DATA_DIR, "data", str(cvat_task_id), "raw", fn
+                )
+                weedai_image = os.path.join(image_dir, fn)
+                logger.warn(f"copy {cvat_image} -> {weedai_image}")
+                try:
+                    shutil.copy(cvat_image, weedai_image)
+                except Exception as e:
+                    logger.error(f"error copying {cvat_image} to {weedai_image}: {e}")
+                    missing.append(img["image_id"])
+            return HttpResponse(
+                json.dumps({"upload_id": upload_id, "missing_images": missing})
+            )
+    except Exception as e:
+        logger.error(f"error copying files: {e}")
+        return HttpResponseServerError(f"error copying files: {e}")
+
+
+@login_required
+@require_http_methods(["POST"])
 def submit_deposit(request):
     user = request.user
     upload_id = request.POST["upload_id"]
@@ -376,7 +496,12 @@ def submit_deposit(request):
         UPLOAD_DIR, str(user.id), str(upload_id), "weedcoco.json"
     )
     images_dir = os.path.join(UPLOAD_DIR, str(user.id), str(upload_id), "images")
-    submit_upload_task.delay(weedcoco_path, images_dir, upload_id)
+    submit_upload_task.delay(
+        weedcoco_path,
+        images_dir,
+        upload_id,
+        mode=request.POST["upload_mode"],
+    )
     return HttpResponse(f"Work on user {user.id}'s upload{upload_id}")
 
 
@@ -407,14 +532,19 @@ def upload_info(request, dataset_id):
     upload_entity = Dataset.objects.get(upload_id=dataset_id)
     return HttpResponse(
         json.dumps(
-            {"metadata": upload_entity.metadata, "agcontexts": upload_entity.agcontext}
+            {
+                "metadata": upload_entity.metadata,
+                "agcontexts": upload_entity.agcontext,
+                "head_version": upload_entity.head_version,
+            }
         )
     )
 
 
 def upload_list(request):
+    user_id = request.user.id if request.user else 0
     upload_list = [
-        retrieve_listing_info(dataset, awaiting_review=False)
+        retrieve_listing_info(dataset, awaiting_review=False, user_id=user_id)
         for dataset in Dataset.objects.filter(status="C")
     ]
     return HttpResponse(json.dumps(upload_list))
@@ -435,8 +565,7 @@ def awaiting_list(request):
 def dataset_approve(request, dataset_id):
     upload_entity = Dataset.objects.get(upload_id=dataset_id, status="AR")
     if upload_entity:
-        weedcoco_path = os.path.join(REPOSITORY_DIR, str(dataset_id), "weedcoco.json")
-        update_index_and_thumbnails.delay(weedcoco_path, dataset_id)
+        update_index_and_thumbnails.delay(dataset_id)
         upload_entity.status = "P"
         upload_entity.status_details = "It's now being indexed"
         upload_entity.save()

@@ -1,5 +1,7 @@
-import React, { useState } from 'react';
-import { Helmet } from "react-helmet";
+import CircularProgress from '@material-ui/core/CircularProgress';
+import IconButton from '@material-ui/core/IconButton';
+import Link from '@material-ui/core/Link';
+import Paper from '@material-ui/core/Paper';
 import { makeStyles } from '@material-ui/core/styles';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
@@ -7,12 +9,11 @@ import TableCell from '@material-ui/core/TableCell';
 import TableContainer from '@material-ui/core/TableContainer';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
-import Paper from '@material-ui/core/Paper';
-import Link from '@material-ui/core/Link';
-import CircularProgress from '@material-ui/core/CircularProgress';
 import PhotoIcon from '@material-ui/icons/Photo';
-import IconButton from '@material-ui/core/IconButton';
 import axios from 'axios';
+import React, { useState } from 'react';
+import { Helmet } from "react-helmet";
+import UploadDialog from '../upload/upload_dialog';
 
 
 const useStyles = makeStyles((theme) => ({
@@ -94,11 +95,14 @@ export default function DatasetList(props) {
           </TableHead>
           <TableBody>
             {props.upload_list.map((row) => (
-              <TableRow key={row.name}>
+              <TableRow key={row.upload_id}>
                 <TableCell component="th" scope="row">
                 <Link href={baseURL + 'datasets/' + row.upload_id} color='blue'>
                   {row.name}
                 </Link>
+                {row.editable
+                ?<UploadDialog upload_mode={'edit'} upload_id={row.upload_id}/>
+                : ""}
                 </TableCell>
                 {inReview ? <TableCell><a href="mailto:{row.contributor_email}">{row.contributor_email}</a></TableCell> : ""}
                 <TableCell>{row.upload_date}</TableCell>
