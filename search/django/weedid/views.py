@@ -673,4 +673,3 @@ def sitemap_xml(request):
     return render(
         request, "sitemap.xml", context={"urls": urls}, content_type="text/xml"
     )
-    
