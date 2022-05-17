@@ -4,8 +4,9 @@ import logging
 import argparse
 import pathlib
 import ocfl
+import uuid
 
-from deposit import Repository, RepositoryError
+from .deposit import Repository, RepositoryError
 
 logger = logging.getLogger(__name__)
 
@@ -43,7 +44,7 @@ def list_contents(repository, identifier, version):
             print(dataset.identifier, dataset.head_version)
 
 
-def migrate(repository, identifier, src, dry_run, metadata):
+def migrate(repository, identifier, src_dir, metadata):
     ocfl_metadata = ocfl.VersionMetadata(
         identifier=identifier,
         message=metadata["message"],
@@ -51,40 +52,38 @@ def migrate(repository, identifier, src, dry_run, metadata):
         name=metadata["name"],
     )
     dataset = repository.dataset(identifier)
-    dry_warn = ""
-    if dry_run:
-        dry_warn = "[dry run] "
     if dataset.exists_in_repo:
-        new_version = int(dataset.head_version[1:]) + 1
-        print(f"{dry_warn}Updating {identifier} to v{new_version}")
-        if dry_run:
-            return None
-        dataset.update(src, ocfl_metadata)
-        return dataset.head_version
-    else:
-        print(f"{dry_warn}Creating OCFL object {identifier} at v1")
-        if dry_run:
-            return None
-        with tempfile.TemporaryDirectory() as temp_dir:
-            new_object_dir = pathlib.Path(temp_dir) / identifier
-            new_object = ocfl.Object(identifier=identifier)
-            new_object.create(
-                objdir=str(new_object_dir),
-                srcdir=str(src),
-                metadata=ocfl_metadata,
-            )
-            repository.ocfl.add(object_path=str(new_object_dir))
-        return "v1"
+        raise RepositoryError(f"Dataset {identifier} already migrated")
+    with tempfile.TemporaryDirectory() as temp_dir:
+        new_object_dir = pathlib.Path(temp_dir) / identifier
+        new_object = ocfl.Object(identifier=identifier)
+        new_object.create(
+            objdir=str(new_object_dir),
+            srcdir=str(src_dir),
+            metadata=ocfl_metadata,
+        )
+        repository.ocfl.add(object_path=str(new_object_dir))
 
 
-def migrate_dir(repository, src, dry_run, metadata):
-    if dry_run:
-        print(f"Dry run, scanning all subdirectories in {src}")
-    else:
-        print(f"Migrating all subdirectories in {src}")
+def migrate_dir(repository, src, metadata):
     for subdir in [x for x in src.iterdir() if x.is_dir()]:
-        identifier = str(subdir.name)
-        migrate(repository, identifier, subdir, dry_run, metadata)
+        try:
+            identifier = str(subdir.name)
+            uuid.UUID(identifier)
+            print(f"Importing {identifier}")
+            migrate(repository, identifier, subdir, metadata)
+        except ValueError:
+            print(f"Skipping non-uuid path {identifier}")
+
+
+def ensure_ocfl(repository_str):
+    """Initialises an OCFL repo in repository_str if it doesn't already
+    exist, and returns the Repository object"""
+    repository_dir = pathlib.Path(repository_str)
+    repository = Repository(repository_dir)
+    if not repository_dir.is_dir():
+        repository.initialize()
+    return repository
 
 
 def main(args=None):
@@ -97,7 +96,6 @@ def main(args=None):
     ap.add_argument("--message", default="", type=str)
     ap.add_argument("--migrate-dir", default=None, type=pathlib.Path)
     ap.add_argument("--migrate", default=None, type=pathlib.Path)
-    ap.add_argument("--dry-run", default=False, action="store_true")
     ap.add_argument("--list", default=False, action="store_true")
     ap.add_argument("--version", default="head", type=str)
     ap.add_argument("--validate", default=False, action="store_true")
@@ -125,13 +123,10 @@ def main(args=None):
         return migrate_dir(
             repository,
             args.migrate_dir,
-            args.dry_run,
             metadata,
         )
     if args.migrate:
-        return migrate(
-            repository, args.identifier, args.migrate, args.dry_run, metadata
-        )
+        return migrate(repository, args.identifier, args.migrate, metadata)
 
 
 if __name__ == "__main__":
