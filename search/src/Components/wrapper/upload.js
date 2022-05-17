@@ -133,13 +133,8 @@ class UploadComponent extends Component {
                     <Typography variant="body1" style={{color: "#f0983a"}}>{this.state.upload_status_details}</Typography>
                 </PaddedPaper>
                 <div>
-<<<<<<< HEAD
-                    <UploadDialog handleUploadStatus={this.retrieveUploadStatus} checkUploadStatusInterval={this.checkUploadStatusInterval}/>
-                    <Button variant="outlined" color="primary" onClick={this.handleLogout}>
-=======
-                    <UploadDialog upload_mode={'upload'} handleUploadStatus={this.retrieveUploadStatus}/>
+                    <UploadDialog upload_mode={'upload'} handleUploadStatus={this.retrieveUploadStatus} checkUploadStatusInterval={this.checkUploadStatusInterval}/>
                     <Button variant="outlined" color="primary" onClick={this.handleLogout} className={classes.logout}>
->>>>>>> 92fc1db9529cd7ea4a287105a6094844b71cf616
                         Log out
                     </Button>
                 </div>
