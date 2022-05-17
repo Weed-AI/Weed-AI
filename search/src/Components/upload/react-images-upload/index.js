@@ -1,11 +1,9 @@
-import React from 'react';
-import PropTypes from 'prop-types';
-import './index.css';
-import FlipMove from 'react-flip-move';
 import axios from 'axios';
 import Cookies from 'js-cookie';
-import http from 'http';
-import https from 'https';
+import PropTypes from 'prop-types';
+import React from 'react';
+import FlipMove from 'react-flip-move';
+import './index.css';
 
 
 const styles = {
@@ -225,7 +223,7 @@ class ReactImageUploadComponent extends React.Component {
     this.state.pictures.map((picture, index) => {
       return (
         <div key={index} className="uploadPictureContainer">
-          <div className="deleteImage" onClick={() => this.removeImage(picture)}>X</div>
+          {/* <div className="deleteImage" onClick={() => this.removeImage(picture)}>X</div> */}
           <div style={{display: 'flex', flexDirection: 'column', width: '100%', overflowWrap: 'anywhere'}}>
             <img src={picture} className="uploadPicture" alt="preview"/>
             <p>{this.state.files[index].name}</p>
@@ -234,7 +232,7 @@ class ReactImageUploadComponent extends React.Component {
       );
     })
     :
-    <p>No preview for images more than {preview_maximum}</p>
+    <p>No preview available over {preview_maximum} images</p>
   }
 
   /*

@@ -1,15 +1,15 @@
 """Validation tools for WeedCOCO
 """
-import pathlib
 import argparse
-import sys
-import json
-import tempfile
 import datetime
+import json
+import pathlib
+import sys
+import tempfile
 
+import yaml
 from jsonschema import FormatChecker
 from jsonschema.validators import Draft7Validator, RefResolver
-import yaml
 
 from .species_utils import get_eppo_singleton
 
@@ -25,6 +25,7 @@ MAIN_SCHEMAS = {
 FORMAT_CHECKER = FormatChecker()
 # TODO: change from temp path to config
 EPPO_CACHE_PATH = pathlib.Path(tempfile.gettempdir()) / "eppo-codes.zip"
+eppo = get_eppo_singleton(EPPO_CACHE_PATH)
 
 
 @FORMAT_CHECKER.checks("date")
@@ -45,7 +46,6 @@ def check_date_missing_parts_format(value):
 def check_plant_taxon_format(value):
     if not value.islower():
         return False
-    eppo = get_eppo_singleton(EPPO_CACHE_PATH)
     try:
         return eppo.lookup_preferred_name(value, species_only=False)
     except KeyError:
@@ -163,11 +163,11 @@ def validate_references(
                                 f"Found in {section_name} id {obj.get('id')}"
                             )
                         referenced_ids.add(id_key)
-
-    for known_id in known_ids:
-        section_name = known_id[0]
-        if section_name in require_reference and known_id not in referenced_ids:
-            raise ValidationError(f"{section_name} ID {known_id[1]} is unreferenced")
+    # Commented to allow datasets with incomplete annotations
+    # for known_id in known_ids:
+    #     section_name = known_id[0]
+    #     if section_name in require_reference and known_id not in referenced_ids:
+    #         raise ValidationError(f"{section_name} ID {known_id[1]} is unreferenced")
     # TODO: consider warning if not require_reference
 
 
