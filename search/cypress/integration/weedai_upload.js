@@ -51,7 +51,10 @@ describe('overall upload workflow', () => {
         cy.clickText(/^Next$/)
         cy.get('.dzu-input').attachFile('test_coco/coco.json')
         cy.clickText(/^Next$/)
+        cy.clickText(/crop: daucus carota /)  // expand accordion
         cy.findByText("crop").type('weed{enter}')
+        cy.clickText(/crop: daucus carota /)  // collapse accordion
+        cy.clickText(/weed: UNSPECIFIED /)  // expand accordion
         cy.findByDisplayValue(/^UNSPECIFIED$/).click().clear().type('rapistrum rugosum{enter}')
         cy.clickText(/^Next$/)
         cy.setAgAndMeta()
@@ -122,8 +125,8 @@ describe('overall upload workflow', () => {
         cy.clickText(/^Apply$/)
         cy.wait(5000)
         cy.clickText(/^Next$/)
-        cy.findByText(task.label.split(': ')[0]).type('weed{enter}')
-        cy.findByDisplayValue(task.label.split(': ')[1]).click().clear().type('rapistrum rugosum{enter}')
+        cy.clickText(/weed: UNSPECIFIED /)  // expand accordion
+        cy.findByDisplayValue(/^UNSPECIFIED$/).click().clear().type('rapistrum rugosum{enter}')
         cy.clickText(/^Next$/)
         cy.setAgAndMeta()
         cy.clickText(/^Submit$/)

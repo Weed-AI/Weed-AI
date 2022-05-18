@@ -17,7 +17,6 @@ from core.settings import (
     TUS_DESTINATION_DIR,
     UPLOAD_DIR,
 )
-
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required
@@ -43,16 +42,16 @@ from weedid.decorators import check_post_and_authenticated
 from weedid.models import Dataset, WeedidUser
 from weedid.notification import review_notification
 from weedid.tasks import (
+    store_tmp_image_from_zip,
     submit_upload_task,
     update_index_and_thumbnails,
-    store_tmp_image_from_zip,
 )
 from weedid.utils import (
     add_agcontexts,
     add_metadata,
     create_upload_entity,
     move_to_upload,
-    parse_category_name,
+    parse_category_for_mapper,
     remove_entity_local_record,
     retrieve_listing_info,
     retrieve_missing_images_list,
@@ -190,7 +189,8 @@ def editing_init(request, dataset_id):
     with open(os.path.join(upload_path, "weedcoco.json")) as f:
         weedcoco_json = json.load(f)
         categories = [
-            parse_category_name(category) for category in weedcoco_json["categories"]
+            parse_category_for_mapper(category)
+            for category in weedcoco_json["categories"]
         ]
         images = retrieve_missing_images_list(
             weedcoco_json, os.path.join(upload_path, "images"), dataset_id
@@ -282,7 +282,8 @@ class CustomUploader:
             validate(coco_json, schema="coco")
             fix_compatibility_quirks(coco_json)
             categories = [
-                parse_category_name(category) for category in coco_json["categories"]
+                parse_category_for_mapper(category)
+                for category in coco_json["categories"]
             ]
             upload_dir, upload_id = setup_upload_dir(
                 os.path.join(UPLOAD_DIR, str(user.id))

@@ -1,15 +1,16 @@
-import json
-import pathlib
-import os
-import warnings
 import hashlib
-import requests
+import json
+import os
+import pathlib
+import re
+import warnings
 
+import imagehash
 import joblib
 import PIL.Image
 import PIL.ImageOps
+import requests
 import yaml
-import imagehash
 
 memory = joblib.Memory(pathlib.Path(__file__).parent / "_cache")
 
@@ -147,6 +148,26 @@ def get_task_types(annotations):
     return out
 
 
+def parse_category_name(name):
+    match = re.fullmatch(r"(crop|weed|none)(?:: ([^(]+))?(?: \((.*)\))?", name)
+    if match:
+        return {
+            "name": name,
+            "role": match.group(1),
+            "taxon": match.group(2),
+            "subcategory": match.group(3),
+        }
+
+
+def format_category_name(role, taxon=None, subcategory=None):
+    out = role
+    if taxon:
+        out += f": {taxon}"
+    if subcategory:
+        out += f" ({subcategory})"
+    return out
+
+
 @memory.cache
 def get_gbif_record(canonical_name):
     results = requests.get(
@@ -174,7 +195,11 @@ def get_supercategory_names(name):
         return []
 
     taxon = name.split(": ", 1)[1]
-    out = ["weed"]
+    if len(taxon.split(" (")) > 1:
+        out = ["weed", name, name.split(" (")[0]]
+        taxon = taxon.split(" (")[0]
+    else:
+        out = ["weed"]
     if taxon == "UNSPECIFIED":
         return out
 

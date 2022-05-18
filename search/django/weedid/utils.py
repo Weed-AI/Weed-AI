@@ -18,7 +18,13 @@ from core.settings import (
 from django.core.files.storage import FileSystemStorage
 from weedcoco.repo.deposit import Repository, mkdir_safely
 from weedcoco.stats import WeedCOCOStats
-from weedcoco.utils import copy_without_exif, set_info, set_licenses
+from weedcoco.utils import (
+    copy_without_exif,
+    format_category_name,
+    parse_category_name,
+    set_info,
+    set_licenses,
+)
 from weedcoco.validation import validate
 
 from weedid.models import Dataset, WeedidUser
@@ -67,18 +73,21 @@ def setup_upload_dir(upload_userid_dir):
 def set_categories(weedcoco_path, categories):
     with open(weedcoco_path, "r") as jsonFile:
         data = json.load(jsonFile)
-    new_categories = []
-    for category in categories:
-        if category["role"] and category["scientific_name"]:
-            new_categories.append(
-                {
-                    "id": category["id"],
-                    "name": ": ".join((category["role"], category["scientific_name"])),
-                }
-            )
-        else:
-            new_categories.append({"id": category["id"], "name": category["name"]})
-    data["categories"] = new_categories
+    # TODO: should we only update category name?
+    data["categories"] = [
+        {
+            "id": category["id"],
+            "name": format_category_name(
+                role=category["role"],
+                taxon=category.get("scientific_name"),
+                subcategory=category.get("subcategory"),
+            ),
+        }
+        for category in categories
+    ]
+    category_name_set = [category["name"] for category in data["categories"]]
+    if len(set(category_name_set)) < len(category_name_set):
+        raise Exception("Sorry, category with the same name is not allowed")
     with open(weedcoco_path, "w") as jsonFile:
         json.dump(data, jsonFile)
     return data
@@ -193,21 +202,23 @@ def send_email(subject, body, recipients):
                 smtp.send_message(msg)
 
 
-def parse_category_name(category):
-    if re.fullmatch(r"(crop|weed): .+", category["name"]):
-        return {
-            "id": category["id"],
-            "name": category["name"],
-            "role": category["name"].split(": ", maxsplit=1)[0],
-            "scientific_name": category["name"].split(": ", maxsplit=1)[1],
-        }
-    else:
+def parse_category_for_mapper(category):
+    parsed = parse_category_name(category["name"])
+    if parsed is None:
         return {
             "id": category["id"],
             "name": category["name"],
             "role": "",
             "scientific_name": "",
+            "subcategory": "",
         }
+    return {
+        "id": category["id"],
+        "name": category["name"],
+        "role": parsed["role"],
+        "scientific_name": parsed["taxon"],
+        "subcategory": parsed["subcategory"],
+    }
 
 
 def retrieve_missing_images_list(weedcoco_json, images_path, upload_id):
@@ -228,7 +239,7 @@ def upload_helper(weedcoco_json, user_id, schema="coco", upload_id=None):
         schema=schema,
     )
     categories = [
-        parse_category_name(category) for category in weedcoco_json["categories"]
+        parse_category_for_mapper(category) for category in weedcoco_json["categories"]
     ]
     if not upload_id or len(upload_id) != len(str(uuid4())):
         upload_dir, upload_id = setup_upload_dir(os.path.join(UPLOAD_DIR, str(user_id)))

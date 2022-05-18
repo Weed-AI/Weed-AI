@@ -10,7 +10,7 @@ import yaml
 from jsonschema import FormatChecker
 from jsonschema.validators import Draft7Validator, RefResolver
 
-from .utils import get_gbif_record
+from .utils import get_gbif_record, parse_category_name
 
 SCHEMA_DIR = pathlib.Path(__file__).parent / "schema"
 MAIN_SCHEMAS = {
@@ -51,21 +51,23 @@ def check_plant_taxon_format(value):
 
 @FORMAT_CHECKER.checks("weedcoco_category")
 def check_weedcoco_category_format(value):
-    prefix, colon, taxon = value.partition(": ")
-    if not colon:
+    parsed = parse_category_name(value)
+    if parsed is None:
+        return
+    if not parsed["taxon"]:
         # Category must begin with weed, crop or none
-        return prefix in {"weed", "crop", "none"}
+        return parsed["role"] in {"weed", "crop", "none"}
 
     # Specific category must begin with 'weed:' or 'crop:'
-    if prefix not in {"weed", "crop"}:
+    if parsed["role"] not in {"weed", "crop"}:
         return False
 
-    if taxon == "UNSPECIFIED":
+    if parsed["taxon"] == "UNSPECIFIED":
         # crop: UNSPECIFIED is not a valid category
-        return prefix == "weed"
+        return parsed["role"] == "weed"
 
     # Taxon name should be lowercase in category
-    return check_plant_taxon_format(taxon)
+    return check_plant_taxon_format(parsed["taxon"])
 
 
 class ValidationError(Exception):
