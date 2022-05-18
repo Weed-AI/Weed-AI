@@ -247,6 +247,7 @@ class UploadStepper extends React.Component {
         if (this.state.activeStep === this.state.steps.length - 1){
             this.handleSubmit();
             this.props.handleClose();
+            this.props.checkUploadStatusInterval(3000);
             this.handleReset();
         }
         else {
