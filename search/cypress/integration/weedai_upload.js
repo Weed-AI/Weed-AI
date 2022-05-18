@@ -1,3 +1,11 @@
+const safeSetForm = () => {
+	cy.wait(1000)
+	// hack needed due to textarea risizing upredictably
+	cy.clickText(/JSON data/)
+	cy.focused().blur()
+	cy.clickText(/^Set Form$/)
+}
+
 describe('overall upload workflow', () => {
 
     beforeEach(() => {

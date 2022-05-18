@@ -5,13 +5,12 @@ import datetime
 import json
 import pathlib
 import sys
-import tempfile
 
 import yaml
 from jsonschema import FormatChecker
 from jsonschema.validators import Draft7Validator, RefResolver
 
-from .species_utils import get_eppo_singleton
+from .utils import get_gbif_record
 
 SCHEMA_DIR = pathlib.Path(__file__).parent / "schema"
 MAIN_SCHEMAS = {
@@ -24,8 +23,6 @@ MAIN_SCHEMAS = {
 
 FORMAT_CHECKER = FormatChecker()
 # TODO: change from temp path to config
-EPPO_CACHE_PATH = pathlib.Path(tempfile.gettempdir()) / "eppo-codes.zip"
-eppo = get_eppo_singleton(EPPO_CACHE_PATH)
 
 
 @FORMAT_CHECKER.checks("date")
@@ -47,8 +44,8 @@ def check_plant_taxon_format(value):
     if not value.islower():
         return False
     try:
-        return eppo.lookup_preferred_name(value, species_only=False)
-    except KeyError:
+        return get_gbif_record(value)
+    except ValueError:
         return False
 
 

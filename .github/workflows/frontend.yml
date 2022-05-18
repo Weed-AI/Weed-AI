@@ -48,7 +48,6 @@ jobs:
             }
             while get_statuses | grep -q starting; do sleep 1; done
             if get_statuses | grep -q -e exited -e restarting -e unhealthy; then false; fi
-            curl -L http://localhost/api/warmup/
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v2
         with:

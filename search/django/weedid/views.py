@@ -673,10 +673,3 @@ def sitemap_xml(request):
     return render(
         request, "sitemap.xml", context={"urls": urls}, content_type="text/xml"
     )
-
-
-def warmup(request):
-    from weedcoco.validation import EPPO_CACHE_PATH, get_eppo_singleton
-
-    get_eppo_singleton(EPPO_CACHE_PATH)
-    return HttpResponse("Success")
