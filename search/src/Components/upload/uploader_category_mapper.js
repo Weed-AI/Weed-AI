@@ -141,7 +141,6 @@ class CategoryMapper extends React.Component {
 
     changeSubcategory(e, index) {
         this.modifyCategories(index, "subcategory", e.target.value);
-        this.props.handleValidation(false);
         this.props.handleErrorMessage("");
     }
 
