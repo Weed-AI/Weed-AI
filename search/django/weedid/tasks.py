@@ -23,7 +23,7 @@ from core.settings import (
 from weedcoco.index.indexing import ElasticSearchIndexer
 from weedcoco.index.thumbnailing import thumbnailing
 from weedcoco.repo.deposit import Repository, RepositoryError, deposit, mkdir_safely
-from weedcoco.repo.repository import migrate_dir, ensure_ocfl
+from weedcoco.repo.repository import ensure_ocfl, migrate_dir
 
 from weedid.models import Dataset, WeedidUser
 from weedid.notification import (
@@ -234,6 +234,35 @@ def redeposit_dataset(
 
 
 @shared_task
+def remove_dataset(
+    upload_id,
+    repository_dir=REPOSITORY_DIR,
+    download_dir=DOWNLOAD_DIR,
+    upload_dir=UPLOAD_DIR,
+):
+    upload_entity = Dataset.objects.get(upload_id=upload_id)
+    upload_record_path = Path(upload_dir) / str(upload_entity.user_id) / upload_id
+    download_zipfile_path = str(Path(download_dir) / f"{upload_id}.zip")
+    repository = Repository(repository_dir)
+    dataset = repository.dataset(upload_id)
+
+    # remove upload record
+    if os.path.exists(upload_record_path):
+        rmtree(upload_record_path)
+    # remove download entity
+    if os.path.isfile(download_zipfile_path):
+        os.remove(download_zipfile_path)
+    # remove dataset in repositry
+    dataset.remove()
+    # remove dataset index
+    ElasticSearchIndexer.remove_all_index_with_upload(
+        upload_id, es_host="elasticsearch"
+    )
+    # remove database entity
+    if upload_entity:
+        upload_entity.delete()
+
+
 def migrate_to_ocfl(
     old_repository_dir,
     upload_id,

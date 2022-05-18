@@ -204,6 +204,27 @@ class ElasticSearchIndexer:
         """
         self.es_client.update_by_query(self.es_index_name, body, conflicts="proceed")
 
+    @staticmethod
+    def remove_all_index_with_upload(
+        upload_id, es_index_name="weedid", es_host="localhost", es_port=9200
+    ):
+        es_client = elasticsearch.Elasticsearch(
+            hosts=[{"host": es_host, "port": es_port}]
+        )
+        body = f"""
+        {{
+          "script": {{
+            "source": "ctx._source.version.version_tag = 'past version'"
+          }},
+          "query": {{
+            "bool": {{
+              "must": {{"match": {{"upload_id": "{upload_id}"}}}}
+            }}
+          }}
+        }}
+        """
+        es_client.update_by_query(es_index_name, body, conflicts="proceed")
+
 
 def main(args=None):
     ap = argparse.ArgumentParser(description=__doc__)

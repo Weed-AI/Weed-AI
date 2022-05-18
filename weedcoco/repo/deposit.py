@@ -185,6 +185,10 @@ class RepositoryDataset:
             if self.object_path.is_dir():
                 rmtree(str(self.object_path))
 
+    def remove(self):
+        if self.object_path and self.object_path.is_dir():
+            rmtree(str(self.object_path))
+
     def write_weedcoco(self, dataset_dir):
         with open(self.weedcoco_path) as f:
             weedcoco = json.load(f)
