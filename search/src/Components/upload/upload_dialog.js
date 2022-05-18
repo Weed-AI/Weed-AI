@@ -91,7 +91,7 @@ export default function UploadDialog(props) {
         <DialogTitle id="upload-dialog-title" onClose={handleClose}>
         </DialogTitle>
         <DialogContent>
-            <UploadSteper handleClose={handleClose} upload_type={props.upload_type} preset={preset} upload_mode={upload_mode}/>
+            <UploadSteper handleClose={handleClose} upload_type={props.upload_type} preset={preset} upload_mode={upload_mode} checkUploadStatusInterval={props.checkUploadStatusInterval}/>
         </DialogContent>
       </Dialog>
     </React.Fragment>

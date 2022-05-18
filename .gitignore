@@ -11,6 +11,10 @@ weedcoco/cwfid_to_json/*.yaml
 weedcoco/cwfid_to_json/annotations/*.yaml
 weedcoco/concatenation/*.json
 
+build/
+search/weedcoco/
+weedcoco/_cache/
+
 # generated files
 weedcoco/schema/*.json
 

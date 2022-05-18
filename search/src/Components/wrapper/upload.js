@@ -49,6 +49,7 @@ class UploadComponent extends Component {
             upload_status_details: "",
         }
         this.retrieveUploadStatus = this.retrieveUploadStatus.bind(this);
+        this.checkUploadStatusInterval = this.checkUploadStatusInterval.bind(this);
         this.handleLogin = this.handleLogin.bind(this);
         this.handleLogout = this.handleLogout.bind(this);
     }
@@ -82,6 +83,10 @@ class UploadComponent extends Component {
         })
     }
 
+    checkUploadStatusInterval(interval=5000){
+        setInterval(this.retrieveUploadStatus, interval)
+    }
+
     retrieveLoginStatus(){
         return new Promise((resolve, reject) => {
             axios.get(baseURL + "api/login_status/")
@@ -107,7 +112,6 @@ class UploadComponent extends Component {
         const isLoggedIn = await this.retrieveLoginStatus()
         if(isLoggedIn){
             this.retrieveUploadStatus()
-            setInterval(this.retrieveUploadStatus, 50000)
         }
     }
 
@@ -129,7 +133,7 @@ class UploadComponent extends Component {
                     <Typography variant="body1" style={{color: "#f0983a"}}>{this.state.upload_status_details}</Typography>
                 </PaddedPaper>
                 <div>
-                    <UploadDialog upload_mode={'upload'} handleUploadStatus={this.retrieveUploadStatus}/>
+                    <UploadDialog upload_mode={'upload'} handleUploadStatus={this.retrieveUploadStatus} checkUploadStatusInterval={this.checkUploadStatusInterval}/>
                     <Button variant="outlined" color="primary" onClick={this.handleLogout} className={classes.logout}>
                         Log out
                     </Button>
