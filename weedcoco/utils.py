@@ -195,7 +195,11 @@ def get_supercategory_names(name):
         return []
 
     taxon = name.split(": ", 1)[1]
-    out = ["weed"]
+    if len(taxon.split(" (")) > 1:
+        out = ["weed", name, name.split(" (")[0]]
+        taxon = taxon.split(" (")[0]
+    else:
+        out = ["weed"]
     if taxon == "UNSPECIFIED":
         return out
 
