@@ -1,20 +1,12 @@
 # Starter Guide
 
-1. `docker-compose up --build --force-recreate`
-2. Mount RDS and run `scripts/load_data_from_rds.sh` to load all prepared data
-3. Open http://localhost:1337 for the reactive search UI
-4. localhost:5601 for kibana and elastic stack
+## Clone repository for Weed-AI and submodules and go to workdir
+```
+git clone --recurse-submodules -j8 -b release-candidate-2.0 git@github.com:Weed-AI/Weed-AI.git
+cd Weed-AI/search/
+```
 
-## Start the server in Development and Production mode:
-
-- DEV: 
-	`docker-compose -f docker-compose-dev.yml build`
-	`docker-compose -f docker-compose-dev.yml up`
-- PROD:
-	`docker-compose -f docker-compose.yml build`
-	`docker-compose -f docker-compose.yml up`
-
-### Include a `.env` file to store key credentials:
+## Include a `.env` file to store key credentials:
 ```
 DJANGO_SECRET_KEY=
 POSTGRES_USER=
@@ -32,7 +24,7 @@ HTTPS_HOST=<https host such as weed-ai.sydney.edu.au>
 CVAT_BASEPATH='/cvat-annotation'
 ```
 
-### Initialise database, migrate and create superuser
+## Initialise database, migrate and create superuser
 - Database init
 	1. Start PostgreSQL server: `docker-compose -f docker-compose-dev.yml up -d db`
 	2. Enter server container: `docker exec -it db bash`
@@ -43,11 +35,10 @@ CVAT_BASEPATH='/cvat-annotation'
 	2. Enter server container: `docker exec -it django bash`
 	3. Create superuser: `python manage.py createsuperuser` and follow the prompt instruction
 
-### To build cvat image
-```
-# To also download cvat as a submodule
-git clone --recurse-submodules -j8 git@github.com:Weed-AI/Weed-AI.git
-cd cvat
-docker-compose build cvat_ui
-# Then start WeedAI as above
-```
+## Start the server in Development and Production mode:
+- DEV: 
+	`docker-compose -f docker-compose-dev.yml build`
+	`docker-compose -f docker-compose-dev.yml up`
+- PROD:
+	`docker-compose -f docker-compose.yml build`
+	`docker-compose -f docker-compose.yml up`
