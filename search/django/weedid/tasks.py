@@ -263,6 +263,7 @@ def remove_dataset(
         upload_entity.delete()
 
 
+@shared_task
 def migrate_to_ocfl(
     old_repository_dir,
     upload_id,
