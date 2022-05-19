@@ -264,7 +264,7 @@ services:
     labels:
       - traefik.enable=true
       - traefik.http.services.cvat.loadbalancer.server.port=8080
-      - traefik.http.routers.cvat.rule=Host(`${HTTP_HOST:-localhost}`,`${HTTPS_HOST}`) && PathPrefix(`${CVAT_BASEPATH}/api/`, `${CVAT_BASEPATH}/git/`, `${CVAT_BASEPATH}/opencv/`, `${CVAT_BASEPATH}/analytics/`, `${CVAT_BASEPATH}/static/`, `${CVAT_BASEPATH}/admin`, `${CVAT_BASEPATH}/documentation/`, `${CVAT_BASEPATH}/django-rq`)
+      - traefik.http.routers.cvat.rule=Host(`${HTTPS_HOST}`) && PathPrefix(`${CVAT_BASEPATH}/api/`, `${CVAT_BASEPATH}/git/`, `${CVAT_BASEPATH}/opencv/`, `${CVAT_BASEPATH}/analytics/`, `${CVAT_BASEPATH}/static/`, `${CVAT_BASEPATH}/admin`, `${CVAT_BASEPATH}/documentation/`, `${CVAT_BASEPATH}/django-rq`)
       - traefik.http.routers.cvat.entrypoints=web
       - traefik.http.routers.cvat.middlewares=add-cvat
       - traefik.http.middlewares.add-cvat.stripprefix.prefixes=${CVAT_BASEPATH}
@@ -290,7 +290,7 @@ services:
     labels:
       - traefik.enable=true
       - traefik.http.services.cvat-ui.loadbalancer.server.port=80
-      - traefik.http.routers.cvat-ui.rule=Host(`${HTTP_HOST:-localhost}`,`${HTTPS_HOST}`) && PathPrefix(`${CVAT_BASEPATH}`, `/cvat-static`)
+      - traefik.http.routers.cvat-ui.rule=Host(`${HTTPS_HOST}`) && PathPrefix(`${CVAT_BASEPATH}`, `/cvat-static`)
       - traefik.http.routers.cvat-ui.entrypoints=web
       - traefik.http.routers.cvat-ui.middlewares=add-cvat-ui
       - traefik.http.middlewares.add-cvat-ui.stripprefix.prefixes=${CVAT_BASEPATH}
@@ -306,14 +306,6 @@ services:
       - "--providers.docker.exposedByDefault=false"
       - "--providers.docker.network=elastic"
       - "--entryPoints.web.address=:80"
-    # Uncomment to get Traefik dashboard
-    #   - "--entryPoints.dashboard.address=:8090"
-    #   - "--api.dashboard=true"
-    # labels:
-    #   - traefik.enable=true
-    #   - traefik.http.routers.dashboard.entrypoints=dashboard
-    #   - traefik.http.routers.dashboard.service=api@internal
-    #   - traefik.http.routers.dashboard.rule=Host(`${HTTP_HOST:-localhost}`)
     ports:
       - 80:80
     volumes:
