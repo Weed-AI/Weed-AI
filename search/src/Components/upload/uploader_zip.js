@@ -55,7 +55,7 @@ const getZipUploadResponse = ({upload_id, images, filename}) => {
                     } else {
                         resolve(res)
                     }
-                })
+                }).catch(() => {setTimeout(poll, pollPeriod)})
             }
             setTimeout(poll, pollPeriod);
         }).catch(reject)
