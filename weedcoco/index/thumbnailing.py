@@ -23,8 +23,7 @@ def thumbnail_one(coco_image, filename, image_path, thumbnails_dir, thumbnail_si
 
     image = Image.open(image_path)
     if not check_if_approved_image_format(image.format):
-        # XXX: should this raise an error?
-        return
+        raise Exception(f"{image.format} wrong for {image.filename}")
 
     orig_width, orig_height = image.size
     image.thumbnail(thumbnail_size)

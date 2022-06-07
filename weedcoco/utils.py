@@ -92,7 +92,7 @@ def check_if_approved_image_extension(image_name):
 
 
 def check_if_approved_image_format(image_ext):
-    return image_ext in ("PNG", "JPG", "JPEG", "TIFF")
+    return image_ext in ("PNG", "JPG", "JPEG", "TIFF", "MPO")
 
 
 def copy_without_exif(src, dest):
