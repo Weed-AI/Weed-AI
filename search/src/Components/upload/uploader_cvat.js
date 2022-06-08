@@ -4,7 +4,6 @@ import TextField from '@material-ui/core/TextField';
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import axios from 'axios';
 import React from 'react';
-import { jsonSchemaTitle } from '../error/utils';
 
 
 const useStyles = (theme) => ({
@@ -28,7 +27,6 @@ class CvatRetriever extends React.Component {
             upload_id: props.upload_id
         }
         this.retrieveCvatTasksList = this.retrieveCvatTasksList.bind(this);
-        this.retrieveTaskExportFile = this.retrieveTaskExportFile.bind(this);
     }
 
     async retrieveCvatTasksList() {
@@ -54,32 +52,6 @@ class CvatRetriever extends React.Component {
             }
         }
     }
-    
-    async retrieveTaskExportFile() {
-        try {
-            const res = await axios.get(baseURL + `cvat-annotation/api/v1/tasks/${this.state.selected_task_id}/annotations?format=COCO%201.0&filename=temp.zip`)
-            if (res.statusText === 'Created') {
-                const cvat_res = await axios.get(baseURL + `api/retrieve_cvat_task/${this.state.upload_id}/${this.state.selected_task_id}`)
-                const payload = cvat_res.data
-                this.props.handleUploadId(payload.upload_id)
-                this.props.handleImages(payload.images)
-                this.props.handleCategories(payload.categories)
-                this.props.handleValidation(true)
-            }
-        } catch (error) {
-            console.log(error)
-            try {
-                const err = JSON.parse(error.responseText)
-                this.props.handleErrorMessage(jsonSchemaTitle(err), err)
-            } catch (err) {
-                this.props.handleErrorMessage("Validation error", error)
-            }
-            finally {
-                this.props.handleValidation(false)
-            }
-        }
-        
-    }
 
     componentDidMount() {
         this.retrieveCvatTasksList();
@@ -100,20 +72,14 @@ class CvatRetriever extends React.Component {
                                 if (value == null) {
                                     this.state.selected_task_id = 0
                                     this.props.handleCvatTaskId(0)
+                                    this.props.handleValidation(false)
                                 } else {
                                     this.state.selected_task_id = value.id
                                     this.props.handleCvatTaskId(value.id)
+                                    this.props.handleValidation(true)
                                 }
                             }}
                     />
-                    <Button 
-                            variant="contained"
-                            color="primary"
-                            className={classes.applyButton}
-                            disabled={this.state.selected_task_id == 0}
-                            onClick={this.retrieveTaskExportFile}>
-                        Apply
-                    </Button>
                 </React.Fragment>
             )
         }
