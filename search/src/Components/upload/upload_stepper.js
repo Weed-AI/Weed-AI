@@ -266,7 +266,7 @@ class UploadStepper extends React.Component {
                 }
             })
             this.handleErrorMessage("")
-            if (stepsByType[this.state.upload_type][this.state.activeStep].type === "images") {
+            if (stepsByType[this.state.upload_type][activeStep + 1].type === "images") {
                 this.handleMissingImages();
             }
         }
