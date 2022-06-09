@@ -117,14 +117,10 @@ describe('overall upload workflow', () => {
         cy.clickText(/^Next$/)
         cy.get('.MuiAutocomplete-endAdornment').click()
         cy.findAllByText(task.name).first().click()
-        cy.findAllByText(/^Apply$/).first().should('not.be.disabled', { timeout: 3000})
-        cy.wait(5000)
+        cy.findAllByText(/^Next$/).first().should('not.be.disabled', { timeout: 3000}).click()
         // very bad but I don't understand why the first couple of clicks fail in cypress
-        cy.clickText(/^Apply$/)
-        cy.wait(5000)
-        cy.clickText(/^Apply$/)
-        cy.wait(5000)
         cy.clickText(/^Next$/)
+        cy.wait(5000)
         cy.clickText(/weed: UNSPECIFIED /)  // expand accordion
         cy.findByDisplayValue(/^UNSPECIFIED$/).click().clear().type('rapistrum rugosum{enter}')
         cy.clickText(/^Next$/)
