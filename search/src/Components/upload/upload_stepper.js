@@ -411,14 +411,14 @@ class UploadStepper extends React.Component {
                 this.setState({nextProcessing: true})
             }
             const res = await axios.get(baseURL + `cvat-annotation/api/v1/tasks/${this.state.cvat_task_id}/annotations?format=COCO%201.0&filename=temp.zip`)
-            if (res.statusText === 'Created') {
+            if (res.status === 201) {
                 const cvat_res = await axios.get(baseURL + `api/retrieve_cvat_task/${this.state.upload_id}/${this.state.cvat_task_id}`)
                 const payload = cvat_res.data
                 this.handleUploadId(payload.upload_id)
                 this.handleImages(payload.images)
                 this.handleCategories(payload.categories)
                 this.progressToNext()
-            } else if (res.statusText === 'Accepted') {
+            } else if (res.status === 202) {
                 this.handleRetrieveCvatTask()
             }
         } catch (error) {
