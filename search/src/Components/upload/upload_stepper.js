@@ -407,7 +407,9 @@ class UploadStepper extends React.Component {
 
     async handleRetrieveCvatTask() {
         try {
-            this.setState({nextProcessing: true})
+            if (!this.state.nextProcessing){
+                this.setState({nextProcessing: true})
+            }
             const res = await axios.get(baseURL + `cvat-annotation/api/v1/tasks/${this.state.cvat_task_id}/annotations?format=COCO%201.0&filename=temp.zip`)
             if (res.statusText === 'Created') {
                 const cvat_res = await axios.get(baseURL + `api/retrieve_cvat_task/${this.state.upload_id}/${this.state.cvat_task_id}`)
@@ -416,6 +418,8 @@ class UploadStepper extends React.Component {
                 this.handleImages(payload.images)
                 this.handleCategories(payload.categories)
                 this.progressToNext()
+            } else if (res.statusText === 'Accepted') {
+                this.handleRetrieveCvatTask()
             }
         } catch (error) {
             console.log(error)
