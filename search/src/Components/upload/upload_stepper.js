@@ -131,6 +131,7 @@ class UploadStepper extends React.Component {
         this.isStepSkipped = this.isStepSkipped.bind(this);
         this.handleUploadId = this.handleUploadId.bind(this);
         this.handleCvatTaskId = this.handleCvatTaskId.bind(this);
+        this.handleRetrieveCvatTask = this.handleRetrieveCvatTask.bind(this);
         this.handleImageExtension = this.handleImageExtension.bind(this);
         this.handleImages = this.handleImages.bind(this);
         this.handleMissingImages = this.handleMissingImages.bind(this);
@@ -265,7 +266,7 @@ class UploadStepper extends React.Component {
                 }
             })
             this.handleErrorMessage("")
-            if (stepsByType[this.state.upload_type][this.state.activeStep].type === "images") {
+            if (stepsByType[this.state.upload_type][activeStep + 1].type === "images") {
                 this.handleMissingImages();
             }
         }
@@ -404,6 +405,35 @@ class UploadStepper extends React.Component {
         })
     }
 
+    async handleRetrieveCvatTask() {
+        try {
+            if (!this.state.nextProcessing){
+                this.setState({nextProcessing: true})
+            }
+            const res = await axios.get(baseURL + `cvat-annotation/api/v1/tasks/${this.state.cvat_task_id}/annotations?format=COCO%201.0&filename=temp.zip`)
+            if (res.status === 201) {
+                const cvat_res = await axios.get(baseURL + `api/retrieve_cvat_task/${this.state.upload_id}/${this.state.cvat_task_id}`)
+                const payload = cvat_res.data
+                this.handleUploadId(payload.upload_id)
+                this.handleImages(payload.images)
+                this.handleCategories(payload.categories)
+                this.progressToNext()
+            } else if (res.status === 202) {
+                this.handleRetrieveCvatTask()
+            }
+        } catch (error) {
+            console.log(error)
+            try {
+                const err = JSON.parse(error.responseText)
+                this.handleErrorMessage(jsonSchemaTitle(err), err)
+            } catch (err) {
+                this.handleErrorMessage("Validation error", error)
+            }
+        } finally {
+            this.setState({nextProcessing: false})
+        } 
+    }
+
     handleSubmit(){
         const baseURL = new URL(window.location.origin);
         const body = new FormData()
@@ -496,6 +526,8 @@ class UploadStepper extends React.Component {
                     return this.handleUploadAgcontexts
                 case "metadata":
                     return this.handleUploadMetadata
+                case "cvat":
+                    return this.handleRetrieveCvatTask
                 default:
                     return this.progressToNext
             }

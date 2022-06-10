@@ -259,7 +259,6 @@ services:
       CVAT_REDIS_HOST: 'cvat_redis'
       CVAT_POSTGRES_HOST: 'cvat_db'
       ADAPTIVE_AUTO_ANNOTATION: 'false'
-      BASENAME: ${CVAT_BASEPATH}
       DJANGO_AUTH_DEFAULT_GROUPS: 'USER'
     labels:
       - traefik.enable=true
@@ -285,8 +284,6 @@ services:
     restart: always
     depends_on:
       - cvat
-    environment:
-      BASENAME: ${CVAT_BASEPATH}
     labels:
       - traefik.enable=true
       - traefik.http.services.cvat-ui.loadbalancer.server.port=80
