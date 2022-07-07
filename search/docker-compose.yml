@@ -157,6 +157,7 @@ services:
     volumes:
       - tus_dir:/srv/tusd-data
     command: -behind-proxy -base-path /tus/files/
+    restart: always
 
   # search engine
   elasticsearch:
