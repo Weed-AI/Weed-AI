@@ -1,12 +1,14 @@
 # Starter Guide
 
 ## Clone repository for Weed-AI and submodules and go to workdir
+
 ```
 git clone --recurse-submodules -j8 -b release-candidate-2.0 git@github.com:Weed-AI/Weed-AI.git
 cd Weed-AI/search/
 ```
 
 ## Include a `.env` file to store key credentials:
+
 ```
 DJANGO_SECRET_KEY=
 POSTGRES_USER=
@@ -27,6 +29,7 @@ CVAT_BASEPATH='/cvat-annotation'
 **NOTE:** if working on Linux, you need to `sudo` all docker commands.
 
 ## Initialise database, migrate and create superuser
+
 - Database init
 	1. Start PostgreSQL server: `docker-compose -f docker-compose-dev.yml up -d db`
 	2. Enter server container: `docker exec -it db bash`
@@ -40,6 +43,7 @@ CVAT_BASEPATH='/cvat-annotation'
 	3. Create superuser: `python manage.py createsuperuser` and follow the prompt instruction
 
 ## Start the server in Development and Production mode:
+
 - DEV: 
 	`docker-compose -f docker-compose-dev.yml build`
 	`docker-compose -f docker-compose-dev.yml up`
