@@ -5,6 +5,8 @@
 3. Open http://localhost:1337 for the reactive search UI
 4. localhost:5601 for kibana and elastic stack
 
+Make sure that you have modified your Docker configuration (either using the command line or Docker Desktop's GUI) so that Docker can use enough resources.
+
 ## Start the server in Development and Production mode:
 
 - DEV: 
