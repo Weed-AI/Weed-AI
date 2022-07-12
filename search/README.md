@@ -33,7 +33,7 @@ DVC_REMOTE_PATH=/path/to/dvc/remote/on/rds
 	1. Start PostgreSQL server: `docker-compose -f docker-compose-dev.yml up -d db`
 	2. Enter server container: `docker exec -it db bash`
 	3. Log in with the credential stored in `.env` file: `psql -U <POSTGRES_USER>`
-	4. Create database: `create database <POSTGRES_DB>`
+	4. Create database: `create database <POSTGRES_DB>;`
 - Django Migration and create superuser
 	1. Start Django server: `docker-compose -f docker-compose-dev.yml up db django`
 	2. Enter server container: `docker exec -it django bash`
