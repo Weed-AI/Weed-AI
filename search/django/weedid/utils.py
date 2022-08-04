@@ -1,24 +1,33 @@
-import os
-from shutil import rmtree, move
 import json
+import os
 import re
-from uuid import uuid4
 import smtplib
 from email.message import EmailMessage
-from weedcoco.repo.deposit import mkdir_safely
-from weedcoco.utils import set_info, set_licenses
-from weedcoco.stats import WeedCOCOStats
-from django.core.files.storage import FileSystemStorage
-from weedid.models import Dataset, WeedidUser
+from shutil import move, rmtree
+from uuid import uuid4
+
 from core.settings import (
-    UPLOAD_DIR,
-    REPOSITORY_DIR,
     DOWNLOAD_DIR,
+    FROM_EMAIL,
+    REPOSITORY_DIR,
+    SEND_EMAIL,
     SMTP_HOST,
     SMTP_PORT,
-    FROM_EMAIL,
-    SEND_EMAIL,
+    UPLOAD_DIR,
 )
+from django.core.files.storage import FileSystemStorage
+from weedcoco.repo.deposit import Repository, mkdir_safely
+from weedcoco.stats import WeedCOCOStats
+from weedcoco.utils import (
+    copy_without_exif,
+    format_category_name,
+    parse_category_name,
+    set_info,
+    set_licenses,
+)
+from weedcoco.validation import validate
+
+from weedid.models import Dataset, WeedidUser
 
 
 class OverwriteStorage(FileSystemStorage):
@@ -30,11 +39,15 @@ class OverwriteStorage(FileSystemStorage):
 
 def store_tmp_image(image, image_dir):
     fs = OverwriteStorage()
-    fs.save(os.path.join(image_dir, image.name), image)
+    image_file = os.path.join(image_dir, image.name)
+    fs.save(image_file, image)
+    copy_without_exif(image_file, image_file)
 
 
 def store_tmp_weedcoco(weedcoco, upload_dir):
     weedcoco_path = os.path.join(upload_dir, "weedcoco.json")
+    if os.path.isfile(weedcoco_path):
+        os.remove(weedcoco_path)
     with open(weedcoco_path, "w") as weedcoco_file:
         weedcoco_file.write(json.dumps(weedcoco))
 
@@ -51,8 +64,8 @@ def move_to_upload(store_dir, upload_dir, mode=""):
 def setup_upload_dir(upload_userid_dir):
     if not os.path.isdir(upload_userid_dir):
         mkdir_safely(upload_userid_dir)
-    upload_id = str(uuid4())
-    upload_dir = upload_userid_dir + f"/{upload_id}"
+    upload_id = str(str(uuid4()))
+    upload_dir = os.path.join(upload_userid_dir, upload_id)
     mkdir_safely(upload_dir)
     return upload_dir, upload_id
 
@@ -60,18 +73,21 @@ def setup_upload_dir(upload_userid_dir):
 def set_categories(weedcoco_path, categories):
     with open(weedcoco_path, "r") as jsonFile:
         data = json.load(jsonFile)
-    new_categories = []
-    for category in categories:
-        if category["role"] and category["scientific_name"]:
-            new_categories.append(
-                {
-                    "id": category["id"],
-                    "name": ": ".join((category["role"], category["scientific_name"])),
-                }
-            )
-        else:
-            new_categories.append({"id": category["id"], "name": category["name"]})
-    data["categories"] = new_categories
+    # TODO: should we only update category name?
+    data["categories"] = [
+        {
+            "id": category["id"],
+            "name": format_category_name(
+                role=category["role"],
+                taxon=category.get("scientific_name"),
+                subcategory=category.get("subcategory"),
+            ),
+        }
+        for category in categories
+    ]
+    category_name_set = [category["name"] for category in data["categories"]]
+    if len(set(category_name_set)) < len(category_name_set):
+        raise Exception("Sorry, category with the same name is not allowed")
     with open(weedcoco_path, "w") as jsonFile:
         json.dump(data, jsonFile)
     return data
@@ -111,7 +127,7 @@ def make_upload_entity_fields(weedcoco):
     for agcontext in weedcoco["agcontexts"]:
         agcontext["n_images"] = int(
             stats.agcontext_summary.loc[agcontext["id"]].image_count
-        )
+        ) + count_image_with_no_annotation(weedcoco)
 
         # Should produce something like:
         # {"crop: daucus carota": {"image_count": 1, "annotation_count": 1, "bounding_box_count": 1, "segmentation_count": 1}}
@@ -129,6 +145,13 @@ def make_upload_entity_fields(weedcoco):
     }
 
 
+def count_image_with_no_annotation(weedcoco):
+    return len(
+        set([image["id"] for image in weedcoco["images"]])
+        - set([annotation["image_id"] for annotation in weedcoco["annotations"]])
+    )
+
+
 def create_upload_entity(upload_id, upload_userid):
     upload_user = WeedidUser.objects.get(id=upload_userid)
     upload_entity = Dataset(upload_id=upload_id, user=upload_user, status="N")
@@ -139,7 +162,9 @@ def create_upload_entity(upload_id, upload_userid):
 
 def remove_entity_local_record(user_id, upload_id):
     upload_dir_record = os.path.join(UPLOAD_DIR, user_id, upload_id)
-    repository_dir_record = os.path.join(REPOSITORY_DIR, upload_id)
+    repository = Repository(REPOSITORY_DIR)
+    dataset = repository.dataset(upload_id)
+    repository_dir_record = dataset.object_path
     download_dir_record = os.path.join(DOWNLOAD_DIR, f"{upload_id}.zip")
     for dir_path in [upload_dir_record, repository_dir_record, download_dir_record]:
         if os.path.isdir(dir_path):
@@ -148,7 +173,7 @@ def remove_entity_local_record(user_id, upload_id):
             os.remove(dir_path)
 
 
-def retrieve_listing_info(query_entity, awaiting_review):
+def retrieve_listing_info(query_entity, awaiting_review, user_id=0):
     """Retrieving info from specific upload entity"""
     return {
         "name": query_entity.metadata["name"]
@@ -158,6 +183,7 @@ def retrieve_listing_info(query_entity, awaiting_review):
         "upload_date": str(query_entity.date),
         "contributor": query_entity.user.username,
         "contributor_email": query_entity.user.email if awaiting_review else "",
+        "editable": query_entity.user.id == user_id,
     }
 
 
@@ -176,18 +202,52 @@ def send_email(subject, body, recipients):
                 smtp.send_message(msg)
 
 
-def parse_category_name(category):
-    if re.fullmatch(r"(crop|weed): .+", category["name"]):
-        return {
-            "id": category["id"],
-            "name": category["name"],
-            "role": category["name"].split(": ", maxsplit=1)[0],
-            "scientific_name": category["name"].split(": ", maxsplit=1)[1],
-        }
-    else:
+def parse_category_for_mapper(category):
+    parsed = parse_category_name(category["name"])
+    if parsed is None:
         return {
             "id": category["id"],
             "name": category["name"],
             "role": "",
             "scientific_name": "",
+            "subcategory": "",
         }
+    return {
+        "id": category["id"],
+        "name": category["name"],
+        "role": parsed["role"],
+        "scientific_name": parsed["taxon"],
+        "subcategory": parsed["subcategory"],
+    }
+
+
+def retrieve_missing_images_list(weedcoco_json, images_path, upload_id):
+    current_images = []
+    for image_reference in weedcoco_json["images"]:
+        current_images.append(image_reference["file_name"].split("/")[-1])
+    if not os.path.isdir(images_path):
+        mkdir_safely(images_path)
+        return current_images[:]
+    existing_images = set(os.listdir(images_path))
+    return [image for image in current_images if image not in existing_images]
+
+
+def upload_helper(weedcoco_json, user_id, schema="coco", upload_id=None):
+    images = []
+    validate(
+        weedcoco_json,
+        schema=schema,
+    )
+    categories = [
+        parse_category_for_mapper(category) for category in weedcoco_json["categories"]
+    ]
+    if not upload_id or len(upload_id) != len(str(uuid4())):
+        upload_dir, upload_id = setup_upload_dir(os.path.join(UPLOAD_DIR, str(user_id)))
+        create_upload_entity(upload_id, user_id)
+    else:
+        upload_dir = os.path.join(UPLOAD_DIR, str(user_id), upload_id)
+    images = retrieve_missing_images_list(
+        weedcoco_json, os.path.join(upload_dir, "images"), upload_id
+    )
+    store_tmp_weedcoco(weedcoco_json, upload_dir)
+    return upload_id, images, categories

@@ -1,16 +1,18 @@
-import json
-import pathlib
-import os
-import warnings
 import hashlib
+import json
+import os
+import pathlib
+import re
+import warnings
 
-import PIL.Image
-import yaml
 import imagehash
+import joblib
+import PIL.Image
+import PIL.ImageOps
+import requests
+import yaml
 
-from .species_utils import get_eppo_singleton
-
-EPPO_PATH = "_eppo_xmlfull.zip"
+memory = joblib.Memory(pathlib.Path(__file__).parent / "_cache")
 
 
 def set_info(coco, metadata):
@@ -90,7 +92,17 @@ def check_if_approved_image_extension(image_name):
 
 
 def check_if_approved_image_format(image_ext):
-    return image_ext in ("PNG", "JPG", "JPEG", "TIFF")
+    return image_ext in ("PNG", "JPG", "JPEG", "TIFF", "MPO")
+
+
+def copy_without_exif(src, dest):
+    """Makes a copy of an image with any exif metadata stripped out.
+    Before copying, uses exif_transpose to orient the image correctly
+    if it has an exif orientation value != 1."""
+    image_origin = PIL.ImageOps.exif_transpose(PIL.Image.open(src))
+    image_without_exif = PIL.Image.new(image_origin.mode, image_origin.size)
+    image_without_exif.putdata(image_origin.getdata())
+    image_without_exif.save(dest)
 
 
 def _get_growth_stage_names():
@@ -136,34 +148,78 @@ def get_task_types(annotations):
     return out
 
 
+def parse_category_name(name):
+    match = re.fullmatch(r"(crop|weed|none)(?:: ([^(]+))?(?: \((.*)\))?", name)
+    if match:
+        return {
+            "name": name,
+            "role": match.group(1),
+            "taxon": match.group(2),
+            "subcategory": match.group(3),
+        }
+
+
+def format_category_name(role, taxon=None, subcategory=None):
+    out = role
+    if taxon:
+        out += f": {taxon}"
+    if subcategory:
+        out += f" ({subcategory})"
+    return out
+
+
+@memory.cache
+def get_gbif_record(canonical_name):
+    results = requests.get(
+        "https://api.gbif.org/v1/species",
+        params={
+            "name": canonical_name,
+            "datasetKey": "d7dddbf4-2cf0-4f39-9b2a-bb099caae36c",
+        },
+    ).json()
+    # assert results["endOfRecords"]  # TODO?: pagination
+    try:
+        gbif_record = next(
+            record
+            for record in results["results"]
+            if record["canonicalName"].lower() == canonical_name.lower()
+            and record["taxonomicStatus"] == "ACCEPTED"
+        )
+    except StopIteration:
+        raise ValueError(f"No accepted GBIF entries for {repr(canonical_name)}")
+    return gbif_record
+
+
 def get_supercategory_names(name):
     if not name.startswith("weed: "):
         return []
 
     taxon = name.split(": ", 1)[1]
-    out = ["weed"]
+    if len(taxon.split(" (")) > 1:
+        out = ["weed", name, name.split(" (")[0]]
+        taxon = taxon.split(" (")[0]
+    else:
+        out = ["weed"]
     if taxon == "UNSPECIFIED":
         return out
 
-    eppo = get_eppo_singleton(EPPO_PATH)
     try:
-        entry = eppo.lookup_preferred_name(taxon, species_only=False)
-    except Exception:
-        warnings.warn(f"Failed to lookup taxon {repr(taxon)}")
+        record = get_gbif_record(taxon)
+    except ValueError:
+        warnings.warn(f"Failed to lookup species/taxon {repr(taxon)}")
         return out
 
-    try:
-        family = next(
-            code for code in entry["ancestors"] if code.endswith(eppo.FAMILY_SUFFIX)
-        )
-    except StopIteration:
-        family = None
-    if family != "1GRAF":
+    ancestors = {
+        rank: record[rank]
+        for rank in ["kingdom", "phylum", "order", "family", "genus", "species"]
+        if rank in record
+    }
+    family = ancestors.get("family", None)
+    if family != "Poaceae":
         out.append("weed: non-poaceae")
 
     if family is not None:
-        family_entry = eppo.entries[family]
-        out.append(f"weed: {family_entry['preferred_name'].lower()}")
+        out.append(f"weed: {family.lower()}")
     return out
 
 

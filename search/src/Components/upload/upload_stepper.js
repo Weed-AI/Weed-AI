@@ -1,25 +1,27 @@
-import React from 'react';
-import { withStyles } from '@material-ui/core/styles';
-import Stepper from '@material-ui/core/Stepper';
+import Button from '@material-ui/core/Button';
+import CircularProgress from '@material-ui/core/CircularProgress';
 import Step from '@material-ui/core/Step';
 import StepLabel from '@material-ui/core/StepLabel';
-import Button from '@material-ui/core/Button';
+import Stepper from '@material-ui/core/Stepper';
+import { withStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
-import CircularProgress from '@material-ui/core/CircularProgress';
-import UploaderSingle from './uploader_single';
-import UploaderVoc from './uploader_voc';
-import UploaderMasks from './uploader_masks';
-import CategoryMapper from './uploader_category_mapper';
-import ErrorMessage from '../error/display';
-import AgContextForm from '../forms/AgContextForm';
-import UploadJsonButton from '../forms/UploadJsonButton';
-import MetadataForm from '../forms/MetadataForm';
 import axios from 'axios';
 import Cookies from 'js-cookie';
 import cloneDeep from 'lodash/cloneDeep';
-import {jsonSchemaTitle} from '../error/utils';
-import ImageOrZipUploader from './uploader_zip_images';
+import React from 'react';
+import ErrorMessage from '../error/display';
+import { jsonSchemaTitle } from '../error/utils';
+import AgContextForm from '../forms/AgContextForm';
+import MetadataForm from '../forms/MetadataForm';
+import UploadJsonButton from '../forms/UploadJsonButton';
 import CardSelector from '../generic/card_selector';
+import CategoryMapper from './uploader_category_mapper';
+import CopyCvatUploader from './uploader_copy_cvat';
+import CvatRetriever from './uploader_cvat';
+import UploaderMasks from './uploader_masks';
+import UploaderSingle from './uploader_single';
+import UploaderVoc from './uploader_voc';
+import ImageOrZipUploader from './uploader_zip_images';
 
 
 const baseURL = new URL(window.location.origin);
@@ -61,6 +63,11 @@ const typeData = [
     "name": "Mask PNGs",
     "description": <Typography>Colour coded mask images for segmentation.</Typography>
   },
+  {
+    "id": "cvat",
+    "name": "Annotation Project",
+    "description": <Typography>Import from Weed-AI's CVAT annotation server</Typography>
+  },
 ]
 const stepsByType = {
     "coco": [
@@ -91,6 +98,14 @@ const stepsByType = {
         {title: "Add Agcontext", type: "agcontext"},
         {title: "Add Metadata", type: "metadata"},
         {title: "Upload Images", type: "images"}
+    ],
+    "cvat": [
+        {title: "Select Format", type: "select-type"},
+        {title: "Select CVAT Task", type: "cvat"},
+        {title: "Categories", type: "categories"},
+        {title: "Add Agcontext", type: "agcontext"},
+        {title: "Add Metadata", type: "metadata"},
+        {title: "Copy CVAT Images", type: "copy_cvat"}
     ]
 }
 
@@ -98,29 +113,28 @@ class UploadStepper extends React.Component {
 
     constructor(props) {
         super(props);
-        const upload_type = props.upload_type || "weedcoco";
+        const upload_type = props.upload_type || this.props.upload_mode == "edit" ? "coco": "weedcoco";
         this.state = {
             activeStep: 0,
-            nextProcessing: false,
-            skip_mapping: {'weedcoco': -1, 'coco': -1},
+            skip_mapping: this.props.upload_mode == "edit" ? Object.keys(stepsByType).reduce((a, v) => ({ ...a, [v]: [1]}), {}) : Object.keys(stepsByType).reduce((a, v) => ({ ...a, [v]: []}), {}),
             skipped: new Set(),
-            upload_id: 0,
+            cvat_task_id: 0,
             voc_id: Math.random().toString(36).slice(-8),
             mask_id: Math.random().toString(36).slice(-8),
             image_ext: '',
-            images: [],
-            categories: [],
-            ag_context: {},
-            metadata: {},
             error_message: "",
             error_message_details: "",
-            ... this.getUploadTypeState(upload_type),
+            ...this.getUploadTypeState(upload_type),
+            ...this.getPresetData(),
         }
         this.isStepOptional = this.isStepOptional.bind(this);
         this.isStepSkipped = this.isStepSkipped.bind(this);
         this.handleUploadId = this.handleUploadId.bind(this);
+        this.handleCvatTaskId = this.handleCvatTaskId.bind(this);
+        this.handleRetrieveCvatTask = this.handleRetrieveCvatTask.bind(this);
         this.handleImageExtension = this.handleImageExtension.bind(this);
         this.handleImages = this.handleImages.bind(this);
+        this.handleMissingImages = this.handleMissingImages.bind(this);
         this.handleCategories = this.handleCategories.bind(this);
         this.handleUpdateCategories = this.handleUpdateCategories.bind(this);
         this.handleAgContextsFormData = this.handleAgContextsFormData.bind(this);
@@ -157,8 +171,28 @@ class UploadStepper extends React.Component {
         }
     }
 
+    getPresetData() {
+        if (!this.props.preset) {
+            return {
+                upload_id: 0,
+                categories: [],
+                ag_context: {},
+                metadata: {},
+                images: [],
+            }
+        } else {
+            return {
+                upload_id: !this.props.preset.upload_id ? 0 : this.props.preset.upload_id,
+                categories: !this.props.preset.categories ? [] : this.props.preset.categories,
+                ag_context: !this.props.preset.agcontext ? {} : this.props.preset.agcontext[0],
+                metadata: !this.props.preset.metadata ? {} : this.props.preset.metadata,
+                images: !this.props.preset.images ? [] : this.props.preset.images,
+            }
+        }
+    }
+
     isStepOptional(step, upload_type) {
-        return this.state.skip_mapping[upload_type] === step;
+        return this.state.skip_mapping[upload_type].includes(step);
     };
 
     isStepSkipped(step) {
@@ -169,12 +203,28 @@ class UploadStepper extends React.Component {
         this.setState({upload_id: upload_id});
     }
 
+    handleCvatTaskId(cvat_task_id) {
+        this.setState({cvat_task_id: cvat_task_id});
+    }
+
     handleImageExtension(image_ext) {
         this.setState({image_ext: image_ext})
     }
 
     handleImages(images) {
         this.setState({images: images});
+    }
+
+    handleMissingImages() {
+        let missingImages = new Set(this.state.images);
+        console.log("Missing images: " + missingImages.size.toString())
+        if (missingImages.size === 0) {
+            this.handleValidation(true, "images");
+            this.handleErrorMessage("");
+        } else {
+            this.handleValidation(false, "images");
+            this.handleErrorMessage(`${missingImages.size} ${missingImages.size > 1 ? "images" : "image"} to be uploaded`, {error_type: "image", missingImages: Array.from(missingImages)});
+        }
     }
 
     handleCategories(categories) {
@@ -198,6 +248,7 @@ class UploadStepper extends React.Component {
         if (this.state.activeStep === this.state.steps.length - 1){
             this.handleSubmit();
             this.props.handleClose();
+            this.props.checkUploadStatusInterval(3000);
             this.handleReset();
         }
         else {
@@ -215,6 +266,9 @@ class UploadStepper extends React.Component {
                 }
             })
             this.handleErrorMessage("")
+            if (stepsByType[this.state.upload_type][activeStep + 1].type === "images") {
+                this.handleMissingImages();
+            }
         }
     };
 
@@ -235,6 +289,9 @@ class UploadStepper extends React.Component {
             newSkipped.add(this.state.activeStep);
             return {skipped: newSkipped};
         })
+        if (stepsByType[this.state.upload_type][this.state.activeStep + 1].type === "images") {
+            this.handleMissingImages();
+        }
     };
 
     handleReset(){
@@ -348,10 +405,40 @@ class UploadStepper extends React.Component {
         })
     }
 
+    async handleRetrieveCvatTask() {
+        try {
+            if (!this.state.nextProcessing){
+                this.setState({nextProcessing: true})
+            }
+            const res = await axios.get(baseURL + `cvat-annotation/api/v1/tasks/${this.state.cvat_task_id}/annotations?format=COCO%201.0&filename=temp.zip`)
+            if (res.status === 201) {
+                const cvat_res = await axios.get(baseURL + `api/retrieve_cvat_task/${this.state.upload_id}/${this.state.cvat_task_id}`)
+                const payload = cvat_res.data
+                this.handleUploadId(payload.upload_id)
+                this.handleImages(payload.images)
+                this.handleCategories(payload.categories)
+                this.progressToNext()
+            } else if (res.status === 202) {
+                this.handleRetrieveCvatTask()
+            }
+        } catch (error) {
+            console.log(error)
+            try {
+                const err = JSON.parse(error.responseText)
+                this.handleErrorMessage(jsonSchemaTitle(err), err)
+            } catch (err) {
+                this.handleErrorMessage("Validation error", error)
+            }
+        } finally {
+            this.setState({nextProcessing: false})
+        } 
+    }
+
     handleSubmit(){
         const baseURL = new URL(window.location.origin);
         const body = new FormData()
         body.append('upload_id', this.state.upload_id)
+        body.append('upload_mode', this.props.upload_mode)
         axios({
             method: 'post',
             url: baseURL + "api/submit_deposit/",
@@ -360,8 +447,8 @@ class UploadStepper extends React.Component {
         })
     }
 
-    handleValidation(status){
-        const currentStep = stepsByType[this.state.upload_type][this.state.activeStep].type
+    handleValidation(status, currentStep=""){
+        currentStep = currentStep ? currentStep: stepsByType[this.state.upload_type][this.state.activeStep].type
         this.setState(prevState => {
             const newState = {stepValid: {...prevState.stepValid}}
             newState.stepValid[currentStep] = status
@@ -387,7 +474,7 @@ class UploadStepper extends React.Component {
             case "coco-upload":
             case "weedcoco-upload":
                 const schema = step == "coco-upload" ? "coco" : "weedcoco"
-                return <UploaderSingle upload_id={this.state.upload_id} images={this.state.images} handleUploadId={this.handleUploadId} handleImages={this.handleImages} handleCategories={this.handleCategories} handleValidation={this.handleValidation} handleErrorMessage={this.handleErrorMessage} schema={schema}/>
+                return <UploaderSingle upload_id={this.state.upload_id} images={this.state.images} handleUploadId={this.handleUploadId} handleImages={this.handleImages} handleCategories={this.handleCategories} handleValidation={this.handleValidation} handleErrorMessage={this.handleErrorMessage} schema={schema} upload_mode={this.props.upload_mode}/>
             case "voc-upload":
                 return <UploaderVoc handleUploadId={this.handleUploadId} handleImages={this.handleImages} handleCategories={this.handleCategories} handleValidation={this.handleValidation} handleErrorMessage={this.handleErrorMessage} voc_id={this.state.voc_id}/>
             case "masks-upload":
@@ -415,7 +502,11 @@ class UploadStepper extends React.Component {
                     </React.Fragment>
                 )
             case "images":
-                return <ImageOrZipUploader stepName={step} upload_id={this.state.upload_id} images={this.state.images} handleValidation={this.handleValidation} handleErrorMessage={this.handleErrorMessage} />
+                return <ImageOrZipUploader stepName={step} upload_id={this.state.upload_id} cvat_task_id={this.state.cvat_task_id} images={this.state.images} handleValidation={this.handleValidation} handleImages={this.handleImages} handleMissingImages={this.handleMissingImages}/>
+            case "cvat":
+                return <CvatRetriever upload_id={this.state.upload_id} handleUploadId={this.handleUploadId} handleCvatTaskId={this.handleCvatTaskId} handleImages={this.handleImages} handleCategories={this.handleCategories} handleValidation={this.handleValidation} handleErrorMessage={this.handleErrorMessage} />
+            case "copy_cvat":
+                return <CopyCvatUploader upload_id={this.state.upload_id} cvat_task_id={this.state.cvat_task_id} images={this.state.images} handleValidation={this.handleValidation} handleErrorMessage={this.handleErrorMessage} />
             default:
                 return ''
         }
@@ -435,6 +526,8 @@ class UploadStepper extends React.Component {
                     return this.handleUploadAgcontexts
                 case "metadata":
                     return this.handleUploadMetadata
+                case "cvat":
+                    return this.handleRetrieveCvatTask
                 default:
                     return this.progressToNext
             }

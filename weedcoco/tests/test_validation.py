@@ -1,27 +1,23 @@
 """Tests for weedcoco.validation"""
 
-import functools
 import copy
+import functools
 import random
 import re
 
-from pycocotools.coco import COCO
-
 import pytest
-
+from pycocotools.coco import COCO
+from weedcoco.utils import fix_compatibility_quirks, get_task_types
 from weedcoco.validation import (
+    JsonValidationError,
+    ValidationError,
     validate,
-    validate_json,
-    validate_references,
     validate_coordinates,
     validate_image_sizes,
-    ValidationError,
-    JsonValidationError,
+    validate_json,
+    validate_references,
 )
-from weedcoco.utils import (
-    fix_compatibility_quirks,
-    get_task_types,
-)
+
 from .testcases import (
     MINIMAL_WEEDCOCO,
     SMALL_WEEDCOCO,
@@ -119,7 +115,7 @@ def test_bad_category_name(func, bad_name, messages):
         "pasture",
         "fallow",
         "daucus carota",
-        "brassica oleracea var. alboglabra",
+        # "brassica oleracea var. alboglabra",  not supported by GBIF
     ],
 )
 def test_crop_type(func, name):
@@ -216,27 +212,6 @@ def _make_unknown_id(weedcoco, section, ref_key, new_id=1000):
 def test_nonexistent_referent(func, bad_weedcoco):
     with pytest.raises(ValidationError, match="Reference to unknown ID"):
         func(bad_weedcoco)
-
-
-def _make_unreferenced(weedcoco, section, new_id=1000):
-    bad_weedcoco = copy.deepcopy(weedcoco)
-    copied = copy.deepcopy(random.choice(bad_weedcoco[section]))
-    copied["id"] = new_id
-    bad_weedcoco[section].insert(random.randint(0, len(bad_weedcoco[section])), copied)
-    return bad_weedcoco
-
-
-@pytest.mark.parametrize("func", [validate, validate_references])
-@pytest.mark.parametrize(
-    "bad_weedcoco",
-    [
-        _make_unreferenced(SMALL_WEEDCOCO, "images"),
-    ],
-)  # TODO
-def test_id_not_referenced(func, bad_weedcoco):
-    with pytest.raises(ValidationError, match="is unreferenced"):
-        func(bad_weedcoco)
-    func(bad_weedcoco, require_reference=())  # no reference validation
 
 
 def _weedcoco_to_coco(weedcoco):

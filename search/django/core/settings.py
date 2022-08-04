@@ -1,6 +1,8 @@
 import os
-from celery.schedules import crontab
+
 from corsheaders.defaults import default_headers
+
+from celery.schedules import crontab
 
 SITE_BASE_URL = "https://weed-ai.sydney.edu.au"
 
@@ -8,8 +10,9 @@ SITE_BASE_URL = "https://weed-ai.sydney.edu.au"
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 UPLOAD_DIR = os.path.join(BASE_DIR, "upload")
 THUMBNAILS_DIR = os.path.join(BASE_DIR, "thumbnails")
-REPOSITORY_DIR = os.path.join(BASE_DIR, "repository")
+REPOSITORY_DIR = os.path.join(BASE_DIR, "repository", "ocfl")
 DOWNLOAD_DIR = os.path.join(BASE_DIR, "download")
+CVAT_DATA_DIR = os.path.join(BASE_DIR, "cvat_data")
 
 TUS_UPLOAD_DIR = os.path.join(BASE_DIR, "tus_upload")
 TUS_DESTINATION_DIR = os.path.join(BASE_DIR, "tus_dir", "data")
@@ -51,6 +54,7 @@ DEBUG = os.environ.get("ENV", "PROD") == "DEV"
 ALLOWED_HOSTS = ["*"]
 CORS_ORIGIN_ALLOW_ALL = True
 AUTH_USER_MODEL = "weedid.WeedidUser"
+SESSION_COOKIE_NAME = "weedai_sessionid"
 
 # TUS headers
 
@@ -66,8 +70,8 @@ CORS_ALLOW_HEADERS = list(default_headers) + [
 ]
 
 
-# Scale file size of upload limit up to 10 MB
-MAX_IMAGE_SIZE = 1024 * 1024 * 10
+# Scale file size of upload limit up to 30 MB
+MAX_IMAGE_SIZE = 1024 * 1024 * 30
 MAX_VOC_SIZE = 1024 * 100
 DATA_UPLOAD_MAX_MEMORY_SIZE = MAX_IMAGE_SIZE
 # Avoid permissions bug, see https://github.com/django-cms/django-filer/issues/1031
@@ -203,3 +207,5 @@ CELERY_BEAT_SCHEDULE = {
         "schedule": crontab(minute="0", hour="*/3"),
     },
 }
+
+IMAGE_HASH_MAPPING_URL = os.environ.get("IMAGE_HASH_MAPPING_URL", "")

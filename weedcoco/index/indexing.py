@@ -1,16 +1,17 @@
 import argparse
+import json
 import os
 import pathlib
-import json
 import sys
 from uuid import uuid4
+
 import elasticsearch  # using `from elastisearch` breaks elasticmock
 from elasticsearch import helpers
 from weedcoco.utils import (
     denormalise_weedcoco,
-    lookup_growth_stage_name,
-    get_task_types,
     get_supercategory_names,
+    get_task_types,
+    lookup_growth_stage_name,
 )
 
 
@@ -38,12 +39,14 @@ class ElasticSearchIndexer:
         es_port=9200,
         indexes=None,
         upload_id="#",
+        version_id=str(uuid4()),
         dry_run=False,
     ):
         self.weedcoco_path = pathlib.Path(weedcoco_path)
         self.thumbnail_dir = pathlib.Path(thumbnail_dir)
         self.es_index_name = es_index_name
         self.batch_size = batch_size
+        self.dry_run = dry_run
         hosts = [{"host": es_host, "port": es_port}]
         if dry_run:
             self.es_client = sys.stdout
@@ -51,7 +54,7 @@ class ElasticSearchIndexer:
             self.es_client = elasticsearch.Elasticsearch(hosts=hosts)
         self.indexes = indexes if indexes is not None else {}
         self.upload_id = upload_id
-        self.version_tag = str(uuid4())
+        self.version_id = version_id
 
     def generate_index_entries(self):
         """
@@ -129,6 +132,8 @@ class ElasticSearchIndexer:
             )  # for deterministic random order
             _flatten(image["agcontext"], image, "agcontext")
             # todo: add license
+            if "annotations" not in image:
+                image["annotations"] = list()
             for annotation in image["annotations"]:
                 for k in annotation:
                     image.setdefault(f"annotation__{k}", []).append(annotation[k])
@@ -138,7 +143,10 @@ class ElasticSearchIndexer:
                 "location"
             ] = f'{image["agcontext"]["location_lat"]}, {image["agcontext"]["location_long"]}'
             image["dataset_name"] = coco["info"]["metadata"]["name"]
-            image["version_tag"] = self.version_tag
+            image["version"] = {
+                "version_id": self.version_id,
+                "version_tag": "latest version",
+            }
             yield image
 
     def generate_batches(self):
@@ -169,11 +177,13 @@ class ElasticSearchIndexer:
             else:
                 # a file for dry run
                 self.es_client.write(json.dumps(index_batch, indent=2))
+        if not self.dry_run:
+            self.archive_other_versions()
 
-    def remove_other_versions(self):
+    def archive_other_versions(self):
         # in case other filenames had been submitted with this upload_id
         if self.upload_id == "#":
-            raise ValueError("remove_other_versions requires upload_id != '#'")
+            raise ValueError("archive_other_versions requires upload_id != '#'")
         assert '"' not in self.upload_id
         assert "\\" not in self.upload_id
 
@@ -181,19 +191,39 @@ class ElasticSearchIndexer:
             return
         body = f"""
         {{
+          "script": {{
+            "source": "ctx._source.version.version_tag = 'past version'"
+          }},
           "query": {{
             "bool": {{
-              "match": {{
-                "upload_id": "{self.upload_id}"
-              }}
-            }},
-            "must_not": {{
-                "version_tag": "{self.version_tag}"
+              "must": {{"match": {{"upload_id": "{self.upload_id}"}}}},
+              "must_not": {{"match": {{"version.version_id": "{self.version_id}"}}}}
             }}
           }}
         }}
         """
-        self.es_client.delete_by_query(self.es_index_name, body)
+        self.es_client.update_by_query(self.es_index_name, body, conflicts="proceed")
+
+    @staticmethod
+    def remove_all_index_with_upload(
+        upload_id, es_index_name="weedid", es_host="localhost", es_port=9200
+    ):
+        es_client = elasticsearch.Elasticsearch(
+            hosts=[{"host": es_host, "port": es_port}]
+        )
+        body = f"""
+        {{
+          "script": {{
+            "source": "ctx._source.version.version_tag = 'past version'"
+          }},
+          "query": {{
+            "bool": {{
+              "must": {{"match": {{"upload_id": "{upload_id}"}}}}
+            }}
+          }}
+        }}
+        """
+        es_client.update_by_query(es_index_name, body, conflicts="proceed")
 
 
 def main(args=None):

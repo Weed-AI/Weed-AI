@@ -1,17 +1,16 @@
 """Validation tools for WeedCOCO
 """
-import pathlib
 import argparse
-import sys
-import json
-import tempfile
 import datetime
+import json
+import pathlib
+import sys
 
+import yaml
 from jsonschema import FormatChecker
 from jsonschema.validators import Draft7Validator, RefResolver
-import yaml
 
-from .species_utils import get_eppo_singleton
+from .utils import get_gbif_record, parse_category_name
 
 SCHEMA_DIR = pathlib.Path(__file__).parent / "schema"
 MAIN_SCHEMAS = {
@@ -24,7 +23,6 @@ MAIN_SCHEMAS = {
 
 FORMAT_CHECKER = FormatChecker()
 # TODO: change from temp path to config
-EPPO_CACHE_PATH = pathlib.Path(tempfile.gettempdir()) / "eppo-codes.zip"
 
 
 @FORMAT_CHECKER.checks("date")
@@ -45,30 +43,31 @@ def check_date_missing_parts_format(value):
 def check_plant_taxon_format(value):
     if not value.islower():
         return False
-    eppo = get_eppo_singleton(EPPO_CACHE_PATH)
     try:
-        return eppo.lookup_preferred_name(value, species_only=False)
-    except KeyError:
+        return get_gbif_record(value)
+    except ValueError:
         return False
 
 
 @FORMAT_CHECKER.checks("weedcoco_category")
 def check_weedcoco_category_format(value):
-    prefix, colon, taxon = value.partition(": ")
-    if not colon:
+    parsed = parse_category_name(value)
+    if parsed is None:
+        return
+    if not parsed["taxon"]:
         # Category must begin with weed, crop or none
-        return prefix in {"weed", "crop", "none"}
+        return parsed["role"] in {"weed", "crop", "none"}
 
     # Specific category must begin with 'weed:' or 'crop:'
-    if prefix not in {"weed", "crop"}:
+    if parsed["role"] not in {"weed", "crop"}:
         return False
 
-    if taxon == "UNSPECIFIED":
+    if parsed["taxon"] == "UNSPECIFIED":
         # crop: UNSPECIFIED is not a valid category
-        return prefix == "weed"
+        return parsed["role"] == "weed"
 
     # Taxon name should be lowercase in category
-    return check_plant_taxon_format(taxon)
+    return check_plant_taxon_format(parsed["taxon"])
 
 
 class ValidationError(Exception):
@@ -163,11 +162,11 @@ def validate_references(
                                 f"Found in {section_name} id {obj.get('id')}"
                             )
                         referenced_ids.add(id_key)
-
-    for known_id in known_ids:
-        section_name = known_id[0]
-        if section_name in require_reference and known_id not in referenced_ids:
-            raise ValidationError(f"{section_name} ID {known_id[1]} is unreferenced")
+    # Commented to allow datasets with incomplete annotations
+    # for known_id in known_ids:
+    #     section_name = known_id[0]
+    #     if section_name in require_reference and known_id not in referenced_ids:
+    #         raise ValidationError(f"{section_name} ID {known_id[1]} is unreferenced")
     # TODO: consider warning if not require_reference
 
 

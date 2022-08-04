@@ -1,14 +1,14 @@
 import pathlib
-import pytest
 
+import pytest
 from elasticmock import elasticmock as elasticmock
-from weedcoco.index.indexing import main, ElasticSearchIndexer
+from weedcoco.index.indexing import ElasticSearchIndexer, main
 
 BASIC_INPUT_PATH = str(
     pathlib.Path(__file__).parent.parent
     / "repo"
     / "deposit_data"
-    / "basic_1"
+    / "subcat"
     / "weedcoco.json"
 )
 THUMBNAIL_DIR = "arbitrary-thumbnail-dir"
@@ -25,6 +25,7 @@ def test_smoke_indexing():
             THUMBNAIL_DIR,
             "--upload-id",
             "12345",
+            "--dry-run",
         ]
     )
 
@@ -63,8 +64,13 @@ def test_annotation_and_category():
             },
         },
         3: {
-            "name": "weed: lolium perenne",
-            "taxo_names": {"weed: lolium perenne", "weed: poaceae", "weed"},
+            "name": "weed: lolium perenne (growing point)",
+            "taxo_names": {
+                "weed: lolium perenne (growing point)",
+                "weed: lolium perenne",
+                "weed: poaceae",
+                "weed",
+            },
         },
     }
     for entry in indexer.generate_index_entries():
