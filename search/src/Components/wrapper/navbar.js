@@ -17,6 +17,7 @@ import ReactiveSearchComponent from './reactive_search';
 import UploadComponent from './upload';
 import DatasetComponent from './datasets';
 import WeedCOCOComponent from './weedcoco';
+import AnnotationComponent from './annotate'
 import AboutComponent from './about';
 import axios from 'axios';
 import Cookies from 'js-cookie';
@@ -90,6 +91,7 @@ const sections = [
   {value: "editor", href: "/editor", label: "AgContext Editor", mobileOnly: true},
   {value: "metaeditor", href: "/meta-editor", label: "Metadata Editor", mobileOnly: true},
   {value: "weedcoco", href: "/weedcoco", label: "WeedCOCO"},
+  {value: "annotate", href: "/annotate", label: "Annotate"},
   {value: "about", href: "/about", label: "About"},
 ]
 
@@ -206,6 +208,9 @@ export default function NavbarComponent(props) {
       }
       {
         selectedTab === "weedcoco" && <WeedCOCOComponent />
+      }
+      {
+        selectedTab === "annotate" && <AnnotationComponent />
       }
       {
         selectedTab === "about" && <AboutComponent />
