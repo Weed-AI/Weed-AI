@@ -2,7 +2,6 @@
 
 ## Clone repository for Weed-AI and submodules and go to workdir
 
-
 ```
 git clone --recurse-submodules -j8 -b release-candidate-2.0 git@github.com:Weed-AI/Weed-AI.git
 cd Weed-AI/search/
@@ -11,6 +10,11 @@ cd Weed-AI/search/
 ## Include a `.env` file to store key credentials:
 
 ```
+git clone --recurse-submodules -j8 -b release-candidate-2.0 git@github.com:Weed-AI/Weed-AI.git
+cd Weed-AI/search/
+```
+
+## Include a `.env` file to store key credentials:
 DJANGO_SECRET_KEY=
 POSTGRES_USER=
 POSTGRES_PASSWORD=
