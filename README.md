@@ -50,7 +50,7 @@ As with MS COCO, the format supports classification, bounding box and segmentati
 Reporting these details will help ensure consistency in published datasets for ease of comparison and use in further research and development.
 
 
-![Weed-AI Data Flow](https://github.com/Sydney-Informatics-Hub/Weed-ID-Interchange/blob/master/weedID-data-flow-diagram.png)
+![Weed-AI Data Flow](docs/content/figure_weedai_dataflow.png)
 
 # Acknowledgements 
 
