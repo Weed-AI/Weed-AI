@@ -5,11 +5,17 @@
 [<img src="https://img.shields.io/github/issues/Sydney-Informatics-Hub/Weed-AI">]("https://github.com/Sydney-Informatics-Hub/Weed-AI/issues)
 [<img src="https://img.shields.io/github/license/Sydney-Informatics-Hub/Weed-AI">](https://github.com/Sydney-Informatics-Hub/Weed-AI/blob/master/LICENSE)
 
-
 Weed-AI provides is an open source, searchable, weeds image platform designed to facilitate the research and development of machine learning algorithms for weed recognition in cropping systems.
 It brings together existing datasets, enables users to contribute their own data and pulls together custom datasets for straightforward download. 
 
 See our Weed Explorer at https://weed-ai.sydney.edu.au
+
+## Train YOLOv5 with Weed-AI Datasets
+Follow the Google Colab Notebook to train your own YOLOv5 algorithms from Weed-AI datasets. 
+
+<a target="_blank" href="https://colab.research.google.com/github/Weed-AI/Weed-AI/blob/master/weed_ai_yolov5.ipynb">
+  <img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/>
+</a>
 
 # Background 
 
