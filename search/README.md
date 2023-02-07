@@ -9,12 +9,6 @@ cd Weed-AI/search/
 
 ## Include a `.env` file to store key credentials:
 
-```
-git clone --recurse-submodules -j8 -b release-candidate-2.0 git@github.com:Weed-AI/Weed-AI.git
-cd Weed-AI/search/
-```
-
-## Include a `.env` file to store key credentials:
 DJANGO_SECRET_KEY=
 POSTGRES_USER=
 POSTGRES_PASSWORD=
@@ -30,6 +24,7 @@ HTTP_HOST=<http host>
 HTTPS_HOST=<https host such as weed-ai.sydney.edu.au>
 CVAT_BASEPATH='/cvat-annotation'
 ```
+
 
 **NOTE:** if working on Linux, you need to `sudo` all docker commands.
 
