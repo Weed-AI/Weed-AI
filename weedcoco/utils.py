@@ -183,7 +183,9 @@ def get_gbif_record(canonical_name):
             record
             for record in results["results"]
             if record["canonicalName"].lower() == canonical_name.lower()
-            and record["taxonomicStatus"] == "ACCEPTED"
+            and (record["taxonomicStatus"] == "ACCEPTED" or record["taxonomicStatus"] == "DOUBTFUL")
+            and record["kingdom"] == "Plantae"
+            and (record["rank"] == 'FAMILY' or record["rank"] == 'GENUS' or record["rank"] == 'SPECIES')
         )
     except StopIteration:
         raise ValueError(f"No accepted GBIF entries for {repr(canonical_name)}")

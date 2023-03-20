@@ -21,6 +21,7 @@ from weedcoco.validation import (
 from .testcases import (
     MINIMAL_WEEDCOCO,
     SMALL_WEEDCOCO,
+    DOUBTFUL_GENUS_WEEDCOCO,
     test_missing_required_at_root_expected,
 )
 
