@@ -8,3 +8,4 @@ django-celery-results==2.0.1
 django-celery-beat==2.2.0
 redis==3.5.3
 dvc==2.4.2
+importlib_metadata==4.13.0
