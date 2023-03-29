@@ -73,6 +73,7 @@ def test_missing_required_at_root(func, bad_weedcoco, expected):
 def test_okay(func):
     func(MINIMAL_WEEDCOCO)
     func(SMALL_WEEDCOCO)
+    func(DOUBTFUL_GENUS_WEEDCOCO)
 
 
 @pytest.mark.parametrize("func", [validate, validate_json])
@@ -85,6 +86,7 @@ def test_okay(func):
         ("crop: daugus carotta", ["is not a 'weedcoco_category'"]),
         ("weed: lollium rigidum", ["is not a 'weedcoco_category'"]),
         ("weed: Triticum Aestivum", ["is not a 'weedcoco_category'", "does not match"]),
+        ("weed: macropus rufus", ["is not a 'weedcoco_category'"]),
     ],
 )
 def test_bad_category_name(func, bad_name, messages):
@@ -230,6 +232,7 @@ def _weedcoco_to_coco(weedcoco):
     [
         _weedcoco_to_coco(MINIMAL_WEEDCOCO),
         _weedcoco_to_coco(SMALL_WEEDCOCO),
+        _weedcoco_to_coco(DOUBTFUL_GENUS_WEEDCOCO),
     ],
 )
 def test_coco_compatible_good(func, coco):
