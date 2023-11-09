@@ -275,3 +275,7 @@ def test_pycocotools_quirks():
     no_segmentations = [a for a in weedcoco["annotations"] if not a.get("segmentation")]
     ttypes = get_task_types(no_segmentations)
     assert "segmentation" not in ttypes
+
+    
+# TODO: Test invalid bbox coordinates and boundary cases
+# TODO: Test invalid polygon coordinates
