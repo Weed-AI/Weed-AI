@@ -21,6 +21,7 @@ import CvatRetriever from './uploader_cvat';
 import UploaderMasks from './uploader_masks';
 import UploaderSingle from './uploader_single';
 import UploaderVoc from './uploader_voc';
+import UploaderYolo from './uploader_yolo';
 import ImageOrZipUploader from './uploader_zip_images';
 
 
@@ -59,6 +60,11 @@ const typeData = [
     "description": <Typography>Pascal VOC's XML annotation format for bounding boxes.</Typography>
   },
   {
+    "id": "yolo",
+    "name": "YOLO",
+    "description": <Typography>YOLO's .txt annotation format for bounding boxes with a data.yaml file.</Typography>
+  },
+  {
     "id": "masks",
     "name": "Mask PNGs",
     "description": <Typography>Colour coded mask images for segmentation.</Typography>
@@ -91,6 +97,14 @@ const stepsByType = {
         {title: "Add Metadata", type: "metadata"},
         {title: "Upload Images", type: "images"}
     ],
+    "yolo": [
+        {title: "Select Format", type: "select-type"},
+        {title: "Upload Images", type: "images"},
+        {title: "Upload YOLO", type: "yolo-upload"},
+        {title: "Categories", type: "categories"},
+        {title: "Add Agcontext", type: "agcontext"},
+        {title: "Add Metadata", type: "metadata"}
+    ],
     "masks": [
         {title: "Select Format", type: "select-type"},
         {title: "Upload Masks", type: "masks-upload"},
@@ -120,6 +134,7 @@ class UploadStepper extends React.Component {
             skipped: new Set(),
             cvat_task_id: 0,
             voc_id: Math.random().toString(36).slice(-8),
+            yolo_id: Math.random().toString(36).slice(-8),
             mask_id: Math.random().toString(36).slice(-8),
             image_ext: '',
             error_message: "",
@@ -147,6 +162,7 @@ class UploadStepper extends React.Component {
         this.handleUploadAgcontexts = this.handleUploadAgcontexts.bind(this);
         this.handleUploadMetadata = this.handleUploadMetadata.bind(this);
         this.handleMoveVoc = this.handleMoveVoc.bind(this);
+        this.handleMoveYolo = this.handleMoveYolo.bind(this);
         this.handleMoveMask = this.handleMoveMask.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
         this.handleTusUpload = this.handleTusUpload.bind(this);
@@ -405,6 +421,29 @@ class UploadStepper extends React.Component {
         })
     }
 
+    handleMoveYolo() {
+        const body = new FormData()
+        body.append('upload_id', this.state.upload_id)
+        body.append('yolo_id', this.state.yolo_id)
+
+        axios({
+            method: 'post',
+            url: baseURL + "api/move_yolo/",
+            data: body,
+            headers: {'X-CSRFToken': Cookies.get('csrftoken') }
+        }).then(res => {
+            console.log(res)
+            this.handleErrorMessage("")
+            this.progressToNext()
+        })
+        .catch(err => {
+            console.log(err)
+            this.handleValidation(false)
+            this.handleErrorMessage("Failed to move YOLO files. Please try again.")
+        })
+    }
+
+
     async handleRetrieveCvatTask() {
         try {
             if (!this.state.nextProcessing){
@@ -431,7 +470,7 @@ class UploadStepper extends React.Component {
             }
         } finally {
             this.setState({nextProcessing: false})
-        } 
+        }
     }
 
     handleSubmit(){
@@ -477,6 +516,8 @@ class UploadStepper extends React.Component {
                 return <UploaderSingle upload_id={this.state.upload_id} images={this.state.images} handleUploadId={this.handleUploadId} handleImages={this.handleImages} handleCategories={this.handleCategories} handleValidation={this.handleValidation} handleErrorMessage={this.handleErrorMessage} schema={schema} upload_mode={this.props.upload_mode}/>
             case "voc-upload":
                 return <UploaderVoc handleUploadId={this.handleUploadId} handleImages={this.handleImages} handleCategories={this.handleCategories} handleValidation={this.handleValidation} handleErrorMessage={this.handleErrorMessage} voc_id={this.state.voc_id}/>
+            case "yolo-upload":
+                return <UploaderYolo upload_id={this.state.upload_id} handleUploadId={this.handleUploadId} handleImages={this.handleImages} handleCategories={this.handleCategories} handleValidation={this.handleValidation} handleErrorMessage={this.handleErrorMessage} yolo_id={this.state.yolo_id}/>
             case "masks-upload":
                 return <UploaderMasks upload_id={this.state.mask_id} handleUploadId={this.handleUploadId} image_ext={this.state.image_ext} handleImageExtension={this.handleImageExtension} handleImages={this.handleImages} handleCategories={this.handleCategories} handleValidation={this.handleValidation} handleErrorMessage={this.handleErrorMessage}/>
             case "categories":
@@ -518,6 +559,8 @@ class UploadStepper extends React.Component {
             switch (step) {
                 case "voc-upload":
                     return this.handleMoveVoc
+                case "yolo-upload":
+                    return this.handleMoveYolo
                 case "masks-upload":
                     return this.handleMoveMask
                 case "categories":

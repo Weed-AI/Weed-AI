@@ -34,6 +34,7 @@ from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_http_methods
 from weedcoco.importers.mask import generate_paths_from_mask_only, masks_to_coco
 from weedcoco.importers.voc import voc_to_coco
+from weedcoco.importers.yolo import yolo_to_coco
 from weedcoco.repo.deposit import Repository, mkdir_safely
 from weedcoco.utils import fix_compatibility_quirks
 from weedcoco.validation import JsonValidationError, validate, validate_json
@@ -319,6 +320,68 @@ class VocUploader(CustomUploader):
     def convert_to_coco(store_path, request):
         return voc_to_coco(store_path)
 
+
+class YoloUploader(CustomUploader):
+    mode = "yolo"
+    id_name = "yolo_id"
+    payload_name = "yolo_file"
+    remove_name = "yolo_filename"
+    max_file_size = MAX_VOC_SIZE
+    store_tmp = store_tmp_voc
+
+    @classmethod
+    @check_post_and_authenticated
+    def submit(cls, request):
+        user = request.user
+        try:
+            store_id = request.POST[cls.id_name]
+            upload_id = request.POST["upload_id"]  # Get the existing upload_id
+            if "/" in store_id or "/" in upload_id:
+                return HttpResponseBadRequest("Bad id")
+
+            store_dir = Path(UPLOAD_DIR) / str(user.id) / store_id
+
+            upload_dir = Path(UPLOAD_DIR) / str(user.id) / upload_id
+
+            coco_json = cls.convert_to_coco(store_dir, request)
+
+            validate(coco_json, schema="compatible-coco")
+            fix_compatibility_quirks(coco_json)
+
+            categories = [
+                parse_category_for_mapper(category)
+                for category in coco_json["categories"]
+            ]
+
+            images = retrieve_missing_images_list(
+                coco_json, upload_dir / "images", upload_id
+            )
+
+            store_tmp_weedcoco(coco_json, str(upload_dir))
+
+        except JsonValidationError as e:
+            traceback.print_exc()
+            return json_validation_response(e)
+        except Exception as e:
+            traceback.print_exc()
+            return HttpResponseBadRequest(str(e))
+        else:
+            return HttpResponse(
+                json.dumps(
+                    {"upload_id": upload_id, "images": images, "categories": categories}
+                )
+            )
+
+    @staticmethod
+    def convert_to_coco(store_path, request):
+        user = request.user
+        upload_id = request.POST["upload_id"]
+        image_dir = Path(UPLOAD_DIR) / str(user.id) / upload_id / "images"
+
+        if not image_dir.is_dir():
+            raise FileNotFoundError("Image directory not found. Please upload images before submitting annotations.")
+
+        return yolo_to_coco(store_path, image_dir)
 
 class MaskUploader(CustomUploader):
     mode = "masks"
