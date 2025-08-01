@@ -381,16 +381,16 @@ class Repository:
     # create a new root in an existing directory)
     def initialize(self):
         if not self.root.is_dir():
-            # use a separate ocfl.Store because it will create an invalid
+            # use a separate ocfl.StorageRoot because it will create an invalid
             # ocfl_layout.json if we initialise with a disposition
-            ocfl_store = ocfl.Store(root=str(self.root))
+            ocfl_store = ocfl.StorageRoot(root=str(self.root))
             ocfl_store.initialize()
 
     @property
     def ocfl(self):
         if self._ocfl is not None:
             return self._ocfl
-        self._ocfl = ocfl.Store(root=str(self.root), disposition=self.disposition)
+        self._ocfl = ocfl.StorageRoot(root=str(self.root), disposition=self.disposition)
         return self._ocfl
 
     def validate(self):

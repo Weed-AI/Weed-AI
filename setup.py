@@ -19,7 +19,7 @@ requirements = [
     "requests",
     "elasticsearch==7.13.*",
     "joblib",
-    "ocfl-py==1.3.0",
+    "ocfl-py",
     "redis",
 ]
 
