@@ -112,8 +112,8 @@ def validate_json(weedcoco, schema="weedcoco", schema_dir=SCHEMA_DIR):
         ref_store = validate_json.ref_store
     schema_uri = MAIN_SCHEMAS[schema]
     main_schema = ref_store[schema_uri]
-    validator = Draft7Validator(main_schema, format_checker=FORMAT_CHECKER)
-    validator.resolver = RefResolver(schema_uri, main_schema, store=ref_store)
+    resolver = RefResolver(schema_uri, main_schema, store=ref_store)
+    validator = Draft7Validator(main_schema, format_checker=FORMAT_CHECKER, resolver=resolver)
     errors = [error for error in validator.iter_errors(weedcoco)]
     if len(errors):
         raise JsonValidationError(
