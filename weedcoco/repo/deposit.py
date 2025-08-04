@@ -64,7 +64,7 @@ class RepositoryDataset:
         self._object_path = self.repo.root / pathlib.Path(rel_path)
         if self._object_path.is_dir():
             self._ocfl = ocfl.Object(identifier=self.identifier)
-            self._ocfl.open_fs(str(self._object_path))
+            self._ocfl.open_obj_fs(str(self._object_path))
             return self._ocfl
         else:
             return None
