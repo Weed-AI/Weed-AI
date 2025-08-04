@@ -369,12 +369,12 @@ class Repository:
     Class representing the ocfl repository
     ---
     root (pathlib.Path): the root directory of the repository
-    disposition (str): the algorithm used by the ocfl library to map ids to paths
+    layout_name (str): the algorithm used by the ocfl library to map ids to paths
     """
 
-    def __init__(self, root, disposition="pairtree"):
+    def __init__(self, root, layout_name="nnnn-tuple-tree"):
         self.root = root
-        self.disposition = disposition
+        self.layout_name = layout_name
         self._ocfl = None
 
     # this requires the ocfl root to not exist (because the OCFL libary won't
@@ -390,7 +390,7 @@ class Repository:
     def ocfl(self):
         if self._ocfl is not None:
             return self._ocfl
-        self._ocfl = ocfl.StorageRoot(root=str(self.root), disposition=self.disposition)
+        self._ocfl = ocfl.StorageRoot(root=str(self.root), layout_name=self.layout_name)
         return self._ocfl
 
     def validate(self):
