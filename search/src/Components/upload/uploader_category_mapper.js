@@ -135,7 +135,7 @@ class CategoryMapper extends React.Component {
     }
 
     changeSciName(e, index) {
-        this.modifyCategories(index, "scientific_name", e.target.value);
+        this.modifyCategories(index, "scientific_name", e.target.value.toLowerCase());
         this.props.handleErrorMessage("");
     }
 

@@ -25,7 +25,7 @@ requirements = [
 
 setup(
     name="weedcoco",
-    version="0.1.0",
+    version="0.1.1",
     description="Tools for WeedCOCO agricultural image annotation interchange",
     author="Henry Lydecker, Joel Nothman, Sydney Informatics Hub",
     long_description=readme,

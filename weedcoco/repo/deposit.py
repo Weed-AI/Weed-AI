@@ -64,7 +64,7 @@ class RepositoryDataset:
         self._object_path = self.repo.root / pathlib.Path(rel_path)
         if self._object_path.is_dir():
             self._ocfl = ocfl.Object(identifier=self.identifier)
-            self._ocfl.open_fs(str(self._object_path))
+            self._ocfl.open_obj_fs(str(self._object_path))
             return self._ocfl
         else:
             return None
@@ -100,11 +100,11 @@ class RepositoryDataset:
     @property
     def head_version(self):
         if self.inventory is not None:
-            return self._inventory["head"]
+            return self._inventory.head
         return None
 
     def update(self, src_dir, metadata):
-        self.ocfl.update(
+        self.ocfl.add_version_with_content(
             objdir=str(self.object_path),
             srcdir=str(src_dir),
             metadata=metadata,
@@ -119,20 +119,21 @@ class RepositoryDataset:
         if self.inventory is None:
             raise RepositoryError(f"Object {self.identifier} not in repository")
         if version == "head":
-            version = self.inventory["head"]
-        for paths in self.inventory["versions"][version]["state"].values():
-            for path in paths:
+            version = self.inventory.head
+        for version in self.inventory.versions():
+            for path in version.logical_paths:
                 yield path
 
     def resolve_path(self, logical_path, version="head"):
         if self.inventory is None:
             raise RepositoryError(f"Object {self.identifier} not in repository")
         if version == "head":
-            version = self.inventory["head"]
-        for digest, paths in self.inventory["versions"][version]["state"].items():
-            if logical_path in paths:
+            version = self.inventory.head
+        for version in self.inventory.versions():
+            if logical_path in version.logical_paths:
+                digest = version.digest_for_logical_path(logical_path)
                 return self.object_path / pathlib.Path(
-                    self.inventory["manifest"][digest][0]
+                    self.inventory.manifest[digest][0]
                 )
         raise RepositoryError(
             f"Logical path {logical_path} not found in version {version}"
@@ -167,7 +168,7 @@ class RepositoryDataset:
         TODO: should use the ocfl's filesystem object so that it works on other
         forms of storage like s3"""
         if last_version:
-            if self.inventory["head"] != last_version:
+            if self.inventory.head != last_version:
                 version_number = int(last_version[1:])
                 for version in self.object_path.glob("v*"):
                     if int(version.name[1:]) > version_number:
@@ -369,28 +370,28 @@ class Repository:
     Class representing the ocfl repository
     ---
     root (pathlib.Path): the root directory of the repository
-    disposition (str): the algorithm used by the ocfl library to map ids to paths
+    layout_name (str): the algorithm used by the ocfl library to map ids to paths
     """
 
-    def __init__(self, root, disposition="pairtree"):
+    def __init__(self, root, layout_name="nnnn-tuple-tree"):
         self.root = root
-        self.disposition = disposition
+        self.layout_name = layout_name
         self._ocfl = None
 
     # this requires the ocfl root to not exist (because the OCFL libary won't
     # create a new root in an existing directory)
     def initialize(self):
         if not self.root.is_dir():
-            # use a separate ocfl.Store because it will create an invalid
+            # use a separate ocfl.StorageRoot because it will create an invalid
             # ocfl_layout.json if we initialise with a disposition
-            ocfl_store = ocfl.Store(root=str(self.root))
+            ocfl_store = ocfl.StorageRoot(root=str(self.root))
             ocfl_store.initialize()
 
     @property
     def ocfl(self):
         if self._ocfl is not None:
             return self._ocfl
-        self._ocfl = ocfl.Store(root=str(self.root), disposition=self.disposition)
+        self._ocfl = ocfl.StorageRoot(root=str(self.root), layout_name=self.layout_name)
         return self._ocfl
 
     def validate(self):
@@ -427,11 +428,11 @@ class Repository:
             assert "/" not in identifier
         dataset.validate_image()
         ocfl_metadata = ocfl.VersionMetadata(
-            identifier=identifier,
             message=metadata["message"],
             address=metadata["address"],
             name=metadata["name"],
         )
+        ocfl_metadata.id = identifier
         last_version = dataset.head_version
         with tempfile.TemporaryDirectory() as temp_dir:
             temp_dir = pathlib.Path(temp_dir)
