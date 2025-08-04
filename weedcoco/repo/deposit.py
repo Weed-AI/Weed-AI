@@ -100,11 +100,11 @@ class RepositoryDataset:
     @property
     def head_version(self):
         if self.inventory is not None:
-            return self._inventory["head"]
+            return self._inventory.head
         return None
 
     def update(self, src_dir, metadata):
-        self.ocfl.update(
+        self.ocfl.add_version_with_content(
             objdir=str(self.object_path),
             srcdir=str(src_dir),
             metadata=metadata,
@@ -119,20 +119,21 @@ class RepositoryDataset:
         if self.inventory is None:
             raise RepositoryError(f"Object {self.identifier} not in repository")
         if version == "head":
-            version = self.inventory["head"]
-        for paths in self.inventory["versions"][version]["state"].values():
-            for path in paths:
+            version = self.inventory.head
+        for version in self.inventory.versions():
+            for path in version.logical_paths:
                 yield path
 
     def resolve_path(self, logical_path, version="head"):
         if self.inventory is None:
             raise RepositoryError(f"Object {self.identifier} not in repository")
         if version == "head":
-            version = self.inventory["head"]
-        for digest, paths in self.inventory["versions"][version]["state"].items():
-            if logical_path in paths:
+            version = self.inventory.head
+        for version in self.inventory.versions():
+            if logical_path in version.logical_paths:
+                digest = version.digest_for_logical_path(logical_path)
                 return self.object_path / pathlib.Path(
-                    self.inventory["manifest"][digest][0]
+                    self.inventory.manifest[digest][0]
                 )
         raise RepositoryError(
             f"Logical path {logical_path} not found in version {version}"
@@ -167,7 +168,7 @@ class RepositoryDataset:
         TODO: should use the ocfl's filesystem object so that it works on other
         forms of storage like s3"""
         if last_version:
-            if self.inventory["head"] != last_version:
+            if self.inventory.head != last_version:
                 version_number = int(last_version[1:])
                 for version in self.object_path.glob("v*"):
                     if int(version.name[1:]) > version_number:
@@ -427,11 +428,11 @@ class Repository:
             assert "/" not in identifier
         dataset.validate_image()
         ocfl_metadata = ocfl.VersionMetadata(
-            identifier=identifier,
             message=metadata["message"],
             address=metadata["address"],
             name=metadata["name"],
         )
+        ocfl_metadata.id = identifier
         last_version = dataset.head_version
         with tempfile.TemporaryDirectory() as temp_dir:
             temp_dir = pathlib.Path(temp_dir)
