@@ -41,12 +41,22 @@ jobs:
             # started: its 2021-era submodule no longer builds (unpinned deps,
             # node:lts-slim, FFmpeg from source). fluentd needs host log paths.
             docker compose up -d --build traefik reverse-proxy django celery celery-beat redis db tus elasticsearch reactivesearch
-            sleep 1
+            set +x
             get_statuses() {
-              docker compose ps -q | xargs docker inspect --format '{{.State.Status}} {{if .State.Health}}{{.State.Health.Status}}{{end}}'
+              docker compose ps -aq | xargs docker inspect --format '{{.Name}} {{.State.Status}} {{if .State.Health}}{{.State.Health.Status}}{{end}}'
             }
-            while get_statuses | grep -q starting; do sleep 1; done
-            if get_statuses | grep -q -e exited -e restarting -e unhealthy; then false; fi
+            # Wait for health checks, failing fast on crash loops.
+            # (Match whole words: "restarting" contains "starting".)
+            for i in $(seq 300); do
+              statuses=$(get_statuses 2>/dev/null)
+              if echo "$statuses" | grep -qwE 'exited|restarting|dead|unhealthy'; then
+                echo "$statuses"; echo "A container failed to start"; exit 1
+              fi
+              echo "$statuses" | grep -qw starting || break
+              sleep 1
+            done
+            echo "$statuses"
+            if echo "$statuses" | grep -qw starting; then echo "Timed out waiting for health checks"; exit 1; fi
       # Host-side Python only runs the indexing script against ES on :9200.
       # 3.8 is the oldest version setup-python still provides on ubuntu-latest.
       - uses: actions/setup-python@v5
@@ -93,8 +103,8 @@ jobs:
       - name: Check logs upon failure
         run: |
             cd search
-            docker compose logs --tail="all"
-            docker compose ps
+            docker compose ps -a
+            docker compose logs --tail=200
         if: ${{ failure() }}
       - name: Shutdown
         run: |
