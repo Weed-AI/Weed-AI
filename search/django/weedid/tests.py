@@ -187,7 +187,10 @@ class ElasticsearchProxyTests(TestCase):
 
     def test_other_paths_rejected(self):
         with mock.patch("weedid.views.requests.post") as p:
-            for url in ["/elasticsearch/_all/_msearch", "/elasticsearch/weedid/_search"]:
+            for url in [
+                "/elasticsearch/_all/_msearch",
+                "/elasticsearch/weedid/_search",
+            ]:
                 self.assertEqual(self.post("{}\n{}\n", url).status_code, 400)
         p.assert_not_called()
 
