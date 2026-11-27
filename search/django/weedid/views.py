@@ -73,6 +73,8 @@ GOOGLE_CLIENT_ID = os.environ.get(
 )
 GOOGLE_TOKENINFO_URL = "https://oauth2.googleapis.com/tokeninfo"
 GOOGLE_ISSUERS = {"accounts.google.com", "https://accounts.google.com"}
+ES_MSEARCH_PATH = "weedid/_msearch"
+ES_FORBIDDEN_KEYS = {"script", "script_fields", "script_score", "runtime_mappings"}
 
 
 @ensure_csrf_cookie
@@ -92,20 +94,60 @@ def check_ownership(upload_id, user_id, message="Permission Denied"):
         raise PermissionDenied(message)
 
 
-@require_http_methods(["GET", "POST"])
+def _contains_forbidden_es_key(obj):
+    if isinstance(obj, dict):
+        return any(
+            k in ES_FORBIDDEN_KEYS or _contains_forbidden_es_key(v)
+            for k, v in obj.items()
+        )
+    if isinstance(obj, list):
+        return any(_contains_forbidden_es_key(v) for v in obj)
+    return False
+
+
+def _sanitise_msearch_body(raw):
+    """Return a safe NDJSON _msearch body, or raise ValueError.
+
+    Header lines (even lines) have any index/routing overrides removed so the
+    search is pinned to the index in the URL. Body lines (odd lines) may not
+    contain scripting clauses.
+    """
+    lines = [ln for ln in raw.decode("utf-8").split("\n") if ln.strip()]
+    if not lines or len(lines) % 2:
+        raise ValueError("Malformed _msearch body")
+    out = []
+    for i, line in enumerate(lines):
+        obj = json.loads(line)
+        if not isinstance(obj, dict):
+            raise ValueError("Malformed _msearch body")
+        if i % 2 == 0:
+            obj = {k: v for k, v in obj.items() if k in ("preference",)}
+        elif _contains_forbidden_es_key(obj):
+            raise ValueError("Scripting is not permitted")
+        out.append(json.dumps(obj))
+    return ("\n".join(out) + "\n").encode("utf-8")
+
+
+@require_http_methods(["POST"])
 def elasticsearch_query(request):
-    try:
-        elasticsearch_url = "/".join(request.path.split("/")[2:])
-    except Exception:
-        return HttpResponseBadRequest("Invalid query format")
-    if not elasticsearch_url.startswith("weedid/_msearch"):
+    elasticsearch_url = "/".join(request.path.split("/")[2:])
+    if elasticsearch_url != ES_MSEARCH_PATH:
         return HttpResponseBadRequest("Only _msearch queries are currently forwarded")
+    try:
+        body = _sanitise_msearch_body(request.body)
+    except (ValueError, UnicodeDecodeError):
+        return HttpResponseBadRequest("Invalid query")
     elasticsearch_response = requests.post(
-        url=f"http://elasticsearch:9200/{elasticsearch_url}",
-        data=request.body,
-        headers=request.headers,
+        url=f"http://elasticsearch:9200/{ES_MSEARCH_PATH}",
+        data=body,
+        headers={"Content-Type": "application/x-ndjson"},
+        timeout=30,
     )
-    return HttpResponse(elasticsearch_response)
+    return HttpResponse(
+        elasticsearch_response.content,
+        status=elasticsearch_response.status_code,
+        content_type="application/json",
+    )
 
 
 @require_http_methods(["POST"])

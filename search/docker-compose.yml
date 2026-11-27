@@ -172,12 +172,17 @@ services:
       - http.cors.allow-headers=X-Requested-With,X-Auth-Token,Content-Type,Content-Length,Authorization
       - http.cors.allow-credentials=true
       - bootstrap.memory_lock=true
+      # Wiz Finding 3: Painless is only needed for update_by_query
+      # (weedcoco/index/indexing.py). Block it in search contexts
+      # (script_fields, script queries, scoring, aggs) reachable via the proxy.
+      - script.allowed_contexts=update
       - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
     volumes:
       - esdata1:/usr/share/elasticsearch/data
+    # Host-local only: unauthenticated ES must never be reachable off-box.
     ports:
-      - "9200:9200"
-      - "9300:9300"
+      - "127.0.0.1:9200:9200"
+      - "127.0.0.1:9300:9300"
     networks:
       - elastic
     healthcheck:
