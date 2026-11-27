@@ -60,17 +60,12 @@ jobs:
             done
             echo "$statuses"
             if echo "$statuses" | grep -qw starting; then echo "Timed out waiting for health checks"; exit 1; fi
-      # Host-side Python only runs the indexing script against ES on :9200.
-      # 3.8 is the oldest version setup-python still provides on ubuntu-latest.
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.8'
-      - name: Install weedcoco library
-        run: |
-          pip install .
+      # Index the test data into ES (published on localhost:9200) using the
+      # same Python 3.7 image as production; runners no longer ship 3.7/3.8.
       - name: Index test data
         run: |
-          bash search/scripts/index_test_images.sh
+          docker run --rm --network host -v "$PWD:/repo" -w /repo python:3.7-bullseye \
+            bash -c "pip install -q . && bash search/scripts/index_test_images.sh"
       - name: Django tests (inside the running container)
         run: |
           cd search
