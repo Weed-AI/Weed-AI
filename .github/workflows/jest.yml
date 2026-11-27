@@ -1,11 +1,20 @@
 name: Javascript tests
-on: push
+on:
+  push:
+  workflow_dispatch:
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
+    # react-scripts 4 predates Node 17's OpenSSL 3 change; match the
+    # Node version used by the production Docker build.
+    - uses: actions/setup-node@v4
+      with:
+        node-version: '12'
+        cache: yarn
+        cache-dependency-path: search/yarn.lock
     - name: Install modules
-      run: cd search && yarn
+      run: cd search && yarn install --frozen-lockfile
     - name: Run tests
-      run: cd search && yarn test
+      run: cd search && yarn test --watchAll=false

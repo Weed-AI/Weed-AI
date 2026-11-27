@@ -33,12 +33,13 @@ export default function AuthPrompt(props) {
   };
 
   const responseGoogle = response => {
-    console.log(response.profileObj)
+    // Send the signed Google ID token; the server verifies it and takes the
+    // email from the verified claims (never trust client-supplied identity).
     axios({
         method: 'post',
         url: baseURL + 'api/login_google/',
         mode: 'same-origin',
-        data: {'email': response.profileObj.email, 'googleId': response.profileObj.googleId},
+        data: {'credential': response.tokenId},
         headers: {'X-CSRFToken': Cookies.get('csrftoken') }
     })
     .then(() => props.handleLogin())

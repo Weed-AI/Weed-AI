@@ -37,6 +37,7 @@ services:
       dockerfile: Dockerfile
       args:
         - WEEDCOCO_VERSION=${WEEDCOCO_VERSION:-master}
+        - WEEDCOCO_REPO=${WEEDCOCO_REPO:-Weed-AI/Weed-AI}
     environment:
       - DJANGO_SECRET_KEY=${DJANGO_SECRET_KEY}
       - CELERY_BROKER=redis://redis:6379/0
@@ -62,7 +63,7 @@ services:
     command: bash -c "python manage.py makemigrations && python manage.py migrate && python manage.py collectstatic <<<yes && gunicorn core.wsgi --access-logfile - -b 0.0.0.0:8000"
     entrypoint: /entrypoint.sh
     ports:
-      - "8000:8000"
+      - "127.0.0.1:8000:8000"
     networks:
       - elastic
     restart: always
@@ -140,7 +141,7 @@ services:
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
       - POSTGRES_DB=${POSTGRES_DB}
     ports:
-      - "5432:5432"
+      - "127.0.0.1:5432:5432"
     networks:
       - elastic
     restart: always
@@ -153,15 +154,19 @@ services:
     networks:
       - elastic
     ports:
-      - "1080:1080"
+      - "127.0.0.1:1080:1080"
     volumes:
       - tus_dir:/srv/tusd-data
-    command: -behind-proxy -base-path /tus/files/
+    # -port 1080 explicitly: tusd v2 changed the default port to 8080, but
+    # Django (TUS_SERVER) and the port mapping expect 1080. Valid on v1 too.
+    command: -behind-proxy -base-path /tus/files/ -port 1080
     restart: always
 
   # search engine
   elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch:7.16.2
+    # 7.17.x: final 7.x line; 7.16.2's bundled JDK 17.0.1 crashes on cgroup v2
+    # hosts. Minor in-place upgrade, but one-way: back up esdata1 first.
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.17.29
     container_name: elasticsearch
     environment:
       - discovery.type=single-node
@@ -172,12 +177,17 @@ services:
       - http.cors.allow-headers=X-Requested-With,X-Auth-Token,Content-Type,Content-Length,Authorization
       - http.cors.allow-credentials=true
       - bootstrap.memory_lock=true
+      # Wiz Finding 3: Painless is only needed for update_by_query
+      # (weedcoco/index/indexing.py). Block it in search contexts
+      # (script_fields, script queries, scoring, aggs) reachable via the proxy.
+      - script.allowed_contexts=update
       - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
     volumes:
       - esdata1:/usr/share/elasticsearch/data
+    # Host-local only: unauthenticated ES must never be reachable off-box.
     ports:
-      - "9200:9200"
-      - "9300:9300"
+      - "127.0.0.1:9200:9200"
+      - "127.0.0.1:9300:9300"
     networks:
       - elastic
     healthcheck:
@@ -200,7 +210,7 @@ services:
       context: .
       dockerfile: Dockerfile
     ports:
-      - "8080:80"
+      - "127.0.0.1:8080:80"
     environment:
       - NODE_ENV=production
     networks:
@@ -297,7 +307,9 @@ services:
       - elastic
 
   traefik:
-    image: traefik:v2.4
+    # v2.11: same v2 labels/flags as v2.4, but negotiates the Docker API
+    # version (v2.4 speaks API 1.24, rejected by Docker Engine 29+).
+    image: traefik:v2.11
     container_name: weedai_traefik
     restart: always
     command:

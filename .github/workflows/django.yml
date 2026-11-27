@@ -1,0 +1,48 @@
+name: Django backend tests
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - '**'
+  workflow_dispatch:
+
+jobs:
+  django:
+    runs-on: ubuntu-latest
+    # Matches the production django image (python:3.7).
+    container: python:3.7-bullseye
+    services:
+      # settings.py connects to host "db"; service containers are reachable
+      # by their label from a container job.
+      db:
+        image: postgres:12-alpine
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: weedai
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      DJANGO_SECRET_KEY: ci-not-secret
+      ENV: DEV
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: weedai
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install
+        run: |
+          pip install -r search/django/requirements.txt
+          pip install .
+      - name: Run Django tests
+        working-directory: search/django
+        run: |
+          # The repo doesn't commit all migrations; production also runs
+          # makemigrations at container start (see entrypoint.sh).
+          python manage.py makemigrations weedid
+          python manage.py test weedid --noinput -v 2

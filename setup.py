@@ -19,7 +19,11 @@ requirements = [
     "requests",
     "elasticsearch==7.13.*",
     "joblib",
-    "ocfl-py",
+    # ocfl-py 2.x removed ocfl.Store, which weedcoco.repo.deposit uses.
+    "ocfl-py<2",
+    # bagit (via ocfl-py) 1.9.0 is sdist-only and needs setuptools-scm>=8,
+    # which doesn't exist for Python 3.7 (used in production and CI).
+    'bagit<1.9; python_version < "3.8"',
     "redis",
 ]
 

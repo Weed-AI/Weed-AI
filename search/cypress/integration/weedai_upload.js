@@ -77,7 +77,9 @@ describe('overall upload workflow', () => {
         cy.clickText(/^Submit$/)
     })
 
-    it('Test Cvat Upload', function() {
+    // CVAT isn't started in CI (see .github/workflows/frontend.yml).
+    const itCvat = Cypress.env('SKIP_CVAT') ? it.skip : it
+    itCvat('Test Cvat Upload', function() {
         const label = 'weed: UNSPECIFIED'
 
         const task = {
