@@ -18,11 +18,12 @@ jobs:
           submodules: recursive
       # The CVAT UI submodule builds FROM node:lts-slim, which now resolves to
       # a Node far too new for its 2021-era webpack. Pre-seed that tag with
-      # Node 14 (the LTS when it was written) so the build uses it.
+      # Node 16: it needs npm >= 7 for `npm run --workspace`, but Node 17+
+      # breaks old webpack (OpenSSL 3).
       - name: Pin node:lts-slim for the CVAT UI build
         run: |
-          docker pull node:14-slim
-          docker tag node:14-slim node:lts-slim
+          docker pull node:16-slim
+          docker tag node:16-slim node:lts-slim
       - name: Bring system up
         env:
           MERGE_SHA: ${{ github.sha }}
