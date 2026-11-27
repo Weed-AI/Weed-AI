@@ -1,36 +1,32 @@
-
-
 name: weedcoco python package tests
-
-# Controls when the action will run. Triggers the workflow on push or pull request
 
 on:
   push:
-    branches: 
+    branches:
       - master
   pull_request:
-    branches: 
+    branches:
       - '**'
+  workflow_dispatch:
 
 jobs:
   test:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        python-version: [3.7]
+    # Python 3.7 (what production runs) is no longer installable via
+    # setup-python on current runners, so use the official image instead.
+    container: python:3.7-bullseye
     steps:
-      - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v2
-        with:
-          python-version: ${{ matrix.python-version }}
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - name: Install
         run: |
           pip install .[test]
-          rm -r build
+          rm -rf build
       - name: Test
         run: pytest --cov=weedcoco/ --cov-report=xml
-      - uses: codecov/codecov-action@v1
+      - uses: codecov/codecov-action@v4
+        # Upload only from the upstream repo; forks have no Codecov token.
+        if: github.repository == 'Weed-AI/Weed-AI'
+        continue-on-error: true
         with:
           flags: weedcoco
           fail_ci_if_error: false

@@ -11,19 +11,15 @@ on:
   pull_request:
     branches: 
       - '**'
+  workflow_dispatch:
 
 jobs:
   verify-json-validation:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        python-version: [3.7]
+    # Python 3.7 is no longer available via setup-python on current runners.
+    container: python:3.7-bullseye
     steps:
-      - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v2
-        with:
-          python-version: ${{ matrix.python-version }}
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - name: Install weedcoco
         run: pip install .
       - name: Run import tools on test data
@@ -55,6 +51,6 @@ jobs:
       - name: Check schemas in web match
         run: |
           for f in search/src/Schemas/*.json; do diff $f weedcoco/schema/$(basename $f) || exit 1; done
-      - uses: actions/setup-node@v1
+      - uses: actions/setup-node@v4
         with:
-          node-version: '10'
+          node-version: '14'

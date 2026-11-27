@@ -23,6 +23,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.hashers import check_password
 from django.core.exceptions import PermissionDenied
 from django.http import (
+    Http404,
     HttpResponse,
     HttpResponseBadRequest,
     HttpResponseForbidden,
@@ -66,6 +67,15 @@ from weedid.utils import (
 
 logger = logging.getLogger(__name__)
 
+GOOGLE_CLIENT_ID = os.environ.get(
+    "GOOGLE_CLIENT_ID",
+    "498415135978-367uphr3ccm5upas8o5lre1h8nsthf1d.apps.googleusercontent.com",
+)
+GOOGLE_TOKENINFO_URL = "https://oauth2.googleapis.com/tokeninfo"
+GOOGLE_ISSUERS = {"accounts.google.com", "https://accounts.google.com"}
+ES_MSEARCH_PATH = "weedid/_msearch"
+ES_FORBIDDEN_KEYS = {"script", "script_fields", "script_score", "runtime_mappings"}
+
 
 @ensure_csrf_cookie
 def set_csrf(request):
@@ -84,20 +94,60 @@ def check_ownership(upload_id, user_id, message="Permission Denied"):
         raise PermissionDenied(message)
 
 
-@require_http_methods(["GET", "POST"])
+def _contains_forbidden_es_key(obj):
+    if isinstance(obj, dict):
+        return any(
+            k in ES_FORBIDDEN_KEYS or _contains_forbidden_es_key(v)
+            for k, v in obj.items()
+        )
+    if isinstance(obj, list):
+        return any(_contains_forbidden_es_key(v) for v in obj)
+    return False
+
+
+def _sanitise_msearch_body(raw):
+    """Return a safe NDJSON _msearch body, or raise ValueError.
+
+    Header lines (even lines) have any index/routing overrides removed so the
+    search is pinned to the index in the URL. Body lines (odd lines) may not
+    contain scripting clauses.
+    """
+    lines = [ln for ln in raw.decode("utf-8").split("\n") if ln.strip()]
+    if not lines or len(lines) % 2:
+        raise ValueError("Malformed _msearch body")
+    out = []
+    for i, line in enumerate(lines):
+        obj = json.loads(line)
+        if not isinstance(obj, dict):
+            raise ValueError("Malformed _msearch body")
+        if i % 2 == 0:
+            obj = {k: v for k, v in obj.items() if k in ("preference",)}
+        elif _contains_forbidden_es_key(obj):
+            raise ValueError("Scripting is not permitted")
+        out.append(json.dumps(obj))
+    return ("\n".join(out) + "\n").encode("utf-8")
+
+
+@require_http_methods(["POST"])
 def elasticsearch_query(request):
-    try:
-        elasticsearch_url = "/".join(request.path.split("/")[2:])
-    except Exception:
-        return HttpResponseBadRequest("Invalid query format")
-    if not elasticsearch_url.startswith("weedid/_msearch"):
+    elasticsearch_url = "/".join(request.path.split("/")[2:])
+    if elasticsearch_url != ES_MSEARCH_PATH:
         return HttpResponseBadRequest("Only _msearch queries are currently forwarded")
+    try:
+        body = _sanitise_msearch_body(request.body)
+    except (ValueError, UnicodeDecodeError):
+        return HttpResponseBadRequest("Invalid query")
     elasticsearch_response = requests.post(
-        url=f"http://elasticsearch:9200/{elasticsearch_url}",
-        data=request.body,
-        headers=request.headers,
+        url=f"http://elasticsearch:9200/{ES_MSEARCH_PATH}",
+        data=body,
+        headers={"Content-Type": "application/x-ndjson"},
+        timeout=30,
     )
-    return HttpResponse(elasticsearch_response)
+    return HttpResponse(
+        elasticsearch_response.content,
+        status=elasticsearch_response.status_code,
+        content_type="application/json",
+    )
 
 
 @require_http_methods(["POST"])
@@ -528,13 +578,26 @@ def upload_status(request):
     )
 
 
+def _redact_emails(obj):
+    """Recursively drop `email` fields (e.g. creator/contributor contact
+    details) from schema.org metadata before it is served publicly."""
+    if isinstance(obj, dict):
+        return {k: _redact_emails(v) for k, v in obj.items() if k != "email"}
+    if isinstance(obj, list):
+        return [_redact_emails(v) for v in obj]
+    return obj
+
+
 @require_http_methods(["GET"])
 def upload_info(request, dataset_id):
-    upload_entity = Dataset.objects.get(upload_id=dataset_id)
+    try:
+        upload_entity = Dataset.objects.get(upload_id=dataset_id)
+    except (Dataset.DoesNotExist, ValueError):
+        raise Http404("Dataset not found")
     return HttpResponse(
         json.dumps(
             {
-                "metadata": upload_entity.metadata,
+                "metadata": _redact_emails(upload_entity.metadata),
                 "agcontexts": upload_entity.agcontext,
                 "head_version": upload_entity.head_version,
             }
@@ -618,9 +681,9 @@ def user_login(request):
     if not WeedidUser.objects.filter(username=username).count():
         return HttpResponseBadRequest("Username doesn't exist")
     user = WeedidUser.objects.get(username=username)
-    if user is not None and not (
-        user.password == password or check_password(password, user.password)
-    ):
+    # Only compare against the stored hash. (The old `user.password == password`
+    # branch let anyone holding a hash log in with it.)
+    if user is not None and not check_password(password, user.password):
         return HttpResponseBadRequest("Incorrect credentials")
     else:
         try:
@@ -642,19 +705,59 @@ def user_login_status(request):
         return HttpResponseForbidden("You havent been logged in")
 
 
+def _verify_google_id_token(id_token):
+    """Verify a Google ID token and return its claims, or None.
+
+    Uses Google's tokeninfo endpoint, which checks the signature and expiry;
+    we then check audience, issuer and email_verified ourselves.
+    """
+    if not id_token or not isinstance(id_token, str):
+        return None
+    try:
+        resp = requests.get(
+            GOOGLE_TOKENINFO_URL, params={"id_token": id_token}, timeout=10
+        )
+    except requests.RequestException:
+        logger.exception("Google tokeninfo request failed")
+        return None
+    if resp.status_code != 200:
+        return None
+    claims = resp.json()
+    if claims.get("aud") != GOOGLE_CLIENT_ID:
+        return None
+    if claims.get("iss") not in GOOGLE_ISSUERS:
+        return None
+    if str(claims.get("email_verified")).lower() != "true":
+        return None
+    if not claims.get("email") or not claims.get("sub"):
+        return None
+    return claims
+
+
 @require_http_methods(["POST"])
 def login_google(request):
-    body = json.loads(request.body)
-    email, googleId = body["email"], body["googleId"]
-    users = WeedidUser.objects.all().filter(email=email)
-    if len(users) > 0:
-        login(request, users[0])
+    try:
+        body = json.loads(request.body)
+    except ValueError:
+        return HttpResponseBadRequest("Invalid request")
+    claims = _verify_google_id_token(body.get("credential"))
+    if claims is None:
+        logger.warning("Rejected Google login with invalid/missing ID token")
+        return HttpResponseForbidden("Invalid Google credential")
+    # Identity comes only from the verified token, never the request body.
+    email = claims["email"]
+    users = WeedidUser.objects.filter(email__iexact=email)
+    if users.exists():
+        login(request, users.first())
         return HttpResponse("You have been logged in")
-    else:
-        user = WeedidUser.objects.create_user(email.split("@")[0], email, googleId)
-        user.save()
-        login(request, user)
-        return HttpResponse("The account has been created and logged in")
+    username = email.split("@")[0]
+    if WeedidUser.objects.filter(username=username).exists():
+        username = email
+    # No usable password: Google accounts can only sign in via Google.
+    user = WeedidUser.objects.create_user(username, email, None)
+    user.save()
+    login(request, user)
+    return HttpResponse("The account has been created and logged in")
 
 
 def sitemap_xml(request):

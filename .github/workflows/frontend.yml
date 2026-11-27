@@ -2,24 +2,20 @@ name: Check search frontend
 
 on:
   push:
-    branches: 
+    branches:
       - master
   pull_request:
-    branches: 
+    branches:
       - '**'
+  workflow_dispatch:
 
 jobs:
   check-search-frontend:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        python-version: [3.7]
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
         with:
           submodules: recursive
-#      - uses: satackey/action-docker-layer-caching@v0.0.11
-#        continue-on-error: true
       - name: Bring system up
         env:
           MERGE_SHA: ${{ github.sha }}
@@ -33,6 +29,7 @@ jobs:
             POSTGRES_PASSWORD=postgres
             POSTGRES_DB=weedai
             WEEDCOCO_VERSION=$MERGE_SHA
+            WEEDCOCO_REPO=${{ github.repository }}
             SEND_EMAIL=False
             CVAT_BASEPATH='/cvat-annotation'
             GIT_REMOTE_PATH=/tmp/git_remote
@@ -40,37 +37,60 @@ jobs:
             HTTPS_HOST=localhost
             HERE
             cat .env
-            # TODO The following could be a separate GitHub action
-            docker-compose up -d --build
-            sleep 1
+            # CVAT (cvat, cvat_ui, cvat_db, cvat_redis) is deliberately not
+            # started: its 2021-era submodule no longer builds (unpinned deps,
+            # node:lts-slim, FFmpeg from source). fluentd needs host log paths.
+            docker compose up -d --build traefik reverse-proxy django celery celery-beat redis db tus elasticsearch reactivesearch
+            set +x
             get_statuses() {
-              docker-compose ps -q | xargs docker inspect --format '{{.State.Status}} {{if .State.Health}}{{.State.Health.Status}}{{end}} }}'
+              docker compose ps -aq | xargs docker inspect --format '{{.Name}} {{.State.Status}} {{if .State.Health}}{{.State.Health.Status}}{{end}}'
             }
-            while get_statuses | grep -q starting; do sleep 1; done
-            if get_statuses | grep -q -e exited -e restarting -e unhealthy; then false; fi
-      - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v2
-        with:
-          python-version: ${{ matrix.python-version }}
-      - name: Install weedcoco library
-        run: |
-          pip install .
+            # Wait for health checks, failing fast on crash loops.
+            # (Match whole words: "restarting" contains "starting".)
+            for i in $(seq 300); do
+              statuses=$(get_statuses 2>/dev/null)
+              if echo "$statuses" | grep -qwE 'exited|restarting|dead|unhealthy'; then
+                echo "$statuses"; echo "A container failed to start"; exit 1
+              fi
+              echo "$statuses" | grep -qw starting || break
+              sleep 1
+            done
+            echo "$statuses"
+            if echo "$statuses" | grep -qw starting; then echo "Timed out waiting for health checks"; exit 1; fi
+      # Index the test data into ES (published on localhost:9200) using the
+      # same Python 3.7 image as production; runners no longer ship 3.7/3.8.
       - name: Index test data
         run: |
-          bash search/scripts/index_test_images.sh
-      # TODO: find syntax to run shutdown regardless of previous step outcomes
-      - name: Cypress run
-        uses: cypress-io/github-action@v2
+          docker run --rm --network host -v "$PWD:/repo" -w /repo python:3.7-bullseye \
+            bash -c "pip install -q . && bash search/scripts/index_test_images.sh"
+      - name: Django tests (inside the running container)
+        run: |
+          cd search
+          docker compose exec -T django python manage.py test weedid --noinput
+      - name: Security checks for Wiz findings
+        run: |
+          cd search
+          ES_URL=http://localhost:9200 bash scripts/check_wiz_fixes.sh http://localhost
+      - uses: actions/setup-node@v4
         with:
-          working-directory: search
+          node-version: '14'
+          cache: yarn
+          cache-dependency-path: search/yarn.lock
+      # Cypress 7 predates cypress-io/github-action's current releases,
+      # so install and run it directly.
+      - name: Cypress run
+        working-directory: search
         env:
           ELECTRON_ENABLE_LOGGING: 1
-      - uses: actions/upload-artifact@v2
+        run: |
+          yarn install --frozen-lockfile
+          yarn cypress run --env SKIP_CVAT=1
+      - uses: actions/upload-artifact@v4
         if: failure()
         with:
           name: cypress-screenshots
           path: search/cypress/screenshots
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: cypress-videos
@@ -78,11 +98,11 @@ jobs:
       - name: Check logs upon failure
         run: |
             cd search
-            docker-compose logs --tail="all"
-            docker-compose ps
+            docker compose ps -a
+            docker compose logs --tail=200
         if: ${{ failure() }}
       - name: Shutdown
         run: |
             cd search
-            docker-compose down
+            docker compose down
         if: ${{ always() }}
