@@ -1,0 +1,9 @@
+# CI-only overrides, layered on docker-compose.yml via COMPOSE_FILE in
+# .github/workflows/frontend.yml.
+services:
+  elasticsearch:
+    environment:
+      # ES 7.16.2 bundles JDK 17.0.1, which crashes on cgroup v2 hosts
+      # (current GitHub runners) with an NPE in CgroupV2Subsystem.
+      # Disabling container detection avoids it; heap is set explicitly.
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m -XX:-UseContainerSupport"
