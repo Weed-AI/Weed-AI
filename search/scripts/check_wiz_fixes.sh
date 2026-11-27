@@ -18,9 +18,14 @@ req() { curl -sk -o /tmp/wiz_body -w '%{http_code}' -b "$JAR" -c "$JAR" -H "Refe
 # checks below aren't confused by index_not_found.
 [ -n "$ES_URL" ] && curl -s -XPUT "$ES_URL/weedid" >/dev/null
 
-curl -sk -c "$JAR" "$BASE/api/set_csrf/" >/dev/null
+code=$(curl -sk -c "$JAR" -o /tmp/wiz_body -w '%{http_code}' "$BASE/api/set_csrf/")
 CSRF=$(awk '$6=="csrftoken"{print $7}' "$JAR")
-[ -n "$CSRF" ] || { echo "Could not get csrftoken from $BASE/api/set_csrf/"; exit 2; }
+if [ -z "$CSRF" ]; then
+  echo "Could not get csrftoken from $BASE/api/set_csrf/ (HTTP $code)"
+  echo "--- response body:"; head -c 500 /tmp/wiz_body; echo
+  echo "--- cookie jar:"; cat "$JAR"
+  exit 2
+fi
 
 echo "Finding 1 - Google login bypass"
 code=$(req -X POST "$BASE/api/login_google/" -H "Content-Type: application/json" \
