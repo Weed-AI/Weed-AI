@@ -157,7 +157,9 @@ services:
       - "127.0.0.1:1080:1080"
     volumes:
       - tus_dir:/srv/tusd-data
-    command: -behind-proxy -base-path /tus/files/
+    # -port 1080 explicitly: tusd v2 changed the default port to 8080, but
+    # Django (TUS_SERVER) and the port mapping expect 1080. Valid on v1 too.
+    command: -behind-proxy -base-path /tus/files/ -port 1080
     restart: always
 
   # search engine
