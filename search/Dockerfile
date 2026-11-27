@@ -1,20 +1,17 @@
 # For Production
-FROM nginx:latest
-
-# build node package
-RUN apt update
-RUN curl -sL https://deb.nodesource.com/setup_12.x | bash
-RUN apt install -y nodejs
-RUN npm install -g yarn
-RUN mkdir /code /code/public /code/src
+# Multi-stage build: compile the React app on a Node image, then serve it from
+# a pinned, patched nginx. (The old single-stage build installed Node 12 from
+# the deprecated NodeSource script on top of nginx:latest, which is fragile and
+# left Node in the runtime image.)
+FROM node:12-bullseye AS build
+WORKDIR /code
+COPY package.json yarn.lock /code/
+RUN yarn install
 COPY public /code/public
 COPY src /code/src
-COPY package.json yarn.lock /code/
-RUN cd /code && find . && yarn install && yarn run build
+RUN yarn run build
 
-# TODO: uninstall node
-
+FROM nginx:1.30
 RUN mkdir /app
-RUN cp -R /code/build/* /app/
-
+COPY --from=build /code/build/ /app/
 COPY ./nginx/react/nginx.conf /etc/nginx/nginx.conf
