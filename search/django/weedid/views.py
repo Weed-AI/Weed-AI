@@ -23,6 +23,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.hashers import check_password
 from django.core.exceptions import PermissionDenied
 from django.http import (
+    Http404,
     HttpResponse,
     HttpResponseBadRequest,
     HttpResponseForbidden,
@@ -535,13 +536,26 @@ def upload_status(request):
     )
 
 
+def _redact_emails(obj):
+    """Recursively drop `email` fields (e.g. creator/contributor contact
+    details) from schema.org metadata before it is served publicly."""
+    if isinstance(obj, dict):
+        return {k: _redact_emails(v) for k, v in obj.items() if k != "email"}
+    if isinstance(obj, list):
+        return [_redact_emails(v) for v in obj]
+    return obj
+
+
 @require_http_methods(["GET"])
 def upload_info(request, dataset_id):
-    upload_entity = Dataset.objects.get(upload_id=dataset_id)
+    try:
+        upload_entity = Dataset.objects.get(upload_id=dataset_id)
+    except (Dataset.DoesNotExist, ValueError):
+        raise Http404("Dataset not found")
     return HttpResponse(
         json.dumps(
             {
-                "metadata": upload_entity.metadata,
+                "metadata": _redact_emails(upload_entity.metadata),
                 "agcontexts": upload_entity.agcontext,
                 "head_version": upload_entity.head_version,
             }
