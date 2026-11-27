@@ -37,6 +37,7 @@ services:
       dockerfile: Dockerfile
       args:
         - WEEDCOCO_VERSION=${WEEDCOCO_VERSION:-master}
+        - WEEDCOCO_REPO=${WEEDCOCO_REPO:-Weed-AI/Weed-AI}
     environment:
       - DJANGO_SECRET_KEY=${DJANGO_SECRET_KEY}
       - CELERY_BROKER=redis://redis:6379/0
