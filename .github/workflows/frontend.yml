@@ -16,6 +16,13 @@ jobs:
       - uses: actions/checkout@v4
         with:
           submodules: recursive
+      # The CVAT UI submodule builds FROM node:lts-slim, which now resolves to
+      # a Node far too new for its 2021-era webpack. Pre-seed that tag with
+      # Node 14 (the LTS when it was written) so the build uses it.
+      - name: Pin node:lts-slim for the CVAT UI build
+        run: |
+          docker pull node:14-slim
+          docker tag node:14-slim node:lts-slim
       - name: Bring system up
         env:
           MERGE_SHA: ${{ github.sha }}
