@@ -12,9 +12,6 @@ on:
 jobs:
   check-search-frontend:
     runs-on: ubuntu-latest
-    env:
-      # Applies to every `docker compose` call in this job (run from search/).
-      COMPOSE_FILE: docker-compose.yml:docker-compose.ci.yml
     steps:
       - uses: actions/checkout@v4
         with:

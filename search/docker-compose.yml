@@ -164,7 +164,9 @@ services:
 
   # search engine
   elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch:7.16.2
+    # 7.17.x: final 7.x line; 7.16.2's bundled JDK 17.0.1 crashes on cgroup v2
+    # hosts. Minor in-place upgrade, but one-way: back up esdata1 first.
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.17.29
     container_name: elasticsearch
     environment:
       - discovery.type=single-node
@@ -305,7 +307,9 @@ services:
       - elastic
 
   traefik:
-    image: traefik:v2.4
+    # v2.11: same v2 labels/flags as v2.4, but negotiates the Docker API
+    # version (v2.4 speaks API 1.24, rejected by Docker Engine 29+).
+    image: traefik:v2.11
     container_name: weedai_traefik
     restart: always
     command:
