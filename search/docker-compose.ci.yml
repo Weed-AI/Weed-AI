@@ -8,3 +8,10 @@ services:
     # 7.17.x is the same major line with a fixed JDK, and behaves the same
     # for everything CI tests (incl. script.allowed_contexts).
     image: docker.elastic.co/elasticsearch/elasticsearch:7.17.29
+
+  traefik:
+    # Production runs traefik:v2.4, whose Docker client speaks API 1.24.
+    # Current Docker Engine (GitHub runners) requires >= 1.40, so v2.4 finds
+    # no containers and routes nothing. v2.11 is the same major version
+    # (identical labels/CLI flags) and negotiates the API version.
+    image: traefik:v2.11
