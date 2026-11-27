@@ -66,6 +66,13 @@ from weedid.utils import (
 
 logger = logging.getLogger(__name__)
 
+GOOGLE_CLIENT_ID = os.environ.get(
+    "GOOGLE_CLIENT_ID",
+    "498415135978-367uphr3ccm5upas8o5lre1h8nsthf1d.apps.googleusercontent.com",
+)
+GOOGLE_TOKENINFO_URL = "https://oauth2.googleapis.com/tokeninfo"
+GOOGLE_ISSUERS = {"accounts.google.com", "https://accounts.google.com"}
+
 
 @ensure_csrf_cookie
 def set_csrf(request):
@@ -618,9 +625,9 @@ def user_login(request):
     if not WeedidUser.objects.filter(username=username).count():
         return HttpResponseBadRequest("Username doesn't exist")
     user = WeedidUser.objects.get(username=username)
-    if user is not None and not (
-        user.password == password or check_password(password, user.password)
-    ):
+    # Only compare against the stored hash. (The old `user.password == password`
+    # branch let anyone holding a hash log in with it.)
+    if user is not None and not check_password(password, user.password):
         return HttpResponseBadRequest("Incorrect credentials")
     else:
         try:
@@ -642,19 +649,59 @@ def user_login_status(request):
         return HttpResponseForbidden("You havent been logged in")
 
 
+def _verify_google_id_token(id_token):
+    """Verify a Google ID token and return its claims, or None.
+
+    Uses Google's tokeninfo endpoint, which checks the signature and expiry;
+    we then check audience, issuer and email_verified ourselves.
+    """
+    if not id_token or not isinstance(id_token, str):
+        return None
+    try:
+        resp = requests.get(
+            GOOGLE_TOKENINFO_URL, params={"id_token": id_token}, timeout=10
+        )
+    except requests.RequestException:
+        logger.exception("Google tokeninfo request failed")
+        return None
+    if resp.status_code != 200:
+        return None
+    claims = resp.json()
+    if claims.get("aud") != GOOGLE_CLIENT_ID:
+        return None
+    if claims.get("iss") not in GOOGLE_ISSUERS:
+        return None
+    if str(claims.get("email_verified")).lower() != "true":
+        return None
+    if not claims.get("email") or not claims.get("sub"):
+        return None
+    return claims
+
+
 @require_http_methods(["POST"])
 def login_google(request):
-    body = json.loads(request.body)
-    email, googleId = body["email"], body["googleId"]
-    users = WeedidUser.objects.all().filter(email=email)
-    if len(users) > 0:
-        login(request, users[0])
+    try:
+        body = json.loads(request.body)
+    except ValueError:
+        return HttpResponseBadRequest("Invalid request")
+    claims = _verify_google_id_token(body.get("credential"))
+    if claims is None:
+        logger.warning("Rejected Google login with invalid/missing ID token")
+        return HttpResponseForbidden("Invalid Google credential")
+    # Identity comes only from the verified token, never the request body.
+    email = claims["email"]
+    users = WeedidUser.objects.filter(email__iexact=email)
+    if users.exists():
+        login(request, users.first())
         return HttpResponse("You have been logged in")
-    else:
-        user = WeedidUser.objects.create_user(email.split("@")[0], email, googleId)
-        user.save()
-        login(request, user)
-        return HttpResponse("The account has been created and logged in")
+    username = email.split("@")[0]
+    if WeedidUser.objects.filter(username=username).exists():
+        username = email
+    # No usable password: Google accounts can only sign in via Google.
+    user = WeedidUser.objects.create_user(username, email, None)
+    user.save()
+    login(request, user)
+    return HttpResponse("The account has been created and logged in")
 
 
 def sitemap_xml(request):
